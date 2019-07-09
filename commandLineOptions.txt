@@ -1,0 +1,81 @@
+
+COMMAND LINE USAGE
+
+       $ANNOTSV/bin/AnnotSV.tcl -SVinputFile 'Path of your VCF or BED input file with SV coordinates' >& AnnotSV.log &
+
+
+OPTIONS
+
+-bedtools:                      Path of the bedtools local installation
+
+-candidateGenesFile:            Path of a file containing the candidate genes of the user (gene names can be space-separated, tabulation-separated, or line-break-separated) (optional)
+
+-candidateGenesFiltering:       To select the SV overlapping a gene from the "candidateGenesFile"
+                                Values: no (default) or yes
+
+-filteredVCFfiles:              Path of the filtered VCF input file(s) with SNV/indel coordinates for compound heterozygotes report (optional)
+                                Gzipped VCF files are supported as well as regular expression
+
+-filteredVCFsamples:            To specifiy the sample names from the VCF files defined from the -filtereVCFfiles option 
+                                Default: use all samples from the filtered VCF files
+
+-genomeBuild:                   Genome build used
+                                Values: GRCh37 (default) or GRCh38
+
+-help:                          More information on the arguments
+
+-metrics:                       Changing numerical values from frequencies to us or fr metrics (e.g. 0.2 or 0,2)
+                                Range values: us (default) or fr
+
+-minTotalNumber:                Minimum number of individuals tested to consider a benign SV for the ranking
+                                Range values: [100-1000], default = 500
+
+-outputDir:                     Output path name
+
+-outputFile:                    Output path and file name 
+
+-overlap:                       Minimum overlap (%) between the features (DGV, DDD, promoter, TAD…) and the annotated SV to be reported
+                                Range values: [0-100], default = 70
+
+-overwrite:                     To overwrite existing output results
+                                Values: yes (default) or no
+
+-promoterSize:                  Number of bases upstream from the transcription start site
+                                Default = 500
+
+-rankFiltering                  To select the SV of an user-defined specific class (from 1 to 5)
+                                Values: use comma separated class values, or use a dash to denote a range of values, default = "1-5"
+                                ( e.g.: "3,4,5" or "3-5")
+
+-SVinputFile:                   Path of the input file (VCF or BED) with SV coordinates
+                                Gzipped VCF file is supported 
+
+-SVinputInfo:                   To extract the additional SV input fields and insert the data in the output file
+                                Range values: 1 (default) or 0
+
+-SVminSize:                     SV minimum size (in bp)
+                                Default = 50
+
+-reciprocal:                    Use of a reciprocal overlap between SV and features (only for annotations with features overlapping the SV)
+                                Values: no (default) or yes
+
+-svtBEDcol:                     Number of the column describing the SV type (DEL, DUP)
+                                Range values: [4-[, default = -1 (value not given)
+
+-typeOfAnnotation:              Description of the types of lines produced by AnnotSV
+                                Values: both (default), full or split
+
+-vcfFiles:                      Path of the VCF input file(s) with SNV/indel coordinates used for false positive discovery
+                                Use counts of the homozygous and heterozygous variants
+                                Gzipped VCF files are supported as well as regular expression
+
+-vcfPASS:                       Boolean. To only use variants from VCF input files that passed all filters during the calling (FILTER column value equal to PASS)
+                                Range values: 0 (default) or 1
+
+-vcfSamples:                    To specifiy the sample names from the VCF files defined from the -vcfFiles option
+                                Default: use all samples from the VCF files
+
+
+-txFile:                        Path of a file containing a list of preferred genes transcripts to be used in priority during the annotation 
+                                (Preferred genes transcripts names should be tab or space separated)
+

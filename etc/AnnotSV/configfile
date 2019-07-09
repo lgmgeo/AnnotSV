@@ -1,0 +1,120 @@
+# This file is used to simplify the configuration of AnnotSV.
+# Anything behind a hashtag is considered as a comment
+# Please, feel free to change the AnnotSV options.
+
+#------------------
+# AnnotSV Options :
+#------------------
+
+
+-genomeBuild:           GRCh37
+
+-overlap:               70
+
+-promoterSize:          500
+
+-SVinputInfo:           1
+
+-SVminSize:             50
+
+-vcfPASS:               0
+
+-metrics:               "us"
+
+-minTotalNumber:        "500"
+
+-overwrite:             "yes"
+
+-reciprocal:            "no"
+
+-typeOfAnnotation:      "both"
+
+-vcfPASS:               "0"
+
+
+#------------------------
+# AnnotSV Output columns:
+#------------------------
+# Output column names are listed below.
+# In order to disable default annotations provided by AnnotSV, some column names (the ones that are not marked with an *) can be commented with a hash character ("#") by the user.
+AnnotSV ID 			*
+SV chrom 			*
+SV start 			*
+SV end 				*
+SV length			*
+SV type				*
+AnnotSV type			*
+Gene name			*
+NM				*
+CDS length			*
+tx length			*
+location			*
+location2			*
+intersectStart			*
+intersectEnd			*
+DGV_GAIN_IDs
+DGV_GAIN_n_samples_with_SV
+DGV_GAIN_n_samples_tested	*
+DGV_GAIN_Frequency		*
+DGV_LOSS_IDs
+DGV_LOSS_n_samples_with_SV
+DGV_LOSS_n_samples_tested	*
+DGV_LOSS_Frequency		*
+GD_ID
+GD_AN
+GD_N_HET
+GD_N_HOMALT
+GD_AF
+GD_POPMAX_AF
+GD_ID_others
+DDD_SV
+DDD_DUP_n_samples_with_SV
+DDD_DUP_Frequency
+DDD_DEL_n_samples_with_SV
+DDD_DEL_Frequency
+1000g_event
+1000g_AF
+1000g_max_AF
+IMH_ID
+IMH_AF
+IMH_ID_others
+promoters
+dbVar_event			*
+dbVar_variant		
+dbVar_status			*
+GHid_elite
+GHid_not_elite
+GHtype
+GHgene_elite			*
+GHgene_not_elite		*
+GHtissue
+TADcoordinates
+ENCODEexperiments
+GCcontent_left
+GCcontent_right
+Repeats_coord_left
+Repeats_type_left
+Repeats_coord_right
+Repeats_type_right
+ACMG
+HI_CGscore			*
+TriS_CGscore			*
+DDD_status
+DDD_mode
+DDD_consequence
+DDD_disease
+DDD_pmids
+HI_DDDpercent
+synZ_ExAC
+misZ_ExAC
+pLI_ExAC			*
+delZ_ExAC
+dupZ_ExAC
+cnvZ_ExAC
+morbidGenes			*
+morbidGenesCandidates		*
+Mim Number
+Phenotypes
+Inheritance
+AnnotSV ranking
+

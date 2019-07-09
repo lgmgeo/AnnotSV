@@ -1,0 +1,95 @@
+############################################################################################################
+# AnnotSV 2.2                                                                                              #
+#                                                                                                          #
+# An integrated tool for Structural Variations annotation                                                  #
+#                                                                                                          #
+# Copyright (C) 2017-2019 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
+#                                                                                                          #
+############################################################################################################
+
+
+For more details, please see the README file.
+
+July 09, 2019: AnnotSV version 2.2
+	- AnnotSV follows now the Filesystem Hierarchy Standard (FHS). Installation can be easily done using a Makefile
+	- Include 2 new options:  "-candidateGenesFiltering" to select the SV overlapping a gene from the "candidateGenesFile" (default = no)
+				  "-rankFiltering" to select the SV of a user-defined specific class (from 1 to 5), default = "1-5"
+	- Users can now disable default annotation (through a configfile) provided by AnnotSV and only have user defined annotations
+	- AnnotSV is now available for the Mouse genome SV annotations
+	- Add the UTR/CDS's information from overlapping genes (location2 column)
+	- Add bugfix concerning the use of the "-candidateGenesFile" and "-reciprocal" options
+	- Add bugfix concerning the report of the SV length
+	- Add bugfix concerning the report of gene-based annotation on the full lines
+
+Apr 18, 2019: AnnotSV version 2.1
+	- Include the gnomAD SV frequency annotation
+	- Include the Ira M. Hall’s lab SV frequency annotations
+	- Include GeneHancer annotation (an integrated compendium of human promoters, enhancers and their inferred target genes)
+	  WARNING: not supplied as part of the AnnotSV sources. Users need to request the up-to-date GeneHancer data dedicated to AnnotSV
+	- Include 2 new options: "-overwrite" to overwrite existing output results (default = yes)
+	                         "-txFile" to specify a list of preferred genes transcripts to be used in priority during the annotation
+	- Default of the -SVinputInfo option is now set to 1 (the additional fields from the SV input file are reported in the outputfile) 
+	- Large bed annotation files are presorted, in order to be compatible for server with low specifications
+	- Improve error messages and exit management (return a non-zero exit code in case of error or zero if all went fine)
+	- AnnotSV minimum requirement is now starting with Tcl 8.5
+	- Add bugfix concerning the homozygous and heterozygous SNV/indel counts within the SV to annotate
+	- Add bugfix for the SV ranking (when the -metrics option was set to "fr")
+	- Add bugfix concerning the "-reciprocal" option
+
+Dec 21, 2018: AnnotSV version 2.0
+	- Add ranking/classification for SV in 5 classes (from benign to pathogenic)
+	- Include 12 additional annotations including:
+		-> the creation of a unique identifier for each SV
+		-> the SV length
+		-> the SV type (DEL, DUP, ...)
+		-> the SV ranking/classification
+		-> the OMIM morbid genes
+		-> the ClinGen Haploinsufficiency Score
+		-> the ClinGen Triplosensitivity Score
+		-> the ACMG genes
+		-> the CNV intolerance from ExAC
+	- Add of the "metrics" option to change numerical values to us or fr metrics (e.g. 0.2 or 0,2)
+	- Add bugfix concerning empty SV input file: return a non-zero exit status (1) to continue processing in a pipeline
+	- Modification of the directories structure for the annotation. Please look at the README file.
+	- Options: "SVfromDBoverlap", "FeaturesOverlap" and "SVtoAnnOverlap" have been replaced by "reciprocal" and "overlap"
+	- By default, AnnotSV now reports the additional fields from the SV BED input file
+	- Report of the input BED file header in the output
+	- Update of all annotation sources provided with AnnotSV
+
+Sep 28, 2018: AnnotSV version 1.2
+	- Support the integration of user defined annotated regions imported from BED and/or TSV file(s) into the output file
+	- Include 3 additional annotations based on the dbVar pathogenic NR SV dataset:
+		-> The dbVar NR SV event types (e.g. deletion, duplication…)
+		-> The dbVar NR SV accession (e.g. nssv1415016)
+		-> The dbVar NR SV clinical assertion (e.g. pathogenic, likely pathogenic)
+	- Include 1 new option (-typeOfAnnotation) to configure the types of lines produced by AnnotSV (both, full or split)
+	- OutputFile extension will always be a “.tsv” (tab separated values) extension
+	- Add bugfix concerning large SV and TAD boundaries annotation
+
+May 16, 2018: AnnotSV version 1.1.1
+	- Add bugfix concerning 1000g annotation (in some cases, an insertion could be not reported and AnnotSV stopped working properly)
+
+Mar 20, 2018: AnnotSV version 1.1
+	- Add bugfix concerning counts of the homozygous and heterozygous variants in VCF files
+	- Support for new SV input file format: VCF file (4.3) can now be used to describe the SV to annotate (in addition to the BED format)
+	  The "-bedFile" option has now been renamed "-SVinputFile"
+	  The "-bedInfo" option has now been renamed "-SVinputInfo". Default is now set to 0 (the additional fields from the SV input file are not reported in the outputfile)
+	- Report additional information while counting variants in the SNV/indel input file(s):
+		-> The number of SNV/indel loaded
+		-> The number of SNV/indel not considered because of the “FILTER” column value
+		-> The number of SNV/indel not considered because of the absence of genotype information (“GT” value can be absent in bad VCF formatted files)
+		-> The number of SV present but not considered for that purpose (only SNV/indel are taken into account)
+	- Set the default value of the -vcfPASS option to 0 (to be non-restrictive and consider all variants in the VCF by default).
+	- Include 2 new options (-outputDir and -outputFile) to specify the output directory and file name
+	- Include 3 additional annotations based on the 1000 genomes phase 3 dataset:
+		-> The type of event (i.e. DEL, ALU, DUP, <CN3>...)
+		-> The global allele frequency
+		-> The maximum observed allele frequency across populations
+	- Include a new option (-SVminSize) to set the SV minimum size (in bp). Default is 50 (bp)
+
+
+Dec 21, 2017: AnnotSV version 1.0
+
+
+
+
