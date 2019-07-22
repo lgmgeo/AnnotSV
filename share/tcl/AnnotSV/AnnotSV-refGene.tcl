@@ -208,7 +208,7 @@ proc refGeneAnnotation {} {
 	    }
 	}
     }
-puts $L_selectedTx
+
     # Parse
     ###############
     set L "[FirstLineFromFile $linesSplitByGene_File]"
