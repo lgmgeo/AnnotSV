@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.2                                                                                              #
+# AnnotSV 2.3                                                                                              #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
@@ -9,6 +9,9 @@
 
 
 For more details, please see the README file.
+
+July 22,2019: AnnotSV version 2.2.1
+	- Add bugfix concerning the -txFile option
 
 July 09, 2019: AnnotSV version 2.2
 	- AnnotSV follows now the Filesystem Hierarchy Standard (FHS). Installation can be easily done using a Makefile
