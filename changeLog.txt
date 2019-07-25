@@ -10,7 +10,10 @@
 
 For more details, please see the README file.
 
-July 22,2019: AnnotSV version 2.2.1
+July 25, 2019: AnnotSV version 2.2.2
+	- Add bugfix concerning the use of "external gene annotation files"
+
+July 22, 2019: AnnotSV version 2.2.1
 	- Add bugfix concerning the -txFile option
 
 July 09, 2019: AnnotSV version 2.2

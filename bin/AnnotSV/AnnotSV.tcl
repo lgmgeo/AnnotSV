@@ -213,7 +213,7 @@ foreach annotFile [glob -nocomplain $extannDir/*/*.tsv] {
 foreach annotFile [glob -nocomplain $extannDir/*/*.tsv.gz] {
     lappend g_AnnotSV(extann) $annotFile
 }
-regsub "share/tcl/AnnotSV" $g_AnnotSV(tclDir) "doc/AnnotSV/Annotations_$g_AnnotSV(organism)/Users/" userDir
+set userDir "$g_AnnotSV(docDir)/Annotations_$g_AnnotSV(organism)/Users/" 
 foreach annotFile [glob -nocomplain $userDir/*.tsv] {
     lappend g_AnnotSV(extann) $annotFile
 }
