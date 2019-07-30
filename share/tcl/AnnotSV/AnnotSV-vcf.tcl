@@ -282,6 +282,8 @@ proc VCFsToBED {SV_VCFfiles} {
     set SV_BEDfile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d"]_AnnotSV_inputSVfile.bed"
     file delete -force "$SV_BEDfile"
     set VCFheader "" 
+    # Variants from the input file that are not annotated by AnnotSV are reported in $unannotatedOutputFile
+    regsub "annotated" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) "unannotated" unannotatedOutputFile
 
     foreach VCFfile $SV_VCFfiles {
 	set L_TextToWrite {}
@@ -352,7 +354,11 @@ proc VCFsToBED {SV_VCFfiles} {
 		regsub -all "\[*.\]" $ref "" refbis
 		regsub -all "\[*.\]" $alt "" altbis
 		set variantLengthType1 [expr {[string length $altbis]-[string length $refbis]}]
-		if {[expr {abs($variantLengthType1)}]<$g_AnnotSV(SVminSize)} {continue}; # it is an indel
+		if {[expr {abs($variantLengthType1)}]<$g_AnnotSV(SVminSize)} {
+		    # it is an indel
+		    WriteTextInFile "${chrom}_${pos}_${end}_${svtype}: variantLength ([expr {abs($variantLengthType1)}]) < SVminSize ($g_AnnotSV(SVminSize))" $unannotatedOutputFile
+		    continue
+		}
 		if {$variantLengthType1>0} {
 		    # insertion
 		    if {$end eq ""} {set end [expr {$pos+1}]} 
@@ -372,11 +378,15 @@ proc VCFsToBED {SV_VCFfiles} {
 		}
 		if {$svlen eq ""} {set svlen $variantLengthType1}
 	    } else {
+		WriteTextInFile "${chrom}_${pos}_${end}_${svtype}: not a known SV format" $unannotatedOutputFile
 		continue
 	    }
 
 	    if {$end <= $pos} {set tutu $end; set end $pos; set pos $tutu}
-	    if {$end eq ""} {continue}
+	    if {$end eq ""} {
+		WriteTextInFile "${chrom}_${pos}_${end}_${svtype}: END of the SV not defined" $unannotatedOutputFile
+		continue
+	    }
 
 	    if {$svtype eq "CNV" || $svtype eq ""} {set svtype $alt}
 	
