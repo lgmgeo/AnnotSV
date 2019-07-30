@@ -47,6 +47,9 @@ OPTIONS
                                 Values: use comma separated class values, or use a dash to denote a range of values, default = "1-5"
                                 ( e.g.: "3,4,5" or "3-5")
 
+-rankOutput:                    To save in an output file the decisions that explain the ranking of each SV 
+                                Values: yes (default) or no
+
 -SVinputFile:                   Path of the input file (VCF or BED) with SV coordinates
                                 Gzipped VCF file is supported 
 

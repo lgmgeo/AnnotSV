@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.3                                                                                              #
+# AnnotSV 2.2.3                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -33,6 +33,7 @@ proc OrganizeAnnotation {} {
     global L_Candidates
     global g_SVLEN
     global g_ExtAnnotation
+    global L_rankingExplanations
 
     # OUTPUT
     ###############
@@ -952,4 +953,14 @@ proc OrganizeAnnotation {} {
     regsub -all "\t" $headerOutput "; " t
     puts "\t$t\n"
 
+
+    # Output file that retraces the decisions that explain the ranking of each SV
+    if {$g_AnnotSV(rankOutput) eq "yes" && [info exists L_rankingExplanations]} {
+	regsub "annotated" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) "ranking" rankingOutputFile
+	puts "\n\n...Writing of the ranking decision explanations:"
+	puts "   ($rankingOutputFile)"
+	ReplaceTextInFile "AnnotSV ID\tAnnotSV type\tGenes\tAnnotSV ranking\tRanking decision" $rankingOutputFile
+	WriteTextInFile [join $L_rankingExplanations "\n"] $rankingOutputFile
+    }
+	
 }

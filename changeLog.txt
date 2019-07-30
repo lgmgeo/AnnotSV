@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.3                                                                                              #
+# AnnotSV 2.2.3                                                                                            #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
@@ -9,6 +9,13 @@
 
 
 For more details, please see the README file.
+
+
+July 30, 2019: AnnotSV version 2.2.3
+	- Integration of the gnomAD data in the ranking
+	- AnnotSV can now create two other output files:
+		- A report of unannotated variants (e.g. badly formatted SV, variant length < SVminSize...)
+		- A report of the decisions that explain the ranking of each SV 
 
 July 25, 2019: AnnotSV version 2.2.2
 	- Add bugfix concerning the use of "external gene annotation files"

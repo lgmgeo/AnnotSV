@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.3                                                                                              #
+# AnnotSV 2.2.3                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -54,6 +54,7 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(overwrite)                "yes"
     set g_AnnotSV(promoterSize)             "500"
     set g_AnnotSV(rankFiltering)            "1-5"
+    set g_AnnotSV(rankOutput)               "yes"
     set g_AnnotSV(reciprocal)               "no"
     set g_AnnotSV(SVinputFile)              ""
     set g_AnnotSV(SVinputInfo)              "1"
@@ -70,7 +71,7 @@ proc configureAnnotSV {argv} {
     ###########################
     ## Load config file options
     ###########################
-    set lOptionsOk "bedtools candidateGenesFile candidateGenesFiltering extann filteredVCFfiles filteredVCFsamples genomeBuild metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering reciprocal SVinputFile SVinputInfo SVminSize svtBEDcol txFile typeOfAnnotation vcfFiles vcfSamples vcfPASS"
+    set lOptionsOk "bedtools candidateGenesFile candidateGenesFiltering extann filteredVCFfiles filteredVCFsamples genomeBuild metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering rankOutput reciprocal SVinputFile SVinputInfo SVminSize svtBEDcol txFile typeOfAnnotation vcfFiles vcfSamples vcfPASS"
     set configFile "$g_AnnotSV(etcDir)/configfile"
     if {[file exists "./configfile"]} {
 	set configFile "./configfile"
@@ -173,7 +174,7 @@ proc configureAnnotSV {argv} {
     }
 
     ## It must be: yes or no
-    foreach val {candidateGenesFiltering} {
+    foreach val {candidateGenesFiltering rankOutput} {
 	if {$g_AnnotSV($val) ne "yes" && $g_AnnotSV($val) ne "no"} {
 	    puts "############################################################################"
 	    puts "Bad option value: -$val = $g_AnnotSV($val)"
