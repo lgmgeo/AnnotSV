@@ -104,11 +104,31 @@ proc WriteTextInFile {text fichier} {
 
 
 ##############################################################################
+#                          Settings of the annotSV_ID
+##############################################################################
+
+# INPUT: "${chrom}_${pos}_${end}_${svtype}" "$ref" "$alt"
+proc settingOfTheAnnotSVID {deb ref alt} {
+    global g_ID
+    global g_deb
+
+    if {![info exists g_ID($deb,$ref,$alt)]} {
+	set i 1	
+	while {[info exists g_deb(${deb}_$i)]} {incr i; continue}
+	set g_deb(${deb}_$i) "1"
+	set g_ID($deb,$ref,$alt) "${deb}_$i"
+    }
+    return $g_ID($deb,$ref,$alt)
+}
+
+
+
+##############################################################################
 #                          WORKING WITH rsID
 ##############################################################################
 
 proc isNotAnRS {rs} {
-        if {[regexp "^rs\[0-9\]+$" $rs]} {return 0} else {return 1}
+    if {[regexp "^rs\[0-9\]+$" $rs]} {return 0} else {return 1}
 }
 
 ##############################################################################

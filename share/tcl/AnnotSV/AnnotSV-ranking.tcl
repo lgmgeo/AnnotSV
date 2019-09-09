@@ -265,7 +265,7 @@ proc EnhancerInformation {Ls SVtype SVtoAnn} {
 ##   40         Evidence suggests the gene is not dosage sensitive
 ##
 ## HI = Haploinsufficiency  TriS = Triplosensitivity
-proc SVranking {L_annotations} {
+proc SVranking {L_annotations ref alt} {
 
     global g_AnnotSV
     global g_i
@@ -285,7 +285,7 @@ proc SVranking {L_annotations} {
     set SVtype [lindex $Ls $g_AnnotSV(svtBEDcol)]   
     set SVtoAnn [join [lrange $Ls 1 3] ","]
     set enhancer [EnhancerInformation $Ls $SVtype $SVtoAnn]
-    set ID "[join [lrange $Ls 1 3] "_"]_$SVtype"
+    set AnnotSV_ID [settingOfTheAnnotSVID "[join [lrange $Ls 1 3] "_"]_$SVtype" "$ref" "$alt"]
     set AnnotSVtype [lindex $Ls $g_i(full)]
     set genes [lindex $Ls $g_i(gene)]
 
@@ -297,12 +297,12 @@ proc SVranking {L_annotations} {
 	set dbVar_event [lindex $Ls $g_i(dbVar_event)]
 	if {[regexp -nocase "Del|Loss|<CN0>" $SVtype] && [regexp -nocase "Del|Loss|<CN0>" $dbVar_event]} {
 	    set ranking "5"	
-	    lappend L_rankingExplanations "$ID\t$AnnotSVtype\t$genes\t$ranking\tLOSS: pathogenic SV overlapped"
+	    lappend L_rankingExplanations "$AnnotSV_ID\t$AnnotSVtype\t$genes\t$ranking\tLOSS: pathogenic SV overlapped"
 	    return $ranking
 	}
 	if {[regexp -nocase "Dup|Gain|Multiplication|<CN\[2-9\]" $SVtype] && [regexp -nocase "Dup|Gain|Multiplication|<CN\[2-9\]" $dbVar_event]} {
 	    set ranking "5"	
-	    lappend L_rankingExplanations "$ID\t$AnnotSVtype\t$genes\t$ranking\tGAIN: pathogenic SV overlapped"
+	    lappend L_rankingExplanations "$AnnotSV_ID\t$AnnotSVtype\t$genes\t$ranking\tGAIN: pathogenic SV overlapped"
 	    return $ranking
 	}
     }
@@ -317,13 +317,13 @@ proc SVranking {L_annotations} {
     set morbidGenes [lindex $Ls $g_i(morbidGenes)]
     if {[regexp "yes" $morbidGenes]} {
 	set ranking "4"	
-	lappend L_rankingExplanations "$ID\t$AnnotSVtype\t$genes\t$ranking\tmorbid gene overlapped"
+	lappend L_rankingExplanations "$AnnotSV_ID\t$AnnotSVtype\t$genes\t$ranking\tmorbid gene overlapped"
 	return $ranking
     }
     # Check if a SV overlaps an enhancer associated to a morbid gene 
     if {[lindex $enhancer 0] eq "MorbidGenes"} {
 	set ranking "4"	
-	lappend L_rankingExplanations "$ID\t$AnnotSVtype\t$genes\t$ranking\tenhancer of a morbid gene overlapped ([lrange $enhancer 1 end])"
+	lappend L_rankingExplanations "$AnnotSV_ID\t$AnnotSVtype\t$genes\t$ranking\tenhancer of a morbid gene overlapped ([lrange $enhancer 1 end])"
 	return $ranking
     }
     
@@ -334,17 +334,17 @@ proc SVranking {L_annotations} {
 	# Check SV that overlap a gene with a pLI > 0.9 or with HI_CGscore of 3 or 2
 	if {$pLI > 0.9} {    ; # {"">0.9} is false; code ok
 	    set ranking "4"	
-	    lappend L_rankingExplanations "$ID\t$AnnotSVtype\t$genes\t$ranking\tLOSS: pLI ($pLI) > 0.9"
+	    lappend L_rankingExplanations "$AnnotSV_ID\t$AnnotSVtype\t$genes\t$ranking\tLOSS: pLI ($pLI) > 0.9"
 	    return $ranking
 	} elseif {$HI_CGscore eq 3 || $HI_CGscore eq 2} {   
 	    set ranking "4"	
-	    lappend L_rankingExplanations "$ID\t$AnnotSVtype\t$genes\t$ranking\tLOSS: HI_CGscore = $HI_CGscore"
+	    lappend L_rankingExplanations "$AnnotSV_ID\t$AnnotSVtype\t$genes\t$ranking\tLOSS: HI_CGscore = $HI_CGscore"
 	    return $ranking
 	}
 	# Check SV that overlap the enhancer of a gene with a pLI > 0.9 or with HI_CGscore of 3 or 2
 	if {[lindex $enhancer 0] eq "DEL"} {
 	    set ranking "4"	
-	    lappend L_rankingExplanations "$ID\t$AnnotSVtype\t$genes\t$ranking\tLOSS: overlap the enhancer of a gene with a pLI > 0.9 or with a HI_CGscore of 3 or 2 ([lrange $enhancer 1 end])"
+	    lappend L_rankingExplanations "$AnnotSV_ID\t$AnnotSVtype\t$genes\t$ranking\tLOSS: overlap the enhancer of a gene with a pLI > 0.9 or with a HI_CGscore of 3 or 2 ([lrange $enhancer 1 end])"
 	    return $ranking
 	}
     }
@@ -355,13 +355,13 @@ proc SVranking {L_annotations} {
 	# Check SV that overlap a gene TriS_CGscore of 3 or 2
 	if {$TriS_CGscore eq 3 || $TriS_CGscore eq 2} {
 	    set ranking "4"	
-	    lappend L_rankingExplanations "$ID\t$AnnotSVtype\t$genes\t$ranking\tGAIN: TriS_CGscore = $TriS_CGscore"
+	    lappend L_rankingExplanations "$AnnotSV_ID\t$AnnotSVtype\t$genes\t$ranking\tGAIN: TriS_CGscore = $TriS_CGscore"
 	    return $ranking
 	}
 	# Check SV that overlap the enhancer of a gene TriS_CGscore of 3 or 2
 	if {[lindex $enhancer 0] eq "DUP"} {
 	    set ranking "4"	
-	    lappend L_rankingExplanations "$ID\t$AnnotSVtype\t$genes\t$ranking\tGAIN: overlap the enhancer of a gene with a TriS_CGscore of 3 or 2 ([lrange $enhancer 1 end])"
+	    lappend L_rankingExplanations "$AnnotSV_ID\t$AnnotSVtype\t$genes\t$ranking\tGAIN: overlap the enhancer of a gene with a TriS_CGscore of 3 or 2 ([lrange $enhancer 1 end])"
 	    return $ranking
 	}
     }
@@ -375,13 +375,13 @@ proc SVranking {L_annotations} {
     set morbidGenesCandidates [lindex $Ls $g_i(morbidGenesCandidates)]
     if {[regexp "yes" $morbidGenesCandidates]} {
 	set ranking "3"	
-	lappend L_rankingExplanations "$ID\t$AnnotSVtype\t$genes\t$ranking\tmorbid gene candidate overlapped"
+	lappend L_rankingExplanations "$AnnotSV_ID\t$AnnotSVtype\t$genes\t$ranking\tmorbid gene candidate overlapped"
 	return $ranking
     }
     # Check if a SV overlaps an enhancer associated to a morbid gene candidate
     if {[lindex $enhancer 0] eq "MorbidGenesCandidates"} {
 	set ranking "3"	
-	lappend L_rankingExplanations "$ID\t$AnnotSVtype\t$genes\t$ranking\tenhancer of a morbid gene candidate overlapped ([lrange $enhancer 1 end])"
+	lappend L_rankingExplanations "$AnnotSV_ID\t$AnnotSVtype\t$genes\t$ranking\tenhancer of a morbid gene candidate overlapped ([lrange $enhancer 1 end])"
 	return $ranking
     }
 
@@ -390,14 +390,14 @@ proc SVranking {L_annotations} {
 	foreach gene [split $genes "/"] {
 	    if {$gene ne "" && [lsearch -exact $L_Candidates $gene] ne -1} {
 		set ranking "3"	
-		lappend L_rankingExplanations "$ID\t$AnnotSVtype\t$genes\t$ranking\tcandidate gene overlapped ($gene)"
+		lappend L_rankingExplanations "$AnnotSV_ID\t$AnnotSVtype\t$genes\t$ranking\tcandidate gene overlapped ($gene)"
 		return $ranking
 	    }
 	}
 	# Check if a SV overlaps the enhancer from a candidate gene (with at least 1bp)
 	if {[lindex $enhancer 0] eq "Candidates"} {
 	    set ranking "3"	
-	    lappend L_rankingExplanations "$ID\t$AnnotSVtype\t$genes\t$ranking\tenhancer of a candidate gene overlapped ([lrange $enhancer 1 end])"
+	    lappend L_rankingExplanations "$AnnotSV_ID\t$AnnotSVtype\t$genes\t$ranking\tenhancer of a candidate gene overlapped ([lrange $enhancer 1 end])"
 	    return $ranking
 	}
     }
@@ -417,19 +417,19 @@ proc SVranking {L_annotations} {
     if {[regexp -nocase "Del|Loss|<CN0>" $SVtype]} {
 	if {$LOSStot > $g_AnnotSV(minTotalNumber) && $LOSSfreq > 0.01} {
 	    set ranking "1"	
-	    lappend L_rankingExplanations "$ID\t$AnnotSVtype\t$genes\t$ranking\t> $g_AnnotSV(overlap)% SV overlapped with a frequent SV + doesn't contain CDS from i) a morbid gene, ii) a morbid gene candidate and iii) a candidate gene"
+	    lappend L_rankingExplanations "$AnnotSV_ID\t$AnnotSVtype\t$genes\t$ranking\t> $g_AnnotSV(overlap)% SV overlapped with a frequent SV + doesn't contain CDS from i) a morbid gene, ii) a morbid gene candidate and iii) a candidate gene"
 	    return $ranking
 	}
     } elseif {[regexp -nocase "Dup|Gain|Multiplication|<CN\[2-9\]" $SVtype]} {
 	if {$GAINtot > $g_AnnotSV(minTotalNumber) && $GAINfreq > 0.01} {
 	    set ranking "1"	
-	    lappend L_rankingExplanations "$ID\t$AnnotSVtype\t$genes\t$ranking\t> $g_AnnotSV(overlap)% SV overlapped with a frequent SV + doesn't contain CDS from i) a morbid gene, ii) a morbid gene candidate and iii) a candidate gene"
+	    lappend L_rankingExplanations "$AnnotSV_ID\t$AnnotSVtype\t$genes\t$ranking\t> $g_AnnotSV(overlap)% SV overlapped with a frequent SV + doesn't contain CDS from i) a morbid gene, ii) a morbid gene candidate and iii) a candidate gene"
 	    return $ranking
 	}
     }
     if {$GDPOPMAXAF > 0.01} {
 	set ranking "1"	
-	lappend L_rankingExplanations "$ID\t$AnnotSVtype\t$genes\t$ranking\t> $g_AnnotSV(overlap)% SV overlapped with a frequent SV + doesn't contain CDS from i) a morbid gene, ii) a morbid gene candidate and iii) a candidate gene"
+	lappend L_rankingExplanations "$AnnotSV_ID\t$AnnotSVtype\t$genes\t$ranking\t> $g_AnnotSV(overlap)% SV overlapped with a frequent SV + doesn't contain CDS from i) a morbid gene, ii) a morbid gene candidate and iii) a candidate gene"
 	return $ranking
     }
     
@@ -437,6 +437,6 @@ proc SVranking {L_annotations} {
     ##           < 70% SV overlapped with a benign SV + doesn't contain CDS from i) a morbid gene, ii) a morbid gene candidate and iii) a candidate gene
     ###################################################################    
     set ranking "2"	
-    lappend L_rankingExplanations "$ID\t$AnnotSVtype\t$genes\t$ranking\t< $g_AnnotSV(overlap)% SV overlapped with a benign SV + doesn't contain CDS from i) a morbid gene, ii) a morbid gene candidate and iii) a candidate gene"
+    lappend L_rankingExplanations "$AnnotSV_ID\t$AnnotSVtype\t$genes\t$ranking\t< $g_AnnotSV(overlap)% SV overlapped with a benign SV + doesn't contain CDS from i) a morbid gene, ii) a morbid gene candidate and iii) a candidate gene"
     return $ranking
 }

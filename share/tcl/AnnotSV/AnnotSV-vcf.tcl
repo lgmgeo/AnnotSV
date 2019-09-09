@@ -328,9 +328,10 @@ proc VCFsToBED {SV_VCFfiles} {
 	    regsub -nocase "chr" $chrom "" chrom
 	    regsub "chr" [lindex $Ls 3] "" ref
 	    regsub "chr" [lindex $Ls 4] "" alt 
-            if {[regexp "SVLEN=(\[0-9-\]+)" [lindex $Ls 7] match SVLEN]} {set svlen $SVLEN} else {set svlen ""}
-	    if {[regexp ";END=(\[0-9\]+)" [lindex $Ls 7] match END] || [regexp "^END=(\[0-9\]+)" [lindex $Ls 7] match END]} {set end $END} else {set end ""}
-	    if {[regexp "SVTYPE=(\[^;\]+)" [lindex $Ls 7] match SVTYPE]} {set svtype $SVTYPE} else {set svtype ""}      
+	    regsub -all "\"" [lindex $Ls 7] "" INFOcol
+            if {[regexp "SVLEN=(\[0-9-\]+)" $INFOcol match SVLEN]} {set svlen $SVLEN} else {set svlen ""}
+	    if {[regexp ";END=(\[0-9\]+)" $INFOcol match END] || [regexp "^END=(\[0-9\]+)" $INFOcol match END]} {set end $END} else {set end ""}
+	    if {[regexp "SVTYPE=(\[^;\]+)" $INFOcol match SVTYPE]} {set svtype $SVTYPE} else {set svtype ""}      
 	    if {[regexp "^<" $alt]} {
 		# Type2
 		if {$end eq ""} {
@@ -356,7 +357,8 @@ proc VCFsToBED {SV_VCFfiles} {
 		set variantLengthType1 [expr {[string length $altbis]-[string length $refbis]}]
 		if {[expr {abs($variantLengthType1)}]<$g_AnnotSV(SVminSize)} {
 		    # it is an indel
-		    WriteTextInFile "${chrom}_${pos}_${end}_${svtype}: variantLength ([expr {abs($variantLengthType1)}]) < SVminSize ($g_AnnotSV(SVminSize))" $unannotatedOutputFile
+		    set AnnotSV_ID [settingOfTheAnnotSVID "${chrom}_${pos}_${end}_${svtype}" "$ref" "$alt"]
+		    WriteTextInFile "$AnnotSV_ID: variantLength ([expr {abs($variantLengthType1)}]) < SVminSize ($g_AnnotSV(SVminSize))" $unannotatedOutputFile
 		    continue
 		}
 		if {$variantLengthType1>0} {
@@ -378,13 +380,17 @@ proc VCFsToBED {SV_VCFfiles} {
 		}
 		if {$svlen eq ""} {set svlen $variantLengthType1}
 	    } else {
-		WriteTextInFile "${chrom}_${pos}_${end}_${svtype}: not a known SV format" $unannotatedOutputFile
+		set AnnotSV_ID [settingOfTheAnnotSVID "${chrom}_${pos}_${end}_${svtype}" "$ref" "$alt"]
+		WriteTextInFile "$AnnotSV_ID: not a known SV format" $unannotatedOutputFile
 		continue
 	    }
 
 	    if {$end <= $pos} {set tutu $end; set end $pos; set pos $tutu}
+
+	    set AnnotSV_ID [settingOfTheAnnotSVID "${chrom}_${pos}_${end}_${svtype}" "$ref" "$alt"]
+
 	    if {$end eq ""} {
-		WriteTextInFile "${chrom}_${pos}_${end}_${svtype}: END of the SV not defined" $unannotatedOutputFile
+		WriteTextInFile "$AnnotSV_ID: END of the SV not defined" $unannotatedOutputFile
 		continue
 	    }
 
@@ -399,7 +405,7 @@ proc VCFsToBED {SV_VCFfiles} {
 	    # Definition of g_SVLEN:
 	    # (If not defined here, the variant length can be calculated in AnnotSV-write.tcl for some type of SV)
 	    if {$svlen ne ""} {
-		set g_SVLEN(${chrom}_${pos}_${end}_$svtype) $svlen
+		set g_SVLEN($AnnotSV_ID) $svlen
 	    }
 	}
 	close $f

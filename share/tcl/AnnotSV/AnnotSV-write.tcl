@@ -96,6 +96,12 @@ proc OrganizeAnnotation {} {
     }
     append headerOutput "\tAnnotSV type\tGene name\tNM\tCDS length\ttx length\tlocation\tlocation2\tintersectStart\tintersectEnd"
     
+    ### Search for "ref" and "alt" information (to define the AnnotSV_ID)
+    set i_ref [lsearch -exact [split $headerOutput "\t"] "REF"]
+    set i_alt [lsearch -exact [split $headerOutput "\t"] "ALT"]
+    set i_ref [expr {$i_ref-2}] ;# (-2) because of the insertion of the END and SVTYPE values.
+    set i_alt [expr {$i_alt-2}] ;# (-2) because of the insertion of the END and SVTYPE values.
+
     ####### "DGV header"
     if {$g_AnnotSV(dgvAnn)} {
 	set g_AnnotSV(dgvAnn_i) ""
@@ -848,12 +854,14 @@ proc OrganizeAnnotation {} {
 	set SVchrom [lindex $Ls 0]
 	set SVstart [lindex $Ls 1]
 	set SVend [lindex $Ls 2]
-	# Creation of the AnnotSV ID (chrom_start_end_SVtype)
-	set ID "${SVchrom}_${SVstart}_${SVend}_$SVtype"
+	set ref [lindex $Ls $i_ref]
+	set alt [lindex $Ls $i_alt]
+	# Creation of the AnnotSV ID (chrom_start_end_SVtype_i)
+	set AnnotSV_ID [settingOfTheAnnotSVID "${SVchrom}_${SVstart}_${SVend}_$SVtype" "$ref" "$alt"]
 	# Report of the SV length
 	#set SVlength [expr {$SVend-$SVstart}] ; # No! Wrong for an insertion, a BND or a translocation
-	if {[info exists g_SVLEN($ID)]} {
-	    set SVlength $g_SVLEN($ID)
+	if {[info exists g_SVLEN($AnnotSV_ID)]} {
+	    set SVlength $g_SVLEN($AnnotSV_ID)
 	} else {
 	    if {[regexp "DEL" [normalizeSVtype $SVtype]]} { ;# DEL
 		set SVlength [expr {$SVstart-$SVend}]
@@ -866,12 +874,12 @@ proc OrganizeAnnotation {} {
 	if {$g_AnnotSV(SVinputInfo)} {
 	    set toadd [lrange $Ls 0 [expr {$theLength-1}]]
 	    set toadd [linsert $toadd 3 $SVlength]
-	    set TextToWrite "$ID\t[join $toadd "\t"]\t$AnnotSVtype\t$geneName\t$NM\t$CDSl\t$txL\t$location\t$location2\t$intersect"
+	    set TextToWrite "$AnnotSV_ID\t[join $toadd "\t"]\t$AnnotSVtype\t$geneName\t$NM\t$CDSl\t$txL\t$location\t$location2\t$intersect"
 	} else {
 	    if {$g_AnnotSV(svtBEDcol) ne -1} { ; # SV type is required for the ranking
-		set TextToWrite "$ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$SVtype\t$AnnotSVtype\t$geneName\t$NM\t$CDSl\t$txL\t$location\t$location2\t$intersect"
+		set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$SVtype\t$AnnotSVtype\t$geneName\t$NM\t$CDSl\t$txL\t$location\t$location2\t$intersect"
 	    } else {
-		set TextToWrite "$ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$AnnotSVtype\t$geneName\t$NM\t$CDSl\t$txL\t$location\t$location2\t$intersect"
+		set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$AnnotSVtype\t$geneName\t$NM\t$CDSl\t$txL\t$location\t$location2\t$intersect"
 	    }
 	}
 	####### "SVincludedInFt"
@@ -928,7 +936,7 @@ proc OrganizeAnnotation {} {
 	}
 	####### "Ranking"
 	if {$g_AnnotSV(ranking)} {
-	    set rank [SVranking $TextToWrite]
+	    set rank [SVranking $TextToWrite $ref $alt]
 	    if {[lsearch -exact $g_AnnotSV(rankFiltering) $rank] eq -1} {
 		continue
 	    }
