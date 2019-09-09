@@ -10,7 +10,7 @@ OPTIONS
 
 -candidateGenesFile:            Path of a file containing the candidate genes of the user (gene names can be space-separated, tabulation-separated, or line-break-separated) (optional)
 
--candidateGenesFiltering:       To select the SV overlapping a gene from the "candidateGenesFile"
+-candidateGenesFiltering:       To select only the SV "split" annotations overlapping a gene from the "candidateGenesFile"
                                 Values: no (default) or yes
 
 -filteredVCFfiles:              Path of the filtered VCF input file(s) with SNV/indel coordinates for compound heterozygotes report (optional)
@@ -48,7 +48,7 @@ OPTIONS
                                 ( e.g.: "3,4,5" or "3-5")
 
 -rankOutput:                    To save in an output file the decisions that explain the ranking of each SV 
-                                Values: yes (default) or no
+                                Values: no (default) or yes
 
 -SVinputFile:                   Path of the input file (VCF or BED) with SV coordinates
                                 Gzipped VCF file is supported 

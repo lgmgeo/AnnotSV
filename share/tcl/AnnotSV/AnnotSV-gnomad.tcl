@@ -23,7 +23,7 @@
 
 
 ## - Check and create if necessary the following file:
-##   'date'_gnomAD_DUP_SV.sorted.bed" --> <=> DUP + MCNV
+##   'date'_gnomAD_DUP_SV.sorted.bed"
 ##   'date'_gnomAD_DEL_SV.sorted.bed" 
 ##   'date'_gnomAD_INV_SV.sorted.bed" 
 ##   'date'_gnomAD_INS_SV.sorted.bed" 
@@ -110,7 +110,14 @@ proc checkgnomADfile {} {
 	    set end        [lindex $Ls $i_end]
 	    set svid       [lindex $Ls $i_svid]
 	    set SVTYPE     [lindex $Ls $i_svtype]
-	    if {$SVTYPE == "MCNV"} {set SVTYPE "DUP"} ;# MCNV = multiallelic CNV = CNV2, CNV3...
+	    # WARNING:
+	    # - MCNV have multiple coma-separated-values for nhet, nhomalt, af and popmaxaf... 
+	    #   => We need to keep only 1 value (for the ranking)
+	    # - Look at the "gnomad_v2_sv.sites.bed" file:
+	    #   445858 lines of which only 1148 are MCNV
+	    #   => We remove these SV from the annotation files
+	    #
+	    # if {$SVTYPE == "MCNV"} {set SVTYPE "DUP"} ;# MCNV = multiallelic CNV = CNV2, CNV3...
 	    if {[lsearch -exact {DEL DUP INV INS} "$SVTYPE"] eq -1} {continue}
 	    set an         [lindex $Ls $i_an]
 	    set nhet       [lindex $Ls $i_nhet]

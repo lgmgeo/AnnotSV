@@ -54,7 +54,7 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(overwrite)                "yes"
     set g_AnnotSV(promoterSize)             "500"
     set g_AnnotSV(rankFiltering)            "1-5"
-    set g_AnnotSV(rankOutput)               "yes"
+    set g_AnnotSV(rankOutput)               "no"
     set g_AnnotSV(reciprocal)               "no"
     set g_AnnotSV(SVinputFile)              ""
     set g_AnnotSV(SVinputInfo)              "1"

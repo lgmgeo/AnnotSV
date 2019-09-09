@@ -437,6 +437,6 @@ proc SVranking {L_annotations} {
     ##           < 70% SV overlapped with a benign SV + doesn't contain CDS from i) a morbid gene, ii) a morbid gene candidate and iii) a candidate gene
     ###################################################################    
     set ranking "2"	
-    lappend L_rankingExplanations "$ID\t$AnnotSVtype\t$genes\t$ranking\t< 80% SV overlapped with a benign SV + doesn't contain CDS from i) a morbid gene, ii) a morbid gene candidate and iii) a candidate gene"
+    lappend L_rankingExplanations "$ID\t$AnnotSVtype\t$genes\t$ranking\t< $g_AnnotSV(overlap)% SV overlapped with a benign SV + doesn't contain CDS from i) a morbid gene, ii) a morbid gene candidate and iii) a candidate gene"
     return $ranking
 }

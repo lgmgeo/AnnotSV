@@ -10,6 +10,9 @@
 
 For more details, please see the README file.
 
+, 2019: AnnotSV version 
+	- Include the lift-over GRCh38 gnomAD SV frequency annotation
+	- Add bugfix concerning the "-candidateGenesFiltering" option
 
 July 30, 2019: AnnotSV version 2.2.3
 	- Integration of the gnomAD data in the ranking

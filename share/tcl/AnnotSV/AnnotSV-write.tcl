@@ -458,11 +458,15 @@ proc OrganizeAnnotation {} {
 
 	if {$g_AnnotSV(candidateGenesFiltering) eq "yes"} {
 	    set test 0
-	    foreach g [split $geneName "/"] {
-		if {[lsearch -exact $L_Candidates $g] eq -1} {
-		    set test 1
-		}
-	    }	
+	    if {$geneName eq ""} {
+		set test 1
+	    } else {
+		foreach g [split $geneName "/"] {
+		    if {[lsearch -exact $L_Candidates $g] eq -1} {
+			set test 1
+		    }
+		}	
+	    }
 	    if {$test} {continue}
 	}
 
