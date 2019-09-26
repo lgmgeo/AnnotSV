@@ -28,7 +28,7 @@
 #####################################
 # The Development Disorder Genotype - Phenotype Database = DDG2P
 #
-# DDD downloaded file: "DDG2P.csv.gz" 
+# DDD downloaded file: "DDG2P.csv.gz"
 # Header:
 # "gene symbol","gene mim","disease name","disease mim","DDD category","allelic requirement","mutation consequence",phenotypes,"organ specificity list",pmids,panel,"prev symbols","hgnc id"
 
@@ -43,14 +43,14 @@ proc checkDDDgeneFile {} {
 
     ## Check if the "DDD gene" file has been downloaded then formatted
     #################################################################
-    set extannDir "$g_AnnotSV(docDir)/Annotations_$g_AnnotSV(organism)/Genes-based"
+    set extannDir "$g_AnnotSV(shareDir)/$g_AnnotSV(organism)/Genes-based"
     set DDDfileDownloaded [glob -nocomplain "$extannDir/DDD/DDG2P.csv.gz"]
-    set DDDfileFormattedAndSortedGzip [glob -nocomplain "$extannDir/DDD/*_DDG2P.sorted.tsv.gz"]   
+    set DDDfileFormattedAndSortedGzip [glob -nocomplain "$extannDir/DDD/*_DDG2P.sorted.tsv.gz"]
 
     if {$DDDfileDownloaded eq "" && $DDDfileFormattedAndSortedGzip eq ""} {
 	# No "DDD gene" annotation (with extAnn procedure)
 	return
-    } 
+    }
 
     if {[llength $DDDfileFormattedAndSortedGzip]>1} {
 	puts "Several DDG2P files exist:"
@@ -60,7 +60,7 @@ proc checkDDDgeneFile {} {
 	    file rename -force $ddd $ddd.notused
 	}
 	return
-    } 
+    }
 
     if {$DDDfileFormattedAndSortedGzip eq ""} {
 	# The downloaded file exist but not the formatted.
@@ -81,17 +81,17 @@ proc updateDDDgeneFile {} {
 	return
     }
 
-    set extannDir "$g_AnnotSV(docDir)/Annotations_$g_AnnotSV(organism)/Genes-based"
+    set extannDir "$g_AnnotSV(shareDir)/$g_AnnotSV(organism)/Genes-based"
     set DDDfileDownloaded [glob -nocomplain "$extannDir/DDD/DDG2P.csv.gz"]
 
     ## Create : 'date'_DDG2P.tsv.gz
     set DDDfileFormatted "$extannDir/DDD/[clock format [clock seconds] -format "%Y%m%d"]_DDG2P.sorted.tsv"
-    
+
     puts "...DDD genes configuration"
-    
+
     puts "\t...creation of $DDDfileFormatted.gz"
     puts "\t   (done only once during the first DDD annotation)\n"
-    
+
     set TexteToWrite {genes\tDDD_status\tDDD_mode\tDDD_consequence\tDDD_disease\tDDD_pmids}
     foreach L [LinesFromGZFile $DDDfileDownloaded] {
 	if {[regexp  "^\"gene symbol" $L]} {
@@ -105,22 +105,22 @@ proc updateDDDgeneFile {} {
 	    continue
 	}
 	set Ls [::csv::split $L]
-	
-	set gene [lindex $Ls $i_gene]   
+
+	set gene [lindex $Ls $i_gene]
 	lappend L_genes "$gene"
-	set disease [lindex $Ls $i_disease]     
-	set category [lindex $Ls $i_category]     
-	set allelic [lindex $Ls $i_allelic]     
-	set mutation [lindex $Ls $i_mutation]     
-	set pmids [lindex $Ls $i_pmids]    
-	
+	set disease [lindex $Ls $i_disease]
+	set category [lindex $Ls $i_category]
+	set allelic [lindex $Ls $i_allelic]
+	set mutation [lindex $Ls $i_mutation]
+	set pmids [lindex $Ls $i_pmids]
+
 	lappend L_category($gene) "$category"
 	lappend L_allelic($gene) "$allelic"
 	lappend L_mutation($gene) "$mutation"
 	lappend L_disease($gene) "$disease"
 	lappend L_pmids($gene) "$pmids"
-    } 
-    
+    }
+
     # Write outputfile (will be used as external annotation)
     set L_genes [lsort -unique $L_genes]
     foreach gene $L_genes {
@@ -135,7 +135,7 @@ proc updateDDDgeneFile {} {
     WriteTextInFile [join $TexteToWrite "\n"] $DDDfileFormatted.tmp
     # Sorting of the bedfile:
     # Intersection with very large files can cause trouble with excessive memory usage.
-    # A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm. 
+    # A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm.
     if {[catch {eval exec sort -k1,1 -k2,2n $DDDfileFormatted.tmp > $DDDfileFormatted} Message]} {
 	puts "-- updateDDDgeneFile --"
 	puts "sort -k1,1 -k2,2n $DDDfileFormatted.tmp > $DDDfileFormatted"
@@ -171,7 +171,7 @@ proc checkDDDfrequencyFile {} {
 
     ## Check if the DDD frequency file has been downloaded then formatted
     ####################################################################
-    set extannDir "$g_AnnotSV(docDir)/Annotations_$g_AnnotSV(organism)/"
+    set extannDir "$g_AnnotSV(shareDir)/$g_AnnotSV(organism)/"
 
     set DDDfrequencyFileDownloaded [glob -nocomplain "$extannDir/SVincludedInFt/DDD/$g_AnnotSV(genomeBuild)/population_cnv.txt.gz"]
     set DDDfrequencyFileFormatted [glob -nocomplain "$extannDir/SVincludedInFt/DDD/$g_AnnotSV(genomeBuild)/*_DDD_population_cnv.sorted.bed"]
@@ -198,18 +198,18 @@ proc checkDDDfrequencyFile {} {
 	    file rename -force $ddd $ddd.notused
 	}
 	return
-    } 
+    }
 
     if {$DDDfrequencyFileFormatted eq ""} {
 	# The downloaded file exist but not the formatted:
 	##   - 'date'_DDD_population_cnv.bed ; # Header: chr start end DDD_DUP_n_samples_with_SV DDD_DUP_Frequency DDD_DEL_n_samples_with_SV DDD_DEL_Frequency
 	set DDDfrequencyFileFormatted "$extannDir/SVincludedInFt/DDD/$g_AnnotSV(genomeBuild)/[clock format [clock seconds] -format "%Y%m%d"]_DDD_population_cnv.sorted.bed"
-	
+
 	puts "...DDD frequency configuration"
-	
+
 	puts "\t...creation of $DDDfrequencyFileFormatted"
 	puts "\t   (done only once during the first DDD annotation)\n"
-	
+
 	set TexteToWrite ""
 	foreach L [LinesFromGZFile $DDDfrequencyFileDownloaded] {
 	    if {[regexp  "^#population_cnv_id" $L]} {
@@ -225,27 +225,27 @@ proc checkDDDfrequencyFile {} {
 		continue
 	    }
 	    set Ls [split $L "\t"]
-	    
-	    set chr [lindex $Ls $i_chr]   
-	    set start [lindex $Ls $i_start]   
-	    set end [lindex $Ls $i_end]   
-	    set dupobs [lindex $Ls $i_dupobs]   
-	    set dupfreq [lindex $Ls $i_dupfreq]   
-	    set delobs [lindex $Ls $i_delobs]   
-	    set delfreq [lindex $Ls $i_delfreq]   
-	    set study [lindex $Ls $i_study]   
-	    
+
+	    set chr [lindex $Ls $i_chr]
+	    set start [lindex $Ls $i_start]
+	    set end [lindex $Ls $i_end]
+	    set dupobs [lindex $Ls $i_dupobs]
+	    set dupfreq [lindex $Ls $i_dupfreq]
+	    set delobs [lindex $Ls $i_delobs]
+	    set delfreq [lindex $Ls $i_delfreq]
+	    set study [lindex $Ls $i_study]
+
 	    if {$study eq "DDD"} {
 		lappend TexteToWrite "$chr\t$start\t$end\t$dupobs\t$dupfreq\t$delobs\t$delfreq"
-	    } 
+	    }
 	}
-	
+
 	# Write outputfile
 	WriteTextInFile [join $TexteToWrite "\n"] $DDDfrequencyFileFormatted.tmp
 
 	# Sorting of the bedfile:
 	# Intersection with very large files can cause trouble with excessive memory usage.
-	# A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm. 
+	# A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm.
 	if {[catch {eval exec sort -k1,1 -k2,2n $DDDfrequencyFileFormatted.tmp > $DDDfrequencyFileFormatted} Message]} {
 	    puts "-- checkDDDfrequencyFile --"
 	    puts "sort -k1,1 -k2,2n $DDDfrequencyFileFormatted.tmp > $DDDfrequencyFileFormatted"
@@ -261,28 +261,28 @@ proc checkDDDfrequencyFile {} {
 
 
 proc DDDfrequencyAnnotation {SVchrom SVstart SVend L_i} {
-    
+
     global g_AnnotSV
     global dddText
-    
-    
-    set extannDir "$g_AnnotSV(docDir)/Annotations_$g_AnnotSV(organism)"
+
+
+    set extannDir "$g_AnnotSV(shareDir)/$g_AnnotSV(organism)"
     set DDDfrequencyFileFormatted [glob -nocomplain "$extannDir/SVincludedInFt/DDD/$g_AnnotSV(genomeBuild)/*_DDD_population_cnv.sorted.bed"]
-    
+
     if {![info exists dddText(DONE)]} {
-	
+
 	# headerOutput "DDD_SV DDD_DUP_n_samples_with_SV DDD_DUP_Frequency DDD_DEL_n_samples_with_SV DDD_DEL_Frequency"
 	set L_dddText(Empty) "{} {} {-1} {} {-1}"
 	foreach i $L_i {
 	    lappend dddText(Empty) "[lindex $L_dddText(Empty) $i]"
 	}
 	set dddText(Empty) "[join $dddText(Empty) "\t"]"
-    
+
 	# Intersect
 	regsub -nocase "(.formatted)?.bed$" $g_AnnotSV(bedFile) ".intersect.ddd" tmpFile
 	set tmpFile "$g_AnnotSV(outputDir)/[file tail $tmpFile]"
 
-	file delete -force $tmpFile	
+	file delete -force $tmpFile
 	if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(fullAndSplitBedFile) -b $DDDfrequencyFileFormatted -wa -wb > $tmpFile} Message]} {
 	    puts "-- DDDfrequencyAnnotation --"
 	    puts "$g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(fullAndSplitBedFile) -b $DDDfrequencyFileFormatted -wa -wb > $tmpFile"
@@ -316,11 +316,11 @@ proc DDDfrequencyAnnotation {SVchrom SVstart SVend L_i} {
 	    # The DDD SV is an insertion or a breakpoint
 	    if {$DDD_length<1} {
 		set DDD_length 1
-	    } 	
+	    }
 	    # The SV to annotate is an insertion or a breakpoint
 	    if {$SVtoAnn_length<1} {
 		set SVtoAnn_length 1
-	    } 	
+	    }
 
 	    if {$SVtoAnn_start < $DDDSV_start} {
 		set overlap_start $DDDSV_start
@@ -333,21 +333,21 @@ proc DDDfrequencyAnnotation {SVchrom SVstart SVend L_i} {
 		set overlap_end $DDDSV_end
 	    }
 	    set overlap_length [expr {$overlap_end - $overlap_start}]
-	    
+
 	    # Keeping only DDD respecting the overlaps (reciprocal or not reciprocal)
 	    if {[expr {$overlap_length*100.0/$SVtoAnn_length}] < $g_AnnotSV(overlap)} {continue}
-	    if {$g_AnnotSV(reciprocal) eq "yes"} {			
+	    if {$g_AnnotSV(reciprocal) eq "yes"} {
 		if {[expr {$overlap_length*100.0/$DDD_length}] < $g_AnnotSV(overlap)} {continue}
 	    }
-	    
+
 	    lappend L_SVddd($SVtoAnn_chrom,$SVtoAnn_start,$SVtoAnn_end) "$SVtoAnn_chrom:${DDDSV_start}-${DDDSV_end}"
 	    lappend L_DUPn($SVtoAnn_chrom,$SVtoAnn_start,$SVtoAnn_end) "$DUP_n"
 	    lappend L_DUPfreq($SVtoAnn_chrom,$SVtoAnn_start,$SVtoAnn_end) "$DUP_freq"
 	    lappend L_DELn($SVtoAnn_chrom,$SVtoAnn_start,$SVtoAnn_end) "$DEL_n"
-	    lappend L_DELfreq($SVtoAnn_chrom,$SVtoAnn_start,$SVtoAnn_end) "$DEL_freq" 
+	    lappend L_DELfreq($SVtoAnn_chrom,$SVtoAnn_start,$SVtoAnn_end) "$DEL_freq"
 
 	}
-	
+
 
 	# Loading DDD final annotation for each SV
 	foreach SVtoAnn [array names L_SVddd] {
@@ -380,10 +380,10 @@ proc DDDfrequencyAnnotation {SVchrom SVstart SVend L_i} {
 	    set dddText($SVtoAnn) [join $dddText($SVtoAnn) "\t"]
 	}
 	catch {unset L_dddText}
-	set dddText(DONE) 1	
+	set dddText(DONE) 1
 	file delete -force $tmpFile
     }
-    
+
     if {[info exist dddText($SVchrom,$SVstart,$SVend)]} {
 	return $dddText($SVchrom,$SVstart,$SVend)
     } else {

@@ -30,7 +30,7 @@ proc checkRepeatFile {} {
 
     ## Check if the repeat file has been downloaded then formatted
     #############################################################
-    set extannDir "$g_AnnotSV(docDir)/Annotations_$g_AnnotSV(organism)/BreakpointsAnnotations"
+    set extannDir "$g_AnnotSV(shareDir)/$g_AnnotSV(organism)/BreakpointsAnnotations"
     set repeatFileDownloaded [glob -nocomplain "$extannDir/Repeat/$g_AnnotSV(genomeBuild)/Repeat.bed"]   
     set repeatFileFormatted [glob -nocomplain "$extannDir/Repeat/$g_AnnotSV(genomeBuild)/*_Repeat.sorted.bed"]   
 
@@ -113,7 +113,7 @@ proc RepeatAnnotation {BreakpointChrom BreakpointPos} {
     # (RepeatAnnotation is executed for each breakpoint)
     set g_Repeat(Empty) "\t"
 
-    set extannDir "$g_AnnotSV(docDir)/Annotations_$g_AnnotSV(organism)/BreakpointsAnnotations"
+    set extannDir "$g_AnnotSV(shareDir)/$g_AnnotSV(organism)/BreakpointsAnnotations"
     set repeatFileFormatted [glob -nocomplain "$extannDir/Repeat/$g_AnnotSV(genomeBuild)/*_Repeat.sorted.bed"]
 
     if {![info exists g_Repeat(DONE)]} {

@@ -38,12 +38,13 @@ RM                    = /bin/rm
 RMDIR                 = /bin/rmdir
 MKDIR                 = install -d
 MV                    = /bin/mv
-CP                    = install -p -m 0644 
+CP                    = install -p -m 0644
 CPDIR                 = /bin/cp -r
 CONFIGFILE            = etc/$(ANNOTSV)/configfile
 TCL_SCRIPTS           = $(shell find share/tcl/$(ANNOTSV)/ -name '*.tcl')
 DOCUMENTATIONS        = License.txt changeLog.txt commandLineOptions.txt README.AnnotSV_$(VERSION).pdf
 OTHERS_DOCUMENTATIONS = $(shell find share/doc/$(ANNOTSV)/ -type d -name 'Annotations_*')
+ORGANISM              = Human
 
 
 .PHONY: install
@@ -60,7 +61,7 @@ install-ligth: $(DOCUMENTATIONS)
 	$(MV) $(TCLDIRDISTRIBUTED) $(TCLDIR)
 	@echo "Done"
 
-install-complete: install-configfile install-executable install-tcl-toolbox install-doc install-others-doc
+install-complete: install-configfile install-executable install-tcl-toolbox install-doc install-others-doc install-biological-data
 	@echo ""
 	@echo "Installation of $(ANNOTSV)-$(VERSION):"
 	@echo "--------------------------------"
@@ -81,10 +82,9 @@ install-executable:
 	@echo ""
 	@echo "Executable installation"
 	@echo "-----------------------"
-	$(MKDIR) $(DESTDIR)$(BINDIR)/$(ANNOTSV)
 	install -p -m 0755 bin/$(ANNOTSV)/AnnotSV.tcl $(DESTDIR)$(BINDIR)/$(ANNOTSV)
 
-install-tcl-toolbox: $(TCL_SCRIPTS) 
+install-tcl-toolbox: $(TCL_SCRIPTS)
 	@echo ""
 	@echo "Tcl scripts installation"
 	@echo "------------------------"
@@ -98,8 +98,12 @@ install-doc: $(DOCUMENTATIONS)
 	$(MKDIR) $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
 	$(CP) $^ $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
 
-install-others-doc: $(OTHERS_DOCUMENTATIONS)
+install-others-doc: share/doc/$(ANNOTSV)/Example
 	$(CPDIR) $^ $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
+
+install-biological-data: share/doc/$(ANNOTSV)/Annotations_$(ORGANISM)
+	$(MKDIR) $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/
+	$(CPDIR) $^ $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/$(ORGANISM)
 
 
 # make uninstall

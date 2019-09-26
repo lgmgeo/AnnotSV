@@ -28,8 +28,8 @@ proc checkClinGenFile {} {
     global g_AnnotSV
 
 
-    set clingenDir "$g_AnnotSV(docDir)/Annotations_$g_AnnotSV(organism)/Genes-based/ClinGen" 
- 
+    set clingenDir "$g_AnnotSV(shareDir)/$g_AnnotSV(organism)/Genes-based/ClinGen"
+
     ## Check if the ClinGen file has been downloaded the formatted
     ##############################################################
     set ClinGenFileDownloaded [glob -nocomplain "$clingenDir/ClinGen_gene_curation_list_*.tsv"]
@@ -38,7 +38,7 @@ proc checkClinGenFile {} {
     if {$ClinGenFileDownloaded eq "" && $ClinGenFileFormattedGzip eq ""} {
 	# No ClinGene annotation
 	return
-    } 
+    }
 
     if {[llength $ClinGenFileFormattedGzip]>1} {
 	puts "Several ClinGen files exist:"
@@ -48,19 +48,19 @@ proc checkClinGenFile {} {
 	    file rename -force $ClinGenF $ClinGenF.notused
 	}
 	return
-    } 
-    if {$ClinGenFileFormattedGzip eq ""} {     
+    }
+    if {$ClinGenFileFormattedGzip eq ""} {
 	## - Create the 'date'_ClinGenAnnotations.tsv file.
-	##   Header: genes, HI_CGscore and TriS_CGscore 
-	
+	##   Header: genes, HI_CGscore and TriS_CGscore
+
 	set ClinGenFileFormatted "$clingenDir/[clock format [clock seconds] -format "%Y%m%d"]_ClinGenAnnotations.tsv"
 	puts "...creation of $ClinGenFileFormatted.gz ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])\n"
 	ReplaceTextInFile "genes\tHI_CGscore\tTriS_CGscore" $ClinGenFileFormatted
-	
+
 	# Parsing of $ClinGenFileDownloaded
 	foreach L [LinesFromFile $ClinGenFileDownloaded] {
 	    set Ls [split $L "\t"]
-	    
+
 	    if {[regexp "^#Gene Symbol" $L]} {
 		set i_gene           [lsearch -exact $Ls "#Gene Symbol"];                      if {$i_gene == -1} {puts "Bad header line syntax. Gene Symbol column not found - Exit with error"; exit 2}
 		set i_HI_CGscore     [lsearch -exact $Ls "Haploinsufficiency Score"];          if {$i_HI_CGscore == -1} {puts "Bad header line syntax. Haploinsufficiency Score column not found - Exit with error"; exit 2}
@@ -68,14 +68,14 @@ proc checkClinGenFile {} {
 		continue
 	    }
 	    if {[regexp "^#" $L]} {continue}
-	    
+
 	    set gene [lindex $Ls $i_gene]
 	    set HI_CGscore [lindex $Ls $i_HI_CGscore]
 	    set TriS_CGscore [lindex $Ls $i_TriS_CGscore]
-	    
+
 	    lappend L_Texte "$gene\t$HI_CGscore\t$TriS_CGscore"
 	}
-	
+
 	# creation of $ClinGenFileFormatted.gz
 	WriteTextInFile "[join $L_Texte "\n"]" $ClinGenFileFormatted
 	if {[catch {exec gzip $ClinGenFileFormatted} Message]} {

@@ -25,8 +25,14 @@
 
 global g_AnnotSV
 
+proc getScriptDirectory {} {
+    set dispScriptFile [file normalize [info script]]
+    set scriptFolder [file dirname $dispScriptFile]
+    return $scriptFolder
+}
+
 # non-zero exit codes --> usually interpreted as error cases
-# zero exit code --> Terminate the process without error 
+# zero exit code --> Terminate the process without error
 # exit <=> exit 0 (default)
 
 
@@ -34,25 +40,20 @@ global g_AnnotSV
 if {![info exists env(ANNOTSV)]} {
     puts "\"ANNOTSV\" environment variable not specified. Please defined it before running AnnotSV. Exit with error"; exit 2
 }
-
 ## Checking if the application name is the same that the path of the ANNOTSV environment variable
-set actualPWD [exec pwd]
-cd $env(ANNOTSV)
-set envPWD [exec pwd]
-cd $actualPWD
-cd [file dirname $argv0]
-cd ../..
-set argv0PWD [pwd]
-if {$envPWD ne $argv0PWD} {
+set scriptDir [getScriptDirectory]
+set prefix [file dirname $scriptDir]
+set env(ANNOTSV) [file normalize $env(ANNOTSV)]
+if {$env(ANNOTSV) ne $prefix} {
     puts "WARNING:"
-    puts "The application path ([file dirname $argv0]) is different from the \"ANNOTSV\" environment variable ($env(ANNOTSV)/bin)."
+    puts "The application path ($prefix) is different from the \"ANNOTSV\" environment variable ($env(ANNOTSV))."
     puts "Check your \"ANNOTSV\" environment variable. Exit with error"; exit 2
 }
-cd $actualPWD
 
 # Setting of g_AnnotSV(installDir), g_AnnotSV(tclDir), g_AnnotSV(docDir) and g_AnnotSV(etcDir):
 set g_AnnotSV(installDir) "$env(ANNOTSV)"
 set g_AnnotSV(etcDir) "$g_AnnotSV(installDir)/etc/AnnotSV"
+set g_AnnotSV(shareDir) "$g_AnnotSV(installDir)/share/AnnotSV"
 set g_AnnotSV(docDir) "$g_AnnotSV(installDir)/share/doc/AnnotSV"
 set tclVersion [info tclversion]
 set g_AnnotSV(tclDir) "$g_AnnotSV(installDir)/share/tcl${tclVersion}/AnnotSV"
@@ -176,10 +177,10 @@ checkDDDfrequencyFile
 # Annotation with 1000g?
 check1000gFile
 
-# Annotation with gnomAD? 
+# Annotation with gnomAD?
 checkgnomADfile
 
-# Annotation with IMH (Ira M. Hall's lab)? 
+# Annotation with IMH (Ira M. Hall's lab)?
 checkIMHfile
 
 # Annotation with HI (Haploinsufficiency)?
@@ -205,7 +206,7 @@ checkUsersBED
 
 # Users Genes-based annotation files (from $ANNOTSV/Annotations_$g_AnnotSV(organism)/*/)
 # g_AnnotSV(extann) has been initialized in AnnotSV-config.tcl
-set extannDir "$g_AnnotSV(docDir)/Annotations_$g_AnnotSV(organism)/Genes-based"
+set extannDir "$g_AnnotSV(shareDir)/$g_AnnotSV(organism)/Genes-based"
 foreach annotFile [glob -nocomplain $extannDir/*/*.tsv] {
     if {[regexp "_DGV_samplesInStudies.tsv$" $annotFile]} {continue}
     lappend g_AnnotSV(extann) $annotFile
@@ -221,7 +222,7 @@ foreach annotFile [glob -nocomplain $userDir/*.tsv.gz] {
     lappend g_AnnotSV(extann) $annotFile
 }
 # Depending of the organism, genes based annotation can be absent:
-if {$g_AnnotSV(extann) eq ""} {set g_AnnotSV(genesBasedAnn) 0} else {set g_AnnotSV(genesBasedAnn) 1} 
+if {$g_AnnotSV(extann) eq ""} {set g_AnnotSV(genesBasedAnn) 0} else {set g_AnnotSV(genesBasedAnn) 1}
 
 
 # DISPLAY
@@ -230,14 +231,14 @@ puts "\tAnnotSV has been run with these arguments:"
 puts "\t******************************************"
 set lKey [array names g_AnnotSV]
 foreach key [lsort $lKey] {
-    if {[regexp "outputColHeader|installDir|etcDir|tclDir|docDir|userDir|Version|bedFile|extann|refGene|Ann|NRSVann|GHann|IMHann|gnomADann|ranking$" $key]} {continue}
+    if {[regexp "outputColHeader|installDir|etcDir|tclDir|docDir|shareDir|userDir|Version|bedFile|extann|refGene|Ann|NRSVann|GHann|IMHann|gnomADann|ranking$" $key]} {continue}
     if {$g_AnnotSV($key) eq ""} {continue}
     puts "\t-$key $g_AnnotSV($key)"
 }
 puts "\t******************************************\n"
 
 
-# Annotation with the gene track 
+# Annotation with the gene track
 refGeneAnnotation
 OrganizeAnnotation
 

@@ -24,9 +24,9 @@
 ## - Check if the DGV files have been downloaded:
 #    - DGV.GS.*.gff3
 #    - *_supportingvariants_*.txt
-#  
+#
 ## - Check and create if necessary the following files:
-#    - 'date'_DGV.GS*_annotations.sorted.bed 
+#    - 'date'_DGV.GS*_annotations.sorted.bed
 #    - 'date'_DGV_samplesInStudies.tsv
 proc checkDGVfiles {} {
 
@@ -34,11 +34,11 @@ proc checkDGVfiles {} {
 
     ## Check if the 2 DGV files have been downloaded then formatted
     ##############################################################
-    set extannDir "$g_AnnotSV(docDir)/Annotations_$g_AnnotSV(organism)"
-    set DGVfile1Downloaded [glob -nocomplain "$extannDir/SVincludedInFt/DGV/$g_AnnotSV(genomeBuild)/DGV.GS.*.gff3"]   
-    set DGVfile2Downloaded [glob -nocomplain "$extannDir/SVincludedInFt/DGV/$g_AnnotSV(genomeBuild)/*_supportingvariants_*.txt"]   
-    set DGVfile1Formatted [glob -nocomplain "$extannDir/SVincludedInFt/DGV/$g_AnnotSV(genomeBuild)/*_DGV.GS*_annotations.sorted.bed"] 
-    set DGVfile2Formatted [glob -nocomplain "$extannDir/SVincludedInFt/DGV/$g_AnnotSV(genomeBuild)/*_DGV_samplesInStudies.tsv"] 
+    set extannDir "$g_AnnotSV(shareDir)/$g_AnnotSV(organism)"
+    set DGVfile1Downloaded [glob -nocomplain "$extannDir/SVincludedInFt/DGV/$g_AnnotSV(genomeBuild)/DGV.GS.*.gff3"]
+    set DGVfile2Downloaded [glob -nocomplain "$extannDir/SVincludedInFt/DGV/$g_AnnotSV(genomeBuild)/*_supportingvariants_*.txt"]
+    set DGVfile1Formatted [glob -nocomplain "$extannDir/SVincludedInFt/DGV/$g_AnnotSV(genomeBuild)/*_DGV.GS*_annotations.sorted.bed"]
+    set DGVfile2Formatted [glob -nocomplain "$extannDir/SVincludedInFt/DGV/$g_AnnotSV(genomeBuild)/*_DGV_samplesInStudies.tsv"]
 
     if {($DGVfile1Downloaded ne "" && $DGVfile2Downloaded ne "") || ($DGVfile1Formatted ne "" && $DGVfile2Formatted ne "")} {
 	# DGV annotation
@@ -63,7 +63,7 @@ proc checkDGVfiles {} {
 	    file rename -force $dgv $dgv.notused
 	}
 	return
-    } 
+    }
     if {[llength $DGVfile2Formatted]>1} {
 	puts "Several DGV files exist:"
 	puts "$DGVfile2Formatted"
@@ -72,16 +72,16 @@ proc checkDGVfiles {} {
 	    file rename -force $dgv $dgv.notused
 	}
 	return
-    } 
+    }
 
     if {$DGVfile1Formatted eq "" || $DGVfile2Formatted eq ""} {
 	# The downloaded file exist but not the 2 formatted.
-	# 
+	#
 	## Create:
 	##   - 'date'_DGV.GS_annotations.sorted.bed file     ; # Header: chr start end variantsubtype supportingsamples studiessamples
-	##   - 'date'_DGV_samplesInStudies.tsv               ; # Syntax: Study num_unique_samples_tested {samples} 
+	##   - 'date'_DGV_samplesInStudies.tsv               ; # Syntax: Study num_unique_samples_tested {samples}
 	#######################################################################################################################
-	
+
 	## Create : 'date'_DGV.GS_annotations.bed
 	set DGVfile1Formatted "$extannDir/SVincludedInFt/DGV/$g_AnnotSV(genomeBuild)/[clock format [clock seconds] -format "%Y%m%d"]_DGV.GS_annotations.sorted.bed"
 
@@ -111,12 +111,12 @@ proc checkDGVfiles {} {
 	    incr i
 	    if {[eval expr {$i%3}]} {continue}
 	    set Ls [split $L "\t"]
-	    
-	    # 3 lines for each ID:: 
+
+	    # 3 lines for each ID::
 	    # chr1    SV     copy_number_variation_region    812998  812998  .       .       .       ID=gssvG1;Name=gssvG1;variant_type=SV;variant_sub_type=Gain;outer_start=812998;inner_start=837847;inner_end=1477469;outer_end=1708649;inner_rank=10;num_variants=3;variants=nssv24621,nssv1423341,nssv1440790;num_studies=2;Studies=Perry2008,Park2010;num_platforms=2;Platforms=AgilentCustom_015685+015686+244K,Agilent24M;number_of_algorithms=1;algorithms=ADM2;num_samples=3;samples=NA18968,NA18969,NA19221;Frequency=5.45%;PopulationSummary=African 1:Asian 2:European 0:Mexican 0:MiddleEast 0:NativeAmerican 0:NorthAmerican 0:Oceania 0:SouthAmerican 0:Turkish 0:Admixed 0:Unknown 0;num_unique_samples_tested=55
 	    # chr1    SV     copy_number_variation_region    837847  1477469 .       .       .       ID=gssvG1;Name=gssvG1;variant_type=SV;variant_sub_type=Gain;outer_start=812998;inner_start=837847;inner_end=1477469;outer_end=1708649;inner_rank=10;num_variants=3;variants=nssv24621,nssv1423341,nssv1440790;num_studies=2;Studies=Perry2008,Park2010;num_platforms=2;Platforms=AgilentCustom_015685+015686+244K,Agilent24M;number_of_algorithms=1;algorithms=ADM2;num_samples=3;samples=NA18968,NA18969,NA19221;Frequency=5.45%;PopulationSummary=African 1:Asian 2:European 0:Mexican 0:MiddleEast 0:NativeAmerican 0:NorthAmerican 0:Oceania 0:SouthAmerican 0:Turkish 0:Admixed 0:Unknown 0;num_unique_samples_tested=55
 	    # chr1    SV     copy_number_variation_region    1708649 1708649 .       .       .       ID=gssvG1;Name=gssvG1;variant_type=SV;variant_sub_type=Gain;outer_start=812998;inner_start=837847;inner_end=1477469;outer_end=1708649;inner_rank=10;num_variants=3;variants=nssv24621,nssv1423341,nssv1440790;num_studies=2;Studies=Perry2008,Park2010;num_platforms=2;Platforms=AgilentCustom_015685+015686+244K,Agilent24M;number_of_algorithms=1;algorithms=ADM2;num_samples=3;samples=NA18968,NA18969,NA19221;Frequency=5.45%;PopulationSummary=African 1:Asian 2:European 0:Mexican 0:MiddleEast 0:NativeAmerican 0:NorthAmerican 0:Oceania 0:SouthAmerican 0:Turkish 0:Admixed 0:Unknown 0;num_unique_samples_tested=55
-	    
+
 	    regsub "chr" [lindex $Ls 0] "" chr
 
 	    set infos [split [lindex $Ls 8] ";"]
@@ -131,11 +131,11 @@ proc checkDGVfiles {} {
 
 	    lappend L_studFromGS {*}[split $studies ","]
 	    lappend TexteToWrite "$chr\t$start\t$end\t$ID\t$variantsubtype\t$studies\t$variants\t$samples"
-	} 
+	}
 	WriteTextInFile [join $TexteToWrite "\n"] $DGVfile1Formatted.tmp
 	# Sorting of the bedfile:
 	# Intersection with very large files can cause trouble with excessive memory usage.
-	# A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm. 
+	# A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm.
 	if {[catch {eval exec sort -k1,1 -k2,2n $DGVfile1Formatted.tmp > $DGVfile1Formatted} Message]} {
 	    puts "-- checkDGVfiles --"
 	    puts "sort -k1,1 -k2,2n $DGVfile1Formatted.tmp > $DGVfile1Formatted"
@@ -159,7 +159,7 @@ proc checkDGVfiles {} {
 	# Parsing of $DGVfile2Downloaded (=file with all supporting variants (not merged))
 	foreach L [LinesFromFile $DGVfile2Downloaded] {
 	    set Ls [split $L "\t"]
-	    
+
 	    # Header + example line:
 	    ########################
 	    # variantaccession        chr     start   end     varianttype     variantsubtype  reference       pubmedid        method  platform        mergedvariants  supportingvariants      mergedorsample  frequency       samplesize  observedgains   observedlosses  cohortdescription       genes   samples
@@ -170,11 +170,11 @@ proc checkDGVfiles {} {
 		set i_samplesize  [lsearch -exact $Ls "samplesize"];    if {$i_samplesize == -1} {puts "$DGVfile2Downloaded"; puts "Bad header line syntax. samplesize column not found - Exit with error"; exit 2}
 		continue
 	    }
-	    
+
 	    # NOTE: only 1 reference by variant (only variants from a same study have been merged)
 
 	    # WARNING: Some merged variants (esv or nsv) are associated with several samples:
-	    #   -> esv2740664: "SSM008,SSM017,SSM053". 
+	    #   -> esv2740664: "SSM008,SSM017,SSM053".
 	    # These sv correspond to ssv present in this file, merged from the same study.
 	    # => No needs to parse
 	    #
@@ -184,12 +184,12 @@ proc checkDGVfiles {} {
 	    regsub -all "_et_al_|-|_|Consortium" $reference "" reference ; # To have the same format as in DGV.GS
 	    set samples    [lindex $Ls $i_samples]
 	    set samplesize [lindex $Ls $i_samplesize]
-	    # WARNING: Some variants are not associated with a sample: 
+	    # WARNING: Some variants are not associated with a sample:
 	    #   -> GRCh37_hg19_supportingvariants_2016-05-15.txt: 496 427 variants not associated / 6 668 716 variants
 	    set size($reference) $samplesize
 	    lappend lSamples($reference) {*}[split $samples ","]
 	}
-	
+
 	## Correction of inconsistence in DGV march 2016 (given by J. MacDonald, march 2017)
 	set size(Durbin2010) $size(1000GenomesPilotProject) ; # Durbin2010 = 1000GenomesPilotProject (only the tandem duplications)
 	set lSamples(Durbin2010) $lSamples(1000GenomesPilotProject)
@@ -219,7 +219,7 @@ proc checkDGVfiles {} {
 	file delete -force $DGVfile2Downloaded
     }
 
-    if {$DGVfile1Formatted eq "" || $DGVfile2Formatted eq ""} { 
+    if {$DGVfile1Formatted eq "" || $DGVfile2Formatted eq ""} {
 	puts "No DGV annotation available"
 	set g_AnnotSV(dgvAnn) 0
     }
@@ -233,11 +233,11 @@ proc DGVannotation {SVchrom SVstart SVend L_i} {
     global dgvText
 
 
-    set extannDir "$g_AnnotSV(docDir)/Annotations_$g_AnnotSV(organism)"
+    set extannDir "$g_AnnotSV(shareDir)/$g_AnnotSV(organism)"
     set DGVfile1Formatted [glob -nocomplain "$extannDir/SVincludedInFt/DGV/$g_AnnotSV(genomeBuild)/*_DGV.GS*_annotations.sorted.bed"]
     set DGVfile2Formatted [glob -nocomplain "$extannDir/SVincludedInFt/DGV/$g_AnnotSV(genomeBuild)/*_DGV_samplesInStudies.tsv"]
 
-    
+
     if {![info exists dgvText(DONE)]} {
 
 	# headerOutput "\tDGV_GAIN_IDs\tDGV_GAIN_n_samples_with_SV\tDGV_GAIN_n_samples_tested\tDGV_GAIN_Frequency"
@@ -255,7 +255,7 @@ proc DGVannotation {SVchrom SVstart SVend L_i} {
 	    set number($study) [lindex $Ls 1]
 	    set samples($study) [lindex $Ls 2]
 	}
-	
+
 	# Intersect
 	regsub -nocase "(.formatted)?.bed$" $g_AnnotSV(bedFile) ".intersect.dgv" tmpFile
 	set tmpFile "$g_AnnotSV(outputDir)/[file tail $tmpFile]"
@@ -295,12 +295,12 @@ proc DGVannotation {SVchrom SVstart SVend L_i} {
 	    # The dgv SV is an insertion or a breakpoint
 	    if {$SVdgv_length<1} {
 		set SVdgv_length 1
-	    } 	
+	    }
 	    # The SV to annotate is an insertion or a breakpoint
 	    if {$SVtoAnn_length<1} {
 		set SVtoAnn_length 1
 	    }
- 	
+
 	    if {$SVtoAnn_start < $SVdgv_start} {
 		set overlap_start $SVdgv_start
 	    } else {
@@ -312,10 +312,10 @@ proc DGVannotation {SVchrom SVstart SVend L_i} {
 		set overlap_end $SVdgv_end
 	    }
 	    set overlap_length [expr {$overlap_end - $overlap_start}]
-	    
+
 	    # Keeping only DGV respecting the overlaps (reciprocal or not reciprocal)
 	    if {[expr {$overlap_length*100.0/$SVtoAnn_length}] < $g_AnnotSV(overlap)} {continue}
-	    if {$g_AnnotSV(reciprocal) eq "yes"} {			
+	    if {$g_AnnotSV(reciprocal) eq "yes"} {
 		if {[expr {$overlap_length*100.0/$SVdgv_length}] < $g_AnnotSV(overlap)} {continue}
 	    }
 
@@ -342,10 +342,10 @@ proc DGVannotation {SVchrom SVstart SVend L_i} {
 		lappend DGVlossID($SVtoAnn_chrom,$SVtoAnn_start,$SVtoAnn_end) $SVdgv_ID
 		lappend DGVlossVariants($SVtoAnn_chrom,$SVtoAnn_start,$SVtoAnn_end) {*}[split $SVdgv_variants ","]
 		lappend DGVlossSamples($SVtoAnn_chrom,$SVtoAnn_start,$SVtoAnn_end) {*}[split $SVdgv_samples ","]
-		lappend DGVlossStudies($SVtoAnn_chrom,$SVtoAnn_start,$SVtoAnn_end) {*}[split $SVdgv_studies	","]	
+		lappend DGVlossStudies($SVtoAnn_chrom,$SVtoAnn_start,$SVtoAnn_end) {*}[split $SVdgv_studies	","]
 	    }
 	}
-	
+
 
 	# Loading DGV final annotation for each SV
 	# headerOutput "\tDGV_GAIN_IDs\tDGV_GAIN_n_samples_with_SV\tDGV_GAIN_n_samples_tested\tDGV_GAIN_Frequency"
@@ -395,7 +395,7 @@ proc DGVannotation {SVchrom SVstart SVend L_i} {
 	    set doublon [expr {$lengthSamples-$lengthSamplesSorted}]
 	    set n_samples_with_SV [expr {$lengthVariantsSorted-$doublon}]
 	    lappend L_dgvText($SVtoAnn) "$n_samples_with_SV"
-	    
+
 	    # DGV_LOSS_n_samples_tested
 	    set allStudies [lsort -unique $DGVlossStudies($SVtoAnn)]
 	    if {$allStudies ne ""} {
@@ -406,10 +406,10 @@ proc DGVannotation {SVchrom SVstart SVend L_i} {
 		    lappend samp $samples($study)
 		}
 		set doublon [expr [llength $samp]-[llength [lsort -unique $samp]]]
-		
+
 		set n_samples_tested [expr {$n -$doublon}]
 		lappend L_dgvText($SVtoAnn) "$n_samples_tested"
-		
+
 		# DGV_LOSS_Frequency
 		set freq [expr {$n_samples_with_SV*1.0/$n_samples_tested}]
 		set freq [format "%.8f" $freq]
@@ -429,10 +429,10 @@ proc DGVannotation {SVchrom SVstart SVend L_i} {
 
 	}
 	catch {unset L_dgvText}
-	set dgvText(DONE) 1	
+	set dgvText(DONE) 1
 	file delete -force $tmpFile
     }
-    
+
     if {[info exist dgvText($SVchrom,$SVstart,$SVend)]} {
 	return $dgvText($SVchrom,$SVstart,$SVend)
     } else {

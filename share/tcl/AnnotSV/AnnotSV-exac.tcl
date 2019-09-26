@@ -28,24 +28,24 @@
 
 ## - Check if the ExAC file has been downloaded:
 #    - fordist_cleaned_nonpsych_z_pli_rec_null_data.txt
-#  
+#
 ## - Check and create if necessary the following file:
-#    - 'date'_ExAC.pLI-Zscore.annotations.tsv.gz 
+#    - 'date'_ExAC.pLI-Zscore.annotations.tsv.gz
 proc checkGeneIntoleranceFile {} {
 
     global g_AnnotSV
 
     ## Check if the GeneIntolerance file has been downloaded then formatted
     ######################################################################
-    set extannDir "$g_AnnotSV(docDir)/Annotations_$g_AnnotSV(organism)/Genes-based"
+    set extannDir "$g_AnnotSV(shareDir)/$g_AnnotSV(organism)/Genes-based"
 
     set GeneIntoleranceFileDownloaded [glob -nocomplain "$extannDir/ExAC/fordist_cleaned_nonpsych_z_pli_rec_null_data.txt"]
-    set GeneIntoleranceFileFormattedGzip [glob -nocomplain "$extannDir/ExAC/*_GeneIntolerance.pLI-Zscore.annotations.tsv.gz"] 
+    set GeneIntoleranceFileFormattedGzip [glob -nocomplain "$extannDir/ExAC/*_GeneIntolerance.pLI-Zscore.annotations.tsv.gz"]
 
     if {$GeneIntoleranceFileDownloaded eq "" && $GeneIntoleranceFileFormattedGzip eq ""} {
 	# No "Gene Intolerance" annotation
 	return
-    } 
+    }
 
     if {[llength $GeneIntoleranceFileFormattedGzip]>1} {
 	puts "Several Gene Intolerance files exist:"
@@ -55,10 +55,10 @@ proc checkGeneIntoleranceFile {} {
 	    file rename -force $gi $gi.notused
 	}
 	return
-    } 
+    }
 
     if {$GeneIntoleranceFileFormattedGzip eq ""} {
-	## Create : 'date'_GeneIntolerance.pLI-Zscore.annotations.tsv.gz   ; # Header: chr start end syn_z mis_z pLI 
+	## Create : 'date'_GeneIntolerance.pLI-Zscore.annotations.tsv.gz   ; # Header: chr start end syn_z mis_z pLI
 	set GeneIntoleranceFileFormatted "$extannDir/ExAC/[clock format [clock seconds] -format "%Y%m%d"]_GeneIntolerance.pLI-Zscore.annotations.tsv"
 
 	puts "...GeneIntolerance configuration for pLI and Z scores annotation from ExAC ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
@@ -76,14 +76,14 @@ proc checkGeneIntoleranceFile {} {
 		continue
 	    }
 	    set Ls [split $L "\t"]
-	    
-	    set gene [lindex $Ls $i_gene]     
-	    set synZ [lindex $Ls $i_synZ]     
-	    set misZ [lindex $Ls $i_misZ]       
-	    set pLI  [lindex $Ls $i_pLI]        
+
+	    set gene [lindex $Ls $i_gene]
+	    set synZ [lindex $Ls $i_synZ]
+	    set misZ [lindex $Ls $i_misZ]
+	    set pLI  [lindex $Ls $i_pLI]
 
 	    lappend TexteToWrite "$gene\t$synZ\t$misZ\t$pLI"
-	} 
+	}
 	WriteTextInFile [join $TexteToWrite "\n"] $GeneIntoleranceFileFormatted
 	if {[catch {exec gzip $GeneIntoleranceFileFormatted} Message]} {
 	    puts "-- checkGeneIntoleranceFile --"
@@ -113,9 +113,9 @@ proc checkGeneIntoleranceFile {} {
 # dup: Number of confident duplication calls
 # del.sing: Number of confident deletion calls spanning only a single gene
 # dup.sing: Number of confident duplication calls spanning only a single gene
-# del.sing.score: Winsorised single-gene deletion intolerance z-score 
-# dup.sing.score: Winsorised single-gene duplication intolerance z-score 
-# del.score: Winsorised deletion intolerance z-score 
+# del.sing.score: Winsorised single-gene deletion intolerance z-score
+# dup.sing.score: Winsorised single-gene duplication intolerance z-score
+# del.score: Winsorised deletion intolerance z-score
 # dup.score: Winsorised duplication intolerance z-score
 # cnv.score: Winsorised cnv intolerance z-score
 # flag: Gene is in a known region of recurrent CNVs mediated by tandem segmental duplications and intolerance scores are more likely to be biased or noisy.
@@ -126,24 +126,24 @@ proc checkGeneIntoleranceFile {} {
 
 ## - Check if the ExAC file has been downloaded:
 #    - exac-final-cnv.gene.scores071316
-#  
+#
 ## - Check and create if necessary the following file:
-#    - 'date'_ExAC.CNV-Zscore.annotations.tsv.gz 
+#    - 'date'_ExAC.CNV-Zscore.annotations.tsv.gz
 proc checkCNVintoleranceFile {} {
 
     global g_AnnotSV
 
     ## Check if the CNVintoleranceFile has been downloaded then formatted
     ######################################################################
-    set extannDir "$g_AnnotSV(docDir)/Annotations_$g_AnnotSV(organism)/Genes-based"
+    set extannDir "$g_AnnotSV(shareDir)/$g_AnnotSV(organism)/Genes-based"
 
     set CNVintoleranceFileDownloaded [glob -nocomplain "$extannDir/ExAC/exac-final-cnv.gene.scores071316"]
-    set CNVintoleranceFileFormattedGzip [glob -nocomplain "$extannDir/ExAC/*_ExAC.CNV-Zscore.annotations.tsv.gz"] 
+    set CNVintoleranceFileFormattedGzip [glob -nocomplain "$extannDir/ExAC/*_ExAC.CNV-Zscore.annotations.tsv.gz"]
 
     if {$CNVintoleranceFileDownloaded eq "" && $CNVintoleranceFileFormattedGzip eq ""} {
 	# No "CNV Intolerance" annotation
 	return
-    } 
+    }
 
     if {[llength $CNVintoleranceFileFormattedGzip]>1} {
 	puts "Several CNV-Intolerant-Genes files exist:"
@@ -153,10 +153,10 @@ proc checkCNVintoleranceFile {} {
 	    file rename -force $ci $ci.notused
 	}
 	return
-    } 
+    }
 
     if {$CNVintoleranceFileFormattedGzip eq ""} {
-	## Create : 'date'_ExAC.CNV-Zscore.annotations.tsv.gz ; # Header: chr start end syn_z mis_z pLI 
+	## Create : 'date'_ExAC.CNV-Zscore.annotations.tsv.gz ; # Header: chr start end syn_z mis_z pLI
 	set CNVintoleranceFileFormatted "$extannDir/ExAC/[clock format [clock seconds] -format "%Y%m%d"]_ExAC.CNV-Zscore.annotations.tsv"
 
 	puts "...ExAC CNV Intolerant Genes configuration ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
@@ -177,10 +177,10 @@ proc checkCNVintoleranceFile {} {
 		continue
 	    }
 
-	    set gene [lindex $Ls $i_gene]     
-	    set delZ [lindex $Ls $i_delZ]        
-	    set dupZ [lindex $Ls $i_dupZ]        
-	    set cnvZ [lindex $Ls $i_cnvZ]        
+	    set gene [lindex $Ls $i_gene]
+	    set delZ [lindex $Ls $i_delZ]
+	    set dupZ [lindex $Ls $i_dupZ]
+	    set cnvZ [lindex $Ls $i_cnvZ]
 
 	    if {![info exists del($gene)]} {
 		set del($gene) $delZ
@@ -194,7 +194,7 @@ proc checkCNVintoleranceFile {} {
 		if {$cnvZ > $cnv($gene)} {set cnv($gene) $cnvZ}
 	    }
 
-	} 
+	}
 
 	foreach gene [array names del] {
 	    lappend TexteToWrite "$gene\t$del($gene)\t$dup($gene)\t$cnv($gene)"

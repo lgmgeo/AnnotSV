@@ -25,7 +25,7 @@
 
 ## - Check if the following chromFa files has been downloaded:
 #    - *chromFa.tar.gz
-#  
+#
 ## - Check and create if necessary the following file:
 #    - 'date'_genomeBuild_chromFa.fasta
 #    - 'date'_genomeBuild_chromFa.chromSizes
@@ -35,9 +35,9 @@ proc checkFASTAfiles {} {
 
     ## Check if the FASTA file has been downloaded then formatted
     ############################################################
-    set extannDir "$g_AnnotSV(docDir)/Annotations_$g_AnnotSV(organism)/BreakpointsAnnotations"
-    set FASTAfileDownloaded [glob -nocomplain "$extannDir/GCcontent/$g_AnnotSV(genomeBuild)/*chromFa.tar.gz"]  
-    set FASTAfileFormatted [glob -nocomplain "$extannDir/GCcontent/$g_AnnotSV(genomeBuild)/$g_AnnotSV(genomeBuild)_chromFa.fasta"] 
+    set extannDir "$g_AnnotSV(shareDir)/$g_AnnotSV(organism)/BreakpointsAnnotations"
+    set FASTAfileDownloaded [glob -nocomplain "$extannDir/GCcontent/$g_AnnotSV(genomeBuild)/*chromFa.tar.gz"]
+    set FASTAfileFormatted [glob -nocomplain "$extannDir/GCcontent/$g_AnnotSV(genomeBuild)/$g_AnnotSV(genomeBuild)_chromFa.fasta"]
 
     if {$FASTAfileDownloaded eq "" && $FASTAfileFormatted eq ""} {
 	# No GCcontent annotations requested by the user
@@ -71,19 +71,19 @@ proc updateFASTAfiles {} {
 	return
     }
 
-    set extannDir "$g_AnnotSV(docDir)/Annotations_$g_AnnotSV(organism)/BreakpointsAnnotations"
-    set FASTAfileDownloaded [glob -nocomplain "$extannDir/GCcontent/$g_AnnotSV(genomeBuild)/*chromFa.tar.gz"]  
+    set extannDir "$g_AnnotSV(shareDir)/$g_AnnotSV(organism)/BreakpointsAnnotations"
+    set FASTAfileDownloaded [glob -nocomplain "$extannDir/GCcontent/$g_AnnotSV(genomeBuild)/*chromFa.tar.gz"]
     set FASTAfileFormatted "$extannDir/GCcontent/$g_AnnotSV(genomeBuild)/$g_AnnotSV(genomeBuild)_chromFa.fasta"
     set ChromSizesFile "$extannDir/GCcontent/$g_AnnotSV(genomeBuild)/$g_AnnotSV(genomeBuild)_chromFa.chromSizes"
 
     puts "...GC content configuration ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
     puts "\t...creation of $FASTAfileFormatted"
     puts "\t   (done only once during the first GC content annotation)\n"
-    
+
     # Extracting files from the .tar.gz file
-    set chan [open "|gzip -cd $FASTAfileDownloaded"] 
+    set chan [open "|gzip -cd $FASTAfileDownloaded"]
     ::tar::untar $chan -chan -dir "$extannDir/GCcontent/$g_AnnotSV(genomeBuild)"
-    
+
     # Merging in a unique file ($FASTAfileFormatted)
     foreach chrom {1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y M MT} {
 	if {$g_AnnotSV(genomeBuild) eq "GRCh37"} {
@@ -94,8 +94,8 @@ proc updateFASTAfiles {} {
 	    set PathGB "$g_AnnotSV(genomeBuild)"
 	} elseif {$g_AnnotSV(genomeBuild) eq "mm10"} {
 	    set PathGB "$g_AnnotSV(genomeBuild)"
-	} 
-	if {![file exists $extannDir/GCcontent/$PathGB/chr$chrom.fa]} {continue}	    
+	}
+	if {![file exists $extannDir/GCcontent/$PathGB/chr$chrom.fa]} {continue}
 	WriteTextInFile [exec sed "s/chr//" $extannDir/GCcontent/$PathGB/chr$chrom.fa] $FASTAfileFormatted
 	if {![regexp "Y|M" $chrom]} {
 	    set wcValue [exec wc $extannDir/GCcontent/$PathGB/chr$chrom.fa]
@@ -108,17 +108,17 @@ proc updateFASTAfiles {} {
 	    # The chr Y doesn't begin at the 1th position => The length of the sequence doesn't correspond to the length of the chrom Y
 	}
     }
-    
+
     foreach tmpFile [glob -nocomplain "$extannDir/GCcontent/$PathGB/chr*.fa"] {
 	file delete -force $tmpFile
     }
     file delete -force $extannDir/GCcontent/GRCh38/chroms
-    
+
     # index file generation
     ReplaceTextInFile "1\t150000\t150200" $extannDir/GCcontent/test.bed
     catch {exec bedtools nuc $FASTAfileFormatted -bed $extannDir/GCcontent/test.bed} Message
     file delete -force $extannDir/GCcontent/test.bed
-    
+
     file delete -force $FASTAfileDownloaded
 
 }
@@ -138,17 +138,17 @@ proc GCcontentAnnotation {BreakpointChrom BreakpointPos} {
     set g_GCcontent(Empty) "" ; # Ok, no "\t" because we return only one value for each procedure call
 
     # Checking with the size of the chrom is needed
-    set extannDir "$g_AnnotSV(docDir)/Annotations_$g_AnnotSV(organism)/BreakpointsAnnotations"
+    set extannDir "$g_AnnotSV(shareDir)/$g_AnnotSV(organism)/BreakpointsAnnotations"
     set ChromSizesFile "$extannDir/GCcontent/$g_AnnotSV(genomeBuild)/$g_AnnotSV(genomeBuild)_chromFa.chromSizes"
     foreach L [LinesFromFile $ChromSizesFile] {
 	set sizeOf([lindex $L 0]) [lindex $L 1]
     }
 
-    set FASTAfileFormatted [glob -nocomplain "$extannDir/GCcontent/$g_AnnotSV(genomeBuild)/$g_AnnotSV(genomeBuild)_chromFa.fasta"] 
-    
+    set FASTAfileFormatted [glob -nocomplain "$extannDir/GCcontent/$g_AnnotSV(genomeBuild)/$g_AnnotSV(genomeBuild)_chromFa.fasta"]
+
 
     if {![info exists g_GCcontent(DONE)]} {
-	
+
 	# Creation of a bedfile with all breakpoints +/- 100 bp:
 	# FORMAT:  chrom   'breakpoint-100'   'breakpoint+100'   'breakpoint'
 	regsub -nocase "(.formatted)?.bed$" $g_AnnotSV(bedFile) ".breakpoints.bed" tmpBreakpointsFile
@@ -172,7 +172,7 @@ proc GCcontentAnnotation {BreakpointChrom BreakpointPos} {
 		if {$start_breakpoint1 < $sizeOf($chrom)} {
 		    set end_breakpoint1 $sizeOf($chrom)
 		}
-	    } 
+	    }
 	    set start_breakpoint2 [expr $end-100]  ; if {$start_breakpoint2 < 0} {set start_breakpoint2 0}
 	    set end_breakpoint2 [expr $end+100]    ; if {$end_breakpoint2 < 0} {set end_breakpoint2 0}
 	    if {[info exists sizeOf($chrom)] && $end_breakpoint2 > $sizeOf($chrom)} {
@@ -180,7 +180,7 @@ proc GCcontentAnnotation {BreakpointChrom BreakpointPos} {
 		if {$start_breakpoint2 < $sizeOf($chrom)} {
 		    set end_breakpoint2 $sizeOf($chrom)
 		}
-	    } 
+	    }
 
 	    lappend L_LinesToWrite "$chrom\t$start_breakpoint1\t$end_breakpoint1\t$start"
 	    lappend L_LinesToWrite "$chrom\t$start_breakpoint2\t$end_breakpoint2\t$end"
@@ -206,7 +206,7 @@ proc GCcontentAnnotation {BreakpointChrom BreakpointPos} {
 	# Intersect
 	regsub -nocase "(.formatted)?.bed$" $g_AnnotSV(bedFile) ".GCcontent.txt" tmpNucFile
 	set tmpNucFile "$g_AnnotSV(outputDir)/[file tail $tmpNucFile]"
-	file delete -force $tmpNucFile	
+	file delete -force $tmpNucFile
 	if {[catch {exec $g_AnnotSV(bedtools) nuc -fi $FASTAfileFormatted -bed $tmpBreakpointsFile > $tmpNucFile} Message]} {
 	    if {$Message ne "Warning: the index file is older than the FASTA file."} {
 		puts "-- GCcontentAnnotation, nuc --"
@@ -240,15 +240,15 @@ proc GCcontentAnnotation {BreakpointChrom BreakpointPos} {
 	    set g_GCcontent($chrom,$breakpoint) $gcPercent
 	    if {$numN ne "0"} {
 		if {$numOth ne "0"} {append g_GCcontent($chrom,$breakpoint) " ($numN N, $numOth Oth)"} else {append g_GCcontent($chrom,$breakpoint) " ($numN N)"}
-	    } elseif {$numOth ne "0"} {append g_GCcontent($chrom,$breakpoint) " ($numOth Oth)"} 
+	    } elseif {$numOth ne "0"} {append g_GCcontent($chrom,$breakpoint) " ($numOth Oth)"}
 	}
-	
-	set g_GCcontent(DONE) 1	
+
+	set g_GCcontent(DONE) 1
 	file delete -force $tmpNucFile
     }
-    
+
     if {[info exist g_GCcontent($BreakpointChrom,$BreakpointPos)]} {
-	return $g_GCcontent($BreakpointChrom,$BreakpointPos) 
+	return $g_GCcontent($BreakpointChrom,$BreakpointPos)
     } else {
 	return $g_GCcontent(Empty)
     }

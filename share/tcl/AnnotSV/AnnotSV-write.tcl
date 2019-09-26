@@ -171,7 +171,7 @@ proc OrganizeAnnotation {} {
 	}
 	if {$g_AnnotSV(IMHann_i) eq ""} {set g_AnnotSV(IMHann) 0}
     }
-    set usersDir "$g_AnnotSV(docDir)/Annotations_$g_AnnotSV(organism)/Users/$g_AnnotSV(genomeBuild)"
+    set usersDir "$g_AnnotSV(shareDir)/$g_AnnotSV(organism)/Users/$g_AnnotSV(genomeBuild)"
     ####### "SVincludedInFt header"
     if {[glob -nocomplain $usersDir/SVincludedInFt/*.formatted.sorted.bed] ne ""} {
 	foreach formattedUserBEDfile [glob -nocomplain $usersDir/SVincludedInFt/*.formatted.sorted.bed] {

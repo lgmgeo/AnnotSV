@@ -34,7 +34,7 @@ proc checkHIfile {} {
 
     ## Check if the HI file has been downloaded then formatted
     #########################################################
-    set extannDir "$g_AnnotSV(docDir)/Annotations_$g_AnnotSV(organism)/Genes-based"
+    set extannDir "$g_AnnotSV(shareDir)/$g_AnnotSV(organism)/Genes-based"
  
     set HIfileDownloaded [glob -nocomplain "$extannDir/DDD/HI_Predictions_Version3.bed.gz"]
     set HIfileFormattedGzip [glob -nocomplain "$extannDir/DDD/*_HI.tsv.gz"] 

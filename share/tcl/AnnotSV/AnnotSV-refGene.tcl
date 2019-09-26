@@ -29,7 +29,7 @@ proc checkRefGeneFile {} {
 
     ## Check if the refGene file has been downloaded then formatted
     ##############################################################
-    set refgeneDir "$g_AnnotSV(docDir)/Annotations_$g_AnnotSV(organism)/RefGene/$g_AnnotSV(genomeBuild)"
+    set refgeneDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)/RefGene/$g_AnnotSV(genomeBuild)"
 
     set refgeneFileDownloaded "[glob -nocomplain $refgeneDir/refGene.txt.gz]"
     set refgeneFileFormatted "[glob -nocomplain $refgeneDir/refGene.sorted.bed]"
@@ -40,13 +40,13 @@ proc checkRefGeneFile {} {
 	puts "Please check your install - Exit with error."
 	puts "############################################################################"
 	exit 2
-    } 
+    }
 
     if {$refgeneFileFormatted eq ""} {
 
 	## Delete promoters files (need to be updated after the creation of new refGene file)
 	##################################################################################### 
-	set promoterDir "$g_AnnotSV(docDir)/Annotations_$g_AnnotSV(organism)/FtIncludedInSV/Promoter/$g_AnnotSV(genomeBuild)"
+	set promoterDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)/FtIncludedInSV/Promoter/$g_AnnotSV(genomeBuild)"
 	foreach promFile [glob -nocomplain "$promoterDir/promoter.*bp.sorted.bed"] {
 	    file delete -force $promFile
 	}
@@ -56,16 +56,16 @@ proc checkRefGeneFile {} {
 	set refgeneFileFormatted "$refgeneDir/refGene.sorted.bed"
 	puts "...creation of $refgeneFileFormatted ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 	puts "\t   (done only once during the first annotation)\n"
-	
+
 	# Removing non-standard contigs (other than the standard 1-22,X,Y,MT) and sorting the file in karyotypic order
 	# -> create L_refGeneTXTsorted
-	
+
 	## Save the line of the refGeneTXT by chromosome (L_lines($chrom))
 	foreach L [LinesFromGZFile $refgeneFileDownloaded] {
-	    set Ls [split $L "\t"]	    
+	    set Ls [split $L "\t"]
 	    set chrom [lindex $Ls 2]
 	    lappend L_lines($chrom) "$L"
-	}	
+	}
 	## Sorting in karyotypic order
 	set L_refGeneTXTsorted {}
 	foreach val {1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y M MT} {
@@ -75,7 +75,7 @@ proc checkRefGeneFile {} {
 	# Creation of the $refgeneFileFormatted.
 	# Chromosome nomenclature used: 1-22,X,Y,M,T (without "chr")
 	## INPUT:    #bin name chrom strand txStart txEnd cdsStart cdsEnd exonCount exonStarts exonEnds score name2 cdsStartStat cdsEndStat exonFrames
-	## OUTPUT:   chrom txStart txEnd strand name2 name cdsStart cdsEnd exonStarts exonEnds	
+	## OUTPUT:   chrom txStart txEnd strand name2 name cdsStart cdsEnd exonStarts exonEnds
 	# WARNING : NR_* are for non coding RNA. However, cdsStart=cdsEnd, => CDSlength=1
 	foreach L $L_refGeneTXTsorted {
 	    set Ls [split $L "\t"]
@@ -85,11 +85,11 @@ proc checkRefGeneFile {} {
 		WriteTextInFile $line $refgeneFileFormatted.tmp
 		set infos($line) 1
 	    }
-	} 
+	}
 	file delete -force $refgeneFileDownloaded
 	# Sorting of the bedfile:
 	# Intersection with very large files can cause trouble with excessive memory usage.
-	# A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm. 
+	# A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm.
 	if {[catch {eval exec sort -k1,1 -k2,2n $refgeneFileFormatted.tmp > $refgeneFileFormatted} Message]} {
 	    puts "-- checkRefGeneFile --"
 	    puts "sort -k1,1 -k2,2n $refgeneFileFormatted.tmp > $refgeneFileFormatted"
@@ -104,7 +104,7 @@ proc checkRefGeneFile {} {
     # DISPLAY:
     ##########
     set g_AnnotSV(refGene) $refgeneFileFormatted
-    
+
 }
 
 
@@ -122,11 +122,10 @@ proc refGeneAnnotation {} {
     global g_AnnotSV
     global g_Lgenes
 
-    
+
     # Bedfile should be sorted and should not have "chr" in the first column
     ########################################################################
     # Removing non-standard contigs (other than the standard 1-22,X,Y,MT) and sorting the file in karyotypic order
-
     set f [open $g_AnnotSV(bedFile)]
     set test 0
     while {![eof $f]} {
@@ -142,7 +141,7 @@ proc refGeneAnnotation {} {
     ## Writing the bedfile (not sorted)
     regsub -nocase ".bed$" $g_AnnotSV(bedFile) ".formatted.sorted.bed" newBed
     set newBed "$g_AnnotSV(outputDir)/[file tail $newBed]"
-    file delete -force $newBed 
+    file delete -force $newBed
     foreach chrom {1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y M MT} {
 	if {![info exists L_Text($chrom)]} {continue}
 	WriteTextInFile [join $L_Text($chrom) "\n"] $newBed.tmp
@@ -150,7 +149,7 @@ proc refGeneAnnotation {} {
     }
     # Sorting of the bedfile:
     # Intersection with very large files can cause trouble with excessive memory usage.
-    # A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm. 
+    # A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm.
     if {[catch {eval exec sort -k1,1 -k2,2n $newBed.tmp >> $newBed} Message]} {
 	puts "-- refGeneAnnotation --"
 	puts "sort -k1,1 -k2,2n $newBed.tmp >> $newBed"
@@ -161,9 +160,9 @@ proc refGeneAnnotation {} {
     file delete -force $newBed.tmp
     set g_AnnotSV(bedFile) $newBed
 
-    # Used for the insertion of the "full/split" information 
+    # Used for the insertion of the "full/split" information
     set L_Bed [LinesFromFile $newBed]
-    
+
 
     # OUTPUT:
     ###############
@@ -198,7 +197,7 @@ proc refGeneAnnotation {} {
 
     # List of the user selected transcripts
     #######################################
-    set L_selectedTx {}  
+    set L_selectedTx {}
     if {$g_AnnotSV(txFile) ne ""} {
 	foreach L [LinesFromFile $g_AnnotSV(txFile)] {
 	    foreach tx [split $L " |\t"] {
@@ -217,7 +216,7 @@ proc refGeneAnnotation {} {
     set splitSVright [lindex $Ls 2]
     # SV/oldSV defined with: "chrom, start, end":
     set oldSplitSV "[join [lrange $Ls 0 2] "\t"]"
-    set L_genes {}	     
+    set L_genes {}
     set n 0
 
     # Keep only 1 NM by gene:
@@ -261,13 +260,12 @@ proc refGeneAnnotation {} {
 		    unset L_annot
 		    unset L_txLength
 		    unset L_CDSlength
-		    catch {unset Finish}
-		    set L_genes {}	     
+		    set L_genes {}
 		    set oldSplitSV "$splitSV"
 		}
 		incr n
 	    }
-	}   
+	}
 	set txName [lindex $Ls end-4]
 	set gene [lindex $Ls end-5]
 
@@ -277,20 +275,20 @@ proc refGeneAnnotation {} {
 	# No preferred transcript annotation registered at this step, continue the selection with the CDS/Tx lengths
 	lappend L_genes $gene
 	lappend L_annot($gene) "$L"
-	
+
 	set txStart [lindex $Ls end-8]
 	set txEnd [lindex $Ls end-7]
 	set CDSstart [lindex $Ls end-3]
 	set CDSend [lindex $Ls end-2]
 	set exonStarts [lindex $Ls end-1]
 	set exonEnds [lindex $Ls end]
-		
+
 	# Calcul of txLength:
 	if {$txStart > $splitSVleft} {set start $txStart} else {set start $splitSVleft}
 	if {$txEnd < $splitSVright} {set end $txEnd} else {set end $splitSVright}
 	set txLength [expr {$end-$start+1}]
 	lappend L_txLength($gene) "$txLength"
-	
+
 	# Calcul of CDSlength:
 	set CDSlength 0
 	foreach A [split $exonStarts ","] B [split $exonEnds ","] {
@@ -314,20 +312,20 @@ proc refGeneAnnotation {} {
 	    if {$end<$B} {set j $end} else {set j $B}
 	    incr CDSlength [expr {$j-$i+1}]
 	}
-	lappend L_CDSlength($gene) "$CDSlength"	
+	lappend L_CDSlength($gene) "$CDSlength"
 
 	# Do we have a user selected transcript?
 	if {"$txName" ne "" && [lsearch -exact $L_selectedTx "$txName"] ne -1} {
 	    set L_annot($gene) {}
 	    lappend L_annot($gene) "$L"
 	    set L_txLength($gene) "$txLength"
-	    set L_CDSlength($gene) "$CDSlength"	
+	    set L_CDSlength($gene) "$CDSlength"
 	    set Finish($gene) 1
 	}
 
     }
     close $f
- 
+
     # Treatment for the last SV of the file
     ########################################
     # Insertion of the "full length" SV line
@@ -353,7 +351,7 @@ proc refGeneAnnotation {} {
 		    set bestAnn $ann; set bestCDSl $CDSl; set bestTxL $txL; continue
 		}
 	    }
-	}	
+	}
 	WriteTextInFile "$bestAnn\t$bestCDSl\t$bestTxL\tsplit" "$tmpFullAndSplitBedFile"
     }
     # Insertion of the last "full length" SV lines
@@ -368,9 +366,9 @@ proc refGeneAnnotation {} {
 
     ## Memo:
     ## The same SV can be annotated on several genes. Warning: annotations are not necessarily group by gene. Example:
-    #     1       144676654       144680028       DEL     SGT161364       NBPF8   NR_102405       0       3375    intron5-intron5 144676654       144680028       
-    #     1       144676654       144680028       DEL     SGT161364       NBPF9   NM_001277444    0       3375    intron8-intron8 144676654       144680028    
-    #     1       144676654       144680028       DEL     SGT161364       NBPF8   NR_102404       0       3375    intron6-intron6 144676654       144680028    
+    #     1       144676654       144680028       DEL     SGT161364       NBPF8   NR_102405       0       3375    intron5-intron5 144676654       144680028
+    #     1       144676654       144680028       DEL     SGT161364       NBPF9   NM_001277444    0       3375    intron8-intron8 144676654       144680028
+    #     1       144676654       144680028       DEL     SGT161364       NBPF8   NR_102404       0       3375    intron6-intron6 144676654       144680028
     # It's due to the alternance of NBPF8 and NBPF9 in the refGene file:
     #     1       144614958       144830407       NBPF8   NR_102405       144830407       144830407       144614958,144618081,144619346,144619882,144621446,144813741,144814679,144815935,144816472,144817965,144823127,144823812,144824704,144825352,144826234,144826932,144827819,144828540,    144615303,144618296,144619419,144620094,144621656,144813844,144814894,144816008,144816678,144818017,144823179,144823985,144824756,144825525,144826286,144827105,144827928,144830407,
     #     1       144614958       145370304       NBPF9   NM_001277444    144615130       145368684       144614958,144615095,144615246,144617149,144618081,144619346,144619882,144621446,144813741,144814679,144815935,144816472,144817965,144821920,144823127,144823812,144824704,144825352,144826234,144826932,144827819,145313333,145314215,145314903,145315790,145368440,    144614998,144615246,144615303,144617252,144618296,144619419,144620094,144621656,144813844,144814894,144816008,144816678,144818017,144822084,144823179,144823985,144824756,144825525,144826286,144827105,144827928,145313506,145314267,145315076,145315899,145370304,
