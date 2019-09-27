@@ -281,6 +281,7 @@ proc SVranking {L_annotations ref alt} {
 
     # Ranking!!
     ###########
+
     set Ls [split $L_annotations "\t"]
     set SVtype [lindex $Ls $g_AnnotSV(svtBEDcol)]   
     set SVtoAnn [join [lrange $Ls 1 3] ","]
