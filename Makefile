@@ -82,7 +82,7 @@ install-executable:
 	@echo ""
 	@echo "Executable installation"
 	@echo "-----------------------"
-	install -p -m 0755 bin/$(ANNOTSV)/AnnotSV.tcl $(DESTDIR)$(BINDIR)/$(ANNOTSV)
+	install -p -m 0755 bin/AnnotSV.tcl $(DESTDIR)$(BINDIR)/$(ANNOTSV)
 
 install-tcl-toolbox: $(TCL_SCRIPTS)
 	@echo ""
