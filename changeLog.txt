@@ -14,6 +14,7 @@ For more details, please see the README file.
 	- Include the lift-over GRCh38 gnomAD SV frequency annotation
 	- New "AnnotSV ID" settings (to ensure to only have unique identifiers)
 	- Add bugfix concerning the "-candidateGenesFiltering" option
+	- AnnotSV executable is now directly located in $ANNOTSV/bin to respect the FHS
 
 July 30, 2019: AnnotSV version 2.2.3
 	- Integration of the gnomAD data in the ranking
