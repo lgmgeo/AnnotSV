@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.2.3                                                                                              #
+# AnnotSV 2.2.4                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -28,7 +28,7 @@ proc checkClinGenFile {} {
     global g_AnnotSV
 
 
-    set clingenDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)/Genes-based/ClinGen"
+    set clingenDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based/ClinGen"
 
     ## Check if the ClinGen file has been downloaded the formatted
     ##############################################################

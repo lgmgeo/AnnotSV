@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.2.3                                                                                              #
+# AnnotSV 2.2.4                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -39,10 +39,11 @@ proc configureAnnotSV {argv} {
     ## Load default options
     #######################
     puts "\t...configuration data by default"
+    set g_AnnotSV(annotationsDir)           ""
     set g_AnnotSV(bedtools)                 "bedtools"
     set g_AnnotSV(candidateGenesFile)       ""
     set g_AnnotSV(candidateGenesFiltering)  "no"
-    set g_AnnotSV(extann)                   ""    ;# list of the “$ANNOTSV/Annotations_$g_AnnotSV(organism)/*/*.tsv(.gz) files” <=> External genes annotation files
+    set g_AnnotSV(extann)                   ""    ;# list of the “.../Annotations_$g_AnnotSV(organism)/*/*.tsv(.gz) files” <=> External genes annotation files
     set g_AnnotSV(filteredVCFfiles)         ""
     set g_AnnotSV(filteredVCFsamples)       ""
     set g_AnnotSV(genomeBuild)              "GRCh37"
@@ -71,7 +72,7 @@ proc configureAnnotSV {argv} {
     ###########################
     ## Load config file options
     ###########################
-    set lOptionsOk "bedtools candidateGenesFile candidateGenesFiltering extann filteredVCFfiles filteredVCFsamples genomeBuild metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering rankOutput reciprocal SVinputFile SVinputInfo SVminSize svtBEDcol txFile typeOfAnnotation vcfFiles vcfSamples vcfPASS"
+    set lOptionsOk "annotationsDir bedtools candidateGenesFile candidateGenesFiltering extann filteredVCFfiles filteredVCFsamples genomeBuild metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering rankOutput reciprocal SVinputFile SVinputInfo SVminSize svtBEDcol txFile typeOfAnnotation vcfFiles vcfSamples vcfPASS"
     set configFile "$g_AnnotSV(etcDir)/configfile"
     if {[file exists "./configfile"]} {
 	set configFile "./configfile"
@@ -135,6 +136,14 @@ proc configureAnnotSV {argv} {
     ## Checking of the configuration options
     ########################################
     puts "\t...checking configuration data and files\n"
+
+    ## annotationsDir: It must be an existing directory (or "" for the default)
+    if {$g_AnnotSV(annotationsDir) eq ""} {
+	set g_AnnotSV(annotationsDir) "$g_AnnotSV(installDir)/share/AnnotSV"
+    } elseif {![file isdirectory $g_AnnotSV(annotationsDir)]} {
+	puts "AnnotSV needs in argument an existing path of the annotations directory (-annotationsDir = \"$g_AnnotSV(annotationsDir)\") - Exit with error."
+	exit 2
+    }
 
     ## SVinputFile: We should have a bed or VCF input file
     if {$g_AnnotSV(SVinputFile) eq ""} {

@@ -1,7 +1,7 @@
 #!/usr/bin/env tclsh
 
 ############################################################################################################
-# AnnotSV 2.2.3                                                                                              #
+# AnnotSV 2.2.4                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -49,16 +49,16 @@ if {$binDirFromScript ne $binDirFromANNOTSV} {
     puts "Check your \"ANNOTSV\" environment variable. Exit with error"; exit 2
 }
 
-# Setting of g_AnnotSV(installDir), g_AnnotSV(tclDir), g_AnnotSV(docDir) and g_AnnotSV(etcDir):
+# Setting of g_AnnotSV(installDir), g_AnnotSV(etcDir), g_AnnotSV(docDir) and g_AnnotSV(tclDir) :
 set g_AnnotSV(installDir) "$env(ANNOTSV)"
-set g_AnnotSV(etcDir) "$g_AnnotSV(installDir)/etc/AnnotSV"
-set g_AnnotSV(shareDir) "$g_AnnotSV(installDir)/share"
-set g_AnnotSV(docDir) "$g_AnnotSV(installDir)/share/doc/AnnotSV"
+set g_AnnotSV(etcDir)     "$g_AnnotSV(installDir)/etc/AnnotSV"
+set g_AnnotSV(docDir)     "$g_AnnotSV(installDir)/share/doc/AnnotSV"
 set tclVersion [info tclversion]
-set g_AnnotSV(tclDir) "$g_AnnotSV(installDir)/share/tcl${tclVersion}/AnnotSV"
+set g_AnnotSV(tclDir)     "$g_AnnotSV(installDir)/share/tcl${tclVersion}/AnnotSV"
 if {![file exists $g_AnnotSV(tclDir)]} {
     set g_AnnotSV(tclDir) "$g_AnnotSV(installDir)/share/tcl/AnnotSV"
 }
+# g_AnnotSV(annotationsDir) is set to "$g_AnnotSV(installDir)/share/AnnotSV" in AnnotSV-config.tcl
 
 source $g_AnnotSV(tclDir)/AnnotSV-1000g.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-clingen.tcl
@@ -205,8 +205,7 @@ checkUsersBED
 
 # Users Genes-based annotation files (from $ANNOTSV/Annotations_$g_AnnotSV(organism)/*/)
 # g_AnnotSV(extann) has been initialized in AnnotSV-config.tcl
-set annotationsDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)"
-set genesBasedDir "$annotationsDir/Genes-based"
+set genesBasedDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based"
 foreach annotFile [glob -nocomplain $genesBasedDir/*/*.tsv] {
     if {[regexp "_DGV_samplesInStudies.tsv$" $annotFile]} {continue}
     lappend g_AnnotSV(extann) $annotFile
@@ -214,7 +213,7 @@ foreach annotFile [glob -nocomplain $genesBasedDir/*/*.tsv] {
 foreach annotFile [glob -nocomplain $genesBasedDir/*/*.tsv.gz] {
     lappend g_AnnotSV(extann) $annotFile
 }
-set userDir "$annotationsDir/Users/" 
+set userDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Users/" 
 foreach annotFile [glob -nocomplain $userDir/*.tsv] {
     lappend g_AnnotSV(extann) $annotFile
 }

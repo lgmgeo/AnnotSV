@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.2.3                                                                                              #
+# AnnotSV 2.2.4                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -33,7 +33,7 @@ proc checkTADfiles {} {
 
     ## Check if TAD files has been downloaded then formatted
     #######################################################
-    set extannDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)"
+    set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)"
     set TADfilesDownloaded [glob -nocomplain "$extannDir/FtIncludedInSV/TAD/$g_AnnotSV(genomeBuild)/ENC*.bed"]
     set boundariesTADfileFormatted [glob -nocomplain "$extannDir/FtIncludedInSV/TAD/$g_AnnotSV(genomeBuild)/*_boundariesTAD.sorted.bed"] 
 
@@ -126,7 +126,7 @@ proc TADannotation {SVchrom SVstart SVend L_i} {
     global tadText
 
 
-    set extannDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)"
+    set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)"
     set boundariesTADfileFormatted [glob -nocomplain "$extannDir/FtIncludedInSV/TAD/$g_AnnotSV(genomeBuild)/*_boundariesTAD.sorted.bed"] 
     
     if {![info exists tadText(DONE)]} {

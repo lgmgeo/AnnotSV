@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.2.3                                                                                              #
+# AnnotSV 2.2.4                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -38,7 +38,7 @@ proc checkGHfiles {} {
 
     ## Check if GH files has been formatted
     #######################################
-    set extannDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)"
+    set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)"
     set GHdir "$extannDir/FtIncludedInSV/GeneHancer"
     set GHfileFormatted [glob -nocomplain "$GHdir/$g_AnnotSV(genomeBuild)/*_GH_$g_AnnotSV(genomeBuild).sorted.bed"] 
 
@@ -241,7 +241,7 @@ proc GHannotation {SVchrom SVstart SVend L_i} {
     global NotEliteGene
    
 
-    set extannDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)"
+    set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)"
     set GHfileFormatted [glob -nocomplain "$extannDir/FtIncludedInSV/GeneHancer/$g_AnnotSV(genomeBuild)/*_GH_$g_AnnotSV(genomeBuild).sorted.bed"] 
     
     if {![info exists GHtext(DONE)]} {

@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.2.3                                                                                              #
+# AnnotSV 2.2.4                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -33,7 +33,7 @@ proc checkIMHfile {} {
 
     ## Check if IMH file has been downloaded then formatted
     #########################################################
-    set IMHdir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)/SVincludedInFt/IMH/$g_AnnotSV(genomeBuild)"
+    set IMHdir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/SVincludedInFt/IMH/$g_AnnotSV(genomeBuild)"
     set IMHfileDownloaded [glob -nocomplain "$IMHdir/B*.callset.public.bedpe"]
     set IMHfileFormattedAndSorted  [glob -nocomplain "$IMHdir/*_IMH_DUP_SV.sorted.bed"]
 
@@ -141,7 +141,7 @@ proc IMHannotation {SVchrom SVstart SVend SVtype L_i} {
     # SVtype in which category: DUP? DEL? INV? INS? None?
     set SVtype [normalizeSVtype $SVtype]
 
-    set IMHdir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)/SVincludedInFt/IMH/$g_AnnotSV(genomeBuild)"
+    set IMHdir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/SVincludedInFt/IMH/$g_AnnotSV(genomeBuild)"
     
     if {![info exists IMHtext(DONE)]} {
 	

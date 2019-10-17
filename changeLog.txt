@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.2.3                                                                                            #
+# AnnotSV 2.2.4                                                                                            #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
@@ -10,8 +10,9 @@
 
 For more details, please see the README file.
 
-, 2019: AnnotSV version 
+Oct 17, 2019: AnnotSV version 2.2.4
 	- Include the lift-over GRCh38 gnomAD SV frequency annotation
+	- Include the "-annotationsDir" option to pass the annotations directory to AnnotSV at run time
 	- New "AnnotSV ID" settings (to ensure to only have unique identifiers)
 	- Add bugfix concerning the "-candidateGenesFiltering" option
 	- Add bugfix concerning the DGV metrics

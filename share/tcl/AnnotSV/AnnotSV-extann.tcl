@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.2.3                                                                                              #
+# AnnotSV 2.2.4                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -25,7 +25,7 @@
 proc ExternalAnnotations args {
 
     # To add external annotation to a gene in particular
-    # All $ANNOTSV/Annotations_$g_AnnotSV(organism)/*/*.tsv and $ANNOTSV/Annotations_$g_AnnotSV(organism)/*/*.tsv.gz files are used (defined in AnnotSV-main.tcl)
+    # All .../Annotations_$g_AnnotSV(organism)/*/*.tsv and .../Annotations_$g_AnnotSV(organism)/*/*.tsv.gz files are used (defined in AnnotSV-main.tcl)
     #
     # Format is tab separated values, 1st line is a header, 1st "genes" column is the gene name, rest is free
     # Typical use would be a gene file containing specific annotations such as tranmission mode, disease, expression...

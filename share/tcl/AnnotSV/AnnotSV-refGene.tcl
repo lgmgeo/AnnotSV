@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.2.3                                                                                              #
+# AnnotSV 2.2.4                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -29,7 +29,7 @@ proc checkRefGeneFile {} {
 
     ## Check if the refGene file has been downloaded then formatted
     ##############################################################
-    set refgeneDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)/RefGene/$g_AnnotSV(genomeBuild)"
+    set refgeneDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/RefGene/$g_AnnotSV(genomeBuild)"
 
     set refgeneFileDownloaded "[glob -nocomplain $refgeneDir/refGene.txt.gz]"
     set refgeneFileFormatted "[glob -nocomplain $refgeneDir/refGene.sorted.bed]"
@@ -46,7 +46,7 @@ proc checkRefGeneFile {} {
 
 	## Delete promoters files (need to be updated after the creation of new refGene file)
 	##################################################################################### 
-	set promoterDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)/FtIncludedInSV/Promoter/$g_AnnotSV(genomeBuild)"
+	set promoterDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/FtIncludedInSV/Promoter/$g_AnnotSV(genomeBuild)"
 	foreach promFile [glob -nocomplain "$promoterDir/promoter.*bp.sorted.bed"] {
 	    file delete -force $promFile
 	}

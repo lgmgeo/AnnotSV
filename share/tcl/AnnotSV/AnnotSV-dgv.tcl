@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.2.3                                                                                              #
+# AnnotSV 2.2.4                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -34,7 +34,7 @@ proc checkDGVfiles {} {
 
     ## Check if the 2 DGV files have been downloaded then formatted
     ##############################################################
-    set extannDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)"
+    set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)"
     set DGVfile1Downloaded [glob -nocomplain "$extannDir/SVincludedInFt/DGV/$g_AnnotSV(genomeBuild)/DGV.GS.*.gff3"]
     set DGVfile2Downloaded [glob -nocomplain "$extannDir/SVincludedInFt/DGV/$g_AnnotSV(genomeBuild)/*_supportingvariants_*.txt"]
     set DGVfile1Formatted [glob -nocomplain "$extannDir/SVincludedInFt/DGV/$g_AnnotSV(genomeBuild)/*_DGV.GS*_annotations.sorted.bed"]
@@ -233,7 +233,7 @@ proc DGVannotation {SVchrom SVstart SVend L_i} {
     global dgvText
 
 
-    set extannDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)"
+    set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)"
     set DGVfile1Formatted [glob -nocomplain "$extannDir/SVincludedInFt/DGV/$g_AnnotSV(genomeBuild)/*_DGV.GS*_annotations.sorted.bed"]
     set DGVfile2Formatted [glob -nocomplain "$extannDir/SVincludedInFt/DGV/$g_AnnotSV(genomeBuild)/*_DGV_samplesInStudies.tsv"]
 

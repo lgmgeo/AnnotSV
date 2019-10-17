@@ -6,6 +6,8 @@ COMMAND LINE USAGE
 
 OPTIONS
 
+-annotationsDir:                Path of the annotations directory
+
 -bedtools:                      Path of the bedtools local installation
 
 -candidateGenesFile:            Path of a file containing the candidate genes of the user (gene names can be space-separated, tabulation-separated, or line-break-separated) (optional)

@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.2.3                                                                                              #
+# AnnotSV 2.2.4                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -171,7 +171,7 @@ proc OrganizeAnnotation {} {
 	}
 	if {$g_AnnotSV(IMHann_i) eq ""} {set g_AnnotSV(IMHann) 0}
     }
-    set usersDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)/Users/$g_AnnotSV(genomeBuild)"
+    set usersDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Users/$g_AnnotSV(genomeBuild)"
     ####### "SVincludedInFt header"
     if {[glob -nocomplain $usersDir/SVincludedInFt/*.formatted.sorted.bed] ne ""} {
 	foreach formattedUserBEDfile [glob -nocomplain $usersDir/SVincludedInFt/*.formatted.sorted.bed] {

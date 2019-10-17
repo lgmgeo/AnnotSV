@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.2.3                                                                                              #
+# AnnotSV 2.2.4                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -37,7 +37,7 @@ proc checkGeneIntoleranceFile {} {
 
     ## Check if the GeneIntolerance file has been downloaded then formatted
     ######################################################################
-    set extannDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)/Genes-based"
+    set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based"
 
     set GeneIntoleranceFileDownloaded [glob -nocomplain "$extannDir/ExAC/fordist_cleaned_nonpsych_z_pli_rec_null_data.txt"]
     set GeneIntoleranceFileFormattedGzip [glob -nocomplain "$extannDir/ExAC/*_GeneIntolerance.pLI-Zscore.annotations.tsv.gz"]
@@ -135,7 +135,7 @@ proc checkCNVintoleranceFile {} {
 
     ## Check if the CNVintoleranceFile has been downloaded then formatted
     ######################################################################
-    set extannDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)/Genes-based"
+    set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based"
 
     set CNVintoleranceFileDownloaded [glob -nocomplain "$extannDir/ExAC/exac-final-cnv.gene.scores071316"]
     set CNVintoleranceFileFormattedGzip [glob -nocomplain "$extannDir/ExAC/*_ExAC.CNV-Zscore.annotations.tsv.gz"]

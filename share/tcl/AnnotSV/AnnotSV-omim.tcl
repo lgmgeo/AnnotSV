@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.2.3                                                                                              #
+# AnnotSV 2.2.4                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -28,7 +28,7 @@ proc checkOMIMfile {} {
     global g_AnnotSV
 
 
-    set omimDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)/Genes-based/OMIM" 
+    set omimDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based/OMIM" 
  
     ## Check if the OMIM file has been downloaded the formatted
     ##########################################################
@@ -152,7 +152,7 @@ proc checkMorbidGenesfile {} {
     global g_AnnotSV
 
 
-    set omimDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)/Genes-based/OMIM" 
+    set omimDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based/OMIM" 
  
     ## Check if the MorbidGenes file has been downloaded the formatted
     ##################################################################

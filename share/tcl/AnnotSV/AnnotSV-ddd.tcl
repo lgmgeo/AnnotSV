@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.2.3                                                                                              #
+# AnnotSV 2.2.4                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -43,7 +43,7 @@ proc checkDDDgeneFile {} {
 
     ## Check if the "DDD gene" file has been downloaded then formatted
     #################################################################
-    set extannDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)/Genes-based"
+    set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based"
     set DDDfileDownloaded [glob -nocomplain "$extannDir/DDD/DDG2P.csv.gz"]
     set DDDfileFormattedAndSortedGzip [glob -nocomplain "$extannDir/DDD/*_DDG2P.sorted.tsv.gz"]
 
@@ -81,7 +81,7 @@ proc updateDDDgeneFile {} {
 	return
     }
 
-    set extannDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)/Genes-based"
+    set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based"
     set DDDfileDownloaded [glob -nocomplain "$extannDir/DDD/DDG2P.csv.gz"]
 
     ## Create : 'date'_DDG2P.tsv.gz
@@ -171,7 +171,7 @@ proc checkDDDfrequencyFile {} {
 
     ## Check if the DDD frequency file has been downloaded then formatted
     ####################################################################
-    set extannDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)/"
+    set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/"
 
     set DDDfrequencyFileDownloaded [glob -nocomplain "$extannDir/SVincludedInFt/DDD/$g_AnnotSV(genomeBuild)/population_cnv.txt.gz"]
     set DDDfrequencyFileFormatted [glob -nocomplain "$extannDir/SVincludedInFt/DDD/$g_AnnotSV(genomeBuild)/*_DDD_population_cnv.sorted.bed"]
@@ -266,7 +266,7 @@ proc DDDfrequencyAnnotation {SVchrom SVstart SVend L_i} {
     global dddText
 
 
-    set extannDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)"
+    set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)"
     set DDDfrequencyFileFormatted [glob -nocomplain "$extannDir/SVincludedInFt/DDD/$g_AnnotSV(genomeBuild)/*_DDD_population_cnv.sorted.bed"]
 
     if {![info exists dddText(DONE)]} {

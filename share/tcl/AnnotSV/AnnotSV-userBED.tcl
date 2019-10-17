@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.2.3                                                                                              #
+# AnnotSV 2.2.4                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -22,15 +22,15 @@
 ############################################################################################################
 
 
-# Check the Users BED regions annotations files (from $ANNOTSV/Annotations_$g_AnnotSV(organism)/Users/GRCh*/*ncludedIn*/*.bed)
-# Create : $ANNOTSV/Annotations_$g_AnnotSV(organism)/Users/GRCh*/*ncludedIn*/*.formatted.sorted
+# Check the Users BED regions annotations files (from .../Annotations_$g_AnnotSV(organism)/Users/GRCh*/*ncludedIn*/*.bed)
+# Create : .../Annotations_$g_AnnotSV(organism)/Users/GRCh*/*ncludedIn*/*.formatted.sorted
 # (After the formatting step, the copy and/or linked users file(s) are deleted)
 proc checkUsersBED {} {
 
     global g_AnnotSV
     global g_numberOfAnnotationCol
 
-    set userBEDdir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)/Users/$g_AnnotSV(genomeBuild)"
+    set userBEDdir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Users/$g_AnnotSV(genomeBuild)"
     foreach userBEDfile [glob -nocomplain $userBEDdir/*ncludedIn*/*.bed] {
 	# Create a formatted and sorted bedfile if it doesn't exist yet
 	# and create a *.header.tsv file associated
