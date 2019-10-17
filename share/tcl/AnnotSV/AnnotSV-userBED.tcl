@@ -30,9 +30,8 @@ proc checkUsersBED {} {
     global g_AnnotSV
     global g_numberOfAnnotationCol
 
-    set userBEDdir "$g_AnnotSV(shareDir)/$g_AnnotSV(organism)/Users/$g_AnnotSV(genomeBuild)"
+    set userBEDdir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)/Users/$g_AnnotSV(genomeBuild)"
     foreach userBEDfile [glob -nocomplain $userBEDdir/*ncludedIn*/*.bed] {
-
 	# Create a formatted and sorted bedfile if it doesn't exist yet
 	# and create a *.header.tsv file associated
 	regsub -nocase "(.formatted.sorted)?.bed$" $userBEDfile ".bed" notFormattedFile

@@ -30,7 +30,7 @@ proc check1000gFile {} {
 
     ## Check if 1000g file has been downloaded then formatted
     #########################################################
-    set 1000gDir "$g_AnnotSV(shareDir)/$g_AnnotSV(organism)/SVincludedInFt/1000g/$g_AnnotSV(genomeBuild)"
+    set 1000gDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)/SVincludedInFt/1000g/$g_AnnotSV(genomeBuild)"
     set 1000gFileDownloaded [glob -nocomplain "$1000gDir/ALL.wgs.mergedSV*.vcf.gz"]
     set 1000gFileFormattedAndSorted  [glob -nocomplain "$1000gDir/*_1000g_SV.sorted.bed"]
 
@@ -152,7 +152,7 @@ proc 1000gAnnotation {SVchrom SVstart SVend L_i} {
     global 1000gText
 
 
-    set 1000gDir "$g_AnnotSV(shareDir)/$g_AnnotSV(organism)/SVincludedInFt/1000g/$g_AnnotSV(genomeBuild)"
+    set 1000gDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)/SVincludedInFt/1000g/$g_AnnotSV(genomeBuild)"
     set 1000gBEDfile [glob -nocomplain "$1000gDir/*_1000g_SV.sorted.bed"]
 
     if {![info exists 1000gText(DONE)]} {

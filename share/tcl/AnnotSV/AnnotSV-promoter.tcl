@@ -29,8 +29,8 @@ proc checkPromoterFile {} {
 
     ## Check if the promoters file has been formatted
     #################################################
-    set refgeneDir "$g_AnnotSV(shareDir)/$g_AnnotSV(organism)/RefGene/$g_AnnotSV(genomeBuild)"
-    set promoterDir "$g_AnnotSV(shareDir)/$g_AnnotSV(organism)/FtIncludedInSV/Promoter/$g_AnnotSV(genomeBuild)"
+    set refgeneDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)/RefGene/$g_AnnotSV(genomeBuild)"
+    set promoterDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)/FtIncludedInSV/Promoter/$g_AnnotSV(genomeBuild)"
 
     if {![file exists $promoterDir]} {file mkdir $promoterDir}
 
@@ -100,7 +100,7 @@ proc promoterAnnotation {SVchrom SVstart SVend} {
     set promoterText(Empty) ""
 
 
-    set promoterDir "$g_AnnotSV(shareDir)/$g_AnnotSV(organism)/FtIncludedInSV/Promoter/$g_AnnotSV(genomeBuild)"
+    set promoterDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)/FtIncludedInSV/Promoter/$g_AnnotSV(genomeBuild)"
     set promoterBEDfile "$promoterDir/promoter.$g_AnnotSV(promoterSize)bp.sorted.bed"
     
     if {![info exists promoterText(DONE)]} {

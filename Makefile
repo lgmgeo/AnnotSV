@@ -44,8 +44,8 @@ CP                    = install -p -m 0644
 CPDIR                 = /bin/cp -r
 CONFIGFILE            = etc/$(ANNOTSV)/configfile
 TCL_SCRIPTS           = $(shell find share/tcl/$(ANNOTSV)/ -name '*.tcl')
-DOCUMENTATIONS        = License.txt changeLog.txt commandLineOptions.txt README.AnnotSV_$(VERSION).pdf
-OTHERS_DOCUMENTATIONS = $(shell find share/doc/$(ANNOTSV)/ -type d -name 'Annotations_*')
+DOCUMENTATIONS        = $(shell find License.txt changeLog.txt commandLineOptions.txt README.AnnotSV_*.pdf)
+ANNOTATIONS           = $(shell find share/$(ANNOTSV)/ -type d -name 'Annotations_*')
 ORGANISM              = Human
 
 
@@ -58,14 +58,8 @@ all: install-complete
 install: install-complete
 endif
 
+
 install-ligth: install-display install-documentationlight
-	@echo "Done"
-
-install-documentationlight: $(DOCUMENTATIONS)
-	$(MV) $^ $(DESTDIR)$(DOCDIR)/AnnotSV
-	$(MV) $(TCLDIRDISTRIBUTED) $(TCLDIR)
-
-install-complete: install-display install-configfile install-executable install-tcl-toolbox install-doc install-others-doc
 	@echo "Done"
 
 install-display:
@@ -76,6 +70,13 @@ install-display:
 	@echo PREFIX=$(PREFIX)
 	@echo TCLVERSION=$(TCLVERSION)
 	@echo ""
+
+install-documentationlight: $(DOCUMENTATIONS)
+	$(MV) $^ $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
+	$(MV) $(TCLDIRDISTRIBUTED) $(TCLDIR)
+
+install-complete: install-display install-configfile install-executable install-tcl-toolbox install-doc install-others-doc install-biological-data
+	@echo "Done"
 
 install-configfile: $(CONFIGFILE)
 	@echo ""
@@ -88,7 +89,8 @@ install-executable:
 	@echo ""
 	@echo "Executable installation"
 	@echo "-----------------------"
-	install -p -m 0755 bin/AnnotSV.tcl $(DESTDIR)$(BINDIR)
+	$(MKDIR) $(DESTDIR)$(BINDIR)
+	install -p -m 0755 bin/AnnotSV $(DESTDIR)$(BINDIR)
 
 install-tcl-toolbox: $(TCL_SCRIPTS)
 	@echo ""
@@ -104,30 +106,37 @@ install-doc: $(DOCUMENTATIONS)
 	$(MKDIR) $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
 	$(CP) $^ $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
 
-#install-others-doc: share/doc/$(ANNOTSV)/Example
-install-others-doc: $(OTHERS_DOCUMENTATIONS)
+install-others-doc: share/doc/$(ANNOTSV)/Example
 	$(CPDIR) $^ $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
 
-install-biological-data: share/doc/$(ANNOTSV)/Annotations_$(ORGANISM)
+install-biological-data: share/$(ANNOTSV)/Annotations_$(ORGANISM)
 	$(MKDIR) $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/
-	$(CPDIR) $^ $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/$(ORGANISM)
+	$(CPDIR) $^ $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/
 
 
 # make uninstall
 .PHONY: uninstall
-uninstall:
+
+ifeq ('$(PREFIX)' , '/usr/local')
+uninstall: uninstall1 uninstall3
+else
+uninstall: uninstall1 uninstall2 uninstall3
+endif
+
+uninstall1:
 	@echo ""
 	@echo "Uninstalling of $(ANNOTSV)"
 	@echo "------------------------"
-	$(RM) -r $(DESTDIR)$(BINDIR)/$(ANNOTSV)
-	$(RM) -r $(DESTDIR)$(TCLDIR)/$(ANNOTSV)
-	$(RM) -r $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
-	$(RM) -r $(DESTDIR)$(ETCDIR)/$(ANNOTSV)
-	if ( $(PREFIX) != "/usr/local" ) then
-		$(RMDIR) --ignore-fail-on-non-empty $(DESTDIR)$(BINDIR) $(DESTDIR)$(TCLDIR) $(DESTDIR)$(DOCDIR) $(DESTDIR)$(SHAREDIR) $(DESTDIR)$(ETCDIR) $(DESTDIR)$(PREFIX)
-	endif
+	$(RM) -f $(DESTDIR)$(BINDIR)/$(ANNOTSV)
+	$(RM) -rf $(DESTDIR)$(TCLDIR)/$(ANNOTSV)
+	$(RM) -rf $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
+	$(RM) -rf $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)
+	$(RM) -rf $(DESTDIR)$(ETCDIR)/$(ANNOTSV)
+
+uninstall2:
+	$(RMDIR) --ignore-fail-on-non-empty $(DESTDIR)$(BINDIR) $(DESTDIR)$(TCLDIR) $(DESTDIR)$(DOCDIR) $(DESTDIR)$(SHAREDIR) $(DESTDIR)$(ETCDIR) $(DESTDIR)$(PREFIX)
+
+uninstall3:
 	@echo ""
 	@echo "Done"
-
-
 

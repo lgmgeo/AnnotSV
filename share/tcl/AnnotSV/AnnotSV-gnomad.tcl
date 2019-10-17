@@ -33,7 +33,7 @@ proc checkgnomADfile {} {
 
     ## Check if gnomAD file has been downloaded then formatted
     #########################################################
-    set gnomADdir "$g_AnnotSV(shareDir)/$g_AnnotSV(organism)/SVincludedInFt/gnomAD/$g_AnnotSV(genomeBuild)"
+    set gnomADdir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)/SVincludedInFt/gnomAD/$g_AnnotSV(genomeBuild)"
     set gnomADfileDownloaded [glob -nocomplain "$gnomADdir/gnomad_v2_sv.sites.bed.gz"]
     set gnomADfileFormattedAndSorted  [glob -nocomplain "$gnomADdir/*_gnomAD_DUP_SV.sorted.bed"]
 
@@ -166,7 +166,7 @@ proc gnomADannotation {SVchrom SVstart SVend SVtype L_i} {
     set SVtype [normalizeSVtype $SVtype]
 
 
-    set gnomADdir "$g_AnnotSV(shareDir)/$g_AnnotSV(organism)/SVincludedInFt/gnomAD/$g_AnnotSV(genomeBuild)"
+    set gnomADdir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)/SVincludedInFt/gnomAD/$g_AnnotSV(genomeBuild)"
 
     if {![info exists gnomADtext(DONE)]} {
 	

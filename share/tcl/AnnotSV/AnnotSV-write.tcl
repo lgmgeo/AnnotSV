@@ -171,7 +171,7 @@ proc OrganizeAnnotation {} {
 	}
 	if {$g_AnnotSV(IMHann_i) eq ""} {set g_AnnotSV(IMHann) 0}
     }
-    set usersDir "$g_AnnotSV(shareDir)/$g_AnnotSV(organism)/Users/$g_AnnotSV(genomeBuild)"
+    set usersDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)/Users/$g_AnnotSV(genomeBuild)"
     ####### "SVincludedInFt header"
     if {[glob -nocomplain $usersDir/SVincludedInFt/*.formatted.sorted.bed] ne ""} {
 	foreach formattedUserBEDfile [glob -nocomplain $usersDir/SVincludedInFt/*.formatted.sorted.bed] {
@@ -854,8 +854,9 @@ proc OrganizeAnnotation {} {
 	set SVchrom [lindex $Ls 0]
 	set SVstart [lindex $Ls 1]
 	set SVend [lindex $Ls 2]
-	set ref [lindex $Ls $i_ref]
-	set alt [lindex $Ls $i_alt]
+	regsub "chr" [lindex $Ls $i_ref] "" ref
+	regsub "chr" [lindex $Ls $i_alt] "" alt
+
 	# Creation of the AnnotSV ID (chrom_start_end_SVtype_i)
 	set AnnotSV_ID [settingOfTheAnnotSVID "${SVchrom}_${SVstart}_${SVend}_$SVtype" "$ref" "$alt"]
 	# Report of the SV length

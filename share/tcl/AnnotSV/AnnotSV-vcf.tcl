@@ -284,6 +284,7 @@ proc VCFsToBED {SV_VCFfiles} {
     set VCFheader "" 
     # Variants from the input file that are not annotated by AnnotSV are reported in $unannotatedOutputFile
     regsub "annotated" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) "unannotated" unannotatedOutputFile
+    file delete -force $unannotatedOutputFile
 
     foreach VCFfile $SV_VCFfiles {
 	set L_TextToWrite {}
@@ -295,8 +296,8 @@ proc VCFsToBED {SV_VCFfiles} {
 	}	 
 	
 	set i 0
+	set VCFheaderNotPresent 1
 	while {![eof $f]} {
-	    incr i
 	    if {$i eq "500000"} {
 		WriteTextInFile [join $L_TextToWrite "\n"] $SV_BEDfile
 		set L_TextToWrite {}	    
@@ -307,6 +308,7 @@ proc VCFsToBED {SV_VCFfiles} {
 
 	    if {[string index $L 0] eq "#" || $L eq ""} {
 		if {[regexp "^#CHROM" $L]} {
+		    set VCFheaderNotPresent 0
 		    #CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  HG00096
 		    if {$g_AnnotSV(SVinputInfo)} {
 			set VCFheader "SV type\t[join [lrange $Ls 2 end] "\t"]"
@@ -316,6 +318,12 @@ proc VCFsToBED {SV_VCFfiles} {
 		}
 		continue
 	    }
+	    incr i
+	    
+	    if {$VCFheaderNotPresent} {
+		set VCFheaderNotPresent 0
+		puts "WARNING:\n$VCFfile: no VCF header line (prefixed with \"#CHROM\"). Check your VCF.\n"
+	    }
 
 	    # Consider only the SV (not the SNV/indel)
 	    ##########################################
@@ -324,8 +332,8 @@ proc VCFsToBED {SV_VCFfiles} {
 	    # - Type2: alt="<INS>", "<DEL>", ...
 	    # - Type3: complex rearrangements with breakends: alt="G]17:1584563]" or alt="G]chr17:1584563]"
 	    set chrom [lindex $Ls 0]
-            set pos [lindex $Ls 1]
 	    regsub -nocase "chr" $chrom "" chrom
+            set pos [lindex $Ls 1]
 	    regsub "chr" [lindex $Ls 3] "" ref
 	    regsub "chr" [lindex $Ls 4] "" alt 
 	    regsub -all "\"" [lindex $Ls 7] "" INFOcol
@@ -346,7 +354,7 @@ proc VCFsToBED {SV_VCFfiles} {
 		    ## => annotation only of the first breakpoint
 		    set end [expr {$pos+1}]
 		}
-	    } elseif {[regexp "(\\\[|\\\])(\[0-9\XYMT]+):(\[0-9\]+)" $alt]} {
+	    } elseif {[regexp "(\\\[|\\\])(\[^:\]+):(\[0-9\]+)" $alt]} {
 		# Type3 	
 		# Only one breakend is annotated with this kind of line
 		set end [expr {$pos+1}]		
@@ -389,6 +397,12 @@ proc VCFsToBED {SV_VCFfiles} {
 
 	    set AnnotSV_ID [settingOfTheAnnotSVID "${chrom}_${pos}_${end}_${svtype}" "$ref" "$alt"]
 
+	    # chrUn_KN707671v1_decoy 
+	    if {[lsearch -exact "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y M MT" $chrom] eq -1} {
+		WriteTextInFile "$AnnotSV_ID: chromosome \"$chrom\" unknown" $unannotatedOutputFile
+		continue
+	    }
+
 	    if {$end eq ""} {
 		WriteTextInFile "$AnnotSV_ID: END of the SV not defined" $unannotatedOutputFile
 		continue
@@ -413,8 +427,14 @@ proc VCFsToBED {SV_VCFfiles} {
 	WriteTextInFile [join $L_TextToWrite "\n"] $SV_BEDfile
 
 	if {$VCFheader eq ""} { ; # No header in the VCF input file
-	    set length [llength [split "$ref\t$alt\t[join [lrange $Ls 8 end] "\t"]" "\t"]]
-	    set VCFheader "SV type\t[join [lrepeat $length ""] "\t"]"
+	    #CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  HG00096
+	    if {$g_AnnotSV(SVinputInfo)} {
+		set length [llength [lrange $Ls 9 end]]
+		set VCFheader "SV type\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t[join [lrepeat $length ""] "\t"]"
+	    } else {
+		set length [llength [lrange $Ls 8 end]]
+		set VCFheader "SV type\tREF\tALT\t[join [lrepeat $length ""] "\t"]"
+	    }
 	}
 
     }

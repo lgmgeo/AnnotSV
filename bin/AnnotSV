@@ -23,18 +23,17 @@
 # along with this program; If not, see <http://www.gnu.org/licenses/>.                                     #
 ############################################################################################################
 
-global g_AnnotSV
-
-proc getScriptDirectory {} {
-    set dispScriptFile [file normalize [info script]]
-    set scriptFolder [file dirname $dispScriptFile]
-    return $scriptFolder
-}
-
 # non-zero exit codes --> usually interpreted as error cases
 # zero exit code --> Terminate the process without error
 # exit <=> exit 0 (default)
 
+global g_AnnotSV
+
+proc getScriptDirectory {} {
+    set scriptFilePath [file normalize [info script]]
+    set scriptDir [file dirname $scriptFilePath]
+    return $scriptDir
+}
 
 ## Checking for environment variables needed (if all are defined).
 if {![info exists env(ANNOTSV)]} {
@@ -42,33 +41,18 @@ if {![info exists env(ANNOTSV)]} {
 }
 
 ## Checking if the application name is the same that the path of the ANNOTSV environment variable
-#set actualPWD [exec pwd]
-#cd $env(ANNOTSV)
-#set envPWD [exec pwd]
-#cd $actualPWD
-#cd [file dirname $argv0]
-#cd ../..
-#set argv0PWD [pwd]
-#if {$envPWD ne $argv0PWD} {
-#    puts "WARNING:"
-#    puts "The application path ([file dirname $argv0]) is different from the \"ANNOTSV\" environment variable ($env(ANNOTSV)/bin)."
-#    puts "Check your \"ANNOTSV\" environment variable. Exit with error"; exit 2
-#}
-#cd $actualPWD
-
-set scriptDir [getScriptDirectory]
-set prefix [file dirname $scriptDir]
-set env(ANNOTSV) [file normalize $env(ANNOTSV)]
-if {$env(ANNOTSV) ne $prefix} {
+set binDirFromScript [getScriptDirectory]
+set binDirFromANNOTSV [file normalize "$env(ANNOTSV)/bin"]
+if {$binDirFromScript ne $binDirFromANNOTSV} {
     puts "WARNING:"
-    puts "The application path ($prefix) is different from the \"ANNOTSV\" environment variable ($env(ANNOTSV))."
+    puts "The application path ([file dirname $binDirFromScript]) is different from the \"ANNOTSV\" environment variable ([file dirname $binDirFromANNOTSV])."
     puts "Check your \"ANNOTSV\" environment variable. Exit with error"; exit 2
 }
 
 # Setting of g_AnnotSV(installDir), g_AnnotSV(tclDir), g_AnnotSV(docDir) and g_AnnotSV(etcDir):
 set g_AnnotSV(installDir) "$env(ANNOTSV)"
 set g_AnnotSV(etcDir) "$g_AnnotSV(installDir)/etc/AnnotSV"
-set g_AnnotSV(shareDir) "$g_AnnotSV(installDir)/share/AnnotSV"
+set g_AnnotSV(shareDir) "$g_AnnotSV(installDir)/share"
 set g_AnnotSV(docDir) "$g_AnnotSV(installDir)/share/doc/AnnotSV"
 set tclVersion [info tclversion]
 set g_AnnotSV(tclDir) "$g_AnnotSV(installDir)/share/tcl${tclVersion}/AnnotSV"
@@ -216,21 +200,21 @@ checkRepeatFile
 # Annotation with GeneHancer?
 checkGHfiles
 
-# Users BED regions annotations files (from $ANNOTSV/Annotations_$g_AnnotSV(organism)/Users/GRCh*/*ncludedIn*/*.bed)
+# Users BED regions annotations files (from $ANNOTSV/share/AnnotSV/Annotations_$g_AnnotSV(organism)/Users/GRCh*/*ncludedIn*/*.bed)
 checkUsersBED
 
 # Users Genes-based annotation files (from $ANNOTSV/Annotations_$g_AnnotSV(organism)/*/)
 # g_AnnotSV(extann) has been initialized in AnnotSV-config.tcl
-set extannDir "$g_AnnotSV(docDir)/Annotations_$g_AnnotSV(organism)/Genes-based"
-foreach annotFile [glob -nocomplain $extannDir/*/*.tsv] {
+set annotationsDir "$g_AnnotSV(shareDir)/AnnotSV/Annotations_$g_AnnotSV(organism)"
+set genesBasedDir "$annotationsDir/Genes-based"
+foreach annotFile [glob -nocomplain $genesBasedDir/*/*.tsv] {
     if {[regexp "_DGV_samplesInStudies.tsv$" $annotFile]} {continue}
     lappend g_AnnotSV(extann) $annotFile
 }
-foreach annotFile [glob -nocomplain $extannDir/*/*.tsv.gz] {
+foreach annotFile [glob -nocomplain $genesBasedDir/*/*.tsv.gz] {
     lappend g_AnnotSV(extann) $annotFile
 }
-# set userDir "$g_AnnotSV(docDir)/Annotations_$g_AnnotSV(organism)/Users/" 
-regsub "share/tcl/AnnotSV" $g_AnnotSV(tclDir) "doc/AnnotSV/Annotations_$g_AnnotSV(organism)/Users/" userDir
+set userDir "$annotationsDir/Users/" 
 foreach annotFile [glob -nocomplain $userDir/*.tsv] {
     lappend g_AnnotSV(extann) $annotFile
 }
