@@ -158,12 +158,11 @@ proc refGeneAnnotation {} {
 	    puts "Exit with error"
 	exit 2
     }
-    file delete -force $newBed.tmp
+    #file delete -force $newBed.tmp
     set g_AnnotSV(bedFile) $newBed
 
     # Used for the insertion of the "full/split" information
     set L_Bed [LinesFromFile $newBed]
-
 
     # OUTPUT:
     ###############
@@ -211,6 +210,7 @@ proc refGeneAnnotation {} {
 
     # Parse
     ###############
+    set L_allGenesOverlapped {}
     set L "[FirstLineFromFile $linesSplitByGene_File]"
     set Ls [split $L "\t"]
     set splitSVleft [lindex $Ls 1]
@@ -271,6 +271,7 @@ proc refGeneAnnotation {} {
 	}
 	set txName [lindex $Ls end-4]
 	set gene [lindex $Ls end-5]
+	lappend L_allGenesOverlapped $gene
 
 	# Look if the annotation line of a user selected transcript has already been registered for this gene
 	if {[info exists Finish($gene)]} {continue}
@@ -329,6 +330,7 @@ proc refGeneAnnotation {} {
     }
     close $f
 
+
     # Treatment for the last SV of the file
     ########################################
     # Insertion of the "full length" SV line
@@ -366,6 +368,11 @@ proc refGeneAnnotation {} {
     ## Delete temporary file
     file delete -force $linesSplitByGene_File
 
+    ## Preparation of the phenotype-driven analysis (Exomiser)
+    if {$g_AnnotSV(hpo) ne ""} {
+	set L_allGenesOverlapped [lsort -unique $L_allGenesOverlapped]
+	runExomiser "$L_allGenesOverlapped" "$g_AnnotSV(hpo)"
+    }
 
     ## Memo:
     ## The same SV can be annotated on several genes. Warning: annotations are not necessarily group by gene. Example:

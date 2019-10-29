@@ -1,7 +1,7 @@
 
 COMMAND LINE USAGE
 
-       $ANNOTSV/bin/AnnotSV.tcl -SVinputFile 'Path of your VCF or BED input file with SV coordinates' >& AnnotSV.log &
+       $ANNOTSV/bin/AnnotSV -SVinputFile 'Path of your VCF or BED input file with SV coordinates' >& AnnotSV.log &
 
 
 OPTIONS
@@ -25,6 +25,10 @@ OPTIONS
                                 Values: GRCh37 (default) or GRCh38 or mm9 or mm10
 
 -help:                          More information on the arguments
+
+-hpo:                           HPO terms list describing the phenotype of the individual being investigated
+                                Values: use comma, semicolon or space separated class values, default = ""
+                                (e.g.: "HP:0001156,HP:0001363,HP:0011304")
 
 -metrics:                       Changing numerical values from frequencies to us or fr metrics (e.g. 0.2 or 0,2)
                                 Range values: us (default) or fr
@@ -52,6 +56,9 @@ OPTIONS
 -rankOutput:                    To save in an output file the decisions that explain the ranking of each SV 
                                 Values: no (default) or yes
 
+-reciprocal:                    Use of a reciprocal overlap between SV and features (only for annotations with features overlapping the SV)
+                                Values: no (default) or yes
+
 -SVinputFile:                   Path of the input file (VCF or BED) with SV coordinates
                                 Gzipped VCF file is supported 
 
@@ -61,11 +68,11 @@ OPTIONS
 -SVminSize:                     SV minimum size (in bp)
                                 Default = 50
 
--reciprocal:                    Use of a reciprocal overlap between SV and features (only for annotations with features overlapping the SV)
-                                Values: no (default) or yes
-
 -svtBEDcol:                     Number of the column describing the SV type (DEL, DUP)
                                 Range values: [4-[, default = -1 (value not given)
+
+-txFile:                        Path of a file containing a list of preferred genes transcripts to be used in priority during the annotation
+                                (Preferred genes transcripts names should be tab or space separated)
 
 -typeOfAnnotation:              Description of the types of lines produced by AnnotSV
                                 Values: both (default), full or split
@@ -79,8 +86,4 @@ OPTIONS
 
 -vcfSamples:                    To specifiy the sample names from the VCF files defined from the -vcfFiles option
                                 Default: use all samples from the VCF files
-
-
--txFile:                        Path of a file containing a list of preferred genes transcripts to be used in priority during the annotation 
-                                (Preferred genes transcripts names should be tab or space separated)
 

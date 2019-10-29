@@ -6,30 +6,35 @@
 # AnnotSV Options :
 #------------------
 
+-candidateGenesFiltering:   no
 
--genomeBuild:           GRCh37
+-genomeBuild:               GRCh37
 
--overlap:               70
+-hpo:                       ""
 
--promoterSize:          500
+-metrics:                   "us"
 
--SVinputInfo:           1
+-minTotalNumber:            "500"
 
--SVminSize:             50
+-overlap:                   70
 
--vcfPASS:               0
+-overwrite:                 "yes"
 
--metrics:               "us"
+-promoterSize:              500
 
--minTotalNumber:        "500"
+-rankFiltering:             "1-5"
 
--overwrite:             "yes"
+-rankOutput:                "no"
 
--reciprocal:            "no"
+-reciprocal:                "no"
 
--typeOfAnnotation:      "both"
+-SVinputInfo:               1
 
--vcfPASS:               "0"
+-SVminSize:                 50
+
+-typeOfAnnotation:          "both"
+
+-vcfPASS:                   "0"
 
 
 #------------------------
@@ -116,5 +121,9 @@ morbidGenesCandidates		*
 Mim Number
 Phenotypes
 Inheritance
+EXOMISER_GENE_PHENO_SCORE
+HUMAN_PHENO_EVIDENCE
+MOUSE_PHENO_EVIDENCE
+FISH_PHENO_EVIDENCE
 AnnotSV ranking
 

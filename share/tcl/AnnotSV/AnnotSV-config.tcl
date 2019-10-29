@@ -40,13 +40,14 @@ proc configureAnnotSV {argv} {
     #######################
     puts "\t...configuration data by default"
     set g_AnnotSV(annotationsDir)           ""
-    set g_AnnotSV(bedtools)                 "bedtools"
+    set g_AnnotSV(bedtools)                 "/biolo/bedtools2-2.26.0/bin/bedtools"
     set g_AnnotSV(candidateGenesFile)       ""
     set g_AnnotSV(candidateGenesFiltering)  "no"
     set g_AnnotSV(extann)                   ""    ;# list of the “.../Annotations_$g_AnnotSV(organism)/*/*.tsv(.gz) files” <=> External genes annotation files
     set g_AnnotSV(filteredVCFfiles)         ""
     set g_AnnotSV(filteredVCFsamples)       ""
     set g_AnnotSV(genomeBuild)              "GRCh37"
+    set g_AnnotSV(hpo)                      ""    ;# "HP:0030684,HP:0085622"
     set g_AnnotSV(metrics)                  "us"
     set g_AnnotSV(minTotalNumber)           "500"
     set g_AnnotSV(outputDir)                ""
@@ -72,7 +73,7 @@ proc configureAnnotSV {argv} {
     ###########################
     ## Load config file options
     ###########################
-    set lOptionsOk "annotationsDir bedtools candidateGenesFile candidateGenesFiltering extann filteredVCFfiles filteredVCFsamples genomeBuild metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering rankOutput reciprocal SVinputFile SVinputInfo SVminSize svtBEDcol txFile typeOfAnnotation vcfFiles vcfSamples vcfPASS"
+    set lOptionsOk "annotationsDir bedtools candidateGenesFile candidateGenesFiltering extann filteredVCFfiles filteredVCFsamples genomeBuild hpo metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering rankOutput reciprocal SVinputFile SVinputInfo SVminSize svtBEDcol txFile typeOfAnnotation vcfFiles vcfSamples vcfPASS"
     set configFile "$g_AnnotSV(etcDir)/configfile"
     if {[file exists "./configfile"]} {
 	set configFile "./configfile"
@@ -85,7 +86,7 @@ proc configureAnnotSV {argv} {
 	if {$L eq ""} {continue}
 	#Reading the config file 
 	if { ! $testColumnNames} {
-	    regsub -all "^-|:" $L "" L
+	    regsub -all "^-|:\[ \t\]" $L "" L
 	    set optionName  [lindex $L 0]
 	    set optionValue [lindex $L 1]
 	    set k [lsearch -exact -nocase $lOptionsOk $optionName]
@@ -104,17 +105,16 @@ proc configureAnnotSV {argv} {
 	    lappend g_AnnotSV(outputColHeader) $L
 	}
     }		
-    
+
     ##################################
     ## Load options given in arguments
     ##################################
     puts "\t...configuration data given in arguments"
-    regsub -all "^-|:" $argv "" argv
     set i 0
     set j 1
     while {$j < [llength $argv]} {
 	set optionName [lindex $argv $i]
-	regsub -all "^-|:" $optionName "" optionName
+	regsub "^-|:\[ \t\]" $optionName "" optionName
 	
 	set optionValue [lindex $argv $j]
 	set  k [lsearch -exact -nocase $lOptionsOk $optionName]
@@ -126,11 +126,10 @@ proc configureAnnotSV {argv} {
 	    puts "For more information on the arguments, please use the -help option"
 	    exit 2
 	}
-	
+
 	incr i 2
 	incr j 2
     }
-    
 
     ########################################
     ## Checking of the configuration options
@@ -193,6 +192,27 @@ proc configureAnnotSV {argv} {
 	}
     }
 
+    # g_AnnotSV(hpo)
+    # It must be a comma, semicolon or space separated class values, default = ""
+    # (e.g.: "HP:0001156,HP:0001363,HP:0011304")
+    set g_AnnotSV(hpo) [split $g_AnnotSV(hpo) ",|;| "]
+    set L_correctHPO {}
+    set L_display ""
+    foreach hpo $g_AnnotSV(hpo) {
+	if {[regexp "^HP:\[0-9\]+$" $hpo]} {
+	    lappend L_correctHPO $hpo
+	} else {
+	    lappend L_display "Bad format for the HPO term: $hpo. Not used."
+	}
+    }
+    if {$L_display ne ""} {
+	puts "############################################################################"
+	puts "[join $L_display "\n"]"
+	puts "############################################################################"
+    }
+    set g_AnnotSV(hpo) [join $L_correctHPO ","]
+
+    # g_AnnotSV(rankFiltering)
     ## It must be a list between 1 and 5 
     ## e.g.: "3,4,5" or "3-5" 
     set liste {}
@@ -220,7 +240,7 @@ proc configureAnnotSV {argv} {
 	}
     }
 
-    ## g_AnnotSV(outputDir) must be an existing directory. Else, we create it
+    ## g_AnnotSV(outputDir) must be an existing directory. Else, we create it.
     ## g_AnnotSV(outputFile) must be defined and should not already exists.
     ## g_AnnotSV(outputFile) extension must be ".tsv".
     if {$g_AnnotSV(outputDir) eq "" && [regexp "/" "$g_AnnotSV(outputFile)"]} {

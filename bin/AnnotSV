@@ -58,6 +58,7 @@ set g_AnnotSV(tclDir)     "$g_AnnotSV(installDir)/share/tcl${tclVersion}/AnnotSV
 if {![file exists $g_AnnotSV(tclDir)]} {
     set g_AnnotSV(tclDir) "$g_AnnotSV(installDir)/share/tcl/AnnotSV"
 }
+set g_AnnotSV(bashDir)    "$g_AnnotSV(installDir)/share/bash/AnnotSV"
 # g_AnnotSV(annotationsDir) is set to "$g_AnnotSV(installDir)/share/AnnotSV" in AnnotSV-config.tcl
 
 source $g_AnnotSV(tclDir)/AnnotSV-1000g.tcl
@@ -65,6 +66,7 @@ source $g_AnnotSV(tclDir)/AnnotSV-clingen.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-config.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-ddd.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-dgv.tcl
+source $g_AnnotSV(tclDir)/AnnotSV-exomiser.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-extann.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-filteredVCF.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-exac.tcl
@@ -203,8 +205,14 @@ checkGHfiles
 # Users BED regions annotations files (from $ANNOTSV/share/AnnotSV/Annotations_$g_AnnotSV(organism)/Users/GRCh*/*ncludedIn*/*.bed)
 checkUsersBED
 
+# Annotation with Exomiser?
+checkExomiserInstallation
+#runExomiser "FGFR2" "HP:0001156,HP:0001363,HP:0011304,HP:0010055"
+
+
 # Users Genes-based annotation files (from $ANNOTSV/Annotations_$g_AnnotSV(organism)/*/)
 # g_AnnotSV(extann) has been initialized in AnnotSV-config.tcl
+# g_AnnotSV(extann) will be completed in AnnotSV-exomiser.tcl
 set genesBasedDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based"
 foreach annotFile [glob -nocomplain $genesBasedDir/*/*.tsv] {
     if {[regexp "_DGV_samplesInStudies.tsv$" $annotFile]} {continue}
@@ -222,6 +230,7 @@ foreach annotFile [glob -nocomplain $userDir/*.tsv.gz] {
 }
 # Depending of the organism, genes based annotation can be absent:
 if {$g_AnnotSV(extann) eq ""} {set g_AnnotSV(genesBasedAnn) 0} else {set g_AnnotSV(genesBasedAnn) 1} 
+
 
 
 # DISPLAY

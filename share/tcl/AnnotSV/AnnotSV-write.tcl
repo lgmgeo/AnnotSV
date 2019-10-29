@@ -37,7 +37,7 @@ proc OrganizeAnnotation {} {
 
     # OUTPUT
     ###############
-    set tmpFullAndSplitBedFile "$g_AnnotSV(outputDir)/$g_AnnotSV(outputFile).tmp"
+    set tmpFullAndSplitBedFile "$g_AnnotSV(outputDir)/$g_AnnotSV(outputFile).tmp" ;# created in AnnotSV-refGene.tcl
     set outputFile "$g_AnnotSV(outputDir)/$g_AnnotSV(outputFile)" 
 
 
@@ -359,8 +359,8 @@ proc OrganizeAnnotation {} {
 
 
     # Prepare the intersection between SV and BED file (DGV, dbVar...):
-    # => creation of a bedfile (chrom, start and end coordinates) with the SV to annotate + the intersections with genes
-    ####################################################################################################################
+    # => creation of a bedfile (3 columns: chrom, start and end coordinates) with coordinates of the SV to annotate + coordinates of the intersections with genes
+    #############################################################################################################################################################
     set g_AnnotSV(fullAndSplitBedFile) "$g_AnnotSV(outputDir)/[file tail $g_AnnotSV(bedFile)].users.bed"
     file delete -force $g_AnnotSV(fullAndSplitBedFile)
     set L_UsersText {}
@@ -960,7 +960,11 @@ proc OrganizeAnnotation {} {
     if {[info exists headerFileToRemove]} {
 	regsub -nocase "(.formatted)?.bed$" $g_AnnotSV(bedFile) ".header.tsv" BEDinputHeaderFile
 	file delete -force $BEDinputHeaderFile
+    }   
+    if {[info exist g_AnnotSV(exomiserTmpFile)]} {
+	file delete -force $g_AnnotSV(exomiserTmpFile)
     }
+
 
     puts "\n\n...Output columns annotation:"
     regsub -all "\t" $headerOutput "; " t
@@ -969,11 +973,14 @@ proc OrganizeAnnotation {} {
 
     # Output file that retraces the decisions that explain the ranking of each SV
     if {$g_AnnotSV(rankOutput) eq "yes" && [info exists L_rankingExplanations]} {
-	regsub "annotated" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) "ranking" rankingOutputFile
+	if {[regexp "annotated" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile)]} {
+	    regsub "annotated" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) "ranking" rankingOutputFile
+	} else {
+	    regsub ".tsv$" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) "ranking.tsv" rankingOutputFile
+	}
 	puts "\n\n...Writing of the ranking decision explanations:"
 	puts "   ($rankingOutputFile)"
 	ReplaceTextInFile "AnnotSV ID\tAnnotSV type\tGenes\tAnnotSV ranking\tRanking decision" $rankingOutputFile
 	WriteTextInFile [join $L_rankingExplanations "\n"] $rankingOutputFile
-    }
-	
+    }	
 }

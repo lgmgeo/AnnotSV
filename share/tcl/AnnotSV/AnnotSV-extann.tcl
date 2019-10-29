@@ -46,7 +46,12 @@ proc ExternalAnnotations args {
     if {[info exists g_ExtAnnotation($What)]} {return [set g_ExtAnnotation($What)]}
 
     if {[info exists g_AnnotSV(extann)] && $g_AnnotSV(extann) ne ""} {
-	set L_Files_Anno [set g_AnnotSV(extann)]
+	set L_Files_Anno {}
+	foreach f [set g_AnnotSV(extann)] {
+	    if {[lsearch -exact $L_Files_Anno "$f"] eq -1} {
+		lappend L_Files_Anno $f
+	    }
+	}
     } else {return ""}
     
     if {[file exists [lindex $args 0]]} {
@@ -61,7 +66,7 @@ proc ExternalAnnotations args {
     #puts "--$What"
 
     if {[info exists g_ExtAnnotation($What)]} {return [set g_ExtAnnotation($What)]}
-    foreach File_Anno [lsort -unique $L_Files_Anno] {
+    foreach File_Anno $L_Files_Anno {
 	if {![info exists g_ExtAnnotation($File_Anno,Loaded)]} {
 	    
 	    if {![info exists g_ExtAnnotation(L_Files)]} {

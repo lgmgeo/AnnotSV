@@ -283,7 +283,11 @@ proc VCFsToBED {SV_VCFfiles} {
     file delete -force "$SV_BEDfile"
     set VCFheader "" 
     # Variants from the input file that are not annotated by AnnotSV are reported in $unannotatedOutputFile
-    regsub "annotated" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) "unannotated" unannotatedOutputFile
+    if {[regexp "annotated" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile)]} {
+	regsub "annotated" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) "unannotated" unannotatedOutputFile
+    } else {
+	regsub ".tsv$" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) "unannotated.tsv" unannotatedOutputFile
+    }
     file delete -force $unannotatedOutputFile
 
     foreach VCFfile $SV_VCFfiles {

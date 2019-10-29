@@ -16,6 +16,7 @@ Oct 17, 2019: AnnotSV version 2.2.4
 	- New "AnnotSV ID" settings (to ensure to only have unique identifiers)
 	- Add bugfix concerning the "-candidateGenesFiltering" option
 	- Add bugfix concerning the DGV metrics
+	- Add bugfix concerning the use of the "-sort" Linux command (which behaviour is OS dependant)
 	- AnnotSV executable is now directly located in $ANNOTSV/bin to respect the FHS
 
 July 30, 2019: AnnotSV version 2.2.3
