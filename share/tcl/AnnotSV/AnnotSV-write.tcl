@@ -976,7 +976,7 @@ proc OrganizeAnnotation {} {
 	if {[regexp "annotated" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile)]} {
 	    regsub "annotated" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) "ranking" rankingOutputFile
 	} else {
-	    regsub ".tsv$" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) "ranking.tsv" rankingOutputFile
+	    regsub ".tsv$" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) ".ranking.tsv" rankingOutputFile
 	}
 	puts "\n\n...Writing of the ranking decision explanations:"
 	puts "   ($rankingOutputFile)"

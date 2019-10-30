@@ -286,7 +286,7 @@ proc VCFsToBED {SV_VCFfiles} {
     if {[regexp "annotated" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile)]} {
 	regsub "annotated" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) "unannotated" unannotatedOutputFile
     } else {
-	regsub ".tsv$" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) "unannotated.tsv" unannotatedOutputFile
+	regsub ".tsv$" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) ".unannotated.tsv" unannotatedOutputFile
     }
     file delete -force $unannotatedOutputFile
 

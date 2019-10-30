@@ -158,7 +158,7 @@ proc refGeneAnnotation {} {
 	    puts "Exit with error"
 	exit 2
     }
-    #file delete -force $newBed.tmp
+    file delete -force $newBed.tmp
     set g_AnnotSV(bedFile) $newBed
 
     # Used for the insertion of the "full/split" information
@@ -369,6 +369,7 @@ proc refGeneAnnotation {} {
     file delete -force $linesSplitByGene_File
 
     ## Preparation of the phenotype-driven analysis (Exomiser)
+    #puts "\t...[llength $L_allGenesOverlapped] overlapped genes"
     if {$g_AnnotSV(hpo) ne ""} {
 	set L_allGenesOverlapped [lsort -unique $L_allGenesOverlapped]
 	runExomiser "$L_allGenesOverlapped" "$g_AnnotSV(hpo)"

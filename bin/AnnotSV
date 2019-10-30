@@ -49,7 +49,7 @@ if {$binDirFromScript ne $binDirFromANNOTSV} {
     puts "Check your \"ANNOTSV\" environment variable. Exit with error"; exit 2
 }
 
-# Setting of g_AnnotSV(installDir), g_AnnotSV(etcDir), g_AnnotSV(docDir) and g_AnnotSV(tclDir) :
+# Setting of g_AnnotSV(installDir), g_AnnotSV(etcDir), g_AnnotSV(docDir), g_AnnotSV(tclDir) and g_AnnotSV(bashDir):
 set g_AnnotSV(installDir) "$env(ANNOTSV)"
 set g_AnnotSV(etcDir)     "$g_AnnotSV(installDir)/etc/AnnotSV"
 set g_AnnotSV(docDir)     "$g_AnnotSV(installDir)/share/doc/AnnotSV"
@@ -239,7 +239,7 @@ puts "\tAnnotSV has been run with these arguments:"
 puts "\t******************************************"
 set lKey [array names g_AnnotSV]
 foreach key [lsort $lKey] {
-    if {[regexp "outputColHeader|installDir|etcDir|tclDir|docDir|userDir|Version|bedFile|extann|refGene|Ann|NRSVann|GHann|IMHann|gnomADann|ranking$" $key]} {continue}
+    if {[regexp "outputColHeader|installDir|etcDir|tclDir|docDir|userDir|bashDir|Version|bedFile|extann|refGene|Ann|NRSVann|GHann|IMHann|gnomADann|ranking$" $key]} {continue}
     if {$g_AnnotSV($key) eq ""} {continue}
     puts "\t-$key $g_AnnotSV($key)"
 }

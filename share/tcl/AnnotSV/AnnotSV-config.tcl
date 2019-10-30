@@ -40,7 +40,7 @@ proc configureAnnotSV {argv} {
     #######################
     puts "\t...configuration data by default"
     set g_AnnotSV(annotationsDir)           ""
-    set g_AnnotSV(bedtools)                 "/biolo/bedtools2-2.26.0/bin/bedtools"
+    set g_AnnotSV(bedtools)                 "bedtools"
     set g_AnnotSV(candidateGenesFile)       ""
     set g_AnnotSV(candidateGenesFiltering)  "no"
     set g_AnnotSV(extann)                   ""    ;# list of the “.../Annotations_$g_AnnotSV(organism)/*/*.tsv(.gz) files” <=> External genes annotation files
