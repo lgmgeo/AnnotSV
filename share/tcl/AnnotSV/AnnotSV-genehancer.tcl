@@ -207,21 +207,36 @@ proc checkGHfiles {} {
     # Sorting of the bedfile:
     # Intersection with very large files can cause trouble with excessive memory usage.
     # A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm. 
-    if {[catch {eval exec sort -k1,1 -k2,2n $GHfileFormatted37.tmp >> $GHfileFormatted37} Message]} {
+    set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.tmp.bash"
+    ReplaceTextInFile "#!/bin/bash" $sortTmpFile
+    WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $sortTmpFile
+    WriteTextInFile "export LC_ALL=C" $sortTmpFile
+    WriteTextInFile "sort -k1,1 -k2,2n $GHfileFormatted37.tmp >> $GHfileFormatted37" $sortTmpFile
+    file attributes $sortTmpFile -permissions 0755
+    if {[catch {eval exec $sortTmpFile} Message]} {
 	puts "-- checkGHfiles --"
 	puts "sort -k1,1 -k2,2n $GHfileFormatted37.tmp >> $GHfileFormatted37"
 	puts "$Message"
-	    puts "Exit with error"
+	puts "Exit with error"
 	exit 2
     }
+    file delete -force $sortTmpFile 
     file delete -force $GHfileFormatted37.tmp
-    if {[catch {eval exec sort -k1,1 -k2,2n $GHfileFormatted38.tmp >> $GHfileFormatted38} Message]} {
+
+    set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.tmp.bash"
+    ReplaceTextInFile "#!/bin/bash" $sortTmpFile
+    WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $sortTmpFile
+    WriteTextInFile "export LC_ALL=C" $sortTmpFile
+    WriteTextInFile "sort -k1,1 -k2,2n $GHfileFormatted38.tmp >> $GHfileFormatted38" $sortTmpFile
+    file attributes $sortTmpFile -permissions 0755
+    if {[catch {eval exec $sortTmpFile} Message]} {
 	puts "-- checkGHfiles --"
 	puts "sort -k1,1 -k2,2n $GHfileFormatted38.tmp >> $GHfileFormatted38"
 	puts "$Message"
-	    puts "Exit with error"
+	puts "Exit with error"
 	exit 2
     }
+    file delete -force $sortTmpFile 
     file delete -force $GHfileFormatted38.tmp
 
     # Delete the downloaded files

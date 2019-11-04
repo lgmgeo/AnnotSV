@@ -391,14 +391,20 @@ proc OrganizeAnnotation {} {
     # Intersection with very large files can cause trouble with excessive memory usage.
     # A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm. 
     set g_AnnotSV(fullAndSplitBedFile) "$g_AnnotSV(outputDir)/[file tail $g_AnnotSV(bedFile)].users.sorted.bed"
-    if {[catch {eval exec sort -k1,1 -k2,2n $newFullAndSplitBedFile > $g_AnnotSV(fullAndSplitBedFile)} Message]} {
+    set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.tmp.bash"
+    ReplaceTextInFile "#!/bin/bash" $sortTmpFile
+    WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $sortTmpFile
+    WriteTextInFile "export LC_ALL=C" $sortTmpFile
+    WriteTextInFile "sort -k1,1 -k2,2n $newFullAndSplitBedFile > $g_AnnotSV(fullAndSplitBedFile)" $sortTmpFile
+    file attributes $sortTmpFile -permissions 0755
+    if {[catch {eval exec $sortTmpFile} Message]} {
 	puts "-- OrganizeAnnotation --"
 	puts "sort -k1,1 -k2,2n $newFullAndSplitBedFile > $g_AnnotSV(fullAndSplitBedFile)"
 	puts "$Message"
 	puts "Exit with error"
 	exit 2
     }
-
+    file delete -force $sortTmpFile 
     file delete -force $newFullAndSplitBedFile
     unset L_UsersText
 

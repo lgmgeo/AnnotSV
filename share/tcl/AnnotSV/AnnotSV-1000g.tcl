@@ -132,17 +132,23 @@ proc check1000gFile {} {
 	# Intersection with very large files can cause trouble with excessive memory usage.
 	# A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm.
 	regsub -nocase ".bed$" $1000gFileFormatted ".sorted.bed" 1000gFileFormattedAndSorted
-	if {[catch {eval exec sort -k1,1 -k2,2n $1000gFileFormatted > $1000gFileFormattedAndSorted} Message]} {
+	set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.tmp.bash"
+	ReplaceTextInFile "#!/bin/bash" $sortTmpFile
+	WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $sortTmpFile
+	WriteTextInFile "export LC_ALL=C" $sortTmpFile
+	WriteTextInFile "sort -k1,1 -k2,2n $1000gFileFormatted > $1000gFileFormattedAndSorted" $sortTmpFile
+	file attributes $sortTmpFile -permissions 0755
+	if {[catch {eval exec $sortTmpFile} Message]} {
 	    puts "-- check1000gFile --"
 	    puts "sort -k1,1 -k2,2n $1000gFileFormatted > $1000gFileFormattedAndSorted"
 	    puts "$Message"
 	    puts "Exit with error"
 	    exit 2
 	}
+	file delete -force $sortTmpFile 
 	file delete -force $1000gFileFormatted
     }
 }
-
 
 
 

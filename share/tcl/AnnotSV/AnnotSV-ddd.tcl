@@ -136,13 +136,20 @@ proc updateDDDgeneFile {} {
     # Sorting of the bedfile:
     # Intersection with very large files can cause trouble with excessive memory usage.
     # A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm.
-    if {[catch {eval exec sort -k1,1 -k2,2n $DDDfileFormatted.tmp > $DDDfileFormatted} Message]} {
+    set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.tmp.bash"
+    ReplaceTextInFile "#!/bin/bash" $sortTmpFile
+    WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $sortTmpFile
+    WriteTextInFile "export LC_ALL=C" $sortTmpFile
+    WriteTextInFile "sort -k1,1 -k2,2n $DDDfileFormatted.tmp > $DDDfileFormatted" $sortTmpFile
+    file attributes $sortTmpFile -permissions 0755
+    if {[catch {eval exec $sortTmpFile} Message]} {
 	puts "-- updateDDDgeneFile --"
 	puts "sort -k1,1 -k2,2n $DDDfileFormatted.tmp > $DDDfileFormatted"
 	puts "$Message"
 	puts "Exit with error"
 	exit 2
     }
+    file delete -force $sortTmpFile 
     file delete -force $DDDfileFormatted.tmp
 
     if {[catch {exec gzip $DDDfileFormatted} Message]} {
@@ -246,13 +253,20 @@ proc checkDDDfrequencyFile {} {
 	# Sorting of the bedfile:
 	# Intersection with very large files can cause trouble with excessive memory usage.
 	# A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm.
-	if {[catch {eval exec sort -k1,1 -k2,2n $DDDfrequencyFileFormatted.tmp > $DDDfrequencyFileFormatted} Message]} {
-	    puts "-- checkDDDfrequencyFile --"
-	    puts "sort -k1,1 -k2,2n $DDDfrequencyFileFormatted.tmp > $DDDfrequencyFileFormatted"
+	set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.tmp.bash"
+	ReplaceTextInFile "#!/bin/bash" $sortTmpFile
+	WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $sortTmpFile
+	WriteTextInFile "export LC_ALL=C" $sortTmpFile
+	WriteTextInFile "sort -k1,1 -k2,2n $DDDfrequencyFileFormatted.tmp > $DDDfrequencyFileFormatted" $sortTmpFile
+	file attributes $sortTmpFile -permissions 0755
+	if {[catch {eval exec $sortTmpFile} Message]} {
+	    puts "-- updateDDDgeneFile --"
+	    puts "sort -k1,1 -k2,2n $DDDfileFormatted.tmp > $DDDfileFormatted"
 	    puts "$Message"
 	    puts "Exit with error"
 	    exit 2
 	}
+	file delete -force $sortTmpFile 
 	# Delete the downloaded and tmp files
 	file delete -force $DDDfrequencyFileDownloaded
 	file delete -force $DDDfrequencyFileFormatted.tmp

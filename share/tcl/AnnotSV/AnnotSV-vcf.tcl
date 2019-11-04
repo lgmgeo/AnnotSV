@@ -279,7 +279,7 @@ proc VCFsToBED {SV_VCFfiles} {
     global VCFheader
     global g_SVLEN
 
-    set SV_BEDfile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d"]_AnnotSV_inputSVfile.bed"
+    set SV_BEDfile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_AnnotSV_inputSVfile.bed"
     file delete -force "$SV_BEDfile"
     set VCFheader "" 
     # Variants from the input file that are not annotated by AnnotSV are reported in $unannotatedOutputFile

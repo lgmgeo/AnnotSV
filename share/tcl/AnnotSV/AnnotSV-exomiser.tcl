@@ -81,27 +81,25 @@ proc startTheRESTservice {applicationPropertiesTmpFile port exomiserStartService
 proc checkExomiserInstallation {} {
 
     global g_AnnotSV
-
+    
     set NCBIgeneDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based/NCBIgeneID" 
- 
-    ## Check if the NCBIgeneID file exists
-    ######################################
-    if {![file exists "$NCBIgeneDir/results.txt"]} {
+
+    if {![regexp "GRCh37|GRCh38" $g_AnnotSV(organism)]} {
+	## Checked the organism
+	set g_AnnotSV(hpo) ""
+    } elseif {![file exists "$NCBIgeneDir/results.txt"]} {
+	## Checked if the NCBIgeneID file exists
 	puts "\nWARNING: No Exomiser annotations available."
 	puts "...$NCBIgeneDir/results.txt doesn't exist"
 	set g_AnnotSV(hpo) ""
-	return 
-    }
-    
-    ## Check if the Exomiser data files exist
-    #########################################
-    if {![file exists "$g_AnnotSV(annotationsDir)/Annotations_Exomiser/1902/"]} {
+    } elseif {![file exists "$g_AnnotSV(annotationsDir)/Annotations_Exomiser/1902/"]} {
+	## Checked if the Exomiser data files exist
 	puts "\nWARNING: No Exomiser annotations available."
 	puts "...$g_AnnotSV(annotationsDir)/Annotations_Exomiser/1902/ doesn't exist"
 	set g_AnnotSV(hpo) ""
-	return 
     }
     
+    return
 }
 
 
@@ -160,13 +158,13 @@ proc runExomiser {L_Genes L_HPO} {
     package require json 1.3.3
     
     # Outputfile
-    set geneBasedTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d"]_exomiser_gene_pheno.tmp.tsv"
+    set geneBasedTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_exomiser_gene_pheno.tmp.tsv"
     set L_output {"genes\tEXOMISER_GENE_PHENO_SCORE\tHUMAN_PHENO_EVIDENCE\tMOUSE_PHENO_EVIDENCE\tFISH_PHENO_EVIDENCE"}	
     file delete -force $geneBasedTmpFile
 
     # Creation of the temporary "application.properties" file
     if {[catch {set port [exec $g_AnnotSV(bashDir)/searchForAFreePortNumber.bash]} Message]} {set port 50000}
-    set applicationPropertiesTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d"]_exomiser_application.properties"
+    set applicationPropertiesTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_exomiser_application.properties"
     set infos [ContentFromFile $g_AnnotSV(etcDir)/application.properties]
     regsub "XXXX" $infos "$port" infos
     regsub "YYYY" $infos "$g_AnnotSV(annotationsDir)/Annotations_Exomiser/1902" infos
@@ -178,7 +176,7 @@ proc runExomiser {L_Genes L_HPO} {
     WriteTextInFile $infos $applicationPropertiesTmpFile
 
     # Start the REST service
-    set exomiserStartServiceFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d"]_exomiser.tmp"
+    set exomiserStartServiceFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_exomiser.tmp"
     set idService [startTheRESTservice $applicationPropertiesTmpFile $port $exomiserStartServiceFile]
 
     if {$idService ne ""} {
