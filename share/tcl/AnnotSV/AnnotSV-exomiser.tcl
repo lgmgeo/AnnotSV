@@ -83,8 +83,7 @@ proc checkExomiserInstallation {} {
     global g_AnnotSV
     
     set NCBIgeneDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based/NCBIgeneID" 
-
-    if {![regexp "GRCh37|GRCh38" $g_AnnotSV(organism)]} {
+    if {![regexp "Human" $g_AnnotSV(organism)]} {
 	## Checked the organism
 	set g_AnnotSV(hpo) ""
     } elseif {![file exists "$NCBIgeneDir/results.txt"]} {

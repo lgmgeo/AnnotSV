@@ -133,7 +133,6 @@ proc refGeneAnnotation {} {
     # Bedfile should be sorted and should not have "chr" in the first column
     ########################################################################
     # Removing non-standard contigs (other than the standard 1-22,X,Y,MT) and sorting the file in karyotypic order
-
     set f [open $g_AnnotSV(bedFile)]
     set test 0
     while {![eof $f]} {

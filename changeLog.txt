@@ -10,6 +10,11 @@
 
 For more details, please see the README file.
 
+Nov 21, 2019: AnnotSV version 2.2.5
+	- Add a phenotype-driven annotation (extracted from Exomiser)
+	- Annotations are not distributed anymore with the sources but downloaded during the installation with the Makefile
+
+
 Oct 17, 2019: AnnotSV version 2.2.4
 	- Include the lift-over GRCh38 gnomAD SV frequency annotation
 	- Include the "-annotationsDir" option to pass the annotations directory to AnnotSV at run time

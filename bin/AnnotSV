@@ -207,7 +207,6 @@ checkUsersBED
 
 # Annotation with Exomiser?
 checkExomiserInstallation
-#runExomiser "FGFR2" "HP:0001156,HP:0001363,HP:0011304,HP:0010055"
 
 
 # Users Genes-based annotation files (from $ANNOTSV/Annotations_$g_AnnotSV(organism)/*/)

@@ -40,10 +40,10 @@ proc DichotomySearch {number OrderedNumberList} {
     if {$number>=[lindex $OrderedNumberList $j]} {return $j}
     set k [expr {($i+$j)/2}]
 
-    if {$number<[lindex $OrderedNumberList $k]} {set j $k } else {set i $k}
+    if {$number<[lindex $OrderedNumberList $k]} {set j $k} else {set i $k}
     while {[expr {$j-$i}] > 1} {
         set k [expr {($i+$j)/2}]
-	if {$number<[lindex $OrderedNumberList $k]} {set j $k } else {set i $k}
+	if {$number<[lindex $OrderedNumberList $k]} {set j $k} else {set i $k}
     }
     return $i
 }
@@ -445,6 +445,14 @@ proc VCFsToBED {SV_VCFfiles} {
 
     # Bedfile should be sorted and should not have "chr" in the first column
     # -> This treatment will be done in the 'refGeneAnnotation' proc
+
+    ## Bedfile: no SV to annotate if it is an empty file, or a file with only SNV/indel
+    if {[isAnEmptyFile $SV_BEDfile]} {
+	puts "############################################################################"
+	puts "No SV to annotate in the SVinputFile - Exit without error."
+	puts "############################################################################"
+	exit 0
+    }
 
     return "$SV_BEDfile"
 }

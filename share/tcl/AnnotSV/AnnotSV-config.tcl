@@ -114,8 +114,7 @@ proc configureAnnotSV {argv} {
     set j 1
     while {$j < [llength $argv]} {
 	set optionName [lindex $argv $i]
-	regsub "^-|:\[ \t\]" $optionName "" optionName
-	
+	regsub "^-|:\[ \t\]" $optionName "" optionName	
 	set optionValue [lindex $argv $j]
 	set  k [lsearch -exact -nocase $lOptionsOk $optionName]
 	if {$k != -1} {
