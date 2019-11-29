@@ -45,18 +45,19 @@ CP                   := install -p -m 0644
 CPDIR                := /bin/cp -r
 CONFIGFILE           := etc/$(ANNOTSV)/configfile
 PROPERTIES           := etc/$(ANNOTSV)/application.properties
-TCL_SCRIPTS          := $(shell find share/tcl/$(ANNOTSV)/ -name '*.tcl')
-DOCUMENTATIONS       := $(shell find License.txt changeLog.txt commandLineOptions.txt README.AnnotSV_*.pdf)
-
+TCL_SCRIPTS          := $(shell find share/tcl/$(ANNOTSV)/ -name '*.tcl' 2> /dev/null)
+DOCUMENTATIONS       := $(shell find License.txt changeLog.txt commandLineOptions.txt README.AnnotSV_*.pdf 2> /dev/null)
 
 # make install
 .PHONY: install
 ifeq ('$(INSTALLDIR1)' , '$(INSTALLDIR2)')
 all: install-display install-documentationlight install-done
 install: install-display install-documentationlight install-done
+install-exomiser: install-exomiser-1 install-exomiser-3
 else
 all: install-display install-configfile install-executable install-tcl-toolbox install-doc install-others-doc install-done
 install: install-display install-configfile install-executable install-tcl-toolbox install-doc install-others-doc install-done
+install-exomiser: install-exomiser-1 install-exomiser-2 install-exomiser-3
 endif
 
 install-display:
@@ -125,17 +126,21 @@ install-human-annotation: Annotations_Human_$(VERSION).tar.gz install-exomiser
 	@echo ""
 	@echo "--> Human annotation installed"
 
-install-exomiser: 1902_phenotype.zip
+install-exomiser-1: 1902_phenotype.zip
 	@echo ""
 	@echo "Installation of Exomiser data:"
 	@echo ""
 	$(MKDIR) -p $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/1902
-	install -p -m 0755 $(PROPERTIES) $(DESTDIR)$(ETCDIR)/$(ANNOTSV)
-	$(CPDIR) share/AnnotSV/jar/ $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/
 	unzip 1902_hg19.zip -d $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/1902/ -x 1902_hg19/1902_hg19_clinvar_whitelist.tsv.gz*
 	unzip 1902_phenotype.zip -d $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/1902/
 	$(RM) -rf 1902_hg19.zip
 	$(RM) -rf 1902_phenotype.zip
+
+install-exomiser-2:
+	install -p -m 0755 $(PROPERTIES) $(DESTDIR)$(ETCDIR)/$(ANNOTSV)
+	$(CPDIR) share/AnnotSV/jar/ $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/
+
+install-exomiser-3:
 	@echo ""
 	@echo "--> Exomiser data installed"
 
@@ -166,9 +171,11 @@ Annotations_%.tar.gz:
 .PHONY: uninstall
 
 ifeq ('$(PREFIX)' , '/usr/local')
-uninstall: uninstall1 uninstall3
+uninstall: uninstall1 uninstall4
+else ifeq ('$(INSTALLDIR1)' , '$(INSTALLDIR2)')
+uninstall: uninstall1 uninstall2 uninstall4
 else
-uninstall: uninstall1 uninstall2 uninstall3
+uninstall: uninstall1 uninstall2 uninstall3 uninstall4
 endif
 
 uninstall1:
@@ -179,12 +186,17 @@ uninstall1:
 	$(RM) -rf $(DESTDIR)$(TCLDIR)/$(ANNOTSV)
 	$(RM) -rf $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
 	$(RM) -rf $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)
+	$(RM) -rf $(DESTDIR)$(SHAREDIR)/bash
 	$(RM) -rf $(DESTDIR)$(ETCDIR)/$(ANNOTSV)
+	$(RM) -rf $(DESTDIR)$(PREFIX)/Makefile
 
 uninstall2:
-	$(RMDIR) --ignore-fail-on-non-empty $(DESTDIR)$(BINDIR) $(DESTDIR)$(TCLDIR) $(DESTDIR)$(DOCDIR) $(DESTDIR)$(SHAREDIR) $(DESTDIR)$(ETCDIR) $(DESTDIR)$(PREFIX)
+	$(RMDIR) --ignore-fail-on-non-empty $(DESTDIR)$(BINDIR) $(DESTDIR)$(TCLDIR) $(DESTDIR)$(DOCDIR) $(DESTDIR)$(SHAREDIR) $(DESTDIR)$(ETCDIR)
 
 uninstall3:
+	$(RMDIR) --ignore-fail-on-non-empty $(DESTDIR)$(PREFIX)
+
+uninstall4:
 	@echo ""
 	@echo "Done"
 

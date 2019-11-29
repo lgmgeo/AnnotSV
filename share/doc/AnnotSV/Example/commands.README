@@ -1,3 +1,3 @@
 
-$ANNOTSV/bin/AnnotSV*/AnnotSV.tcl -SVinputFile test.bed -SVinputInfo 1 -outputFile ./test.annotated.tsv -svtBEDcol 4 
+$ANNOTSV/bin/AnnotSV -SVinputFile test.bed -outputFile ./test.annotated.tsv -svtBEDcol 4 
 
