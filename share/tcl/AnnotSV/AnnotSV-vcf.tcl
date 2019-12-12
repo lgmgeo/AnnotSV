@@ -364,7 +364,7 @@ proc VCFsToBED {SV_VCFfiles} {
 		set end [expr {$pos+1}]		
 	    } elseif {[regexp -nocase "^\[ACGTN.*\]+$" $ref$alt]} {
 		# Type1
-		regsub -all "\[*.\]" $ref "" refbis
+		regsub -all "\[*.\]" $ref "" refbis ;# cf GRIDSS comment, just below
 		regsub -all "\[*.\]" $alt "" altbis
 		set variantLengthType1 [expr {[string length $altbis]-[string length $refbis]}]
 		if {[expr {abs($variantLengthType1)}]<$g_AnnotSV(SVminSize)} {
@@ -382,13 +382,21 @@ proc VCFsToBED {SV_VCFfiles} {
 		    if {$end eq ""} {set end [expr $pos-$variantLengthType1]}
 		    if {$svtype eq ""} {set svtype "DEL"}
 		}
-		if {![regexp -nocase "^$refbis" $altbis] && ![regexp -nocase "^$altbis" $refbis]} {
-		    # Complex SV: AGT>ATTGCATGGACCTGAGTCCCCAAAAAAAAAAATTTTTTTTTTGGGGGGGGGGCCCCCCCCCCGGGGGGGGGG 
-		    set variantLengthType1 ""
-		} elseif {[regexp "\\\." $ref] || [regexp "\\\." $alt]} {
+		if {[regexp "\\\." $ref] || [regexp "\\\." $alt]} {
 		    # The GRIDSS author says that a . followed by bases refers to a single breakend where the reads cannot be uniquely mapped back. 
-		    # e.g.: 2       39564894        gridss28_45b    T       .TTCTCTCATAACAAACCATGACATCCAGTCATTTAATACAATATGTCTGGGGTGGCTGGGCCCCTTTTTT 246.24  LOW_QUAL       
+		    # e.g.: 2       39564894        gridss28_45b    T       .TTCTCTCATAACAAACCATGACATCCAGTCATTTAATACAATATGTCTGGGGTGGCTGGGCCCCTTTTTT 246.24  LOW_QUAL
+		    # => AnnotSV can not determine the SV length
 		    set variantLengthType1 ""
+		} elseif {[string length $refbis] < 10000 && [string length $altbis] < 10000} { ;# else we can have "couldn't compile regular expression pattern: out of memory" in the next regexp!!!
+		    if {![regexp -nocase "$refbis" $altbis] && ![regexp -nocase "$altbis" $refbis]} {
+			# Complex SV: AGT>ATTGCATGGACCTGAGTCCCCAAAAAAAAAAATTTTTTTTTTGGGGGGGGGGCCCCCCCCCCGGGGGGGGGG 
+			# => AnnotSV can not determine the SV length
+			set variantLengthType1 ""
+		    }
+		} else {
+		    # AnnotSV can not check the ref and alt values
+		    # => AnnotSV can not determine the SV length
+		    set variantLengthType1 ""		    
 		}
 		if {$svlen eq ""} {set svlen $variantLengthType1}
 	    } else {
@@ -397,7 +405,8 @@ proc VCFsToBED {SV_VCFfiles} {
 		continue
 	    }
 
-	    if {$end <= $pos} {set tutu $end; set end $pos; set pos $tutu}
+	    if {$end < $pos} {set tutu $end; set end $pos; set pos $tutu}
+	    if {$end eq $pos} {set end [expr {$pos+1}]}
 
 	    set AnnotSV_ID [settingOfTheAnnotSVID "${chrom}_${pos}_${end}_${svtype}" "$ref" "$alt"]
 
