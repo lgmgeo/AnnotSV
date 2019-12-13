@@ -81,6 +81,7 @@ proc startTheRESTservice {applicationPropertiesTmpFile port exomiserStartService
 proc checkExomiserInstallation {} {
 
     global g_AnnotSV
+    global hpoVersion
     
     set NCBIgeneDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based/NCBIgeneID" 
     if {![regexp "Human" $g_AnnotSV(organism)]} {
@@ -91,12 +92,25 @@ proc checkExomiserInstallation {} {
 	puts "\nWARNING: No Exomiser annotations available."
 	puts "...$NCBIgeneDir/results.txt doesn't exist"
 	set g_AnnotSV(hpo) ""
-    } elseif {![file exists "$g_AnnotSV(annotationsDir)/Annotations_Exomiser/1902/"]} {
-	## Checked if the Exomiser data files exist
-	puts "\nWARNING: No Exomiser annotations available."
-	puts "...$g_AnnotSV(annotationsDir)/Annotations_Exomiser/1902/ doesn't exist"
-	set g_AnnotSV(hpo) ""
     }
+    
+    ## Checked if the Exomiser data files exist
+    ## + HPO citation
+    set L_hpoDir [glob -nocomplain $g_AnnotSV(annotationsDir)/Annotations_Exomiser/*]
+    set L_hpoDir_ok {}
+    foreach hpoDir $L_hpoDir {
+	if {[regexp "^(\[0-9\]+)$" [file tail $hpoDir] match hpoDir]} {
+	    lappend L_hpoDir_ok $hpoDir
+	}
+    }
+    if {$L_hpoDir_ok ne ""} {
+	set hpoVersion [lindex [lsort -integer $L_hpoDir_ok] end]
+	puts "INFO: AnnotSV takes use of Exomiser (Smedley et al., 2015) for the phenotype-driven analysis."
+	puts "      AnnotSV is using the Human Phenotype Ontology (version $hpoVersion). Find out more at http://www.human-phenotype-ontology.org\n"
+    } else {
+	puts "\nWARNING: No Exomiser annotations available in $g_AnnotSV(annotationsDir)/Annotations_Exomiser/\n"
+	set g_AnnotSV(hpo) ""
+    } 
     
     return
 }
@@ -151,6 +165,7 @@ proc searchforGeneID {geneName} {
 proc runExomiser {L_Genes L_HPO} {
     
     global g_AnnotSV
+    global hpoVersion
 
     #Tcl 8.5 is required for use of the json package.
     package require http
@@ -166,7 +181,7 @@ proc runExomiser {L_Genes L_HPO} {
     set applicationPropertiesTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_exomiser_application.properties"
     set infos [ContentFromFile $g_AnnotSV(etcDir)/application.properties]
     regsub "XXXX" $infos "$port" infos
-    regsub "YYYY" $infos "$g_AnnotSV(annotationsDir)/Annotations_Exomiser/1902" infos
+    regsub "YYYY" $infos "$g_AnnotSV(annotationsDir)/Annotations_Exomiser/$hpoVersion" infos
 #    if {$g_AnnotSV(genomeBuild) eq "GRCh37"} {
 #	regsub "ZZZZ" $infos "hg19" infos
 #    } else {
@@ -250,7 +265,6 @@ proc runExomiser {L_Genes L_HPO} {
 	# End the REST service
 	exec kill -9 $idService
 	file delete -force $exomiserStartServiceFile
-	
     }
     
     # Remove tmp files

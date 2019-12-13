@@ -10,33 +10,23 @@
 
 For more details, please see the README file.
 
-	- Add bugfix concerning the management of the BED files
-	- Add bufix for the report of the compound heterozygosity (1 SV + 1 SNV/indel)
-
-Nov 21, 2019: AnnotSV version 2.2.5
-	- Add a phenotype-driven annotation (extracted from Exomiser)
+Dec 20, 2019: AnnotSV version 2.3
+	- To score genes overlapped with a SV on biological relevance to the individual phenotype, AnnotSV takes use of Exomiser by reporting the HPO-based scoring of genes and phenotypes evidences
 	- Annotations are not distributed anymore with the sources but downloaded during the installation with the Makefile
-
-
-Oct 17, 2019: AnnotSV version 2.2.4
 	- Include the lift-over GRCh38 gnomAD SV frequency annotation
 	- Include the "-annotationsDir" option to pass the annotations directory to AnnotSV at run time
 	- New "AnnotSV ID" settings (to ensure to only have unique identifiers)
-	- Add bugfix concerning the "-candidateGenesFiltering" option
-	- Add bugfix concerning the DGV metrics
-	- Add bugfix concerning the use of the "-sort" Linux command (whose behavior is OS dependant)
 	- AnnotSV executable is now directly located in $ANNOTSV/bin to respect the FHS
-
-July 30, 2019: AnnotSV version 2.2.3
 	- Integration of the gnomAD data in the ranking
 	- AnnotSV can now create two other output files:
 		- A report of unannotated variants (e.g. badly formatted SV, variant length < SVminSize...)
-		- A report of the decisions that explain the ranking of each SV 
-
-July 25, 2019: AnnotSV version 2.2.2
+		- A report of the decisions that explain the ranking of each SV
+	- Add bugfix concerning the management of the BED files
+	- Add bugfix for the report of the compound heterozygosity (1 SV + 1 SNV/indel)
+	- Add bugfix concerning the -candidateGenesFiltering option
+	- Add bugfix concerning the DGV metrics
+	- Add bugfix concerning the use of the "-sort" Linux command (whose behavior is OS dependant)
 	- Add bugfix concerning the use of "external gene annotation files"
-
-July 22, 2019: AnnotSV version 2.2.1
 	- Add bugfix concerning the -txFile option
 
 July 09, 2019: AnnotSV version 2.2
