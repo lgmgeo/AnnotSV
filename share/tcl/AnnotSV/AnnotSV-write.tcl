@@ -54,6 +54,11 @@ proc OrganizeAnnotation {} {
 	# SVinputFile = VCF
 	append headerOutput "\t$VCFheader"
 	set theLength [expr {[llength [split $headerOutput "\t"]]-2}] ; # we remove "2" for the 2 columns not in the input file (AnnotSV ID and SV length)
+	if {$g_AnnotSV(SVinputInfo)} {
+	    set g_AnnotSV(formatColNumber) 10 ;# used in AnnotSV-filteredVCF.tcl
+	} else {
+	    set g_AnnotSV(formatColNumber) 6
+	}
 	set g_AnnotSV(SVinputInfo) 1 ; # The created bedfile contains only the info to report
     } else {
 	# SVinputFile = BED
@@ -411,7 +416,7 @@ proc OrganizeAnnotation {} {
     # Parse
     ###############
     set L_TextToWrite {}
-    foreach L [LinesFromFile $tmpFullAndSplitBedFile] {
+    foreach L [LinesFromFile $tmpFullAndSplitBedFile] {	
 
 	set Ls [split $L "\t"]
 
@@ -465,7 +470,6 @@ proc OrganizeAnnotation {} {
 	    set location   ""
 	    set location2  ""
 	    set intersect  "\t"
-	    set compound   ""
 	}	    
 
 	if {$g_AnnotSV(candidateGenesFiltering) eq "yes"} {
@@ -485,7 +489,7 @@ proc OrganizeAnnotation {} {
 
 	# Definition of "locationStart" and "locationEnd" variables
 	if {$AnnotSVtype eq "split"} {
-	    set nbEx [expr {[llength [split $exonStarts ","]]-1}] ; #Example: "1652370,1657120,1660664,1661968," --> 1652370 1657120 1660664 1661968 {}
+	    set nbEx [expr {[llength [split $exonStarts ","]]-1}] ; # Example: "1652370,1657120,1660664,1661968," --> 1652370 1657120 1660664 1661968 {}
 	    
 	    set tx_left [lindex [split $exonStarts ","] 0]
 	    set tx_right [lindex [split $exonEnds ","] end-1]
@@ -843,11 +847,13 @@ proc OrganizeAnnotation {} {
 	} 
 
 	# Calculate the compound-htz variable
-	if {$AnnotSVtype eq "split"} {
-	    set compound ""
-	    if {$g_AnnotSV(filteredVCFfiles) ne ""} {
-		set compound "[filteredVCFannotation $SVchrom $txStart $txEnd]"
-	    } 
+	set compound ""
+	if {$g_AnnotSV(filteredVCFfiles) ne ""} {
+	    if {$AnnotSVtype eq "split"} {
+		set compound [filteredVCFannotation $SVchrom $txStart $txEnd $Ls $headerOutput]
+	    } else {
+		set compound [filteredVCFannotation "FULL" "" "" "" ""]
+	    }
 	}
 
 	# "bestAnn" annotation order: 

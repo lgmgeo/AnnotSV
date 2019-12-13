@@ -10,6 +10,9 @@
 
 For more details, please see the README file.
 
+	- Add bugfix concerning the management of the BED files
+	- Add bufix for the report of the compound heterozygosity (1 SV + 1 SNV/indel)
+
 Nov 21, 2019: AnnotSV version 2.2.5
 	- Add a phenotype-driven annotation (extracted from Exomiser)
 	- Annotations are not distributed anymore with the sources but downloaded during the installation with the Makefile

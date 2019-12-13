@@ -29,14 +29,19 @@
 ##########################################################################
 
 
-proc filteredVCFannotation {GENEchrom GENEstart GENEend} {
+proc filteredVCFannotation {GENEchrom GENEstart GENEend Line headerOutput} {
 
     global g_AnnotSV
     global L_htzPos
+    global L_samples
 
     ## VCFs parsing is done only 1 time (After, g_AnnotSV(filteredVCFparsing) is set to "done")
     if {![info exists g_AnnotSV(filteredVCFparsing)]} {
 	set g_AnnotSV(filteredVCFparsing) "done"
+
+	# No htz compound for the full lines
+	set L_htzPos(FULL) [lrepeat [llength $g_AnnotSV(filteredVCFsamples)] ""]
+	
 	# parsing of $g_AnnotSV(filteredVCFfiles): creation of L_htzPos($chrom,$sample)
 	puts "...Parse all positions from $g_AnnotSV(filteredVCFfiles) for \"$g_AnnotSV(filteredVCFsamples)\" ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])\n" 
 
@@ -97,21 +102,51 @@ proc filteredVCFannotation {GENEchrom GENEstart GENEend} {
 	    close $f
 	}
     }
+    
+    if {![info exists L_samples] && $headerOutput ne ""} {
+	# Listing of all the samples in the VCF input files
+	regsub ".*FORMAT\t" $headerOutput "" samples
+	regsub "\tAnnotSV type.*" $samples "" samples
+	set L_samples [split $samples "\t"]
+    }
 
-    set textToReturn {}
-    foreach sample $g_AnnotSV(filteredVCFsamples) {
-	# if $GENEchrom not present in the VCF file:
-	if {![info exists L_htzPos($GENEchrom,$sample)]} {lappend textToReturn ""; continue}
-	# List for htz variants
-	set i_first [DichotomySearch $GENEstart $L_htzPos($GENEchrom,$sample)]
-	set i_last [DichotomySearch $GENEend $L_htzPos($GENEchrom,$sample)]
-	if {$GENEstart ne [lindex $L_htzPos($GENEchrom,$sample) $i_first]} {set i_first [expr {$i_first+1}]}
-	set sampleText {}
-	foreach pos [lsort -unique [lrange $L_htzPos($GENEchrom,$sample) $i_first $i_last]] {
-	    lappend sampleText "${GENEchrom}_$pos"
+    # Is the SV detected in each sample from $g_AnnotSV(filteredVCFsamples)?
+    # Answer given in the GT of the VCF input file (but not from a bedfile)
+    if {[info exists g_AnnotSV(formatColNumber)]} { ;# <=> SVinputFile is a VCF
+	set formatData [lindex $Line $g_AnnotSV(formatColNumber)]
+	set i_gt [lsearch [split $formatData ":"] "GT"]
+	foreach sample $L_samples valueSample [lrange $Line [expr {$g_AnnotSV(formatColNumber)+1}] end-13] {
+	    set gt [lindex [split $valueSample ":"] $i_gt]
+	    regsub -all "\\||/" $gt "" gt
+	    if {![regexp "^0+$" $gt]} {
+		set SV($sample) detected
+	    }
 	}
-	
-	lappend textToReturn [join $sampleText ";"]
+    }
+    
+    set textToReturn {}
+    
+    if {$GENEchrom eq "FULL"} {
+	# No annotation for a full line (an SV can overlap several genes)
+	set textToReturn "$L_htzPos(FULL)"
+    } else {
+	# Annotation of a split line
+	foreach sample $g_AnnotSV(filteredVCFsamples) {
+	    # If the SV is not detected in this sample:
+	    if {![info exists SV($sample)]} {lappend textToReturn ""; continue}
+	    # if $GENEchrom not present in the VCF file:
+	    if {![info exists L_htzPos($GENEchrom,$sample)]} {lappend textToReturn ""; continue}
+	    # List for htz variants
+	    set i_first [DichotomySearch $GENEstart $L_htzPos($GENEchrom,$sample)]
+	    set i_last [DichotomySearch $GENEend $L_htzPos($GENEchrom,$sample)]
+	    if {$GENEstart ne [lindex $L_htzPos($GENEchrom,$sample) $i_first]} {set i_first [expr {$i_first+1}]}
+	    set sampleText {}
+	    foreach pos [lsort -unique [lrange $L_htzPos($GENEchrom,$sample) $i_first $i_last]] {
+		lappend sampleText "${GENEchrom}_$pos"
+	    }
+	    
+	    lappend textToReturn [join $sampleText ";"]
+	}
     }
 
     return "[join $textToReturn "\t"]" 
