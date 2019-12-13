@@ -190,6 +190,7 @@ proc runExomiser {L_Genes L_HPO} {
 	    
 	    # Exomiser request
 	    set url "http://localhost:${port}/exomiser/api/prioritise/?phenotypes=${L_HPO}&prioritiser=hiphive&prioritiser-params=human,mouse,fish,ppi&genes=$geneID"
+
 	    if {[catch {
 		set token [::http::geturl $url]
 		set exomiserResult [::http::data $token]

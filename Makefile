@@ -131,9 +131,8 @@ install-exomiser-1: 1902_phenotype.zip
 	@echo "Installation of Exomiser data:"
 	@echo ""
 	$(MKDIR) -p $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/1902
-	unzip 1902_hg19.zip -d $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/1902/ -x 1902_hg19/1902_hg19_clinvar_whitelist.tsv.gz*
+	$(MV) 1902_hg19 $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/1902/
 	unzip 1902_phenotype.zip -d $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/1902/
-	$(RM) -rf 1902_hg19.zip
 	$(RM) -rf 1902_phenotype.zip
 
 install-exomiser-2:
@@ -164,7 +163,8 @@ Annotations_%.tar.gz:
 	@echo ""
 	@echo "Download Exomiser supporting data files:"
 	@echo ""
-	curl -C - -LO https://data.monarchinitiative.org/exomiser/data/1902_hg19.zip -LO https://data.monarchinitiative.org/exomiser/data/$@
+	curl -C - -LO https://www.lbgi.fr/~geoffroy/Annotations/1902_hg19
+	curl -C - -LO https://data.monarchinitiative.org/exomiser/data/$@
 
 
 # make uninstall
