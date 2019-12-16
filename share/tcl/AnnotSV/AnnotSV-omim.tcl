@@ -33,30 +33,43 @@ proc checkOMIMfile {} {
     ## Check if the OMIM file has been downloaded the formatted
     ##########################################################
     set OMIMfileDownloaded [glob -nocomplain "$omimDir/genemap2.txt"]
-    set OMIMfileFormattedGzip [glob -nocomplain "$omimDir/*_OMIMannotations.tsv.gz"]
+    set OMIMfile1FormattedGzip [glob -nocomplain "$omimDir/*_OMIM-1-annotations.tsv.gz"]
+    set OMIMfile2FormattedGzip [glob -nocomplain "$omimDir/*_OMIM-2-annotations.tsv.gz"]
 
-    if {$OMIMfileDownloaded eq "" && $OMIMfileFormattedGzip eq ""} {
+    if {$OMIMfileDownloaded eq "" && $OMIMfile1FormattedGzip eq ""} {
 	# No OMIM annotation
 	return
     } 
 
-    if {[llength $OMIMfileFormattedGzip]>1} {
+    if {[llength $OMIMfile1FormattedGzip]>1} {
 	puts "Several OMIM files exist:"
-	puts "$OMIMfileFormattedGzip"
-	puts "Keep only one: [lindex $OMIMfileFormattedGzip end]\n"
-	foreach omim [lrange $OMIMfileFormattedGzip 0 end-1] {
+	puts "$OMIMfile1FormattedGzip"
+	puts "Keep only one: [lindex $OMIMfile1FormattedGzip end]\n"
+	foreach omim [lrange $OMIMfile1FormattedGzip 0 end-1] {
+	    file rename -force $omim $omim.notused
+	}
+	return
+    } 
+    if {[llength $OMIMfile2FormattedGzip]>1} {
+	puts "Several OMIM files exist:"
+	puts "$OMIMfile2FormattedGzip"
+	puts "Keep only one: [lindex $OMIMfile2FormattedGzip end]\n"
+	foreach omim [lrange $OMIMfile2FormattedGzip 0 end-1] {
 	    file rename -force $omim $omim.notused
 	}
 	return
     } 
 
-    if {$OMIMfileFormattedGzip eq ""} {     
-	## - Create the 'date'_OMIMannotations.tsv file.
-	##   Header: genes, Mim Number, Phenotypes, Inheritance
+    if {$OMIMfile1FormattedGzip eq "" || $OMIMfile2FormattedGzip eq ""} {     
+	## - Create the 'date'_OMIM-1-annotations.tsv and 'date'_OMIM-2-annotations.tsv files.
+	##   Header1: genes, Mim Number
+	##   Header2: genes, Phenotypes, Inheritance
 
-	set OMIMfileFormatted "$omimDir/[clock format [clock seconds] -format "%Y%m%d"]_OMIMannotations.tsv"
-	puts "...creation of $OMIMfileFormatted.gz ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])\n"
-	ReplaceTextInFile "genes\tMim Number\tPhenotypes\tInheritance" $OMIMfileFormatted
+	set OMIMfile1Formatted "$omimDir/[clock format [clock seconds] -format "%Y%m%d"]_OMIM-1-annotations.tsv"
+	set OMIMfile2Formatted "$omimDir/[clock format [clock seconds] -format "%Y%m%d"]_OMIM-2-annotations.tsv"
+	puts "...creation of $OMIM1fileFormatted.gz and $OMIM2fileFormatted ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])\n"
+	ReplaceTextInFile "genes\tMim Number" $OMIMfile1Formatted
+	ReplaceTextInFile "genes\tPhenotypes\tInheritance" $OMIMfile2Formatted
 	
 	# Parsing of $OMIMfileDownloaded
 	foreach L [LinesFromFile $OMIMfileDownloaded] {
@@ -126,17 +139,24 @@ proc checkOMIMfile {} {
 	# creation of $OMIMfileFormatted.gz
 	set L_genes [lsort -unique $L_genes]
 	# Header :
-	# Gene    Mim Number      Phenotypes      Inheritance
+	# Gene    Mim Number     
+	# Gene    Phenotypes      Inheritance
 	foreach g $L_genes {
 	    set Pheno($g) "[join $Pheno($g) ";"]"
 	    
 	    set Inheritance($g) "[join $Inheritance($g) ";"]"
 	    if {[regexp "^;+$" $Inheritance($g)]} {set Inheritance($g) ""}
-	    WriteTextInFile "$g\t[join $Mim($g) ";"]\t$Pheno($g)\t$Inheritance($g)" $OMIMfileFormatted
+	    WriteTextInFile "$g\t[join $Mim($g) ";"]" $OMIMfile1Formatted
+	    WriteTextInFile "$g\t$Pheno($g)\t$Inheritance($g)" $OMIMfile2Formatted
 	}
-	if {[catch {exec gzip $OMIMfileFormatted} Message]} {
+	if {[catch {exec gzip $OMIMfile1Formatted} Message]} {
 	    puts "-- checkOMIMfile --"
-	    puts "gzip $OMIMfileFormatted"
+	    puts "gzip $OMIMfile1Formatted"
+	    puts "$Message\n"
+	}
+	if {[catch {exec gzip $OMIMfile2Formatted} Message]} {
+	    puts "-- checkOMIMfile --"
+	    puts "gzip $OMIMfile2Formatted"
 	    puts "$Message\n"
 	}
 

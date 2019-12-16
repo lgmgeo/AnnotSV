@@ -749,6 +749,7 @@ proc OrganizeAnnotation {} {
 			    # Second (for full lines), we doesn't keep the annotation of all genes (value is set to empty), 
 			    # except for scores and percentages where we keep the max value
 			    # (in order not to have value such "1.5/////-0.2////")
+			    # and except for OMIM number where we keep all the numbers
 			    set L_newGenesBasedText ""
 			    if {$tutu eq ""} {lappend L_genesBasedText ""} ; #if {$tutu eq ""} => doesn't enter in the foreach
 			    foreach valueByColumn [split $tutu "\t"] { 
@@ -769,6 +770,8 @@ proc OrganizeAnnotation {} {
 						    set max 1
 						} 
 					    }
+					} elseif {[regexp "OMIM-1-annotations.tsv" $F]} {
+					    if {$valueByGene ne ""} {if {$max eq "-1000"} {set max "$valueByGene"} else {append max ";$valueByGene"}}
 					} elseif {[regexp "morbid" $F]} {
 					    if {[regexp "yes" $valueByGene]} {set max "yes"}
 					} else {
