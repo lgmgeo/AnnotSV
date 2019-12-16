@@ -15,10 +15,10 @@ OPTIONS
 -candidateGenesFiltering:       To select only the SV "split" annotations overlapping a gene from the "candidateGenesFile"
                                 Values: no (default) or yes
 
--filteredVCFfiles:              Path of the filtered VCF input file(s) with SNV/indel coordinates for compound heterozygotes report (optional)
+-candidateSnvIndelFiles:        Path of the filtered VCF input file(s) with SNV/indel coordinates for compound heterozygotes report (optional)
                                 Gzipped VCF files are supported as well as regular expression
 
--filteredVCFsamples:            To specifiy the sample names from the VCF files defined from the -filtereVCFfiles option 
+-candidateSnvIndelsamples:      To specifiy the sample names from the VCF files defined from the -filtereVCFfiles option 
                                 Default: use all samples from the filtered VCF files
 
 -genomeBuild:                   Genome build used
@@ -59,6 +59,16 @@ OPTIONS
 -reciprocal:                    Use of a reciprocal overlap between SV and features (only for annotations with features overlapping the SV)
                                 Values: no (default) or yes
 
+-snvIndelFiles:                 Path of the VCF input file(s) with SNV/indel coordinates used for false positive discovery
+                                Use counts of the homozygous and heterozygous variants
+                                Gzipped VCF files are supported as well as regular expression
+
+-vcfIndelPASS:                  Boolean. To only use variants from VCF input files that passed all filters during the calling (FILTER column value equal to PASS)
+                                Range values: 0 (default) or 1
+
+-snvIndelSamples:               To specifiy the sample names from the VCF files defined from the -vcfFiles option
+                                Default: use all samples from the VCF files
+
 -SVinputFile:                   Path of the input file (VCF or BED) with SV coordinates
                                 Gzipped VCF file is supported 
 
@@ -76,14 +86,4 @@ OPTIONS
 
 -typeOfAnnotation:              Description of the types of lines produced by AnnotSV
                                 Values: both (default), full or split
-
--vcfFiles:                      Path of the VCF input file(s) with SNV/indel coordinates used for false positive discovery
-                                Use counts of the homozygous and heterozygous variants
-                                Gzipped VCF files are supported as well as regular expression
-
--vcfPASS:                       Boolean. To only use variants from VCF input files that passed all filters during the calling (FILTER column value equal to PASS)
-                                Range values: 0 (default) or 1
-
--vcfSamples:                    To specifiy the sample names from the VCF files defined from the -vcfFiles option
-                                Default: use all samples from the VCF files
 

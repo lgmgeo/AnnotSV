@@ -21,6 +21,12 @@ Dec 20, 2019: AnnotSV version 2.3
 	- AnnotSV can now create two other output files:
 		- A report of unannotated variants (e.g. badly formatted SV, variant length < SVminSize...)
 		- A report of the decisions that explain the ranking of each SV
+	- Change the names of the misleading following options: 
+		vcfFiles           >>  snvIndelFiles
+		vcfPASS            >>  snvIndelPASS
+		vcfSamples         >>  snvIndelSamples) 
+		filteredVCFfiles   >>  candidateSnvIndelFiles
+		filteredVCFsamples >>  candidateSnvIndelSamples
 	- Add bugfix concerning the management of the BED files
 	- Add bugfix for the report of the compound heterozygosity (1 SV + 1 SNV/indel)
 	- Add bugfix concerning the -candidateGenesFiltering option
