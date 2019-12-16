@@ -40,13 +40,13 @@ proc filteredVCFannotation {GENEchrom GENEstart GENEend Line headerOutput} {
 	set g_AnnotSV(filteredVCFparsing) "done"
 
 	# No htz compound for the full lines
-	set L_htzPos(FULL) [lrepeat [llength $g_AnnotSV(filteredVCFsamples)] ""]
+	set L_htzPos(FULL) [lrepeat [llength $g_AnnotSV(candidateSnvIndelSamples)] ""]
 	
-	# parsing of $g_AnnotSV(filteredVCFfiles): creation of L_htzPos($chrom,$sample)
-	puts "...Parse all positions from $g_AnnotSV(filteredVCFfiles) for \"$g_AnnotSV(filteredVCFsamples)\" ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])\n" 
+	# parsing of $g_AnnotSV(candidateSnvIndelFiles): creation of L_htzPos($chrom,$sample)
+	puts "...Parse all positions from $g_AnnotSV(candidateSnvIndelFiles) for \"$g_AnnotSV(candidateSnvIndelSamples)\" ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])\n" 
 
 	# "eval glob" accept regular expression ("*.vcf) as well as a list of files ("sample1.vcf sample2.vcf.gz"):
-	foreach vcfF [eval glob -nocomplain $g_AnnotSV(filteredVCFfiles)] {
+	foreach vcfF [eval glob -nocomplain $g_AnnotSV(candidateSnvIndelFiles)] {
 	    if {[regexp ".gz$" $vcfF]} {
 		set f [open "|gzip -cd $vcfF"]
 	    } else {
@@ -56,7 +56,7 @@ proc filteredVCFannotation {GENEchrom GENEstart GENEend Line headerOutput} {
 		set L [gets $f]
 		if {[string range $L 0 5] eq "#CHROM"} {
 		    set L_samples {}
-		    foreach sample $g_AnnotSV(filteredVCFsamples) {
+		    foreach sample $g_AnnotSV(candidateSnvIndelSamples) {
 			set i_sample($sample) [lsearch -exact [split $L "\t"] $sample]
 			if {$i_sample($sample) ne -1} {lappend L_samples $sample}
 		    }
@@ -84,7 +84,7 @@ proc filteredVCFannotation {GENEchrom GENEstart GENEend Line headerOutput} {
 		if {[expr {abs($variantLength)}]>$g_AnnotSV(SVminSize)} {continue}; # it is an SV
 
 		# keep only variant with FILTER == PASS
-		if {$g_AnnotSV(vcfPASS) && $filter ne "PASS"} {continue}
+		if {$g_AnnotSV(snvIndelPASS) && $filter ne "PASS"} {continue}
 		
 		foreach sample $L_samples {
 		    set sampleData [lindex $Ls $i_sample($sample)]
@@ -110,7 +110,7 @@ proc filteredVCFannotation {GENEchrom GENEstart GENEend Line headerOutput} {
 	set L_samples [split $samples "\t"]
     }
 
-    # Is the SV detected in each sample from $g_AnnotSV(filteredVCFsamples)?
+    # Is the SV detected in each sample from $g_AnnotSV(candidateSnvIndelSamples)?
     # Answer given in the GT of the VCF input file (but not from a bedfile)
     if {[info exists g_AnnotSV(formatColNumber)]} { ;# <=> SVinputFile is a VCF
 	set formatData [lindex $Line $g_AnnotSV(formatColNumber)]
@@ -131,7 +131,7 @@ proc filteredVCFannotation {GENEchrom GENEstart GENEend Line headerOutput} {
 	set textToReturn "$L_htzPos(FULL)"
     } else {
 	# Annotation of a split line
-	foreach sample $g_AnnotSV(filteredVCFsamples) {
+	foreach sample $g_AnnotSV(candidateSnvIndelSamples) {
 	    # If the SV is not detected in this sample:
 	    if {![info exists SV($sample)]} {lappend textToReturn ""; continue}
 	    # if $GENEchrom not present in the VCF file:

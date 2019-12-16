@@ -236,13 +236,13 @@ proc OrganizeAnnotation {} {
     }
 
     ####### "VCF files header"
-    if {$g_AnnotSV(vcfFiles) ne ""} {
-	foreach sample $g_AnnotSV(vcfSamples) {
+    if {$g_AnnotSV(snvIndelFiles) ne ""} {
+	foreach sample $g_AnnotSV(snvIndelSamples) {
 	    append headerOutput "\t#hom($sample)\t#htz($sample)"
 	}
     }
-    if {$g_AnnotSV(filteredVCFfiles) ne ""} {
-	foreach sample $g_AnnotSV(filteredVCFsamples) {
+    if {$g_AnnotSV(candidateSnvIndelFiles) ne ""} {
+	foreach sample $g_AnnotSV(candidateSnvIndelSamples) {
 	    append headerOutput "\tcompound-htz($sample)"
 	}
     }
@@ -841,7 +841,7 @@ proc OrganizeAnnotation {} {
 
 	# Calculate the #hom and #htz variables
 	set HomHtz ""
-	if {$g_AnnotSV(vcfFiles) ne ""} {
+	if {$g_AnnotSV(snvIndelFiles) ne ""} {
 	    if {$AnnotSVtype eq "split"} {
 		set HomHtz "[VCFannotation $SVchrom $intersectStart $intersectEnd]"
 	    } else {
@@ -851,7 +851,7 @@ proc OrganizeAnnotation {} {
 
 	# Calculate the compound-htz variable
 	set compound ""
-	if {$g_AnnotSV(filteredVCFfiles) ne ""} {
+	if {$g_AnnotSV(candidateSnvIndelFiles) ne ""} {
 	    if {$AnnotSVtype eq "split"} {
 		set compound [filteredVCFannotation $SVchrom $txStart $txEnd $Ls $headerOutput]
 	    } else {

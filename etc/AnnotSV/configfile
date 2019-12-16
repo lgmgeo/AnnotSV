@@ -28,13 +28,13 @@
 
 -reciprocal:                "no"
 
+-snvindelPASS:              "0"
+
 -SVinputInfo:               1
 
 -SVminSize:                 50
 
 -typeOfAnnotation:          "both"
-
--vcfPASS:                   "0"
 
 
 #------------------------

@@ -27,7 +27,7 @@
 ## - Config file options (if file exists)
 ## - Options given in arguments
 #
-## Please note: the case in the name of options is not important. Ex: "vcffiles" = "vcfFiles"
+## Please note: the case in the name of options is not important. Ex: "snvIndelFiles" = "snvindelfiles"
 ##
 proc configureAnnotSV {argv} {
     
@@ -44,8 +44,8 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(candidateGenesFile)       ""
     set g_AnnotSV(candidateGenesFiltering)  "no"
     set g_AnnotSV(extann)                   ""    ;# list of the “.../Annotations_$g_AnnotSV(organism)/*/*.tsv(.gz) files” <=> External genes annotation files
-    set g_AnnotSV(filteredVCFfiles)         ""
-    set g_AnnotSV(filteredVCFsamples)       ""
+    set g_AnnotSV(candidateSnvIndelFiles)   ""
+    set g_AnnotSV(candidateSnvIndelSamples) ""
     set g_AnnotSV(genomeBuild)              "GRCh37"
     set g_AnnotSV(hpo)                      ""    ;# "HP:0030684,HP:0085622"
     set g_AnnotSV(metrics)                  "us"
@@ -58,22 +58,22 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(rankFiltering)            "1-5"
     set g_AnnotSV(rankOutput)               "no"
     set g_AnnotSV(reciprocal)               "no"
+    set g_AnnotSV(snvIndelFiles)            ""
+    set g_AnnotSV(snvIndelPASS)             "0"
+    set g_AnnotSV(snvIndelSamples)          ""
     set g_AnnotSV(SVinputFile)              ""
     set g_AnnotSV(SVinputInfo)              "1"
     set g_AnnotSV(SVminSize)                "50"
     set g_AnnotSV(svtBEDcol)                "-1"
     set g_AnnotSV(txFile)                   ""
     set g_AnnotSV(typeOfAnnotation)         "both"
-    set g_AnnotSV(vcfFiles)                 ""
-    set g_AnnotSV(vcfPASS)                  "0"
-    set g_AnnotSV(vcfSamples)               ""
     set g_AnnotSV(ranking)                  "1"
     set g_AnnotSV(outputColHeader)          ""
 
     ###########################
     ## Load config file options
     ###########################
-    set lOptionsOk "annotationsDir bedtools candidateGenesFile candidateGenesFiltering extann filteredVCFfiles filteredVCFsamples genomeBuild hpo metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering rankOutput reciprocal SVinputFile SVinputInfo SVminSize svtBEDcol txFile typeOfAnnotation vcfFiles vcfSamples vcfPASS"
+    set lOptionsOk "annotationsDir bedtools candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann genomeBuild hpo metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering rankOutput reciprocal snvIndelFiles snvIndelPASS SVinputFile SVinputInfo SVminSize svtBEDcol txFile typeOfAnnotation snvIndelSamples"
     set configFile "$g_AnnotSV(etcDir)/configfile"
     if {[file exists "./configfile"]} {
 	set configFile "./configfile"
@@ -228,8 +228,8 @@ proc configureAnnotSV {argv} {
     set liste [lsort -unique $liste]
     set g_AnnotSV(rankFiltering) $liste
 
-    ## It must be a boolean (0 or 1) for the SVinputInfo and vcfPASS options.
-    foreach val {SVinputInfo vcfPASS} {
+    ## It must be a boolean (0 or 1) for the SVinputInfo and snvIndelPASS options.
+    foreach val {SVinputInfo snvIndelPASS} {
 	if {$g_AnnotSV($val) ne 0 && $g_AnnotSV($val) ne 1} {
 	    puts "############################################################################"
 	    puts "Bad option value: -$val = $g_AnnotSV($val)"
@@ -345,19 +345,19 @@ proc configureAnnotSV {argv} {
     ## The following step could be improved: too long
     #################################################
 
-    ## If "vcfFiles" option is defined:
-    if {$g_AnnotSV(vcfFiles) ne ""} {
+    ## If "snvIndelFiles" option is defined:
+    if {$g_AnnotSV(snvIndelFiles) ne ""} {
 	## It must be existing files
-	## All "$vcfSamples" should be presents in one of the VCF files
-	## If the "-vcfSamples" option is not defined, we defined it with all samples from the VCF files.
+	## All "$snvIndelSamples" should be presents in one of the VCF files
+	## If the "-snvIndelSamples" option is not defined, we defined it with all samples from the VCF files.
 	set L_samples {}
 	set L_allSamplesFromVCF {}
 
 	# Script à améliorer ici, un nom de fichier (sans expr reg) qui n'existe pas ne provoque pas de message d'erreur
-	foreach vcfF [eval glob -nocomplain $g_AnnotSV(vcfFiles)] {
+	foreach vcfF [eval glob -nocomplain $g_AnnotSV(snvIndelFiles)] {
 	    if {![file exists $vcfF]} { ;# Never used during the script. If the file doesn't exist, the foreach is empty! 
 		puts "############################################################################"
-		puts "Bad value for vcfFiles option, file does not exist ($vcfF) - Exit with error."
+		puts "Bad value for snvIndelFiles option, file does not exist ($vcfF) - Exit with error."
 		puts "############################################################################"
 		exit 2
 	    }
@@ -371,7 +371,7 @@ proc configureAnnotSV {argv} {
 		if {[string range $L 0 5] ne "#CHROM"} {continue}
 		set Ls [split $L "\t"]
 		lappend L_allSamplesFromVCF {*}[lrange $Ls 9 end]
-		foreach sample $g_AnnotSV(vcfSamples) {
+		foreach sample $g_AnnotSV(snvIndelSamples) {
 		    if {[lsearch -exact $Ls $sample] ne -1} {lappend L_samples $sample}
 		}
 		# We can't put a break here, because the pipe command: "|gzip ..." still produces data.
@@ -381,26 +381,26 @@ proc configureAnnotSV {argv} {
 	    }
 	    close $f
 	}
-	if {$g_AnnotSV(vcfSamples) eq ""} {
+	if {$g_AnnotSV(snvIndelSamples) eq ""} {
 	    set L_allSamplesFromVCF [lsort -unique $L_allSamplesFromVCF]
-	    set g_AnnotSV(vcfSamples) $L_allSamplesFromVCF
+	    set g_AnnotSV(snvIndelSamples) $L_allSamplesFromVCF
 	} else {
 	    set L_samples [lsort -unique $L_samples]
-	    set g_AnnotSV(vcfSamples) $L_samples; # Remove samples from g_AnnotSV(vcfSamples) that are not in a VCF file
+	    set g_AnnotSV(snvIndelSamples) $L_samples; # Remove samples from g_AnnotSV(snvIndelSamples) that are not in a VCF file
 	}
     }
 
-    ## If "filteredVCFfiles" option is defined:
-    if {$g_AnnotSV(filteredVCFfiles) ne ""} {
+    ## If "candidateSnvIndelFiles" option is defined:
+    if {$g_AnnotSV(candidateSnvIndelFiles) ne ""} {
 	## It must be existing files
-	## All "$filteredVCFsamples" should be presents in one of the VCF files
-	## If the "-filteredVCFsamples" option is not defined, we defined it with all samples from the VCF files.
+	## All "$candidateSnvIndelSamples" should be presents in one of the VCF files
+	## If the "-candidateSnvIndelSamples" option is not defined, we defined it with all samples from the VCF files.
 	set L_samples {}
 	set L_allSamplesFromVCF {}
-	foreach vcfF [eval glob -nocomplain $g_AnnotSV(filteredVCFfiles)] {
+	foreach vcfF [eval glob -nocomplain $g_AnnotSV(candidateSnvIndelFiles)] {
 	    if {![file exists $vcfF]} {
 		puts "############################################################################"
-		puts "Bad value for filteredVCFfiles option, file does not exist ($vcfF) - Exit with error."
+		puts "Bad value for candidateSnvIndelFiles option, file does not exist ($vcfF) - Exit with error."
 		puts "############################################################################"
 		exit 2
 	    }
@@ -414,7 +414,7 @@ proc configureAnnotSV {argv} {
 		if {[string range $L 0 5] ne "#CHROM"} {continue}
 		set Ls [split $L "\t"]
 		lappend L_allSamplesFromVCF {*}[lrange $Ls 9 end]
-		foreach sample $g_AnnotSV(filteredVCFsamples) {
+		foreach sample $g_AnnotSV(candidateSnvIndelSamples) {
 		    if {[lsearch -exact $Ls $sample] ne -1} {lappend L_samples $sample}
 		}
 		# We can't put a break here, because the pipe command: "|gzip ..." still produces data.
@@ -424,12 +424,12 @@ proc configureAnnotSV {argv} {
 	    }
 	    close $f
 	}
-	if {$g_AnnotSV(filteredVCFsamples) eq ""} {
+	if {$g_AnnotSV(candidateSnvIndelSamples) eq ""} {
 	    set L_allSamplesFromVCF [lsort -unique $L_allSamplesFromVCF]
-	    set g_AnnotSV(filteredVCFsamples) $L_allSamplesFromVCF
+	    set g_AnnotSV(candidateSnvIndelSamples) $L_allSamplesFromVCF
 	} else {
 	    set L_samples [lsort -unique $L_samples]
-	    set g_AnnotSV(filteredVCFsamples) $L_samples; # Remove samples from g_AnnotSV(filteredVCFsamples) that are not in a VCF file
+	    set g_AnnotSV(candidateSnvIndelSamples) $L_samples; # Remove samples from g_AnnotSV(candidateSnvIndelSamples) that are not in a VCF file
 	}
     }
     

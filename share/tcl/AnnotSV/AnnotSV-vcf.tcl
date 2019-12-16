@@ -56,11 +56,11 @@ proc VCFannotation {SVchrom SVstart SVend} {
     ## VCFs parsing is done only 1 time (After, g_AnnotSV(vcfParsing) is set to "done")
     if {![info exists g_AnnotSV(vcfParsing)]} {
 	set g_AnnotSV(vcfParsing) "done"
-	# parsing of $g_AnnotSV(vcfFiles): creation of lPos($SVchrom,htz,sample) and lPos($SVchrom,hom,sample)
-	puts "\n\n...parsing of VCF file(s) for \"$g_AnnotSV(vcfSamples)\" ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
+	# parsing of $g_AnnotSV(snvIndelFiles): creation of lPos($SVchrom,htz,sample) and lPos($SVchrom,hom,sample)
+	puts "\n\n...parsing of VCF file(s) for \"$g_AnnotSV(snvIndelSamples)\" ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
 
 	# "eval glob" accept regular expression ("*.vcf) as well as a list of files ("sample1.vcf sample2.vcf.gz"):
-	foreach vcfF [eval glob -nocomplain $g_AnnotSV(vcfFiles)] {
+	foreach vcfF [eval glob -nocomplain $g_AnnotSV(snvIndelFiles)] {
 	    puts "\t...parsing of $vcfF ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
 	    set iIntersect 0
 	    set iSV 0
@@ -173,7 +173,7 @@ proc VCFannotation {SVchrom SVstart SVend} {
 		set L [gets $f]
 
 		if {[string range $L 0 5] eq "#CHROM"} {
-		    foreach sample $g_AnnotSV(vcfSamples) {
+		    foreach sample $g_AnnotSV(snvIndelSamples) {
 			set i_sample($sample) [lsearch -exact [split $L "\t"] $sample]
 			if {$i_sample($sample) ne -1} {lappend L_samples $sample}
 		    }
@@ -207,7 +207,7 @@ proc VCFannotation {SVchrom SVstart SVend} {
 		if {$j_GT eq -1} {incr iNotGT; continue}
 	      
 		# keep only variant with FILTER == PASS
-		if {$g_AnnotSV(vcfPASS) && $filter ne "PASS"} {incr iNotPASS; continue}
+		if {$g_AnnotSV(snvIndelPASS) && $filter ne "PASS"} {incr iNotPASS; continue}
 		incr iLoaded
 		
 		foreach sample $L_samples {
@@ -245,7 +245,7 @@ proc VCFannotation {SVchrom SVstart SVend} {
     }
 
     set textToReturn {}
-    foreach sample $g_AnnotSV(vcfSamples) {
+    foreach sample $g_AnnotSV(snvIndelSamples) {
 	# if $chrom not present in the VCF file:
 	if {![info exists lPos($SVchrom,htz,$sample)] && ![info exists lPos($SVchrom,hom,$sample)]} {lappend textToReturn "0\t0"; continue}
 	# Count for hom variants
