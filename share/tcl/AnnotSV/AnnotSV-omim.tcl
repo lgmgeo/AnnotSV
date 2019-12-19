@@ -67,7 +67,7 @@ proc checkOMIMfile {} {
 
 	set OMIMfile1Formatted "$omimDir/[clock format [clock seconds] -format "%Y%m%d"]_OMIM-1-annotations.tsv"
 	set OMIMfile2Formatted "$omimDir/[clock format [clock seconds] -format "%Y%m%d"]_OMIM-2-annotations.tsv"
-	puts "...creation of $OMIM1fileFormatted.gz and $OMIM2fileFormatted ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])\n"
+	puts "...creation of $OMIMfile1Formatted.gz and $OMIMfile2Formatted ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])\n"
 	ReplaceTextInFile "genes\tMim Number" $OMIMfile1Formatted
 	ReplaceTextInFile "genes\tPhenotypes\tInheritance" $OMIMfile2Formatted
 	
@@ -78,7 +78,7 @@ proc checkOMIMfile {} {
 	    if {[regexp "^# Chromosome\tGenomic" $L]} {
 		set i_gene1    [lsearch -exact $Ls "Gene Symbols"];    if {$i_gene1 == -1} {puts "Bad header line syntax. Gene Symbols column not found - Exit with error"; exit 2}
 		set i_gene2    [lsearch -exact $Ls "Approved Symbol"]; if {$i_gene2 == -1} {puts "Bad header line syntax. Approved Symbol column not found - Exit with error"; exit 2}
-		set i_mim      [lsearch -exact $Ls "Mim Number"];      if {$i_mim == -1} {puts "Bad header line syntax. Mim Number column not found - Exit with error"; exit 2}
+		set i_mim      [lsearch -exact $Ls "MIM Number"];      if {$i_mim == -1} {puts "Bad header line syntax. Mim Number column not found - Exit with error"; exit 2}
 		set i_pheno    [lsearch -exact $Ls "Phenotypes"];      if {$i_pheno == -1} {puts "Bad header line syntax. Phenotypes column not found - Exit with error"; exit 2}
 		continue
 	    }

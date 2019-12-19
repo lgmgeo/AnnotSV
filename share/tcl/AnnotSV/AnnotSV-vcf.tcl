@@ -24,9 +24,10 @@
 
 
 ##################################################################
-# Prepare 2 new annotation columns for annotated bedfile:
-# - nb Hom in the SV
-# - nb Htz in the SV
+# Prepare 3 new annotation columns:
+# - Number of homozygous SNV/indel detected in the sample and located in the SV
+# - Number of heterozygous SNV/indel detected in the sample and  located in the SV
+# - Total number of calls detected in all samples and located in the SV
 ##################################################################
 
 
@@ -48,18 +49,20 @@ proc DichotomySearch {number OrderedNumberList} {
     return $i
 }
 
-proc VCFannotation {SVchrom SVstart SVend} {
+proc VCFannotation {SVchrom SVstart SVend SVtype} {
 
     global g_AnnotSV
     global lPos
+    global L_allSamples
 
     ## VCFs parsing is done only 1 time (After, g_AnnotSV(vcfParsing) is set to "done")
     if {![info exists g_AnnotSV(vcfParsing)]} {
 	set g_AnnotSV(vcfParsing) "done"
-	# parsing of $g_AnnotSV(snvIndelFiles): creation of lPos($SVchrom,htz,sample) and lPos($SVchrom,hom,sample)
+	# parsing of $g_AnnotSV(snvIndelFiles): creation of lPos($SVchrom,htz,sample), lPos($SVchrom,hom,sample) and lPos($SVchrom,tot,cohort)
 	puts "\n\n...parsing of VCF file(s) for \"$g_AnnotSV(snvIndelSamples)\" ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
 
 	# "eval glob" accept regular expression ("*.vcf) as well as a list of files ("sample1.vcf sample2.vcf.gz"):
+	set L_allSamples {}
 	foreach vcfF [eval glob -nocomplain $g_AnnotSV(snvIndelFiles)] {
 	    puts "\t...parsing of $vcfF ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
 	    set iIntersect 0
@@ -94,6 +97,7 @@ proc VCFannotation {SVchrom SVstart SVend} {
 		    }
 		}
 		unset f
+		lappend L_allSamples {*}[lrange $L_tmpVCF_Header 9 end]
 		
 		WriteTextInFile "$L_tmpVCF_Header" $tmpVCF
 		if {[catch {exec gzip $tmpVCF} Message]} {
@@ -132,6 +136,7 @@ proc VCFannotation {SVchrom SVstart SVend} {
 		    }
 		}
 		close $f
+		lappend L_allSamples {*}[lrange $L_tmpVCF_Header 9 end]
 
 		WriteTextInFile "$L_tmpVCF_Header" $tmpVCF
 		if {[catch {exec gzip $tmpVCF} Message]} {
@@ -168,14 +173,17 @@ proc VCFannotation {SVchrom SVstart SVend} {
 
 	    # load SNV/Indel in memory
 	    set f [open "| gzip -cd $tmpVCFgz"]	  
-	    set L_samples {}
+	    set L_samples1VCF {}
 	    while {![eof $f]} {
 		set L [gets $f]
+		set Ls [split $L "\t"]
 
 		if {[string range $L 0 5] eq "#CHROM"} {
-		    foreach sample $g_AnnotSV(snvIndelSamples) {
-			set i_sample($sample) [lsearch -exact [split $L "\t"] $sample]
-			if {$i_sample($sample) ne -1} {lappend L_samples $sample}
+		    set L_samples1VCF [lrange $Ls 9 end]
+		    set k 9
+		    foreach sample [lrange $Ls 9 end] {
+			set i_sample($sample) $k
+			incr k
 		    }
 		    continue
 		}
@@ -210,7 +218,7 @@ proc VCFannotation {SVchrom SVstart SVend} {
 		if {$g_AnnotSV(snvIndelPASS) && $filter ne "PASS"} {incr iNotPASS; continue}
 		incr iLoaded
 		
-		foreach sample $L_samples {
+		foreach sample $L_samples1VCF {
 		    set sampleData [lindex $Ls $i_sample($sample)]
 		    # set the GT
 		    set GTsample [lindex [split $sampleData ":"] $j_GT]
@@ -222,6 +230,9 @@ proc VCFannotation {SVchrom SVstart SVend} {
 		    if {[lindex $GTsample 0] ne [lindex $GTsample 1]} {set GT "htz"} else {set GT "hom"} 
 		    # set the lPos($chrom,$GT,$sample)
 		    lappend lPos($chrom,$GT,$sample) $pos
+		}
+		if {[info exists i_samples]} {
+		    unset i_samples
 		}
 	    }
 	    close $f
@@ -245,31 +256,63 @@ proc VCFannotation {SVchrom SVstart SVend} {
     }
 
     set textToReturn {}
-    foreach sample $g_AnnotSV(snvIndelSamples) {
-	# if $chrom not present in the VCF file:
-	if {![info exists lPos($SVchrom,htz,$sample)] && ![info exists lPos($SVchrom,hom,$sample)]} {lappend textToReturn "0\t0"; continue}
+    set lPosTotInTheCohort {}
+    foreach sample $L_allSamples {
 	# Count for hom variants
-	set countHom 0
+	set countHom($sample) 0
 	if {[info exists lPos($SVchrom,hom,$sample)]} {
 	    set i_first [DichotomySearch $SVstart $lPos($SVchrom,hom,$sample)]
 	    set i_last [DichotomySearch $SVend $lPos($SVchrom,hom,$sample)]
 	    if {$SVstart ne [lindex $lPos($SVchrom,hom,$sample) $i_first]} {set i_first [expr {$i_first+1}]}
 	    set L_posHom [lsort -unique [lrange $lPos($SVchrom,hom,$sample) $i_first $i_last]]
-	    set countHom [llength $L_posHom]
+	    set countHom($sample) [llength $L_posHom]
+	    lappend lPosTotInTheCohort {*}$L_posHom
 	} 
 	# Count for htz variants
-	set countHtz 0
+	set countHtz($sample) 0
 	if {[info exists lPos($SVchrom,htz,$sample)]} {
 	    set i_first [DichotomySearch $SVstart $lPos($SVchrom,htz,$sample)]
 	    set i_last [DichotomySearch $SVend $lPos($SVchrom,htz,$sample)]
 	    if {$SVstart ne [lindex $lPos($SVchrom,htz,$sample) $i_first]} {set i_first [expr {$i_first+1}]}
 	    set L_posHtz [lsort -unique [lrange $lPos($SVchrom,htz,$sample) $i_first $i_last]]
-	    set countHtz [llength $L_posHtz]
+	    set countHtz($sample) [llength $L_posHtz]
+	    lappend lPosTotInTheCohort {*}$L_posHtz
 	}
-	lappend textToReturn "$countHom\t$countHtz"
+    }
+    set lPosTotInTheCohort [lsort -unique $lPosTotInTheCohort]
+    set totalCount [llength $lPosTotInTheCohort]
+
+
+    if {[regexp "DEL" [normalizeSVtype $SVtype]]} {
+	if {$totalCount>50} {
+	    set textToReturn ""
+	    foreach sample $g_AnnotSV(snvIndelSamples) {
+		# Count for hom variants (Hom + WT hom)
+		set CountAllHom [expr {$totalCount-$countHtz($sample)}]
+		# htz/AllHom
+		if {$CountAllHom eq 0} {
+		    set HtzHomRatio "NA"
+		} else {
+		    set HtzHomRatio [format "%.4f" [expr {$countHtz($sample)*1.0/$CountAllHom}]]
+		}
+		# htz(sample)/total(cohort)
+		if {$totalCount eq 0} {
+		    set HtzTotRatio "NA"
+		} else {
+		    set HtzTotRatio [format "%.4f" [expr {$countHtz($sample)*1.0/$totalCount}]]
+		}
+		
+		append textToReturn "$countHom($sample)\t$countHtz($sample)\t$HtzHomRatio\t$HtzTotRatio"
+	    }
+	    append textToReturn "\t$totalCount"
+	} else {
+	    set textToReturn "$countHom($sample)\t$countHtz($sample)\tNA\tNA\t$totalCount"
+	}
+    } else {
+	set textToReturn "\t\t\t\t"
     }
 
-    return "[join $textToReturn "\t"]" 
+    return "$textToReturn" 
 }
 
 

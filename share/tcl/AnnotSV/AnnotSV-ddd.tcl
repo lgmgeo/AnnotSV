@@ -45,26 +45,26 @@ proc checkDDDgeneFile {} {
     #################################################################
     set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based"
     set DDDfileDownloaded [glob -nocomplain "$extannDir/DDD/DDG2P.csv.gz"]
-    set DDDfileFormattedAndSortedGzip [glob -nocomplain "$extannDir/DDD/*_DDG2P.sorted.tsv.gz"]
+    set DDDfileFormattedGzip [glob -nocomplain "$extannDir/DDD/*_DDG2P.tsv.gz"]
 
-    if {$DDDfileDownloaded eq "" && $DDDfileFormattedAndSortedGzip eq ""} {
+    if {$DDDfileDownloaded eq "" && $DDDfileFormattedGzip eq ""} {
 	# No "DDD gene" annotation (with extAnn procedure)
 	return
     }
 
-    if {[llength $DDDfileFormattedAndSortedGzip]>1} {
+    if {[llength $DDDfileFormattedGzip]>1} {
 	puts "Several DDG2P files exist:"
-	puts "$DDDfileFormattedAndSortedGzip"
-	puts "Keep only one: [lindex $DDDfileFormattedAndSortedGzip end]\n"
-	foreach ddd [lrange $DDDfileFormattedAndSortedGzip 0 end-1] {
+	puts "$DDDfileFormattedGzip"
+	puts "Keep only one: [lindex $DDDfileFormattedGzip end]\n"
+	foreach ddd [lrange $DDDfileFormattedGzip 0 end-1] {
 	    file rename -force $ddd $ddd.notused
 	}
 	return
     }
 
-    if {$DDDfileFormattedAndSortedGzip eq ""} {
+    if {$DDDfileFormattedGzip eq ""} {
 	# The downloaded file exist but not the formatted.
-	## Create : 'date'_DDG2P.sorted.tsv.gz
+	## Create : 'date'_DDG2P.tsv.gz
 	updateDDDgeneFile
     }
 }
@@ -85,7 +85,7 @@ proc updateDDDgeneFile {} {
     set DDDfileDownloaded [glob -nocomplain "$extannDir/DDD/DDG2P.csv.gz"]
 
     ## Create : 'date'_DDG2P.tsv.gz
-    set DDDfileFormatted "$extannDir/DDD/[clock format [clock seconds] -format "%Y%m%d"]_DDG2P.sorted.tsv"
+    set DDDfileFormatted "$extannDir/DDD/[clock format [clock seconds] -format "%Y%m%d"]_DDG2P.tsv"
 
     puts "...DDD genes configuration"
 
@@ -132,26 +132,7 @@ proc updateDDDgeneFile {} {
 	lappend TexteToWrite "$gene\t$a\t$b\t$c\t$d\t$e"
     }
 
-    WriteTextInFile [join $TexteToWrite "\n"] $DDDfileFormatted.tmp
-    # Sorting of the bedfile:
-    # Intersection with very large files can cause trouble with excessive memory usage.
-    # A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm.
-    set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.tmp.bash"
-    ReplaceTextInFile "#!/bin/bash" $sortTmpFile
-    WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $sortTmpFile
-    WriteTextInFile "export LC_ALL=C" $sortTmpFile
-    WriteTextInFile "sort -k1,1 -k2,2n $DDDfileFormatted.tmp > $DDDfileFormatted" $sortTmpFile
-    file attributes $sortTmpFile -permissions 0755
-    if {[catch {eval exec $sortTmpFile} Message]} {
-	puts "-- updateDDDgeneFile --"
-	puts "sort -k1,1 -k2,2n $DDDfileFormatted.tmp > $DDDfileFormatted"
-	puts "$Message"
-	puts "Exit with error"
-	exit 2
-    }
-    file delete -force $sortTmpFile 
-    file delete -force $DDDfileFormatted.tmp
-
+    WriteTextInFile [join $TexteToWrite "\n"] $DDDfileFormatted
     if {[catch {exec gzip $DDDfileFormatted} Message]} {
 	puts "-- updateDDDgeneFile --"
 	puts "gzip $DDDfileFormatted"

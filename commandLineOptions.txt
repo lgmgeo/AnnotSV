@@ -63,7 +63,7 @@ OPTIONS
                                 Use counts of the homozygous and heterozygous variants
                                 Gzipped VCF files are supported as well as regular expression
 
--vcfIndelPASS:                  Boolean. To only use variants from VCF input files that passed all filters during the calling (FILTER column value equal to PASS)
+-snvIndelPASS:                  Boolean. To only use variants from VCF input files that passed all filters during the calling (FILTER column value equal to PASS)
                                 Range values: 0 (default) or 1
 
 -snvIndelSamples:               To specifiy the sample names from the VCF files defined from the -vcfFiles option

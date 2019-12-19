@@ -11,13 +11,12 @@
 For more details, please see the README file.
 
 Dec 20, 2019: AnnotSV version 2.3
-	- To score genes overlapped with a SV on biological relevance to the individual phenotype, AnnotSV takes use of Exomiser by reporting the HPO-based scoring of genes and phenotypes evidences
-	- Annotations are not distributed anymore with the sources but downloaded during the installation with the Makefile
+	- Include phenotype-driven annotations (HPO), based on Exomiser (Smedley et al., 2015)
 	- Include the lift-over GRCh38 gnomAD SV frequency annotation
 	- Include the "-annotationsDir" option to pass the annotations directory to AnnotSV at run time
-	- New "AnnotSV ID" settings (to ensure to only have unique identifiers)
-	- AnnotSV executable is now directly located in $ANNOTSV/bin to respect the FHS
-	- Integration of the gnomAD data in the ranking
+	- New "AnnotSV ID" settings (to ensure unique SV identifiers)
+	- DELETION filtering improvment
+	- Integration of the gnomAD frequency data in the ranking
 	- AnnotSV can now create two other output files:
 		- A report of unannotated variants (e.g. badly formatted SV, variant length < SVminSize...)
 		- A report of the decisions that explain the ranking of each SV
@@ -27,7 +26,9 @@ Dec 20, 2019: AnnotSV version 2.3
 		vcfSamples         >>  snvIndelSamples) 
 		filteredVCFfiles   >>  candidateSnvIndelFiles
 		filteredVCFsamples >>  candidateSnvIndelSamples
-	- Add bugfix concerning the management of the BED files
+	- Annotations are not distributed anymore with the sources but downloaded during the installation with the Makefile
+	- AnnotSV executable is now directly located in $ANNOTSV/bin to respect the FHS
+	- Add bugfix concerning the management of BED files
 	- Add bugfix for the report of the compound heterozygosity (1 SV + 1 SNV/indel)
 	- Add bugfix concerning the -candidateGenesFiltering option
 	- Add bugfix concerning the DGV metrics

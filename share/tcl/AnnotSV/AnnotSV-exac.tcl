@@ -120,9 +120,6 @@ proc checkGeneIntoleranceFile {} {
 # cnv.score: Winsorised cnv intolerance z-score
 # flag: Gene is in a known region of recurrent CNVs mediated by tandem segmental duplications and intolerance scores are more likely to be biased or noisy.
 #
-# ExAC downloaded file: "fordist_cleaned_nonpsych_z_pli_rec_null_data.txt"
-# Header:
-# transcript  gene  chr  n_exons tx_start  tx_end  bp   p_syn  p_mis   p_lof   n_syn   n_mis   n_lof   adj_exp_syn  adj_exp_mis   adj_exp_lof   syn_z   mis_z  lof_z   pLI   pRecessive  pNull
 
 ## - Check if the ExAC file has been downloaded:
 #    - exac-final-cnv.gene.scores071316

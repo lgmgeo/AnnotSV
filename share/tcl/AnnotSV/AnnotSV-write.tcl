@@ -238,8 +238,9 @@ proc OrganizeAnnotation {} {
     ####### "VCF files header"
     if {$g_AnnotSV(snvIndelFiles) ne ""} {
 	foreach sample $g_AnnotSV(snvIndelSamples) {
-	    append headerOutput "\t#hom($sample)\t#htz($sample)"
+	    append headerOutput "\t#hom($sample)\t#htz($sample)\t#htz/allHom($sample)\t#htz/total(cohort)"
 	}
+	append headerOutput "\t#total(cohort)"
     }
     if {$g_AnnotSV(candidateSnvIndelFiles) ne ""} {
 	foreach sample $g_AnnotSV(candidateSnvIndelSamples) {
@@ -839,13 +840,15 @@ proc OrganizeAnnotation {} {
 	    } 
 	}
 
-	# Calculate the #hom and #htz variables
+	# Calculate among the SNV/indel (only for deletion) the:
+	# - #hom(sample), #htz(sample), #htz/allHom(sample), #htz/total(sample) variables for each sample
+	# - #total(cohort) variable
 	set HomHtz ""
 	if {$g_AnnotSV(snvIndelFiles) ne ""} {
 	    if {$AnnotSVtype eq "split"} {
-		set HomHtz "[VCFannotation $SVchrom $intersectStart $intersectEnd]"
+		set HomHtz "[VCFannotation $SVchrom $intersectStart $intersectEnd $SVtype]"
 	    } else {
-		set HomHtz "[VCFannotation $SVchrom $SVleft $SVright]"
+		set HomHtz "[VCFannotation $SVchrom $SVleft $SVright $SVtype]"
 	    } 
 	} 
 
