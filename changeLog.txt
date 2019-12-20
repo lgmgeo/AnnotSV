@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.2.4                                                                                            #
+# AnnotSV 2.3                                                                                              #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
@@ -15,7 +15,7 @@ Dec 20, 2019: AnnotSV version 2.3
 	- Include the lift-over GRCh38 gnomAD SV frequency annotation
 	- Include the "-annotationsDir" option to pass the annotations directory to AnnotSV at run time
 	- New "AnnotSV ID" settings (to ensure unique SV identifiers)
-	- DELETION filtering improvment
+	- Deletion filtering improvement
 	- Integration of the gnomAD frequency data in the ranking
 	- AnnotSV can now create two other output files:
 		- A report of unannotated variants (e.g. badly formatted SV, variant length < SVminSize...)

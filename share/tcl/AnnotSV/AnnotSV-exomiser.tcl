@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.2.4                                                                                            #
+# AnnotSV 2.3                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -105,8 +105,10 @@ proc checkExomiserInstallation {} {
     }
     if {$L_hpoDir_ok ne ""} {
 	set hpoVersion [lindex [lsort -integer $L_hpoDir_ok] end]
-	puts "INFO: AnnotSV takes use of Exomiser (Smedley et al., 2015) for the phenotype-driven analysis."
-	puts "INFO: AnnotSV is using the Human Phenotype Ontology (version $hpoVersion). Find out more at http://www.human-phenotype-ontology.org\n"
+	if {$g_AnnotSV(hpo) ne ""} {
+	    puts "INFO: AnnotSV takes use of Exomiser (Smedley et al., 2015) for the phenotype-driven analysis."
+	    puts "INFO: AnnotSV is using the Human Phenotype Ontology (version $hpoVersion). Find out more at http://www.human-phenotype-ontology.org\n"
+	}
     } else {
 	puts "\nWARNING: No Exomiser annotations available in $g_AnnotSV(annotationsDir)/Annotations_Exomiser/\n"
 	set g_AnnotSV(hpo) ""

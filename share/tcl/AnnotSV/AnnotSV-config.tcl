@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.2.4                                                                                            #
+# AnnotSV 2.3                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -344,16 +344,16 @@ proc configureAnnotSV {argv} {
 
     ## The following step could be improved: too long
     #################################################
+    set g_AnnotSV(snvIndelFiles) [eval glob -nocomplain $g_AnnotSV(snvIndelFiles)] ;# A file (not defined with a regexp) that doesn't exists will not return an error message but will return an empty list
 
     ## If "snvIndelFiles" option is defined:
     if {$g_AnnotSV(snvIndelFiles) ne ""} {
 	## It must be existing files
 	## All "$snvIndelSamples" should be presents in one of the VCF files
-	## If the "-snvIndelSamples" option is not defined, we defined it with all samples from the VCF files.
+	## If the "-snvIndelSamples" option is not defined, we defined it with all samples from the "snvIndelFiles".
 	set L_samples {}
 	set L_allSamplesFromVCF {}
 
-	# Script à améliorer ici, un nom de fichier (sans expr reg) qui n'existe pas ne provoque pas de message d'erreur
 	foreach vcfF [eval glob -nocomplain $g_AnnotSV(snvIndelFiles)] {
 	    if {![file exists $vcfF]} { ;# Never used during the script. If the file doesn't exist, the foreach is empty! 
 		puts "############################################################################"

@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.2.4                                                                                            #
+# AnnotSV 2.3                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
