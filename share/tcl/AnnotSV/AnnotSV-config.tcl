@@ -344,7 +344,9 @@ proc configureAnnotSV {argv} {
 
     ## The following step could be improved: too long
     #################################################
-    set g_AnnotSV(snvIndelFiles) [eval glob -nocomplain $g_AnnotSV(snvIndelFiles)] ;# A file (not defined with a regexp) that doesn't exists will not return an error message but will return an empty list
+    if {$g_AnnotSV(snvIndelFiles) ne ""} {
+	set g_AnnotSV(snvIndelFiles) [eval glob -nocomplain $g_AnnotSV(snvIndelFiles)] ;# A file (not defined with a regexp) that doesn't exists will not return an error message but will return an empty list
+    }
 
     ## If "snvIndelFiles" option is defined:
     if {$g_AnnotSV(snvIndelFiles) ne ""} {
