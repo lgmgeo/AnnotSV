@@ -3,12 +3,16 @@
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
-# Copyright (C) 2017-2019 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
+# Copyright (C) 2017-2020 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
 #                                                                                                          #
 ############################################################################################################
 
 
 For more details, please see the README file.
+
+	- Add bugfix concerning the running of bash scripts (illegal use of |
+	or |& in command)
+	- Add bugfix concerning the use of the "-snvIndelFiles"
 
 Dec 20, 2019: AnnotSV version 2.3
 	- Include phenotype-driven annotations (HPO), based on Exomiser (Smedley et al., 2015)

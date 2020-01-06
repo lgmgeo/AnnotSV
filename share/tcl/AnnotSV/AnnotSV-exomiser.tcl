@@ -3,7 +3,7 @@
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
-# Copyright (C) 2017-2019 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
+# Copyright (C) 2017-2020 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
 #                                                                                                          #
 # This is part of AnnotSV source code.                                                                     #
 #                                                                                                          #
@@ -179,7 +179,7 @@ proc runExomiser {L_Genes L_HPO} {
     file delete -force $geneBasedTmpFile
 
     # Creation of the temporary "application.properties" file
-    if {[catch {set port [exec $g_AnnotSV(bashDir)/searchForAFreePortNumber.bash]} Message]} {set port 50000}
+    if {[catch {set port [exec bash $g_AnnotSV(bashDir)/searchForAFreePortNumber.bash]} Message]} {set port 50000}
     set applicationPropertiesTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_exomiser_application.properties"
     set infos [ContentFromFile $g_AnnotSV(etcDir)/application.properties]
     regsub "XXXX" $infos "$port" infos

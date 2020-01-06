@@ -3,7 +3,7 @@
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
-# Copyright (C) 2017-2019 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
+# Copyright (C) 2017-2020 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
 #                                                                                                          #
 # This is part of AnnotSV source code.                                                                     #
 #                                                                                                          #
@@ -121,7 +121,7 @@ proc checkIMHfile {} {
 	    WriteTextInFile "export LC_ALL=C" $sortTmpFile
 	    WriteTextInFile "sort -k1,1 -k2,2n [set IMH_${SVTYPE}_fileFormatted].tmp > [set IMH_${SVTYPE}_fileFormatted]" $sortTmpFile
 	    file attributes $sortTmpFile -permissions 0755
-	    if {[catch {eval exec $sortTmpFile} Message]} {
+	    if {[catch {eval exec bash $sortTmpFile} Message]} {
 		puts "-- checkIMHfile --"
 		puts "sort -k1,1 -k2,2n [set IMH_${SVTYPE}_fileFormatted].tmp > [set IMH_${SVTYPE}_fileFormatted]"
 		puts "$Message"

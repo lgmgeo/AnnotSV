@@ -3,7 +3,7 @@
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
-# Copyright (C) 2017-2019 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
+# Copyright (C) 2017-2020 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
 #                                                                                                          #
 # This is part of AnnotSV source code.                                                                     #
 #                                                                                                          #
@@ -96,7 +96,7 @@ proc checkRefGeneFile {} {
 	WriteTextInFile "export LC_ALL=C" $sortTmpFile
 	WriteTextInFile "sort -k1,1 -k2,2n $refgeneFileFormatted.tmp > $refgeneFileFormatted" $sortTmpFile
 	file attributes $sortTmpFile -permissions 0755
-	if {[catch {eval exec $sortTmpFile} Message]} {
+	if {[catch {eval exec bash $sortTmpFile} Message]} {
 	    puts "-- checkRefGeneFile --"
 	    puts "sort -k1,1 -k2,2n $refgeneFileFormatted.tmp > $refgeneFileFormatted"
 	    puts "$Message"
@@ -163,7 +163,7 @@ proc refGeneAnnotation {} {
     WriteTextInFile "export LC_ALL=C" $sortTmpFile
     WriteTextInFile "sort -k1,1 -k2,2n $newBed.tmp >> $newBed" $sortTmpFile
     file attributes $sortTmpFile -permissions 0755
-    if {[catch {eval exec $sortTmpFile} Message]} {
+    if {[catch {eval exec bash $sortTmpFile} Message]} {
 	puts "-- refGeneAnnotation --"
 	puts "sort -k1,1 -k2,2n $newBed.tmp >> $newBed"
 	puts "$Message"

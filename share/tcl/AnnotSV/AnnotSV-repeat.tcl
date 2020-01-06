@@ -3,7 +3,7 @@
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
-# Copyright (C) 2017-2019 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
+# Copyright (C) 2017-2020 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
 #                                                                                                          #
 # This is part of AnnotSV source code.                                                                     #
 #                                                                                                          #
@@ -89,7 +89,7 @@ proc checkRepeatFile {} {
 	WriteTextInFile "export LC_ALL=C" $sortTmpFile
 	WriteTextInFile "sort -k1,1 -k2,2n $repeatFileFormatted.tmp > $repeatFileFormatted" $sortTmpFile
 	file attributes $sortTmpFile -permissions 0755
-	if {[catch {eval exec $sortTmpFile} Message]} {
+	if {[catch {eval exec bash $sortTmpFile} Message]} {
 	    puts "-- checkRepeatFile --"
 	    puts "sort -k1,1 -k2,2n $repeatFileFormatted.tmp > $repeatFileFormatted"
 	    puts "$Message"
@@ -167,7 +167,7 @@ proc RepeatAnnotation {BreakpointChrom BreakpointPos} {
 	    WriteTextInFile "export LC_ALL=C" $sortTmpFile
 	    WriteTextInFile "sort -k1,1 -k2,2n $tmpBreakpointsFile.tmp > $tmpBreakpointsFile" $sortTmpFile
 	    file attributes $sortTmpFile -permissions 0755
-	    if {[catch {eval exec $sortTmpFile} Message]} {
+	    if {[catch {eval exec bash $sortTmpFile} Message]} {
 		puts "-- RepeatAnnotation, sort --"
 		puts "sort -k1,1 -k2,2n $tmpBreakpointsFile.tmp > $tmpBreakpointsFile"
 		puts "$Message"
