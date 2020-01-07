@@ -265,7 +265,7 @@ proc runExomiser {L_Genes L_HPO} {
 	}
 	
 	# End the REST service
-	exec kill -9 $idService
+	catch {exec kill -9 $idService}
 	file delete -force $exomiserStartServiceFile
     }
     
