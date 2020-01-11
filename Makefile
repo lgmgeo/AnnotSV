@@ -121,7 +121,7 @@ install-human-annotation: Annotations_Human_$(VERSION).tar.gz install-exomiser
 	@echo ""
 	@echo "Installation of human annotation:"
 	@echo ""
-	tar xf Annotations_Human_$(VERSION).tar.gz -C $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/
+	tar -xvf Annotations_Human_$(VERSION).tar.gz -C $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/
 	$(RM) -rf Annotations_Human_$(VERSION).tar.gz
 	@echo ""
 	@echo "--> Human annotation installed"
@@ -131,9 +131,10 @@ install-exomiser-1: 1902_phenotype.zip
 	@echo "Installation of Exomiser data:"
 	@echo ""
 	$(MKDIR) -p $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/1902
-	$(MV) 1902_hg19 $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/1902/
+	tar -xvf 1902_hg19.tar.gz -C $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/1902/
 	unzip 1902_phenotype.zip -d $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/1902/
 	$(RM) -rf 1902_phenotype.zip
+	$(RM) -rf 1902_hg19.tar.gz
 
 install-exomiser-2:
 	install -p -m 0755 $(PROPERTIES) $(DESTDIR)$(ETCDIR)/$(ANNOTSV)
@@ -148,7 +149,7 @@ install-mouse-annotation: Annotations_Mouse_$(VERSION).tar.gz
 	@echo "Installation of mouse annotation:"
 	@echo ""
 	$(MKDIR) $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/
-	tar xf Annotations_Mouse_$(VERSION).tar.gz -C $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/
+	tar -xvf Annotations_Mouse_$(VERSION).tar.gz -C $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/
 	$(RM) -rf Annotations_Mouse_$(VERSION).tar.gz
 	@echo ""
 	@echo "--> Mouse annotation installed"
@@ -163,7 +164,7 @@ Annotations_%.tar.gz:
 	@echo ""
 	@echo "Download Exomiser supporting data files:"
 	@echo ""
-	curl -C - -LO https://www.lbgi.fr/~geoffroy/Annotations/1902_hg19
+	curl -C - -LO https://www.lbgi.fr/~geoffroy/Annotations/1902_hg19.tar.gz
 	curl -C - -LO https://data.monarchinitiative.org/exomiser/data/$@
 
 

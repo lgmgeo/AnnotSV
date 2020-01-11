@@ -179,7 +179,11 @@ proc runExomiser {L_Genes L_HPO} {
     file delete -force $geneBasedTmpFile
 
     # Creation of the temporary "application.properties" file
-    if {[catch {set port [exec bash $g_AnnotSV(bashDir)/searchForAFreePortNumber.bash]} Message]} {set port 50000}
+    if {[catch {set port [exec bash $g_AnnotSV(bashDir)/searchForAFreePortNumber.bash]} Message]} {
+	puts "$Message"
+	puts "WARNING: port is defined to 50000"
+	set port 50000
+    }
     set applicationPropertiesTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_exomiser_application.properties"
     set infos [ContentFromFile $g_AnnotSV(etcDir)/application.properties]
     regsub "XXXX" $infos "$port" infos
@@ -190,7 +194,6 @@ proc runExomiser {L_Genes L_HPO} {
 #	regsub "ZZZZ" $infos "hg38" infos
 #    }
     WriteTextInFile $infos $applicationPropertiesTmpFile
-
     # Start the REST service
     set exomiserStartServiceFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_exomiser.tmp"
     set idService [startTheRESTservice $applicationPropertiesTmpFile $port $exomiserStartServiceFile]
@@ -213,7 +216,12 @@ proc runExomiser {L_Genes L_HPO} {
 		set exomiserResult [::http::data $token]
 		::http::cleanup $token
 		set d_all [::json::json2dict $exomiserResult]
-	    } Message]} {continue}
+	    } Message]} {
+		puts "geneName: $geneName"
+		puts "$Message\n"
+		puts "$url"
+		continue
+	    }
 	    
 	    # The exomiser http request can be used for x genes -> in this case, it returns in the results a list of dictionary, 1 for each gene
 	    # If the http request is only for 1 gene, the result is a list of 1 dict.
@@ -221,8 +229,7 @@ proc runExomiser {L_Genes L_HPO} {
 	    if {[catch {set d_results [lindex [dict get $d_all "results"] 0]} Message]} {continue}
 	    # dict for {theKey theValue} $d_results {
 	    #    puts "$theKey -> $theValue\n"
-	    # }
-	    
+	    # }	    
 	    
 	    if {[catch {set EXOMISER_GENE_PHENO_SCORE [dict get $d_results "score"]} Message]} {continue}
 	    set EXOMISER_GENE_PHENO_SCORE [format "%.4f" $EXOMISER_GENE_PHENO_SCORE]
@@ -234,6 +241,7 @@ proc runExomiser {L_Genes L_HPO} {
 	    #dict for {theKey theValue} [lindex $d_phenotypeEvidence 0] {
 	    #    puts "$theKey -> $theValue\n"
 	    #}
+
 	    # score -> 0.8790527581872061
 	    #
 	    # model -> organism HUMAN entrezGeneId 2263 humanGeneSymbol FGFR2 diseaseId OMIM:101600 diseaseTerm {Craniofacial-skeletal-dermatologic dysplasia} phenotypeIds {HP:0000494 HP:0005347 HP:0000452 HP:0003041 HP:0005280 HP:0011304 HP:0000006 HP:0000303 HP:0002308 HP:0006101 HP:0000327 HP:0000586 HP:0000244 HP:0000486 HP:0003795 HP:0002780 HP:0004440 HP:0003196 HP:0003070 HP:0010055 HP:0000238 HP:0000678 HP:0006110 HP:0001249 HP:0000218 HP:0000316 HP:0000453 HP:0002676} id OMIM:101600_2263
@@ -265,7 +273,11 @@ proc runExomiser {L_Genes L_HPO} {
 	}
 	
 	# End the REST service
-	catch {exec kill -9 $idService}
+        if {[catch {exec kill -9 $idService} Message]} {
+            puts "End the REST service:"
+            puts $Message
+        }
+
 	file delete -force $exomiserStartServiceFile
     }
     
