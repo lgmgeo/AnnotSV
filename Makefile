@@ -32,6 +32,7 @@ BINDIR               := $(PREFIX)/bin
 ETCDIR               := $(PREFIX)/etc
 SHAREDIR             := $(PREFIX)/share
 DOCDIR               := $(SHAREDIR)/doc
+BASHDIR              := $(SHAREDIR)/bash
 TCLVERSION           := tcl$(shell echo 'puts $${tcl_version};exit 0' | tclsh)
 TCLDIRDISTRIBUTED    := share/tcl
 TCLDIR               := $(SHAREDIR)/$(TCLVERSION)
@@ -44,8 +45,10 @@ MV                   := /bin/mv
 CP                   := install -p -m 0644
 CPDIR                := /bin/cp -r
 CONFIGFILE           := etc/$(ANNOTSV)/configfile
+MAKEFILE             := Makefile
 PROPERTIES           := etc/$(ANNOTSV)/application.properties
 TCL_SCRIPTS          := $(shell find share/tcl/$(ANNOTSV)/ -name '*.tcl' 2> /dev/null)
+BASH_SCRIPTS         := $(shell find share/bash/$(ANNOTSV)/ -name '*.bash' 2> /dev/null)
 DOCUMENTATIONS       := $(shell find License.txt changeLog.txt commandLineOptions.txt README.AnnotSV_*.pdf 2> /dev/null)
 
 # make install
@@ -55,8 +58,8 @@ all: install-display install-documentationlight install-done
 install: install-display install-documentationlight install-done
 install-exomiser: install-exomiser-1 install-exomiser-3
 else
-all: install-display install-configfile install-executable install-tcl-toolbox install-doc install-others-doc install-done
-install: install-display install-configfile install-executable install-tcl-toolbox install-doc install-others-doc install-done
+all: install-display install-configfile install-makefile install-executable install-tcl-toolbox install-bash-toolbox install-doc install-others-doc install-done
+install: install-display install-configfile install-makefile install-executable install-tcl-toolbox install-bash-toolbox install-doc install-others-doc install-done
 install-exomiser: install-exomiser-1 install-exomiser-2 install-exomiser-3
 endif
 
@@ -80,6 +83,12 @@ install-configfile: $(CONFIGFILE)
 	$(MKDIR) $(DESTDIR)$(ETCDIR)/$(ANNOTSV)
 	install -p -m 0755 $(CONFIGFILE)  $(DESTDIR)$(ETCDIR)/$(ANNOTSV)
 
+install-makefile: $(MAKEFILE)
+	@echo ""
+	@echo "Makefile installation"
+	@echo "---------------------"
+	install -p -m 0755 $(MAKEFILE)  $(DESTDIR)$(PREFIX)
+
 install-executable:
 	@echo ""
 	@echo "Executable installation"
@@ -93,6 +102,13 @@ install-tcl-toolbox: $(TCL_SCRIPTS)
 	@echo "------------------------"
 	$(MKDIR) $(DESTDIR)$(TCLDIR)/$(ANNOTSV)
 	$(CP) $^ $(DESTDIR)$(TCLDIR)/$(ANNOTSV)
+
+install-bash-toolbox: $(BASH_SCRIPTS)
+	@echo ""
+	@echo "Bash scripts installation"
+	@echo "-------------------------"
+	$(MKDIR) $(DESTDIR)$(BASHDIR)/$(ANNOTSV)
+	$(CP) $^ $(DESTDIR)$(BASHDIR)/$(ANNOTSV)
 
 install-doc: $(DOCUMENTATIONS)
 	@echo ""
@@ -121,7 +137,7 @@ install-human-annotation: Annotations_Human_$(VERSION).tar.gz install-exomiser
 	@echo ""
 	@echo "Installation of human annotation:"
 	@echo ""
-	tar -xvf Annotations_Human_$(VERSION).tar.gz -C $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/
+	tar -xf Annotations_Human_$(VERSION).tar.gz -C $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/
 	$(RM) -rf Annotations_Human_$(VERSION).tar.gz
 	@echo ""
 	@echo "--> Human annotation installed"
@@ -131,7 +147,7 @@ install-exomiser-1: 1902_phenotype.zip
 	@echo "Installation of Exomiser data:"
 	@echo ""
 	$(MKDIR) -p $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/1902
-	tar -xvf 1902_hg19.tar.gz -C $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/1902/
+	tar -xf 1902_hg19.tar.gz -C $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/1902/
 	unzip 1902_phenotype.zip -d $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/1902/
 	$(RM) -rf 1902_phenotype.zip
 	$(RM) -rf 1902_hg19.tar.gz
@@ -149,7 +165,7 @@ install-mouse-annotation: Annotations_Mouse_$(VERSION).tar.gz
 	@echo "Installation of mouse annotation:"
 	@echo ""
 	$(MKDIR) $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/
-	tar -xvf Annotations_Mouse_$(VERSION).tar.gz -C $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/
+	tar -xf Annotations_Mouse_$(VERSION).tar.gz -C $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/
 	$(RM) -rf Annotations_Mouse_$(VERSION).tar.gz
 	@echo ""
 	@echo "--> Mouse annotation installed"

@@ -30,9 +30,11 @@ proc startTheRESTservice {applicationPropertiesTmpFile port exomiserStartService
     set jarFile "$g_AnnotSV(annotationsDir)/jar/exomiser-rest-prioritiser-12.1.0.jar"
 
     # Run the service
+
     if {[catch {set idService [eval exec java -Xmx4g -jar $jarFile --server.port=$port --spring.config.location=$applicationPropertiesTmpFile >& $exomiserStartServiceFile &]} Message]} {
 	puts "\nWARNING: No Exomiser annotations available."
-	puts "The REST service has not been started successfully."
+	puts "The REST service has not been started successfully:"
+	puts "java -Xmx4g -jar $jarFile --server.port=$port --spring.config.location=$applicationPropertiesTmpFile >& $exomiserStartServiceFile"
 	puts "$Message"
 	set g_AnnotSV(hpo) ""
 	file delete -force $exomiserStartServiceFile
@@ -42,7 +44,7 @@ proc startTheRESTservice {applicationPropertiesTmpFile port exomiserStartService
 	set waiting 1
 	set i 1
 	while {$waiting} {
-	    after 6000
+	    after 6000 ; # 6s
 	    if {[catch {set s [socket localhost $port]} Message]} { 
 		# The REST service is not started yet, we have the following error message: "couldn't open socket: connection refused"
 		incr i
@@ -54,22 +56,33 @@ proc startTheRESTservice {applicationPropertiesTmpFile port exomiserStartService
 		close $s
 		set waiting 0
 	    }
-	    if {[file exists $exomiserStartServiceFile] && [regexp "APPLICATION FAILED TO START" [ContentFromFile $exomiserStartServiceFile]]} {
-		# The REST service failed to start
-		set i 100
-		set waiting 0
+	    if {[file exists $exomiserStartServiceFile]} {
+		if {[regexp "APPLICATION FAILED TO START|Application run failed" [ContentFromFile $exomiserStartServiceFile]]} {
+		    # The REST service failed to start
+		    set i 50
+		    set waiting 0
+		}
+		foreach L [LinesFromFile $exomiserStartServiceFile] {
+		    if {[regexp "^ERROR" $L]} {
+			puts $L
+			set i 50
+			set waiting 0
+		    }
+		}
 	    } 
 	}
 	
-	if {$i eq 100} {
+	if {$i eq 50} {
 	    # if the REST service has not started after 10 minutes
 	    puts "\nWARNING: No Exomiser annotations available."
-	    puts "The REST service has not been started successfully."
+	    puts "The REST service has not been started successfully:"
+	    puts "java -Xmx4g -jar $jarFile --server.port=$port --spring.config.location=$applicationPropertiesTmpFile >& $exomiserStartServiceFile"
 	    puts "(see $exomiserStartServiceFile)"
 	    set g_AnnotSV(hpo) ""
 	    set idService ""
 	} else {
 	    # The REST service has been successfully started
+	    puts "\t...idService = $idService"
 	}
     }
     return $idService
@@ -106,8 +119,8 @@ proc checkExomiserInstallation {} {
     if {$L_hpoDir_ok ne ""} {
 	set hpoVersion [lindex [lsort -integer $L_hpoDir_ok] end]
 	if {$g_AnnotSV(hpo) ne ""} {
-	    puts "INFO: AnnotSV takes use of Exomiser (Smedley et al., 2015) for the phenotype-driven analysis."
-	    puts "INFO: AnnotSV is using the Human Phenotype Ontology (version $hpoVersion). Find out more at http://www.human-phenotype-ontology.org\n"
+	    puts "\tINFO: AnnotSV takes use of Exomiser (Smedley et al., 2015) for the phenotype-driven analysis."
+	    puts "\tINFO: AnnotSV is using the Human Phenotype Ontology (version $hpoVersion). Find out more at http://www.human-phenotype-ontology.org\n"
 	}
     } else {
 	puts "\nWARNING: No Exomiser annotations available in $g_AnnotSV(annotationsDir)/Annotations_Exomiser/\n"
@@ -169,7 +182,8 @@ proc runExomiser {L_Genes L_HPO} {
     global g_AnnotSV
     global hpoVersion
 
-    #Tcl 8.5 is required for use of the json package.
+    puts "...running Exomiser"
+    # Tcl 8.5 is required for use of the json package.
     package require http
     package require json 1.3.3
     
@@ -184,6 +198,8 @@ proc runExomiser {L_Genes L_HPO} {
 	puts "WARNING: port is defined to 50000"
 	set port 50000
     }
+    puts "\t...on port $port"
+
     set applicationPropertiesTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_exomiser_application.properties"
     set infos [ContentFromFile $g_AnnotSV(etcDir)/application.properties]
     regsub "XXXX" $infos "$port" infos
@@ -196,8 +212,8 @@ proc runExomiser {L_Genes L_HPO} {
     WriteTextInFile $infos $applicationPropertiesTmpFile
     # Start the REST service
     set exomiserStartServiceFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_exomiser.tmp"
+    puts "\t...starting the REST service"
     set idService [startTheRESTservice $applicationPropertiesTmpFile $port $exomiserStartServiceFile]
-
     if {$idService ne ""} {
 	# Requests
 	foreach geneName $L_Genes {
