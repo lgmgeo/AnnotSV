@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.3                                                                                              #
+# AnnotSV 2.3.1                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -59,7 +59,7 @@ proc VCFannotation {SVchrom SVstart SVend SVtype} {
     if {![info exists g_AnnotSV(vcfParsing)]} {
 	set g_AnnotSV(vcfParsing) "done"
 	# parsing of $g_AnnotSV(snvIndelFiles): creation of lPos($SVchrom,htz,sample), lPos($SVchrom,hom,sample) and lPos($SVchrom,tot,cohort)
-	puts "\n\n...parsing of VCF file(s) for \"$g_AnnotSV(snvIndelSamples)\" ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
+	puts "\n\n...parsing of snvIndelFiles for \"$g_AnnotSV(snvIndelSamples)\" ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
 
 	# "eval glob" accept regular expression ("*.vcf) as well as a list of files ("sample1.vcf sample2.vcf.gz"):
 	set L_allSamples {}
@@ -301,15 +301,20 @@ proc VCFannotation {SVchrom SVstart SVend SVtype} {
 		} else {
 		    set HtzTotRatio [format "%.4f" [expr {$countHtz($sample)*1.0/$totalCount}]]
 		}
-		
-		append textToReturn "$countHom($sample)\t$countHtz($sample)\t$HtzHomRatio\t$HtzTotRatio"
+		append textToReturn "$countHom($sample)\t$countHtz($sample)\t$HtzHomRatio\t$HtzTotRatio\t"
 	    }
-	    append textToReturn "\t$totalCount"
+	    append textToReturn "$totalCount"
 	} else {
-	    set textToReturn "$countHom($sample)\t$countHtz($sample)\tNA\tNA\t$totalCount"
+	    foreach sample $g_AnnotSV(snvIndelSamples) {
+		append textToReturn "$countHom($sample)\t$countHtz($sample)\tNA\tNA\t"
+	    }
+	    append textToReturn "$totalCount"
 	}
     } else {
-	set textToReturn "\t\t\t\t"
+	foreach sample $g_AnnotSV(snvIndelSamples) {
+	    append textToReturn "NA\tNA\tNA\tNA\t"
+	}
+	append textToReturn "NA"
     }
 
     return "$textToReturn" 

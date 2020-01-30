@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.3                                                                                              #
+# AnnotSV 2.3.1                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -38,15 +38,15 @@ proc filteredVCFannotation {GENEchrom GENEstart GENEend Line headerOutput} {
     ## VCFs parsing is done only 1 time (After, g_AnnotSV(filteredVCFparsing) is set to "done")
     if {![info exists g_AnnotSV(filteredVCFparsing)]} {
 	set g_AnnotSV(filteredVCFparsing) "done"
-
+	# parsing of $g_AnnotSV(candidateSnvIndelFiles): creation of L_htzPos($chrom,$sample)
+	puts "\n\n...parsing of candidateSnvIndelFiles for \"$g_AnnotSV(snvIndelSamples)\" ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
+	
 	# No htz compound for the full lines
 	set L_htzPos(FULL) [lrepeat [llength $g_AnnotSV(candidateSnvIndelSamples)] ""]
 	
-	# parsing of $g_AnnotSV(candidateSnvIndelFiles): creation of L_htzPos($chrom,$sample)
-	puts "...Parse all positions from $g_AnnotSV(candidateSnvIndelFiles) for \"$g_AnnotSV(candidateSnvIndelSamples)\" ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])\n" 
-
 	# "eval glob" accept regular expression ("*.vcf) as well as a list of files ("sample1.vcf sample2.vcf.gz"):
 	foreach vcfF [eval glob -nocomplain $g_AnnotSV(candidateSnvIndelFiles)] {
+	    puts "\t...parse all positions from $vcfF ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
 	    if {[regexp ".gz$" $vcfF]} {
 		set f [open "|gzip -cd $vcfF"]
 	    } else {
