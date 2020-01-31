@@ -92,7 +92,7 @@ source $g_AnnotSV(tclDir)/AnnotSV-write.tcl
 if {![info exists g_AnnotSV(Version)]} {
     set configFile "$g_AnnotSV(tclDir)/AnnotSV-config.tcl"
     foreach L [LinesFromFile $configFile] {
-	if {[regexp "^# AnnotSV (\[0-9\]+.\[0-9\]+)" $L match version]} {
+	if {[regexp "^# AnnotSV (\[0-9\]+.\[0-9\]+(.\[0-9\]+)?)" $L match version]} {
 	    set g_AnnotSV(Version) "$version"
 	    break
 	}

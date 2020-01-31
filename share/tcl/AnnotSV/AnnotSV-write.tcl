@@ -936,7 +936,7 @@ proc OrganizeAnnotation {} {
 	if {$HomHtz ne ""} {
 	   append TextToWrite "\t$HomHtz"
 	} 
-	if {$compound ne ""} {
+	if {$g_AnnotSV(candidateSnvIndelFiles) ne ""} {
 	   append TextToWrite "\t$compound"
 	}
 	if {[glob -nocomplain $usersDir/FtIncludedInSV/*.formatted.sorted.bed] ne ""} { ; # Don't put {$FtIncludedInSVtext ne ""}: the user BED could have only 1 annotation column, and so $UserText can be equel to "" (without "\t")
