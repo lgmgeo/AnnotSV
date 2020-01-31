@@ -344,25 +344,19 @@ proc configureAnnotSV {argv} {
 
     ## The following step could be improved: too long
     #################################################
-    if {$g_AnnotSV(snvIndelFiles) ne ""} {
-	set g_AnnotSV(snvIndelFiles) [eval glob -nocomplain $g_AnnotSV(snvIndelFiles)] ;# A file (not defined with a regexp) that doesn't exists will not return an error message but will return an empty list
-    }
-
     ## If "snvIndelFiles" option is defined:
+    ## It must be existing files
     if {$g_AnnotSV(snvIndelFiles) ne ""} {
-	## It must be existing files
+	# Warning: A file that doesn't exists (or badly defined with a regexp) will not return an error message but will return an empty list:
+	set g_AnnotSV(snvIndelFiles) [eval glob -nocomplain $g_AnnotSV(snvIndelFiles)]
+    }
+    ## After that, if "snvIndelFiles" contains at least 1 existing file:
+    if {$g_AnnotSV(snvIndelFiles) ne ""} {
 	## All "$snvIndelSamples" should be presents in one of the VCF files
 	## If the "-snvIndelSamples" option is not defined, we defined it with all samples from the "snvIndelFiles".
-	set L_samples {}
+	set L_correctSamples {}
 	set L_allSamplesFromVCF {}
-
-	foreach vcfF [eval glob -nocomplain $g_AnnotSV(snvIndelFiles)] {
-	    if {![file exists $vcfF]} { ;# Never used during the script. If the file doesn't exist, the foreach is empty! 
-		puts "############################################################################"
-		puts "Bad value for snvIndelFiles option, file does not exist ($vcfF) - Exit with error."
-		puts "############################################################################"
-		exit 2
-	    }
+	foreach vcfF $g_AnnotSV(snvIndelFiles) {
 	    if {[regexp ".gz$" $vcfF]} {
 		set f [open "|gzip -cd $vcfF"]
 	    } else {
@@ -374,7 +368,7 @@ proc configureAnnotSV {argv} {
 		set Ls [split $L "\t"]
 		lappend L_allSamplesFromVCF {*}[lrange $Ls 9 end]
 		foreach sample $g_AnnotSV(snvIndelSamples) {
-		    if {[lsearch -exact $Ls $sample] ne -1} {lappend L_samples $sample}
+		    if {[lsearch -exact $Ls $sample] ne -1} {lappend L_correctSamples $sample}
 		}
 		# We can't put a break here, because the pipe command: "|gzip ..." still produces data.
 		# break will creates a broken pipe signal: 
@@ -387,25 +381,32 @@ proc configureAnnotSV {argv} {
 	    set L_allSamplesFromVCF [lsort -unique $L_allSamplesFromVCF]
 	    set g_AnnotSV(snvIndelSamples) $L_allSamplesFromVCF
 	} else {
-	    set L_samples [lsort -unique $L_samples]
-	    set g_AnnotSV(snvIndelSamples) $L_samples; # Remove samples from g_AnnotSV(snvIndelSamples) that are not in a VCF file
+	    if {$L_correctSamples ne ""} {
+		set L_correctSamples [lsort -unique $L_correctSamples]
+		set g_AnnotSV(snvIndelSamples) $L_correctSamples; # Remove samples from g_AnnotSV(snvIndelSamples) that are not in a VCF file
+	    } else {
+		set L_allSamplesFromVCF [lsort -unique $L_allSamplesFromVCF]
+		set g_AnnotSV(snvIndelSamples) $L_allSamplesFromVCF
+	    }
 	}
+    } else {
+	set g_AnnotSV(snvIndelSamples) ""
     }
+    
 
     ## If "candidateSnvIndelFiles" option is defined:
+    ## It must be existing files
     if {$g_AnnotSV(candidateSnvIndelFiles) ne ""} {
-	## It must be existing files
+	# Warning: A file that doesn't exist (or badly defined with a regexp) will not return an error message but will return an empty list:
+	set g_AnnotSV(candidateSnvIndelFiles) [eval glob -nocomplain $g_AnnotSV(candidateSnvIndelFiles)] 
+    }
+    ## After that, if "candidateSnvIndelFiles" contains at least 1 existing file:
+    if {$g_AnnotSV(candidateSnvIndelFiles) ne ""} {
 	## All "$candidateSnvIndelSamples" should be presents in one of the VCF files
-	## If the "-candidateSnvIndelSamples" option is not defined, we defined it with all samples from the VCF files.
-	set L_samples {}
+	## If the "-candidateSnvIndelSamples" option is not defined, we defined it with all samples from the "candidateSnvIndelFiles".
+	set L_correctCandidateSamples ""
 	set L_allSamplesFromVCF {}
-	foreach vcfF [eval glob -nocomplain $g_AnnotSV(candidateSnvIndelFiles)] {
-	    if {![file exists $vcfF]} {
-		puts "############################################################################"
-		puts "Bad value for candidateSnvIndelFiles option, file does not exist ($vcfF) - Exit with error."
-		puts "############################################################################"
-		exit 2
-	    }
+	foreach vcfF $g_AnnotSV(candidateSnvIndelFiles) {
 	    if {[regexp ".gz$" $vcfF]} {
 		set f [open "|gzip -cd $vcfF"]
 	    } else {
@@ -413,28 +414,37 @@ proc configureAnnotSV {argv} {
 	    }
 	    while {![eof $f]} {
 		set L [gets $f]
-		if {[string range $L 0 5] ne "#CHROM"} {continue}
-		set Ls [split $L "\t"]
-		lappend L_allSamplesFromVCF {*}[lrange $Ls 9 end]
-		foreach sample $g_AnnotSV(candidateSnvIndelSamples) {
-		    if {[lsearch -exact $Ls $sample] ne -1} {lappend L_samples $sample}
+		if {[string range $L 0 5] eq "#CHROM"} {
+		    set Ls [split $L "\t"]
+		    lappend L_allSamplesFromVCF {*}[lrange $Ls 9 end]
+		    foreach sample $g_AnnotSV(candidateSnvIndelSamples) {
+			if {[lsearch -exact $Ls $sample] ne -1} {lappend L_correctCandidateSamples $sample}
+		    }
+		    # We can't put a break here, because the pipe command: "|gzip ..." still produces data.
+		    # break will creates a broken pipe signal: 
+		    #   child killed: write on pipe with no readers
+		    #   while executing "close $f"
 		}
-		# We can't put a break here, because the pipe command: "|gzip ..." still produces data.
-		# break will creates a broken pipe signal: 
-		#   child killed: write on pipe with no readers
-		#   while executing "close $f"
 	    }
 	    close $f
 	}
+	
 	if {$g_AnnotSV(candidateSnvIndelSamples) eq ""} {
 	    set L_allSamplesFromVCF [lsort -unique $L_allSamplesFromVCF]
 	    set g_AnnotSV(candidateSnvIndelSamples) $L_allSamplesFromVCF
 	} else {
-	    set L_samples [lsort -unique $L_samples]
-	    set g_AnnotSV(candidateSnvIndelSamples) $L_samples; # Remove samples from g_AnnotSV(candidateSnvIndelSamples) that are not in a VCF file
+	    if {$L_correctCandidateSamples ne ""} {
+		set L_correctCandidateSamples [lsort -unique $L_correctCandidateSamples]
+		set g_AnnotSV(candidateSnvIndelSamples) $L_correctCandidateSamples; # Remove samples from g_AnnotSV(candidateSnvIndelSamples) that are not in a VCF file
+	    } else {
+		set L_allSamplesFromVCF [lsort -unique $L_allSamplesFromVCF]
+		set g_AnnotSV(candidateSnvIndelSamples) $L_allSamplesFromVCF
+	    }
 	}
+    } else {
+	set g_AnnotSV(candidateSnvIndelSamples) ""
     }
-    
+
     ## It must be "GRCh37" or "GRCh38" or "mm9" or "mm10" for the genomeBuild option.
     if {![regexp -nocase "^(GRCh37)|(GRCh38)|(mm9)|(mm10)$" $g_AnnotSV(genomeBuild)]} {
 	puts "############################################################################"
