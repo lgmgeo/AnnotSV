@@ -254,6 +254,7 @@ proc configureAnnotSV {argv} {
 	set g_AnnotSV(outputDir) "[clock format [clock seconds] -format "%Y%m%d"]_AnnotSV"
 	file mkdir "$g_AnnotSV(outputDir)"
     }
+    regsub "/+$" $g_AnnotSV(outputDir) "" g_AnnotSV(outputDir)
     if {$g_AnnotSV(outputFile) ne ""} {
 	set g_AnnotSV(outputFile) [file tail $g_AnnotSV(outputFile)]
 	if {[string range $g_AnnotSV(outputFile) end-3 end] ne ".tsv"} {

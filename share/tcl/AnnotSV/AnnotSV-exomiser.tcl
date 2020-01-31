@@ -299,7 +299,7 @@ proc runExomiser {L_Genes L_HPO} {
     
     # Remove tmp files
     file delete -force $applicationPropertiesTmpFile
-    
+
     # If some gene annotations have been done...
     if {[llength $L_output] > 1} {
 	# Write the tmp Exomiser file, with a score for each gene overlapped with an SV
