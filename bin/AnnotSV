@@ -61,6 +61,10 @@ if {![file exists $g_AnnotSV(tclDir)]} {
 set g_AnnotSV(bashDir)    "$g_AnnotSV(installDir)/share/bash/AnnotSV"
 # g_AnnotSV(annotationsDir) is set to "$g_AnnotSV(installDir)/share/AnnotSV" in AnnotSV-config.tcl
 
+# Setting of "auto_path" for the use of the Tcl packages added in AnnotSV
+set auto_path [linsert $::auto_path 0 $g_AnnotSV(tclDir)/tcllib]
+
+
 source $g_AnnotSV(tclDir)/AnnotSV-1000g.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-clingen.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-config.tcl
