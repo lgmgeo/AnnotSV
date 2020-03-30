@@ -10,9 +10,11 @@
 
 For more details, please see the README file.
 
-	- Add bugfix concerning the running of bash scripts (illegal use of |
-	or |& in command)
-	- Add bugfix concerning the use of the "-snvIndelFiles"
+	- Add bugfix with gzipped VCF files as input
+	- Integration of 4 Tcl packages (http/tar/csv/json) in the AnnotSV distribution
+	- Add bugfix concerning the running of bash scripts (illegal use of | or |& in command)
+	- Add bugfix concerning the use of the "-snvIndelFiles" and "-candidateSnvIndelSamples" options
+	- Add bugfix for the exomiser use
 
 Dec 20, 2019: AnnotSV version 2.3
 	- Include phenotype-driven annotations (HPO), based on Exomiser (Smedley et al., 2015)

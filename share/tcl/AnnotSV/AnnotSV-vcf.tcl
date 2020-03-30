@@ -483,7 +483,7 @@ proc VCFsToBED {SV_VCFfiles} {
 		set g_SVLEN($AnnotSV_ID) $svlen
 	    }
 	}
-	close $f
+	if {![regexp ".gz$" $VCFfile]} {close $f}
 	
 	WriteTextInFile [join $L_TextToWrite "\n"] $SV_BEDfile
 
