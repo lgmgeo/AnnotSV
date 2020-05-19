@@ -21,6 +21,10 @@ OPTIONS
 -candidateSnvIndelsamples:      To specifiy the sample names from the VCF files defined from the -filtereVCFfiles option 
                                 Default: use all samples from the filtered VCF files
 
+-externalGenesFiles:            Path of a tab separated values file to integrate external gene annotations into the output file. 
+                                The first line should be a header including a column entitled "genes".
+                                Gzipped files are supported
+
 -genomeBuild:                   Genome build used
                                 Values: GRCh37 (default) or GRCh38 or mm9 or mm10
 

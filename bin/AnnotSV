@@ -213,7 +213,7 @@ checkUsersBED
 checkExomiserInstallation
 
 
-# Users Genes-based annotation files (from $ANNOTSV/Annotations_$g_AnnotSV(organism)/*/)
+# Users Genes-based annotation files (from $ANNOTSV/Annotations_$g_AnnotSV(organism)/*/ and from user command lines "-externalGenesFile")
 # g_AnnotSV(extann) has been initialized in AnnotSV-config.tcl
 # g_AnnotSV(extann) will be completed in AnnotSV-exomiser.tcl
 set genesBasedDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based"
@@ -229,6 +229,9 @@ foreach annotFile [glob -nocomplain $userDir/*.tsv] {
     lappend g_AnnotSV(extann) $annotFile
 }
 foreach annotFile [glob -nocomplain $userDir/*.tsv.gz] {
+    lappend g_AnnotSV(extann) $annotFile
+}
+foreach annotFile $g_AnnotSV(externalGenesFile) {
     lappend g_AnnotSV(extann) $annotFile
 }
 # Depending of the organism, genes based annotation can be absent:
