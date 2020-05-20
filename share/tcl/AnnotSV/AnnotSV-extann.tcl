@@ -25,7 +25,7 @@
 proc ExternalAnnotations args {
 
     # To add external annotation to a gene in particular
-    # All .../Annotations_$g_AnnotSV(organism)/*/*.tsv(.gz) files are used (defined in AnnotSV-main.tcl)
+    # All .../Annotations_$g_AnnotSV(organism)/*/*.tsv(.gz) files are used, as well as files given with the -externalGeneFiles option (defined in AnnotSV-main.tcl)
     #
     # Format is tab separated values, 1st line is a header, 1st "genes" column is the gene name, rest is free
     # Typical use would be a gene file containing specific annotations such as tranmission mode, disease, expression...

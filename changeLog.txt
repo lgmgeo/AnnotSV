@@ -10,7 +10,7 @@
 
 For more details, please see the README file.
 
-	- Include the new "-externalGenesFiles" option to pass external gene file(s) path in the command line
+	- Include the new "-externalGeneFiles" option to pass external gene file(s) path in the command line
 	- Add bugfix with gzipped VCF files as input
 	- Integration of 4 Tcl packages (http/tar/csv/json) in the AnnotSV distribution
 	- Add bugfix concerning the running of bash scripts (illegal use of | or |& in command)

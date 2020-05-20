@@ -43,10 +43,10 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(bedtools)                 "bedtools"
     set g_AnnotSV(candidateGenesFile)       ""
     set g_AnnotSV(candidateGenesFiltering)  "no"
-    set g_AnnotSV(extann)                   ""    ;# list of the “.../Annotations_$g_AnnotSV(organism)/*/*.tsv(.gz) files” <=> External genes annotation files
+    set g_AnnotSV(extann)                   ""    ;# list of the “.../Annotations_$g_AnnotSV(organism)/*/*.tsv(.gz) files” <=> External gene annotation files
     set g_AnnotSV(candidateSnvIndelFiles)   ""
     set g_AnnotSV(candidateSnvIndelSamples) ""
-    set g_AnnotSV(externalGenesFile)        ""
+    set g_AnnotSV(externalGeneFiles)        ""
     set g_AnnotSV(genomeBuild)              "GRCh37"
     set g_AnnotSV(hpo)                      ""    ;# "HP:0030684,HP:0085622"
     set g_AnnotSV(metrics)                  "us"
@@ -74,7 +74,7 @@ proc configureAnnotSV {argv} {
     ###########################
     ## Load config file options
     ###########################
-    set lOptionsOk "annotationsDir bedtools candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGenesFile genomeBuild hpo metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering rankOutput reciprocal snvIndelFiles snvIndelPASS SVinputFile SVinputInfo SVminSize svtBEDcol txFile typeOfAnnotation snvIndelSamples"
+    set lOptionsOk "annotationsDir bedtools candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering rankOutput reciprocal snvIndelFiles snvIndelPASS SVinputFile SVinputInfo SVminSize svtBEDcol txFile typeOfAnnotation snvIndelSamples"
     set configFile "$g_AnnotSV(etcDir)/configfile"
     if {[file exists "./configfile"]} {
 	set configFile "./configfile"
@@ -289,8 +289,8 @@ proc configureAnnotSV {argv} {
 	exit 2
     }
 
-    ## candidateGenesFile, externalGenesFile: It must be an existing file
-    foreach annfile {candidateGenesFile externalGenesFile} {
+    ## candidateGenesFile, externalGeneFiles: It must be an existing file
+    foreach annfile {candidateGenesFile externalGeneFiles} {
 	if {$g_AnnotSV($annfile) ne "" && ![file exists $g_AnnotSV($annfile)]} {
 	    puts "############################################################################"
 	    puts "Bad value for the $annfile option, file does not exist ([set g_AnnotSV($annfile)]) - Exit with error."
