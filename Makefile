@@ -47,7 +47,6 @@ CPDIR                := /bin/cp -r
 CONFIGFILE           := etc/$(ANNOTSV)/configfile
 MAKEFILE             := Makefile
 PROPERTIES           := etc/$(ANNOTSV)/application.properties
-TCL_SCRIPTS          := $(shell find share/tcl/$(ANNOTSV)/ -name '*.tcl' 2> /dev/null)
 BASH_SCRIPTS         := $(shell find share/bash/$(ANNOTSV)/ -name '*.bash' 2> /dev/null)
 DOCUMENTATIONS       := $(shell find License.txt changeLog.txt commandLineOptions.txt README.AnnotSV_*.pdf 2> /dev/null)
 
@@ -96,12 +95,12 @@ install-executable:
 	$(MKDIR) $(DESTDIR)$(BINDIR)
 	install -p -m 0755 bin/AnnotSV $(DESTDIR)$(BINDIR)
 
-install-tcl-toolbox: $(TCL_SCRIPTS)
+install-tcl-toolbox: 
 	@echo ""
 	@echo "Tcl scripts installation"
 	@echo "------------------------"
 	$(MKDIR) $(DESTDIR)$(TCLDIR)/$(ANNOTSV)
-	$(CP) $^ $(DESTDIR)$(TCLDIR)/$(ANNOTSV)
+	cd share/tcl ; tar cf - $(ANNOTSV) | tar xf - -C $(DESTDIR)$(TCLDIR)/
 
 install-bash-toolbox: $(BASH_SCRIPTS)
 	@echo ""
