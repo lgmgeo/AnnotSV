@@ -32,7 +32,12 @@ proc SVprepareRanking {L_header} {
     # List of the candidate genes (given by the user)
     set L_Candidates {}
     if {$g_AnnotSV(candidateGenesFile) ne ""} {
-	set L_Candidates [split [ContentFromFile $g_AnnotSV(candidateGenesFile)] " |\n|\t"]
+	set f [open $g_AnnotSV(candidateGenesFile)]
+        while {![eof $f]} {
+            set L [gets $f]
+	    lappend L_Candidates {*}[split $L " |\n|\t"]
+        }
+        close $f
     }
 
     # Check if we have all the needed information for ranking
