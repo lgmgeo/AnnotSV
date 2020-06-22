@@ -370,7 +370,9 @@ proc OrganizeAnnotation {} {
     set g_AnnotSV(fullAndSplitBedFile) "$g_AnnotSV(outputDir)/[file tail $g_AnnotSV(bedFile)].users.bed"
     file delete -force $g_AnnotSV(fullAndSplitBedFile)
     set L_UsersText {}
-    foreach L [LinesFromFile $tmpFullAndSplitBedFile] {
+    set f [open "$tmpFullAndSplitBedFile"]
+    while {! [eof $f]} {
+        set L [gets $f]
 	set Ls [split $L "\t"]
 	set AnnotSVtype [lindex $Ls end]
 	if {$AnnotSVtype eq "split"} {
@@ -388,6 +390,7 @@ proc OrganizeAnnotation {} {
 	    lappend L_UsersText "[join [lrange $Ls 0 2] "\t"]"
 	}
     }
+    close $f
     set L_UsersText [lsort -unique $L_UsersText]
     WriteTextInFile [join $L_UsersText "\n"] $g_AnnotSV(fullAndSplitBedFile)
     checkBed $g_AnnotSV(fullAndSplitBedFile)
@@ -417,8 +420,9 @@ proc OrganizeAnnotation {} {
     # Parse
     ###############
     set L_TextToWrite {}
-    foreach L [LinesFromFile $tmpFullAndSplitBedFile] {	
-
+    set f [open "$tmpFullAndSplitBedFile"]
+    while {! [eof $f]} {
+        set L [gets $f]
 	set Ls [split $L "\t"]
 
 	# Full + split
@@ -963,6 +967,7 @@ proc OrganizeAnnotation {} {
 	}
 	lappend L_TextToWrite "$TextToWrite"	
     }
+    close $f
 
     WriteTextInFile [join $L_TextToWrite "\n"] "$outputFile"
 

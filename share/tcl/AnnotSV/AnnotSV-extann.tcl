@@ -66,7 +66,7 @@ proc ExternalAnnotations args {
     #puts "--$What"
 
     if {[info exists g_ExtAnnotation($What)]} {return [set g_ExtAnnotation($What)]}
-    foreach File_Anno $L_Files_Anno {
+    foreach File_Anno [lsort $L_Files_Anno] {
 	if {![info exists g_ExtAnnotation($File_Anno,Loaded)]} {
 	    
 	    if {![info exists g_ExtAnnotation(L_Files)]} {
