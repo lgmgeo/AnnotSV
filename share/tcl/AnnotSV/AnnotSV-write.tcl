@@ -373,6 +373,7 @@ proc OrganizeAnnotation {} {
     set f [open "$tmpFullAndSplitBedFile"]
     while {! [eof $f]} {
         set L [gets $f]
+	if {$L eq ""} {continue}
 	set Ls [split $L "\t"]
 	set AnnotSVtype [lindex $Ls end]
 	if {$AnnotSVtype eq "split"} {
@@ -423,6 +424,7 @@ proc OrganizeAnnotation {} {
     set f [open "$tmpFullAndSplitBedFile"]
     while {! [eof $f]} {
         set L [gets $f]
+	if {$L eq ""} {continue}
 	set Ls [split $L "\t"]
 
 	# Full + split
