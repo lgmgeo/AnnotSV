@@ -151,16 +151,11 @@ proc OrganizeAnnotation {} {
 
     ####### "1000g header"
     if {$g_AnnotSV(1000gAnn)} {
-	set g_AnnotSV(1000gAnn_i) ""
-	set j 0
-	foreach col "1000g_event 1000g_AF 1000g_max_AF" {
-	    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" $col] ne -1} {
-		append headerOutput "\t$col"
-		lappend g_AnnotSV(1000gAnn_i) $j
-	    }
-	    incr j
+	if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "1000g_event"] ne -1} {
+	    append headerOutput "\t1000g_event"
+	} else {
+	    set g_AnnotSV(1000gAnn) 0
 	}
-	if {$g_AnnotSV(1000gAnn_i) eq ""} {set g_AnnotSV(1000gAnn) 0}
     }
 
     ####### "IMH header"
@@ -324,7 +319,7 @@ proc OrganizeAnnotation {} {
     if {$g_AnnotSV(dgvAnn)} {puts "\t\t...DGV Gold Standard frequency annotation"}
     if {$g_AnnotSV(gnomADann)} {puts "\t\t...gnomAD frequency annotation"}
     if {$g_AnnotSV(DDDfreqAnn)} {puts "\t\t...DDD frequency annotation"}
-    if {$g_AnnotSV(1000gAnn)} {puts "\t\t...1000g frequency annotation"}
+    if {$g_AnnotSV(1000gAnn)} {puts "\t\t...1000g events annotation"}
     if {$g_AnnotSV(IMHann)} {puts "\t\t...Ira M. Hall's lab frequency annotation"}
     foreach formattedUserBEDfile [glob -nocomplain $usersDir/SVincludedInFt/*.formatted.sorted.bed] {
 	puts "\t\t...[file tail $formattedUserBEDfile]"
@@ -653,9 +648,9 @@ proc OrganizeAnnotation {} {
 	# 1000g annotations
 	if {$g_AnnotSV(1000gAnn)} {
 	    if {$AnnotSVtype eq "split"} {
-		set 1000gText "[1000gAnnotation $SVchrom $intersectStart $intersectEnd $g_AnnotSV(1000gAnn_i)]"
+		set 1000gText "[1000gAnnotation $SVchrom $intersectStart $intersectEnd]"
 	    } else {
-		set 1000gText "[1000gAnnotation $SVchrom $SVleft $SVright $g_AnnotSV(1000gAnn_i)]"
+		set 1000gText "[1000gAnnotation $SVchrom $SVleft $SVright]"
 	    } 
 	}
 

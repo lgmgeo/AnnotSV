@@ -41,11 +41,7 @@ proc check1000gFile {} {
     } else {
 	set g_AnnotSV(1000gAnn) 1
 	# Check if the user asked for these annotations in the configfile
-	set test 0
-	foreach col "1000g_event 1000g_AF 1000g_max_AF" {
-	    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" $col] ne -1} {set test 1;break}
-	}
-	if {$test eq 0} {set g_AnnotSV(1000gAnn) 0; return}
+	if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "1000g_event"] eq -1} {set g_AnnotSV(1000gAnn) 0; return}
     }
 
     if {[llength $1000gFileFormattedAndSorted]>1} {
@@ -61,16 +57,34 @@ proc check1000gFile {} {
     if {$1000gFileFormattedAndSorted eq ""} {
 	# The downloaded file exist but not the formatted.
 	## Create:
-	##   - 'date'_1000g_SV.sorted.bed file     ; # Header: chr start end 1000g_event 1000g_AF 1000g_max_AF
+	##   -> 'date'_1000g_SV.sorted.bed file     ; # Header: chr start end 1000g_event 1000g_AF 1000g_max_AF
+	##   Only "1000g_event" is used for the annotations ("1000g_AF" and "1000g_max_AF" are kept in this file to come back to frequencies if needed by the user).
 	set 1000gFileFormatted "$1000gDir/[clock format [clock seconds] -format "%Y%m%d"]_1000g_SV.bed"
-
 	puts "...1000g configuration"
 
+	# Split multiallelic sites into multiple rows
+	set 1000gFileTmp "$1000gDir/tmp_1000g_SV.vcf"	
+	puts "\t...split multiallelic sites into multiple rows for $1000gFileDownloaded ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+	catch {eval exec $g_AnnotSV(bcftools) norm -m -both $1000gFileDownloaded > $1000gFileTmp} Message
+	if {[file size $1000gFileTmp] eq 0} {
+	    # we continue AnnotSV without splitting the multiallelic sites !
+	    puts "\t   -- check1000gFile --"
+	    puts "\t   $g_AnnotSV(bcftools) norm -m -both $1000gFileDownloaded > $1000gFileTmp"
+	    puts "\t   $1000gFileTmp: file empty."
+	    puts "\t   No multiallelic treatment done."
+	    file delete -force $1000gFileTmp	   
+	} 
+
+
+	# Creation of $1000gFileFormatted
 	puts "\t...creation of $1000gFileFormatted"
 	puts "\t   (done only once during the first boundaries 1000g annotation)\n"
-
+	if {[file exists $1000gFileTmp]} {
+	    set f [open "$1000gFileTmp"]
+	} else {
+	    set f [open "| gzip -cd $1000gFileDownloaded"]
+	}
 	set L_TextToWrite {}
-	set f [open "|gzip -cd $1000gFileDownloaded"]
 	while {![eof $f]} {
 	    set L [gets $f]
 	    if {[string index $L 0] eq "#" || $L eq ""} {continue}
@@ -83,47 +97,53 @@ proc check1000gFile {} {
 	    set pos [lindex $Ls 1]
  	    set L_infos [split [lindex $Ls 7] ";"]
 	    set ref [lindex $Ls 3]
-	    set L_alt [split [lindex $Ls 4] ","]
-	    set lengthAlt [llength $L_alt]
-	    set i 0
-	    foreach alt $L_alt {
-		# Consider only the SV (not the SNV/indel in the VCF file)
-		##########################################################
-		# Example of SV:
-		# - Type1: ref="G" and alt="ACTGCTAACGATCCGTTTGCTGCTAACGATCTAACGATCGGGATTGCTAACGATCTCGGG"
-		# - Type2: "<INS>", "<DEL>", ...
-		# - Type3: complex rearrangements with breakends: "G]17:1584563]"
-		if {![regexp "<|\\\[|\\\]" $alt]} {
-		    set variantLength [expr {[string length $ref]-[string length $alt]}]
-		    if {[expr {abs($variantLength)}]<$g_AnnotSV(SVminSize)} {incr i; continue}; # it is not an SV
-		}
-		set max -1
-		catch {unset AF}
-		catch {unset END}
-		set SVTYPE "CNV"
-		foreach inf $L_infos {
-		    set inf [split $inf "="]
-		    set val [lindex $inf 0]
-		    set $val [lindex $inf 1]
-		    if {[regexp "AF$" $val]} {
-			set $val [lindex [split [set $val] ","] $i]
-			if {[set $val]>$max} {set max [set $val]}
-		    }
-		}
-		if {![info exists AF]} {incr i; continue}
-		if {![info exists END]} {
-		    # INS:ME (LINE1, ALU or SVA)
-		    set END [expr {$pos+1}]
-		}
-		# In case of multiple alt ("<CN0>,<CN2>"), SVTYPE has a unique value (often: SVTYPE=CNV  else: SVTYPE=DUP).
-		# => We replace CNV with a more precise value <CN0> or <CNV2>
-		if {$lengthAlt>1} {set SVTYPE [lindex [split [lindex $Ls 4] ","] $i]}
-		lappend L_TextToWrite "$chrom\t$pos\t$END\t$SVTYPE\t$AF\t$max"
-		incr i
+	    set alt [lindex $Ls 4]
+	    # Consider only the SV (not the SNV/indel in the VCF file)
+	    ##########################################################
+	    # Example of SV:
+	    # - Type1: ref="G" and alt="ACTGCTAACGATCCGTTTGCTGCTAACGATCTAACGATCGGGATTGCTAACGATCTCGGG"
+	    # - Type2: "<INS>", "<DEL>", ...
+	    # - Type3: complex rearrangements with breakends: "G]17:1584563]"
+	    if {![regexp "<|\\\[|\\\]" $alt]} {
+		set variantLength [expr {[string length $ref]-[string length $alt]}]
+		if {[expr {abs($variantLength)}]<$g_AnnotSV(SVminSize)} {continue}; # it is not an SV
 	    }
+	    set max -1
+	    catch {unset AF}
+	    catch {unset END}
+	    set SVTYPE "CNV"
+	    foreach inf $L_infos {
+		set inf [split $inf "="]
+		set val [lindex $inf 0]
+		set $val [lindex $inf 1]
+		if {[regexp "AF$" $val]} {
+		    if {[set $val]>$max} {set max [set $val]}
+		}
+	    }
+	    # Consider only the frequent SV
+	    if {![info exists AF] || $AF < 0.005} {continue}
+	    if {![info exists END]} {
+		# INS:ME (LINE1, ALU or SVA)
+		set END [expr {$pos+1}]
+	    }
+	    # SVTYPE is defined in $L_infos
+	    # In case of a single value for "alt", SVTYPE is correctly defined (e.g. SVTYPE=DUP).
+	    # In case of multiple alt ("<CN0>,<CN2>"), SVTYPE has a unique value (often: SVTYPE=CNV)
+	    #   => We replace CNV with a more precise value <CN0> or <CNV2>
+	    if {$SVTYPE eq "CNV"} {set SVTYPE "$alt"}
+	    # Sometimes, we have "SVTYPE=DUP" and alt=<CN0>
+	    # or "SVTYPE=DEL" and alt=<CN2>
+	    # It's due to multiallelic sites. The good value is in "alt"
+	    if {[regexp "^<CN" $alt]} {
+		set SVTYPE "$alt"
+	    }
+	    lappend L_TextToWrite "$chrom\t$pos\t$END\t$SVTYPE\t$AF\t$max"
+	    incr i
 	}
+    
 	close $f
 	file delete -force $1000gFileDownloaded
+	file delete -force $1000gFileTmp	   
 
 	ReplaceTextInFile [join $L_TextToWrite "\n"] $1000gFileFormatted
 
@@ -152,7 +172,7 @@ proc check1000gFile {} {
 
 
 
-proc 1000gAnnotation {SVchrom SVstart SVend L_i} {
+proc 1000gAnnotation {SVchrom SVstart SVend} {
 
     global g_AnnotSV
     global 1000gText
@@ -163,12 +183,8 @@ proc 1000gAnnotation {SVchrom SVstart SVend L_i} {
 
     if {![info exists 1000gText(DONE)]} {
 
-	# headerOutput "1000g_event 1000g_AF 1000g_max_AF"
-	set L_1000gText(Empty) "{} {-1} {-1}"
-	foreach i $L_i {
-	    lappend 1000gText(Empty) "[lindex $L_1000gText(Empty) $i]"
-	}
-	set 1000gText(Empty) [join $1000gText(Empty) "\t"]
+	# headerOutput "1000g_event"
+	set 1000gText(Empty) ""
 
 	# Intersect
 	regsub -nocase "(.formatted)?.bed$" $g_AnnotSV(bedFile) ".intersect.1000g" tmpFile
@@ -192,8 +208,6 @@ proc 1000gAnnotation {SVchrom SVstart SVend L_i} {
 	    set SVtoAnn_start [lindex $Ls 1]
 	    set SVtoAnn_end   [lindex $Ls 2]
 
-	    set 1000g_max_AF [lindex $Ls end]
-	    set 1000g_AF [lindex $Ls end-1]
 	    set 1000g_event [lindex $Ls end-2]
 	    set 1000g_end [lindex $Ls end-3]
 	    set 1000g_start [lindex $Ls end-4]
@@ -214,7 +228,6 @@ proc 1000gAnnotation {SVchrom SVstart SVend L_i} {
 
 	    # Values of "1000g_event":
 	    # ALU, <CN0>, <CN2>, <CN3>, <CN4>, <CN5>, <CN6>, <CN7>, <CN8>, <CN9>, DEL, DEL_ALU, DEL_HERV, DEL_LINE1, DEL_SVA, DUP, INS, INV, LINE1, SVA
-	    # if {![regexp "^(ALU)|(INS)|(LINE1)|(SVA)$" $1000g_event]} {}
 
 	    # we keep only SV with > 70% (default) overlap with the SV to annotate
 	    if {$SVtoAnn_start < $1000g_start} {
@@ -235,42 +248,17 @@ proc 1000gAnnotation {SVchrom SVstart SVend L_i} {
 		if {[expr {$overlap_length*100.0/$1000g_length}] < $g_AnnotSV(overlap)} {continue}
 	    }
 
-
 	    lappend L_1000gAnn_event($SVtoAnn_chrom,$SVtoAnn_start,$SVtoAnn_end) $1000g_event
-	    lappend L_1000gAnn_AF($SVtoAnn_chrom,$SVtoAnn_start,$SVtoAnn_end) $1000g_AF
-	    lappend L_1000gAnn_max_AF($SVtoAnn_chrom,$SVtoAnn_start,$SVtoAnn_end) $1000g_max_AF
 
 	}
 
 
 	# Loading 1000g final annotation for each SV
 	foreach SVtoAnn [array names L_1000gAnn_event] {
-	    # Change metrics from "." to ","
-	    if {[set g_AnnotSV(metrics)] eq "fr"} {
-		regsub -all {\.} $L_1000gAnn_AF($SVtoAnn) "," L_1000gAnn_AF($SVtoAnn)
-		regsub -all {\.} $L_1000gAnn_max_AF($SVtoAnn) "," L_1000gAnn_max_AF($SVtoAnn)
-	    }
 	    # For L_1000gAnn_event($SVtoAnn): we keep a unique list of the events
 	    set L_1000gAnn_event($SVtoAnn) [lsort -unique $L_1000gAnn_event($SVtoAnn)]
-	    # For L_1000gAnn_AF($SVtoAnn) and L_1000gAnn_max_AF($SVtoAnn): we keep only the maximum value
-	    set max_AF -1
-	    foreach a $L_1000gAnn_AF($SVtoAnn) {if {$a > $max_AF} {set max_AF $a}}
-	    set max2_AF -1
-	    foreach a $L_1000gAnn_max_AF($SVtoAnn) {if {$a > $max2_AF} {set max2_AF $a}}
-
-	    set L_1000gText($SVtoAnn) ""
-	    lappend L_1000gText($SVtoAnn) "[join $L_1000gAnn_event($SVtoAnn) ";"]"
-	    lappend L_1000gText($SVtoAnn) "$max_AF"
-	    lappend L_1000gText($SVtoAnn) "$max2_AF"
-
-	    # Keep only the user requested columns (defined in the configfile)
-	    set 1000gText($SVtoAnn) ""
-	    foreach i $L_i {
-		lappend 1000gText($SVtoAnn) "[lindex $L_1000gText($SVtoAnn) $i]"
-	    }
-	    set 1000gText($SVtoAnn) [join $1000gText($SVtoAnn) "\t"]
+	    set 1000gText($SVtoAnn) "[join $L_1000gAnn_event($SVtoAnn) "/"]"
 	}
-	catch {unset L_1000gText}
 	set 1000gText(DONE) 1
 	file delete -force $tmpFile
     }

@@ -24,17 +24,11 @@
 
 
 ##################################################################
-# Prepare 3 new annotation columns:
-# - Number of homozygous SNV/indel detected in the sample and located in the SV
-# - Number of heterozygous SNV/indel detected in the sample and  located in the SV
-# - Total number of calls detected in all samples and located in the SV
+# Search for the place of a number into a big ordered number list. 
+# Return the indice after which we can range the number
+# Return -1 if number < [lindex $ListeOrdonnee 0]
 ##################################################################
-
-
 proc DichotomySearch {number OrderedNumberList} {
-    # Search for the place of a number into a big ordered number list. 
-    # Return the indice after which we can range the number
-    # Return -1 if number < [lindex $ListeOrdonnee 0]
     set i 0
     set j [expr {[llength $OrderedNumberList]-1}]
     if {$number<[lindex $OrderedNumberList 0]} {return -1}
@@ -49,6 +43,13 @@ proc DichotomySearch {number OrderedNumberList} {
     return $i
 }
 
+
+##################################################################
+# Prepare 3 new annotation columns:
+# - Number of homozygous SNV/indel detected in the sample and located in the SV
+# - Number of heterozygous SNV/indel detected in the sample and  located in the SV
+# - Total number of calls detected in all samples and located in the SV
+##################################################################
 proc VCFannotation {SVchrom SVstart SVend SVtype} {
 
     global g_AnnotSV
@@ -57,122 +58,106 @@ proc VCFannotation {SVchrom SVstart SVend SVtype} {
 
     ## VCFs parsing is done only 1 time (After, g_AnnotSV(vcfParsing) is set to "done")
     if {![info exists g_AnnotSV(vcfParsing)]} {
+
 	set g_AnnotSV(vcfParsing) "done"
+	
 	# parsing of $g_AnnotSV(snvIndelFiles): creation of lPos($SVchrom,htz,sample), lPos($SVchrom,hom,sample) and lPos($SVchrom,tot,cohort)
 	puts "\n\n...parsing of snvIndelFiles for \"$g_AnnotSV(snvIndelSamples)\" ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
 
 	# "eval glob" accept regular expression ("*.vcf) as well as a list of files ("sample1.vcf sample2.vcf.gz"):
 	set L_allSamples {}
 	foreach vcfF [eval glob -nocomplain $g_AnnotSV(snvIndelFiles)] {
+	    
+	    # Split multiallelic sites into multiple rows
+	    puts "\t...split multiallelic sites into multiple rows for $vcfF ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+            set tmpVCF1 "$g_AnnotSV(outputDir)/[file tail $vcfF].[clock seconds].separate.vcf"
+            set tmpVCFgz1 "$g_AnnotSV(outputDir)/[file tail $vcfF].[clock seconds].separate.vcf.gz"
+	    catch {eval exec $g_AnnotSV(bcftools) norm -m -both $vcfF > $tmpVCF1} Message
+	    if {[file size $tmpVCF1] eq 0} {
+		# we continue AnnotSV without splitting the multiallelic sites !
+		puts "\t   -- VCFannotation --"
+		puts "\t   $g_AnnotSV(bcftools) norm -m -both $vcfF > $tmpVCF1"
+		puts "\t   $tmpVCF1: file empty."
+		puts "\t   No multiallelic treatment done."
+		if {[regexp ".gz$" $vcfF]} {
+		    file copy -force $vcfF $tmpVCFgz1 
+		} else {
+		    catch {eval exec cat $vcfF | gzip > $tmpVCFgz1} Message 
+		}
+	    } else {
+		    catch {eval exec gzip $tmpVCF1} Message
+	    }
+	    file delete -force $tmpVCF1
+
+	    # Parsing of $vcfF
 	    puts "\t...parsing of $vcfF ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
 	    set iIntersect 0
 	    set iSV 0
 	    set iLoaded 0
 	    set iNotPASS 0
 	    set iNotGT 0
-	    set chrManipulation 0
 
-	    # Intersect each VCF with the bedfile
-	    if {[regexp ".gz$" $vcfF]} {
-		regsub ".gz$" [file tail $vcfF] ".tmp.gz" tmpVCFgz
-		set tmpVCFgz "$g_AnnotSV(outputDir)/$tmpVCFgz"
-		regsub ".gz$" $tmpVCFgz "" tmpVCF
-
-		# VCF should not contain "chr" prefix
-		catch {exec gunzip -c $vcfF | grep -c "^chr"} Message
-		if {[string index $Message 0] ne 0} {
-		    exec gunzip -c $vcfF | sed "s/^chr//" | gzip  > $g_AnnotSV(outputDir)/[file tail $vcfF].withoutchr.vcf.gz
-		    set vcfF $g_AnnotSV(outputDir)/[file tail $vcfF].withoutchr.vcf.gz
-		    set chrManipulation 1
-		}
-
-		set f [open "| gzip -cd $vcfF"]	 
-		set L_tmpVCF_Header {} ; # Header is used to find "samples" columns names
-		while {! [eof $f]} {
-		    set L [gets $f]
-		    if {[regexp "^#" $L]} {
-			set L_tmpVCF_Header $L
-		    } else {
-			break
-		    }
-		}
-		unset f
-		lappend L_allSamples {*}[lrange $L_tmpVCF_Header 9 end]
-		
-		WriteTextInFile "$L_tmpVCF_Header" $tmpVCF
-		if {[catch {exec gzip $tmpVCF} Message]} {
-		    puts "-- VCFannotation --"
-		    puts "gzip $tmpVCF"
-		    puts $Message
-		}
-		if {[catch {exec gunzip -c $vcfF | $g_AnnotSV(bedtools) intersect -a stdin -b $g_AnnotSV(bedFile) > $tmpVCFgz.bis} Message]} {
-		    if {[regexp -nocase "error" $Message]} {
-			WriteTextInFile "$Message" $vcfF.intersect.error
-			puts "-- VCFannotation --"
-			puts "gunzip -c $vcfF | $g_AnnotSV(bedtools) intersect -a stdin -b $g_AnnotSV(bedFile) > $tmpVCFgz.bis"
-			puts "Error: look at $vcfF.intersect.error"
-		    }
-		}	
+	    # VCF should not contain "chr" prefix
+	    regsub ".gz$" $tmpVCFgz1 ".withoutChr.gz" tmpVCFgz2
+	    catch {exec gunzip -c $tmpVCFgz1 | grep -c "^chr"} Message
+	    if {[string index $Message 0] ne 0} {
+		exec gunzip -c $tmpVCFgz1 | sed "s/^chr//" | gzip > $tmpVCFgz2
 	    } else {
-		set tmpVCFgz "$g_AnnotSV(outputDir)/[file tail $vcfF].tmp.gz"
-		set tmpVCF "$g_AnnotSV(outputDir)/[file tail $vcfF].tmp"
-		
-		# VCF should not contain "chr" prefix
-		catch {exec grep -c "^chr" $vcfF} Message
-		if {[string index $Message 0] ne 0} {
-		    exec sed "s/^chr//" $vcfF > $g_AnnotSV(outputDir)/[file tail $vcfF].withoutchr.vcf
-		    set vcfF $g_AnnotSV(outputDir)/[file tail $vcfF].withoutchr.vcf
-		    set chrManipulation 1
-		}
+		set tmpVCFgz2 "$tmpVCFgz1"
+	    }
 
-		set f [open "$vcfF"]	 
-		set L_tmpVCF_Header {} ; # Header is used to find "samples" columns names
-		while {! [eof $f]} {
-		    set L [gets $f]
-		    if {[regexp "^#" $L]} {
-			set L_tmpVCF_Header $L
-		    } else {
-			break
-		    }
+	    # Header for the intersection with the bedfile
+	    regsub ".gz$" $tmpVCFgz2 ".intersect.gz" tmpVCFgz3
+	    regsub ".gz$" $tmpVCFgz3 "" tmpVCF3
+	    set f [open "| gzip -cd $tmpVCFgz2"]	 
+	    set L_tmpVCF_Header {} ; # Header is used to find "samples" columns names
+	    while {! [eof $f]} {
+		set L [gets $f]
+		if {[regexp "^#" $L]} {
+		    set L_tmpVCF_Header $L
+		} else {
+		    break
 		}
-		close $f
-		lappend L_allSamples {*}[lrange $L_tmpVCF_Header 9 end]
+	    }
+	    unset f
+	    lappend L_allSamples {*}[lrange $L_tmpVCF_Header 9 end]	    
+	    WriteTextInFile "$L_tmpVCF_Header" $tmpVCF3
+	    if {[catch {exec gzip $tmpVCF3} Message]} {
+		puts "-- VCFannotation --"
+		puts "gzip $tmpVCF3"
+		puts $Message
+	    }
 
-		WriteTextInFile "$L_tmpVCF_Header" $tmpVCF
-		if {[catch {exec gzip $tmpVCF} Message]} {
+	    # Intersect with the bedfile
+	    if {[catch {exec gunzip -c $tmpVCFgz2 | $g_AnnotSV(bedtools) intersect -a stdin -b $g_AnnotSV(bedFile) > $tmpVCF3} Message]} {
+		if {[regexp -nocase "error" $Message]} {
+		    WriteTextInFile "$Message" $tmpVCF3.error
 		    puts "-- VCFannotation --"
-		    puts "gzip $tmpVCF"
-		    puts $Message
-		}
-		if {[catch {exec $g_AnnotSV(bedtools) intersect -a $vcfF -b $g_AnnotSV(bedFile) > $tmpVCFgz.bis} Message]} {
-		    if {[regexp -nocase "error" $Message]} {
-			WriteTextInFile "$Message" "$g_AnnotSV(outputDir)/[file tail $vcfF].intersect.error"
-			puts "-- VCFannotation --"
-			puts "$g_AnnotSV(bedtools) intersect -a $vcfF -b $g_AnnotSV(bedFile) > $tmpVCFgz.bis"
-			puts "Error: look $g_AnnotSV(outputDir)/[file tail $vcfF].intersect.error"
-		    }
+		    puts "gunzip -c $tmpVCFgz2 | $g_AnnotSV(bedtools) intersect -a stdin -b $g_AnnotSV(bedFile) > $tmpVCF3"
+		    puts "Error: look at $tmpVCF3.error"
 		}
 	    }
 
-	    if {$chrManipulation} {file delete -force $vcfF}
+	    # Nettoyage
+	    file delete -force $tmpVCFgz1
+	    file delete -force $tmpVCFgz2
 
-	    if {[file size $tmpVCFgz.bis] eq 0} {
+	    if {[file size $tmpVCF3] eq 0} {
 		# no intersection between the bed and the VCF, no SNV/Indel to load in memory
 		puts "\t\t-> no variant in the intersection"
-		file delete -force $tmpVCFgz
-		file delete -force $tmpVCFgz.bis
+		file delete -force $tmpVCF3
 		continue
 	    } else {
-		if {[catch {exec cat $tmpVCFgz.bis | gzip >> $tmpVCFgz} Message]} {
+		if {[catch {exec cat $tmpVCF3 | gzip >> $tmpVCFgz3} Message]} {
 		    puts "-- VCFannotation --"
-		    puts "cat $tmpVCFgz.bis | gzip >> $tmpVCFgz"
+		    puts "cat $tmpVCF3 | gzip >> $tmpVCFgz3"
 		    puts $Message
 		}
-		file delete -force $tmpVCFgz.bis
+		file delete -force $tmpVCF3	
 	    }
-
+	    
 	    # load SNV/Indel in memory
-	    set f [open "| gzip -cd $tmpVCFgz"]	  
+	    set f [open "| gzip -cd $tmpVCFgz3"]	  
 	    set L_samples1VCF {}
 	    while {![eof $f]} {
 		set L [gets $f]
@@ -236,7 +221,7 @@ proc VCFannotation {SVchrom SVstart SVend SVtype} {
 		}
 	    }
 	    close $f
-	    file delete -force $tmpVCFgz
+	    file delete -force $tmpVCFgz3
 	    if {$iIntersect} {
 		puts "\t\t-> $iIntersect variants located in the SV"
 	    }
@@ -386,7 +371,7 @@ proc VCFsToBED {SV_VCFfiles} {
 	    set chrom [lindex $Ls 0]
 	    regsub -nocase "chr" $chrom "" chrom
             set pos [lindex $Ls 1]
-	    regsub "chr" [lindex $Ls 3] "" ref
+	    regsub "chr" [lindex $Ls 3] "" ref ; # for alt like: "alt="G]chr17:1584563]"
 	    regsub "chr" [lindex $Ls 4] "" alt 
 	    regsub -all "\"" [lindex $Ls 7] "" INFOcol
             if {[regexp "SVLEN=(\[0-9-\]+)" $INFOcol match SVLEN]} {set svlen $SVLEN} else {set svlen ""}

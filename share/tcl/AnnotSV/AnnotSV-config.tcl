@@ -40,6 +40,7 @@ proc configureAnnotSV {argv} {
     #######################
     puts "\t...configuration data by default"
     set g_AnnotSV(annotationsDir)           ""
+    set g_AnnotSV(bcftools)                 "bcftools"
     set g_AnnotSV(bedtools)                 "bedtools"
     set g_AnnotSV(candidateGenesFile)       ""
     set g_AnnotSV(candidateGenesFiltering)  "no"
@@ -74,7 +75,7 @@ proc configureAnnotSV {argv} {
     ###########################
     ## Load config file options
     ###########################
-    set lOptionsOk "annotationsDir bedtools candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering rankOutput reciprocal snvIndelFiles snvIndelPASS SVinputFile SVinputInfo SVminSize svtBEDcol txFile typeOfAnnotation snvIndelSamples"
+    set lOptionsOk "annotationsDir bcftools bedtools candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering rankOutput reciprocal snvIndelFiles snvIndelPASS SVinputFile SVinputInfo SVminSize svtBEDcol txFile typeOfAnnotation snvIndelSamples"
     set configFile "$g_AnnotSV(etcDir)/configfile"
     if {[file exists "./configfile"]} {
 	set configFile "./configfile"
@@ -271,14 +272,16 @@ proc configureAnnotSV {argv} {
 	exit 2
     }
 
-    # bedtools: It should be a good path that we can run
-    if {[catch {exec $g_AnnotSV(bedtools)} Message]} {
-	puts "############################################################################"
-	puts "Bad value for the bedtools option ($g_AnnotSV(bedtools))"
-	puts "$Message"
-	puts "Exit with error."
-	puts "############################################################################"	
-	exit 2
+    # bedtools/bcftools: It should be a good path that we can run
+    foreach tool {bedtools bcftools} {
+	if {[catch {eval exec $g_AnnotSV($tool) --version} Message]} {
+	    puts "############################################################################"
+	    puts "Bad value for the $tool option ($g_AnnotSV($tool))"
+	    puts "$Message"
+	    puts "Exit with error."
+	    puts "############################################################################"	
+	    exit 2
+	}
     }
     
     ## txFile: It must be an existing file 

@@ -78,8 +78,6 @@ DDD_DUP_Frequency
 DDD_DEL_n_samples_with_SV
 DDD_DEL_Frequency
 1000g_event
-1000g_AF
-1000g_max_AF
 IMH_ID
 IMH_AF
 IMH_ID_others
