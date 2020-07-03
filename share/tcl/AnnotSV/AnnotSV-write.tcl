@@ -41,10 +41,11 @@ proc OrganizeAnnotation {} {
     set outputFile "$g_AnnotSV(outputDir)/$g_AnnotSV(outputFile)" 
 
 
-    # Check the -svtBEDcol option
-    # Incr -svtBEDcol +1 (-1 to be ok for an informatic list + 2 for the 2 added columns)
+    # Check the -svtBEDcol and -samplesidBEDcol options
+    # Create the -svtTSVcol variable
     #####################################################################################
     checksvtBEDcol $g_AnnotSV(bedFile)
+    checksamplesidBEDcol $g_AnnotSV(bedFile)
 
 
     ################### Writing of the header (first line of the output) ####################
@@ -53,7 +54,7 @@ proc OrganizeAnnotation {} {
     if {[info exist VCFheader]} {
 	# SVinputFile = VCF
 	append headerOutput "\t$VCFheader"
-	set theLength [expr {[llength [split $headerOutput "\t"]]-2}] ; # we remove "2" for the 2 columns not in the input file (AnnotSV ID and SV length)
+	set theBEDlength [expr {[llength [split $headerOutput "\t"]]-2}] ; # we remove "2" for the 2 columns not in the input file ("AnnotSV ID" and "SV length")
 	if {$g_AnnotSV(SVinputInfo)} {
 	    set g_AnnotSV(formatColNumber) 10 ;# used in AnnotSV-filteredVCF.tcl
 	} else {
@@ -65,38 +66,47 @@ proc OrganizeAnnotation {} {
 	if {$g_AnnotSV(SVinputInfo)} {
 	    # The user wants to keep all the columns from the SV BED input file
 	    regsub -nocase ".bed$" $g_AnnotSV(SVinputFile) ".header.tsv" headerSVinputFile
-	    set theLength [llength [split [FirstLineFromFile $g_AnnotSV(bedFile)] "\t"]] ;# theLength = number of col in the SV input BED file
-	    set testH 1
+	    set theBEDlength [llength [split [FirstLineFromFile $g_AnnotSV(bedFile)] "\t"]] ;# theBEDlength = number of col in the SV input BED file
+
 	    if {[file exists $headerSVinputFile]} {
-		# The user has given a header for all the columns from the SV BED input file
+		# The user has given a header for the SV BED input file
 		set headerFromTheUser [split [FirstLineFromFile $headerSVinputFile] "\t"]	
-		if {[llength $headerFromTheUser] ne $theLength} { ;# A stupid error can be to have a "\t" at the end of the header line
-		    puts "Numbers of columns from $g_AnnotSV(SVinputFile) and $headerSVinputFile are different ($theLength != [llength $headerFromTheUser])" 
+		if {[llength $headerFromTheUser] ne $theBEDlength} { ;# A stupid error can be to have a "\t" at the end of the header line
+		    puts "Numbers of columns from $g_AnnotSV(SVinputFile) and $headerSVinputFile are different ($theBEDlength != [llength $headerFromTheUser])" 
 		    puts "=> Can not report: $headerFromTheUser"
 		} else {
 		    if {$g_AnnotSV(svtBEDcol) ne -1} {
-			set i [expr {$g_AnnotSV(svtBEDcol)-2}]
-			set headerFromTheUser [lreplace $headerFromTheUser $i $i "SV type"]
+			set headerFromTheUser [lreplace $headerFromTheUser $g_AnnotSV(svtBEDcol) $g_AnnotSV(svtBEDcol) "SV type"]
 		    }
+		    if {$g_AnnotSV(samplesidBEDcol) ne -1} {
+			set headerFromTheUser [lreplace $headerFromTheUser $g_AnnotSV(samplesidBEDcol) $g_AnnotSV(samplesidBEDcol) "Samples_ID"]
+		    } 
 		    append headerOutput "\t[join [lrange $headerFromTheUser 3 end] "\t"]"		
-		    set testH 0
 		}	
-	    } 
-	    if {$testH} {
-		set i 5 ; #AnnotSV ID	SV chrom    SV start	SV end	SV length
-		set j [expr {$theLength+2}]
+	    } else {
+		# No header given by the user
+		set i 5 ; # headerOutput = "AnnotSV ID   SV chrom    SV start	   SV end	SV length"
+		set j [expr {$theBEDlength+2}]
 		while {$i < $j} {
-		    if {$i eq $g_AnnotSV(svtBEDcol)} {
+		    if {$i eq $g_AnnotSV(svtTSVcol)} {
 			append headerOutput "\tSV type"
+		    } elseif {$i eq $g_AnnotSV(samplesidTSVcol)} {
+			append headerOutput "\tSamples_ID"
 		    } else {
 			append headerOutput "\t"
 		    }
 		    incr i
 		}
 	    }
-	} elseif {$g_AnnotSV(svtBEDcol) ne -1} {; # At least the "SV type" column should be reported for the ranking
-	    # The user doesn't want to keep all the columns from the SV BED input file. We keep only the SV type (for the ranking)
-	    append headerOutput "\tSV type"
+	} else {
+	    # At least the "SV type" and the "samples_ID" columns should be reported for the ranking
+	    if {$g_AnnotSV(svtTSVcol) ne -1} {
+		# The user doesn't want to keep all the columns from the SV BED input file. We keep only the "SV type" (for the ranking) 
+		append headerOutput "\tSV type"
+	    }
+	    if {$g_AnnotSV(samplesidTSVcol) ne -1} {
+		append headerOutput "\tSamples_ID"
+	    }
 	}
     }
     append headerOutput "\tAnnotSV type\tGene name\tNM\tCDS length\ttx length\tlocation\tlocation2\tintersectStart\tintersectEnd"
@@ -286,10 +296,10 @@ proc OrganizeAnnotation {} {
     }
  
     # Preparation for the ranking (from benign to pathogenic)
-    SVprepareRanking $headerOutput    ; # svtBEDcol (for VCF input file) is defined there
+    SVprepareRanking $headerOutput    ; # svtTSVcol (for VCF input file) is defined there
 
     ####### "Ranking header"
-    if {$g_AnnotSV(svtBEDcol) eq -1 && $g_AnnotSV(organism) eq "Human"} { ; # SV type is required for the ranking of human SV
+    if {$g_AnnotSV(svtTSVcol) eq -1 && $g_AnnotSV(organism) eq "Human"} { ; # SV type is required for the ranking of human SV
 	puts "\nWARNING: AnnotSV requires the SV type (duplication, deletion...) to classify the SV"
 	puts "Not provided (svtBEDcol = -1)"
 	puts "=> No SV ranking"
@@ -428,10 +438,14 @@ proc OrganizeAnnotation {} {
 	set SVright   [lindex $Ls 2]
 	set AnnotSVtype   [lindex $Ls end]                 ;# full or split
 	if {$g_AnnotSV(svtBEDcol) ne -1} { 
-	    set i [expr {"$g_AnnotSV(svtBEDcol)"-2}]
-	    set SVtype [lindex $Ls $i]                     ;# DEL, DUP, <CN0>...
+	    set SVtype [lindex $Ls "$g_AnnotSV(svtBEDcol)"]                     ;# DEL, DUP, <CN0>...
 	} else {
 	    set SVtype ""
+	}
+	if {$g_AnnotSV(samplesidBEDcol) ne -1} { 
+	    set Samplesid [lindex $Ls "$g_AnnotSV(samplesidBEDcol)"]                    
+	} else {
+	    set Samplesid ""
 	}
 
 	# For the use of the -typeOfAnnotation option: keep only the corresponding lines (full or split or both)
@@ -892,14 +906,22 @@ proc OrganizeAnnotation {} {
 
 	################ Writing
 	if {$g_AnnotSV(SVinputInfo)} {
-	    set toadd [lrange $Ls 0 [expr {$theLength-1}]]
+	    set toadd [lrange $Ls 0 [expr {$theBEDlength-1}]]
 	    set toadd [linsert $toadd 3 $SVlength]
 	    set TextToWrite "$AnnotSV_ID\t[join $toadd "\t"]\t$AnnotSVtype\t$geneName\t$NM\t$CDSl\t$txL\t$location\t$location2\t$intersect"
 	} else {
 	    if {$g_AnnotSV(svtBEDcol) ne -1} { ; # SV type is required for the ranking
-		set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$SVtype\t$AnnotSVtype\t$geneName\t$NM\t$CDSl\t$txL\t$location\t$location2\t$intersect"
+		if {$g_AnnotSV(samplesidBEDcol) ne -1} {
+		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$SVtype\t$Samplesid\t$AnnotSVtype\t$geneName\t$NM\t$CDSl\t$txL\t$location\t$location2\t$intersect"		    
+		} else {
+		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$SVtype\t$AnnotSVtype\t$geneName\t$NM\t$CDSl\t$txL\t$location\t$location2\t$intersect"
+		}
 	    } else {
-		set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$AnnotSVtype\t$geneName\t$NM\t$CDSl\t$txL\t$location\t$location2\t$intersect"
+		if {$g_AnnotSV(samplesidBEDcol) ne -1} {
+		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$Samplesid\t$AnnotSVtype\t$geneName\t$NM\t$CDSl\t$txL\t$location\t$location2\t$intersect"
+		} else {
+		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$AnnotSVtype\t$geneName\t$NM\t$CDSl\t$txL\t$location\t$location2\t$intersect"
+		}
 	    }
 	}
 	####### "SVincludedInFt"

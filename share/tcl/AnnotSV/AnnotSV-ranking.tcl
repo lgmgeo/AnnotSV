@@ -46,9 +46,10 @@ proc SVprepareRanking {L_header} {
 
     set Ls [split $L_header "\t"]
 
-    # The user is using a VCF SV input file: the svtBEDcol is necessarily the 6th in the corresponding created annotated file
+    # The user is using a VCF SV input file: the svtTSVcol is necessarily the 6th in the corresponding output annotated file.tsv
     if {[regexp ".vcf$|.vcf.gz$" $g_AnnotSV(SVinputFile)]} {
-	set g_AnnotSV(svtBEDcol) 5
+	set g_AnnotSV(svtTSVcol) 5
+	set g_AnnotSV(svtBEDcol) 3
     } 
 
     # Check if we have all the needed information for ranking
@@ -280,7 +281,7 @@ proc SVranking {L_annotations ref alt} {
     # Check if we have enougth information to do the ranking:
     #########################################################
     set ranking ""
-    if {$g_AnnotSV(svtBEDcol) eq -1} {return $ranking}
+    if {$g_AnnotSV(svtTSVcol) eq -1} {return $ranking}
     if {!$g_AnnotSV(ranking)} {return $ranking}
 
 
@@ -288,7 +289,7 @@ proc SVranking {L_annotations ref alt} {
     ###########
 
     set Ls [split $L_annotations "\t"]
-    set SVtype [lindex $Ls $g_AnnotSV(svtBEDcol)]   
+    set SVtype [lindex $Ls $g_AnnotSV(svtTSVcol)]   
     set SVtoAnn [join [lrange $Ls 1 3] ","]
     set enhancer [EnhancerInformation $Ls $SVtype $SVtoAnn]
     set AnnotSV_ID [settingOfTheAnnotSVID "[join [lrange $Ls 1 3] "_"]_$SVtype" "$ref" "$alt"]

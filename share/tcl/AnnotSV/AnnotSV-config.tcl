@@ -60,6 +60,8 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(rankFiltering)            "1-5"
     set g_AnnotSV(rankOutput)               "no"
     set g_AnnotSV(reciprocal)               "no"
+    set g_AnnotSV(samplesidBEDcol)          "-1"
+    set g_AnnotSV(samplesidTSVcol)          "-1" ;# not given in parameter
     set g_AnnotSV(snvIndelFiles)            ""
     set g_AnnotSV(snvIndelPASS)             "0"
     set g_AnnotSV(snvIndelSamples)          ""
@@ -67,6 +69,7 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(SVinputInfo)              "1"
     set g_AnnotSV(SVminSize)                "50"
     set g_AnnotSV(svtBEDcol)                "-1"
+    set g_AnnotSV(svtTSVcol)                "-1" ;# not given in parameter
     set g_AnnotSV(txFile)                   ""
     set g_AnnotSV(typeOfAnnotation)         "both"
     set g_AnnotSV(ranking)                  "1"
@@ -75,7 +78,7 @@ proc configureAnnotSV {argv} {
     ###########################
     ## Load config file options
     ###########################
-    set lOptionsOk "annotationsDir bcftools bedtools candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering rankOutput reciprocal snvIndelFiles snvIndelPASS SVinputFile SVinputInfo SVminSize svtBEDcol txFile typeOfAnnotation snvIndelSamples"
+    set lOptionsOk "annotationsDir bcftools bedtools candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering rankOutput reciprocal samplesidBEDcol snvIndelFiles snvIndelPASS SVinputFile SVinputInfo SVminSize svtBEDcol txFile typeOfAnnotation snvIndelSamples"
     set configFile "$g_AnnotSV(etcDir)/configfile"
     if {[file exists "./configfile"]} {
 	set configFile "./configfile"

@@ -63,6 +63,9 @@ OPTIONS
 -reciprocal:                    Use of a reciprocal overlap between SV and features (only for annotations with features overlapping the SV)
                                 Values: no (default) or yes
 
+-samplesidBEDcol:               Number of the column collecting the sample names if the input SV file is a BED
+                                Range values: [4-[, default = -1 (value not given)
+
 -snvIndelFiles:                 Path of the VCF input file(s) with SNV/indel coordinates used for false positive discovery
                                 Use counts of the homozygous and heterozygous variants
                                 Gzipped VCF files are supported as well as regular expression
@@ -82,7 +85,7 @@ OPTIONS
 -SVminSize:                     SV minimum size (in bp)
                                 Default = 50
 
--svtBEDcol:                     Number of the column describing the SV type (DEL, DUP)
+-svtBEDcol:                     Number of the column describing the SV type (DEL, DUP) if the input SV file is a BED
                                 Range values: [4-[, default = -1 (value not given)
 
 -txFile:                        Path of a file containing a list of preferred genes transcripts to be used in priority during the annotation

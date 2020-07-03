@@ -400,44 +400,122 @@ proc isAnEmptyFile {bedOrVCFfile} {
 }
 
 
-# Check the -svtBEDcol option (=number of the SVtype column)
+# Check the -samplesidBEDcol option (= number of the "samples_ID" column)
+# - Should be > 3 (the 3 first columns are chrom, start, end)
+# - Should be an existing column (<= total number of columns)
+proc checksamplesidBEDcol {bedFile} {
+
+    global g_AnnotSV
+
+
+    if {$g_AnnotSV(samplesidBEDcol) ne -1} {
+	
+	# Look at the length of a line in the bed file
+	set f [open $bedFile]
+	while {![eof $f]} {
+	    set L [gets $f]
+	    if {$L eq ""} {continue}
+	    if {[regexp "^#" $L]} {continue}
+	    
+	    set thelength [llength [split $L "\t"]]
+	    break
+	}
+	close $f
+	
+	# Check the -samplesidBEDcol option, and set it to -1 if the column doesn't exist
+	if {$g_AnnotSV(samplesidBEDcol) ne -1} {
+	    if {$g_AnnotSV(samplesidBEDcol) > $thelength} {
+		puts "\nWARNING: -samplesidBEDcol = $g_AnnotSV(samplesidBEDcol)"
+		puts "This value should correspond to a column of $bedFile ($thelength columns)"
+		puts "-samplesidBEDcol is set to -1.\n"
+		set g_AnnotSV(samplesidBEDcol) "-1"
+	    } elseif {$g_AnnotSV(samplesidBEDcol) < 4} {
+		puts "\nWARNING: -samplesidBEDcol = $g_AnnotSV(samplesidBEDcol)"
+		puts "This value should be > 3"
+		puts "-samplesidBEDcol is set to -1.\n"
+		set g_AnnotSV(samplesidBEDcol) "-1"
+	    } 
+	}
+
+	# If g_AnnotSV(samplesidBEDcol) is still different to -1
+	# -> formatting of the different values in the "Samples_ID" column
+	if {$g_AnnotSV(samplesidBEDcol) ne -1} {
+	    
+	    incr g_AnnotSV(samplesidBEDcol) -1 ;# 0 is the first element of an informatic list: -1
+	    set g_AnnotSV(samplesidTSVcol) [expr {$g_AnnotSV(samplesidBEDcol)+2}]
+	    
+	    # This column should be a coma separated list of samplesid
+	    set L_toWrite {}
+	    set L_fromStart {}
+	    set f [open $bedFile]
+	    while {![eof $f]} {
+		set L [gets $f]
+		if {$L eq ""} {continue}
+		
+		lappend L_fromStart $L
+		if {[regexp "^#" $L]} {lappend L_toWrite $L; continue}
+		
+		set Ls [split $L "\t"]
+		
+		set part2 [lindex $Ls $g_AnnotSV(samplesidBEDcol)]
+		set part2 [join [split $part2 " +| *\\\| *| *, *| *; *| */ *"] ","]
+		
+		lappend L_toWrite [join [lreplace $Ls $g_AnnotSV(samplesidBEDcol) $g_AnnotSV(samplesidBEDcol) $part2] "\t"]
+	    }
+	    close $f
+	    if {$L_toWrite ne $L_fromStart} {
+		ReplaceTextInFile [join $L_toWrite "\n"] $bedFile
+	    }
+	} 
+    }
+    
+    return
+}
+
+
+# Check the -svtBEDcol option (= number of the SVtype column)
 # - Should be > 3 (the 3 first columns are chrom, start, end)
 # - Should be an existing column (<= total number of columns)
 proc checksvtBEDcol {bedFile} {
 
     global g_AnnotSV
 
-    # Look at the length of a line in the bed file
-    set f [open $bedFile]
-    while {![eof $f]} {
-        set L [gets $f]
-        if {$L eq ""} {continue}
-        if {[regexp "^#" $L]} {continue}
 
-	set thelength [llength [split $L "\t"]]
-	break
-    }
-    close $f
-
-    # Check the -svtBEDcol option, is set to -1 if the column doesn't exist
     if {$g_AnnotSV(svtBEDcol) ne -1} {
-	if {$g_AnnotSV(svtBEDcol) > $thelength} {
-	    puts "\nWARNING: -svtBEDcol = $g_AnnotSV(svtBEDcol)"
-	    puts "This value should correspond to a column of $bedFile ($thelength columns)"
-	    puts "-svtBEDcol is set to -1. NO SV RANKING WILL BE PERFORMED.\n"
-	    set g_AnnotSV(svtBEDcol) "-1"
-	    set g_AnnotSV(ranking) 0
-	} elseif {$g_AnnotSV(svtBEDcol) < 4} {
-	    puts "\nWARNING: -svtBEDcol = $g_AnnotSV(svtBEDcol)"
-	    puts "This value should be > 3"
-	    puts "-svtBEDcol is set to -1. NO SV RANKING WILL BE PERFORMED.\n"
-	    set g_AnnotSV(svtBEDcol) "-1"
-	    set g_AnnotSV(ranking) 0
-	} else {
-	    # 0 is the first element of an informatic list: -1
-	    # AND 2 columns (AnnotSV ID + SV length) are added: +2
-	    # Finally: +1
-	    incr g_AnnotSV(svtBEDcol) 1
+	
+	# Look at the length of a line in the bed file
+	set f [open $bedFile]
+	while {![eof $f]} {
+	    set L [gets $f]
+	    if {$L eq ""} {continue}
+	    if {[regexp "^#" $L]} {continue}	    
+	    set thelength [llength [split $L "\t"]]
+	    break
+	}
+	close $f
+	
+	# Check the -svtBEDcol option, is set to -1 if the column doesn't exist
+	if {$g_AnnotSV(svtBEDcol) ne -1} {
+	    if {$g_AnnotSV(svtBEDcol) > $thelength} {
+		puts "\nWARNING: -svtBEDcol = $g_AnnotSV(svtBEDcol)"
+		puts "This value should correspond to a column of $bedFile ($thelength columns)"
+		puts "-svtBEDcol is set to -1. NO SV RANKING WILL BE PERFORMED.\n"
+		set g_AnnotSV(svtBEDcol) "-1"
+		set g_AnnotSV(ranking) 0
+	    } elseif {$g_AnnotSV(svtBEDcol) < 4} {
+		puts "\nWARNING: -svtBEDcol = $g_AnnotSV(svtBEDcol)"
+		puts "This value should be > 3"
+		puts "-svtBEDcol is set to -1. NO SV RANKING WILL BE PERFORMED.\n"
+		set g_AnnotSV(svtBEDcol) "-1"
+		set g_AnnotSV(ranking) 0
+	    } else {
+		# 0 is the first element of an informatic list: -1
+		# AND 2 columns (AnnotSV ID + SV length) are added: +2
+		# Finally: +1
+		incr g_AnnotSV(svtBEDcol) -1 ;# number of the "SV TYPE" column in the input BED file
+		set g_AnnotSV(svtTSVcol) [expr {$g_AnnotSV(svtBEDcol) +2}] ;# number of the "SV TYPE" column in the output TSV file
+	    }
 	}
     }
+    return
 }

@@ -11,13 +11,14 @@
 For more details, please see the README file.
 
 July , 2020: AnnotSV version 2.4
-	- Use of the “bcftools” toolset (Li, 2011) to fix a bug with multiallelic sites from VCF input file(s)
 	- Update of the annotations (cf the "Versions of the annotations sources" section of the README)
+	- Use of the “bcftools” toolset (Li, 2011) to fix a bug with multiallelic sites from VCF input file(s)
+	- Add of the "Samples_ID" feature (report of the sample names for which the SV was called)
 	- Include the new "-externalGeneFiles" option to pass external gene file(s) path in the command line
-	- Add bugfix with gzipped VCF files as input
 	- Integration of 4 Tcl packages (http/tar/csv/json) in the AnnotSV distribution
+	- "1000g_AF" and "1000g_max_AF" features are not reported anymore
+	- Add bugfix with gzipped VCF files as input
 	- Fix the output columns order - whatever the machines
-	- "1000g_AF" and "1000g_max_AF" features are not reported anymore (included in the "dbVarNR SV" database)
 	- Add bugfix concerning the running of bash scripts (illegal use of | or |& in command)
 	- Add bugfix concerning the use of the "-snvIndelFiles" and "-candidateSnvIndelSamples" options
 	- Add bugfix for the exomiser use
@@ -37,7 +38,7 @@ Dec 20, 2019: AnnotSV version 2.3
 	- Change the names of the misleading following options: 
 		vcfFiles           >>  snvIndelFiles
 		vcfPASS            >>  snvIndelPASS
-		vcfSamples         >>  snvIndelSamples) 
+		vcfSamples         >>  snvIndelSamples
 		filteredVCFfiles   >>  candidateSnvIndelFiles
 		filteredVCFsamples >>  candidateSnvIndelSamples
 	- Annotations are not distributed anymore with the sources but downloaded during the installation with the Makefile

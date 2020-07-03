@@ -48,6 +48,7 @@ SV start 			*
 SV end 				*
 SV length			*
 SV type				*
+Samples_ID			*
 AnnotSV type			*
 Gene name			*
 NM				*

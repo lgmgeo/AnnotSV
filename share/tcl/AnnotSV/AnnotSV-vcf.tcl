@@ -78,6 +78,9 @@ proc VCFannotation {SVchrom SVstart SVend SVtype} {
 		puts "\t   -- VCFannotation --"
 		puts "\t   $g_AnnotSV(bcftools) norm -m -both $vcfF > $tmpVCF1"
 		puts "\t   $tmpVCF1: file empty."
+		foreach line [split $Message "\n"] {
+		    if {[regexp -nocase "error|fail" $line]} {puts "\t   $line"}
+		}
 		puts "\t   No multiallelic treatment done."
 		if {[regexp ".gz$" $vcfF]} {
 		    file copy -force $vcfF $tmpVCFgz1 
@@ -98,7 +101,7 @@ proc VCFannotation {SVchrom SVstart SVend SVtype} {
 	    set iNotGT 0
 
 	    # VCF should not contain "chr" prefix
-	    regsub ".gz$" $tmpVCFgz1 ".withoutChr.gz" tmpVCFgz2
+	    regsub ".vcf.gz$" $tmpVCFgz1 ".withoutChr.vcf.gz" tmpVCFgz2
 	    catch {exec gunzip -c $tmpVCFgz1 | grep -c "^chr"} Message
 	    if {[string index $Message 0] ne 0} {
 		exec gunzip -c $tmpVCFgz1 | sed "s/^chr//" | gzip > $tmpVCFgz2
@@ -107,7 +110,7 @@ proc VCFannotation {SVchrom SVstart SVend SVtype} {
 	    }
 
 	    # Header for the intersection with the bedfile
-	    regsub ".gz$" $tmpVCFgz2 ".intersect.gz" tmpVCFgz3
+	    regsub ".vcf.gz$" $tmpVCFgz2 ".intersect.vcf.gz" tmpVCFgz3
 	    regsub ".gz$" $tmpVCFgz3 "" tmpVCF3
 	    set f [open "| gzip -cd $tmpVCFgz2"]	 
 	    set L_tmpVCF_Header {} ; # Header is used to find "samples" columns names
@@ -122,7 +125,7 @@ proc VCFannotation {SVchrom SVstart SVend SVtype} {
 	    unset f
 	    lappend L_allSamples {*}[lrange $L_tmpVCF_Header 9 end]	    
 	    WriteTextInFile "$L_tmpVCF_Header" $tmpVCF3
-	    if {[catch {exec gzip $tmpVCF3} Message]} {
+	    if {[catch {exec gzip $tmpVCF3} Message]} { ; #creation of $tmpVCFgz3
 		puts "-- VCFannotation --"
 		puts "gzip $tmpVCF3"
 		puts $Message
@@ -146,6 +149,7 @@ proc VCFannotation {SVchrom SVstart SVend SVtype} {
 		# no intersection between the bed and the VCF, no SNV/Indel to load in memory
 		puts "\t\t-> no variant in the intersection"
 		file delete -force $tmpVCF3
+		file delete -force $tmpVCFgz3
 		continue
 	    } else {
 		if {[catch {exec cat $tmpVCF3 | gzip >> $tmpVCFgz3} Message]} {
@@ -335,11 +339,13 @@ proc VCFsToBED {SV_VCFfiles} {
 	set i 0
 	set VCFheaderNotPresent 1
 	while {![eof $f]} {
+	    
 	    if {$i eq "500000"} {
 		WriteTextInFile [join $L_TextToWrite "\n"] $SV_BEDfile
 		set L_TextToWrite {}	    
 		set i 0
 	    }
+	    
 	    set L [gets $f]
 	    set Ls [split $L "\t"]
 
@@ -348,10 +354,11 @@ proc VCFsToBED {SV_VCFfiles} {
 		    set VCFheaderNotPresent 0
 		    #CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  HG00096
 		    if {$g_AnnotSV(SVinputInfo)} {
-			set VCFheader "SV type\t[join [lrange $Ls 2 end] "\t"]"
+			set VCFheader "SV type\tSamples_ID\t[join [lrange $Ls 2 end] "\t"]"
 		    } else {
-			set VCFheader "SV type\t[join [lrange $Ls 3 4] "\t"]\t[join [lrange $Ls 8 end] "\t"]"
+			set VCFheader "SV type\tSamples_ID\t[join [lrange $Ls 3 4] "\t"]\t[join [lrange $Ls 8 end] "\t"]"
 		    }
+		    set L_allSamples [lrange $Ls 9 end]
 		}
 		continue
 	    }
@@ -456,12 +463,28 @@ proc VCFsToBED {SV_VCFfiles} {
 
 	    if {$svtype eq "CNV" || $svtype eq ""} {set svtype $alt}
 	
-	    
-	    if {$g_AnnotSV(SVinputInfo)} {
-		lappend L_TextToWrite "$chrom\t$pos\t$end\t$svtype\t[join [lrange $Ls 2 end] "\t"]"
+	    # Set up for the Samples_ID value
+	    set i_gt [lsearch -exact [split [lindex $Ls 8] ":"] "GT"]
+	    if {$i_gt eq -1} {
+		# If the GT is not given, AnnotSV considers that the SV is present in all the samples
+		set L_samplesid "$L_allSamples"
 	    } else {
-		lappend L_TextToWrite "$chrom\t$pos\t$end\t$svtype\t$ref\t$alt\t[join [lrange $Ls 8 end] "\t"]"
+		set L_samplesid {}
+		set isample 0
+		foreach sampleValue [lrange $Ls 9 end] {
+		    set gt [lindex [split $sampleValue ":"] $i_gt]
+		    if {[regexp "1|2|3|4|5|6|7|8|9" $gt]} {lappend L_samplesid [lindex $L_allSamples $isample]}
+		    incr isample
+		}
 	    }
+
+	    # Text to write
+	    if {$g_AnnotSV(SVinputInfo)} {
+		lappend L_TextToWrite "$chrom\t$pos\t$end\t$svtype\t[join $L_samplesid ","]\t[join [lrange $Ls 2 end] "\t"]"
+	    } else {
+		lappend L_TextToWrite "$chrom\t$pos\t$end\t$svtype\t[join $L_samplesid ","]\t$ref\t$alt\t[join [lrange $Ls 8 end] "\t"]"
+	    }
+	    
 	    # Definition of g_SVLEN:
 	    # (If not defined here, the variant length can be calculated in AnnotSV-write.tcl for some type of SV)
 	    if {$svlen ne ""} {
