@@ -354,9 +354,17 @@ proc VCFsToBED {SV_VCFfiles} {
 		    set VCFheaderNotPresent 0
 		    #CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  HG00096
 		    if {$g_AnnotSV(SVinputInfo)} {
-			set VCFheader "SV type\tSamples_ID\t[join [lrange $Ls 2 end] "\t"]"
+			if {[lsearch -exact $g_AnnotSV(outputColHeader) "Samples_ID"] eq "-1"} {
+			    set VCFheader "SV type\t[join [lrange $Ls 2 end] "\t"]"
+			} else {
+			    set VCFheader "SV type\tSamples_ID\t[join [lrange $Ls 2 end] "\t"]"
+			}
 		    } else {
-			set VCFheader "SV type\tSamples_ID\t[join [lrange $Ls 3 4] "\t"]\t[join [lrange $Ls 8 end] "\t"]"
+			if {[lsearch -exact $g_AnnotSV(outputColHeader) "Samples_ID"] eq "-1"} {
+			    set VCFheader "SV type\t[join [lrange $Ls 3 4] "\t"]\t[join [lrange $Ls 8 end] "\t"]"
+			} else {
+			    set VCFheader "SV type\tSamples_ID\t[join [lrange $Ls 3 4] "\t"]\t[join [lrange $Ls 8 end] "\t"]"
+			}
 		    }
 		    set L_allSamples [lrange $Ls 9 end]
 		}
@@ -480,9 +488,17 @@ proc VCFsToBED {SV_VCFfiles} {
 
 	    # Text to write
 	    if {$g_AnnotSV(SVinputInfo)} {
-		lappend L_TextToWrite "$chrom\t$pos\t$end\t$svtype\t[join $L_samplesid ","]\t[join [lrange $Ls 2 end] "\t"]"
+		if {[lsearch -exact $g_AnnotSV(outputColHeader) "Samples_ID"] eq "-1"} {
+		    lappend L_TextToWrite "$chrom\t$pos\t$end\t$svtype\t[join [lrange $Ls 2 end] "\t"]"
+		} else {
+		    lappend L_TextToWrite "$chrom\t$pos\t$end\t$svtype\t[join $L_samplesid ","]\t[join [lrange $Ls 2 end] "\t"]"
+		}
 	    } else {
-		lappend L_TextToWrite "$chrom\t$pos\t$end\t$svtype\t[join $L_samplesid ","]\t$ref\t$alt\t[join [lrange $Ls 8 end] "\t"]"
+		if {[lsearch -exact $g_AnnotSV(outputColHeader) "Samples_ID"] eq "-1"} {
+		    lappend L_TextToWrite "$chrom\t$pos\t$end\t$svtype\t$ref\t$alt\t[join [lrange $Ls 8 end] "\t"]"
+		} else {
+		    lappend L_TextToWrite "$chrom\t$pos\t$end\t$svtype\t[join $L_samplesid ","]\t$ref\t$alt\t[join [lrange $Ls 8 end] "\t"]"
+		}
 	    }
 	    
 	    # Definition of g_SVLEN:

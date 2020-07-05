@@ -109,8 +109,8 @@ proc configureAnnotSV {argv} {
 	    regsub "( |\t|\\*)+$" $L "" L
 	    lappend g_AnnotSV(outputColHeader) $L
 	}
-    }		
-
+    }
+    
     ##################################
     ## Load options given in arguments
     ##################################
@@ -133,6 +133,11 @@ proc configureAnnotSV {argv} {
 
 	incr i 2
 	incr j 2
+    }
+    
+    # If g_AnnotSV(outputColHeader) doesn't contain "Samples_ID", this column should not be displayed
+    if {[lsearch -exact $g_AnnotSV(outputColHeader) "Samples_ID"] eq "-1"} {
+	set g_AnnotSV(samplesidBEDcol) "-1"
     }
 
     ########################################
