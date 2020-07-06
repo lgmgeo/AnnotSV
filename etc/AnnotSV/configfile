@@ -51,7 +51,7 @@ SV type				*
 Samples_ID
 AnnotSV type			*
 Gene name			*
-NM				*
+tx				*
 CDS length			*
 tx length			*
 location			*

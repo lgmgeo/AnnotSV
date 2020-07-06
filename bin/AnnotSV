@@ -85,12 +85,13 @@ source $g_AnnotSV(tclDir)/AnnotSV-omim.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-pathogenic-NR-SV.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-promoter.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-ranking.tcl
-source $g_AnnotSV(tclDir)/AnnotSV-refGene.tcl
+source $g_AnnotSV(tclDir)/AnnotSV-genes.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-repeat.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-tad.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-userBED.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-vcf.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-write.tcl
+
 
 # Setting of g_AnnotSV(Version):
 if {![info exists g_AnnotSV(Version)]} {
@@ -105,7 +106,6 @@ if {![info exists g_AnnotSV(Version)]} {
 if {![info exists g_AnnotSV(Version)]} {
     set g_AnnotSV(Version) "X.X"
 }
-
 
 puts "AnnotSV $g_AnnotSV(Version)"
 puts ""
@@ -138,7 +138,6 @@ if {[regexp -nocase "help" $argv]} {showHelp; exit 0}
 configureAnnotSV $argv
 
 
-
 ## Depending of the VCF or BED input format:
 set testHeader 0
 if {[regexp "\\.vcf(.gz)?$" $g_AnnotSV(SVinputFile)]} {
@@ -155,8 +154,12 @@ if {[regexp "\\.vcf(.gz)?$" $g_AnnotSV(SVinputFile)]} {
     }
 }
 
-# Annotation with RefGene ?
-checkRefGeneFile
+# Annotation of genes depending of the transcripts (NM or ENST) ?
+if {$g_AnnotSV(tx) eq "NM"} {
+    checkGenesNMfile
+} else {
+    checkGenesENSTfile
+}
 
 # Annotation with Promoters?
 checkPromoterFile
@@ -245,7 +248,7 @@ puts "\tAnnotSV has been run with these arguments:"
 puts "\t******************************************"
 set lKey [array names g_AnnotSV]
 foreach key [lsort $lKey] {
-    if {[regexp "Ann|bashDir|bedFile|docDir|etcDir|extann|GHann|gnomADann|IMHann|installDir|NRSVann|outputColHeader|ranking|refGene|samplesidTSVcol|svtTSVcol|tclDir|userDir|Version$" $key]} {continue}
+    if {[regexp "Ann|bashDir|bedFile|docDir|etcDir|extann|GHann|gnomADann|IMHann|installDir|NRSVann|outputColHeader|ranking|genes|samplesidTSVcol|svtTSVcol|tclDir|userDir|Version$" $key]} {continue}
     if {$g_AnnotSV($key) eq ""} {continue}
     puts "\t-$key $g_AnnotSV($key)"
 }
@@ -253,7 +256,7 @@ puts "\t******************************************\n"
 
 
 # Annotation with the gene track 
-refGeneAnnotation
+genesAnnotation
 OrganizeAnnotation
 
 if {$testHeader} {file delete -force $BEDinputHeaderFile}

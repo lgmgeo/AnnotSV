@@ -35,7 +35,7 @@ OPTIONS
                                 (e.g.: "HP:0001156,HP:0001363,HP:0011304")
 
 -metrics:                       Changing numerical values from frequencies to us or fr metrics (e.g. 0.2 or 0,2)
-                                Range values: us (default) or fr
+                                Values: us (default) or fr
 
 -minTotalNumber:                Minimum number of individuals tested to consider a benign SV for the ranking
                                 Range values: [100-1000], default = 500
@@ -72,7 +72,7 @@ OPTIONS
                                 Gzipped VCF files are supported as well as regular expression
 
 -snvIndelPASS:                  Boolean. To only use variants from VCF input files that passed all filters during the calling (FILTER column value equal to PASS)
-                                Range values: 0 (default) or 1
+                                Values: 0 (default) or 1
 
 -snvIndelSamples:               To specifiy the sample names from the VCF files defined from the -vcfFiles option
                                 Default: use all samples from the VCF files
@@ -81,13 +81,16 @@ OPTIONS
                                 Gzipped VCF file is supported 
 
 -SVinputInfo:                   To extract the additional SV input fields and insert the data in the output file
-                                Range values: 1 (default) or 0
+                                Values: 1 (default) or 0
 
 -SVminSize:                     SV minimum size (in bp)
                                 Default = 50
 
 -svtBEDcol:                     Number of the column describing the SV type (DEL, DUP) if the input SV file is a BED
                                 Range values: [4-[, default = -1 (value not given)
+
+-tx:                            Origin of the transcripts (NCBI or ENSEMBL)
+                                Values: NM (default) or ENST
 
 -txFile:                        Path of a file containing a list of preferred genes transcripts to be used in priority during the annotation
                                 (Preferred genes transcripts names should be tab or space separated)

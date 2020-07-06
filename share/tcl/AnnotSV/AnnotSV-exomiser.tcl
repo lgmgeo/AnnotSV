@@ -176,7 +176,7 @@ proc searchforGeneID {geneName} {
 # If the request failed, return ""
 # else return "$geneBasedTmp"
 #
-# INFO: This proc is run from "AnnotSV-refGene.tcl"
+# INFO: This proc is run from "AnnotSV-genes.tcl"
 proc runExomiser {L_Genes L_HPO} {
     
     global g_AnnotSV

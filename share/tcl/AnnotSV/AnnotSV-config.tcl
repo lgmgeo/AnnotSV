@@ -70,6 +70,7 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(SVminSize)                "50"
     set g_AnnotSV(svtBEDcol)                "-1"
     set g_AnnotSV(svtTSVcol)                "-1" ;# not given in parameter
+    set g_AnnotSV(tx)                       "NM"
     set g_AnnotSV(txFile)                   ""
     set g_AnnotSV(typeOfAnnotation)         "both"
     set g_AnnotSV(ranking)                  "1"
@@ -78,7 +79,7 @@ proc configureAnnotSV {argv} {
     ###########################
     ## Load config file options
     ###########################
-    set lOptionsOk "annotationsDir bcftools bedtools candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering rankOutput reciprocal samplesidBEDcol snvIndelFiles snvIndelPASS SVinputFile SVinputInfo SVminSize svtBEDcol txFile typeOfAnnotation snvIndelSamples"
+    set lOptionsOk "annotationsDir bcftools bedtools candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering rankOutput reciprocal samplesidBEDcol snvIndelFiles snvIndelPASS SVinputFile SVinputInfo SVminSize svtBEDcol tx txFile typeOfAnnotation snvIndelSamples"
     set configFile "$g_AnnotSV(etcDir)/configfile"
     if {[file exists "./configfile"]} {
 	set configFile "./configfile"
@@ -290,6 +291,15 @@ proc configureAnnotSV {argv} {
 	    puts "############################################################################"	
 	    exit 2
 	}
+    }
+
+    # tx: It must be "NM" or "ENST"
+    if {$g_AnnotSV(tx) ne "NM" && $g_AnnotSV(tx) ne "ENST"} {
+	puts "############################################################################"
+	puts "Bad option value: -tx = $g_AnnotSV(tx)"
+	puts "Should be \"NM\" or \"ENST\""
+	puts "############################################################################"
+	exit 2
     }
     
     ## txFile: It must be an existing file 

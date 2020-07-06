@@ -525,7 +525,7 @@ proc VCFsToBED {SV_VCFfiles} {
     }
 
     # Bedfile should be sorted and should not have "chr" in the first column
-    # -> This treatment will be done in the 'refGeneAnnotation' proc
+    # -> This treatment will be done in the 'genesAnnotation' proc
 
     ## Bedfile: no SV to annotate if it is an empty file, or a file with only SNV/indel
     if {[isAnEmptyFile $SV_BEDfile]} {

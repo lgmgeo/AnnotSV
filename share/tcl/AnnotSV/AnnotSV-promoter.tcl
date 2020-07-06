@@ -29,13 +29,13 @@ proc checkPromoterFile {} {
 
     ## Check if the promoters file has been formatted
     #################################################
-    set refgeneDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/RefGene/$g_AnnotSV(genomeBuild)"
+    set genesDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes/$g_AnnotSV(genomeBuild)"
     set promoterDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/FtIncludedInSV/Promoter/$g_AnnotSV(genomeBuild)"
 
     if {![file exists $promoterDir]} {file mkdir $promoterDir}
 
-    set refgeneFileFormatted "$refgeneDir/refGene.sorted.bed"
-    set promoterFormatted "$promoterDir/promoter.$g_AnnotSV(promoterSize)bp.sorted.bed"
+    set genesFileFormatted "$genesDir/genes.$g_AnnotSV(tx).sorted.bed"
+    set promoterFormatted "$promoterDir/promoter.$g_AnnotSV(promoterSize)bp.$g_AnnotSV(tx).sorted.bed"
     set g_AnnotSV(promAnn) 1
     if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "promoters"] eq -1} {
 	set g_AnnotSV(promAnn) 0; return
@@ -44,7 +44,7 @@ proc checkPromoterFile {} {
     if {![file exists $promoterFormatted]} {
 	
 	# Creation of the promoterFormatted 
-	foreach L [LinesFromFile $refgeneFileFormatted] {
+	foreach L [LinesFromFile $genesFileFormatted] {
 	    # Line example:
 	    # 1       17368   17436   -       MIR6859-2       NR_107062       17436   17436   17368,  17436,
 	    set Ls [split $L "\t"]	    
