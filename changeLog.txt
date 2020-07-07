@@ -14,6 +14,7 @@ For more details, please see the README file.
 	- Add of the "-tx" option to report either NM or ENST transcripts (NCBI or ENSEMBL) 
 	  => Rename the transcript feature from "NM" to "tx"
 	  => Rename the genes directory from "RefGene" to "Genes"
+	- Add bugfix concerning the CDS length and tx length calculation
 
 July 05, 2020: AnnotSV version 2.3.3
 	- Update of the annotations (cf the "Versions of the annotations sources" section of the README)
