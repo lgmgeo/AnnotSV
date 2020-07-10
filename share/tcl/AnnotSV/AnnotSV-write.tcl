@@ -37,15 +37,8 @@ proc OrganizeAnnotation {} {
 
     # OUTPUT
     ###############
-    set tmpFullAndSplitBedFile "$g_AnnotSV(outputDir)/$g_AnnotSV(outputFile).tmp" ;# created in AnnotSV-genes.tcl
+    set FullAndSplitBedFile "$g_AnnotSV(outputDir)/$g_AnnotSV(outputFile).tmp" ;# created in AnnotSV-genes.tcl
     set outputFile "$g_AnnotSV(outputDir)/$g_AnnotSV(outputFile)" 
-
-
-    # Check the -svtBEDcol and -samplesidBEDcol options
-    # Create the -svtTSVcol variable
-    #####################################################################################
-    checksvtBEDcol $g_AnnotSV(bedFile)
-    checksamplesidBEDcol $g_AnnotSV(bedFile)
 
 
     ################### Writing of the header (first line of the output) ####################
@@ -318,7 +311,7 @@ proc OrganizeAnnotation {} {
     ##################################################################################
     puts "\n...listing of the annotations to realized ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
     puts "\t...Genes annotation" 
-    puts "\t(with $g_AnnotSV(genes))"
+    puts "\t(with $g_AnnotSV(genesFile))"
     ####### "Genes-based annotations"
     puts "\t...Genes-based annotations"
     if {$g_AnnotSV(genesBasedAnn)} {
@@ -375,7 +368,7 @@ proc OrganizeAnnotation {} {
     set g_AnnotSV(fullAndSplitBedFile) "$g_AnnotSV(outputDir)/[file tail $g_AnnotSV(bedFile)].users.bed"
     file delete -force $g_AnnotSV(fullAndSplitBedFile)
     set L_UsersText {}
-    set f [open "$tmpFullAndSplitBedFile"]
+    set f [open "$FullAndSplitBedFile"]
     while {! [eof $f]} {
         set L [gets $f]
 	if {$L eq ""} {continue}
@@ -426,7 +419,7 @@ proc OrganizeAnnotation {} {
     # Parse
     ###############
     set L_TextToWrite {}
-    set f [open "$tmpFullAndSplitBedFile"]
+    set f [open "$FullAndSplitBedFile"]
     while {! [eof $f]} {
         set L [gets $f]
 	if {$L eq ""} {continue}
@@ -991,7 +984,7 @@ proc OrganizeAnnotation {} {
     WriteTextInFile [join $L_TextToWrite "\n"] "$outputFile"
 
     ## Delete temporary file
-    file delete -force $tmpFullAndSplitBedFile
+    file delete -force $FullAndSplitBedFile
     file delete -force $g_AnnotSV(bedFile) ; # => ".formatted.bed" tmp file
     file delete -force $g_AnnotSV(fullAndSplitBedFile)
     regsub -nocase "(.formatted)?.bed$" $g_AnnotSV(bedFile) ".breakpoints.bed" tmpBreakpointsFile

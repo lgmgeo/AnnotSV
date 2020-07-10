@@ -15,10 +15,12 @@ For more details, please see the README file.
 	  => Rename the transcript feature from "NM" to "tx"
 	  => Rename the genes directory from "RefGene" to "Genes"
 	- Add bugfix concerning the CDS length and tx length calculation
+	- Add bugfix concerning annotation of 2 SV with the same coordinates but 2 different types (DEL, DUP...)
 
 July 05, 2020: AnnotSV version 2.3.3
 	- Update of the annotations (cf the "Versions of the annotations sources" section of the README)
 	- Use of the “bcftools” toolset (Li, 2011) to fix a bug with multiallelic sites from VCF input file(s)
+	  => bcftools is now required if using VCF input file(s)
 	- Add of the "Samples_ID" feature (report of the sample names for which the SV was called)
 	- Include the new "-externalGeneFiles" option to pass external gene file(s) path in the command line
 	- Integration of 4 Tcl packages (http/tar/csv/json) in the AnnotSV distribution

@@ -110,7 +110,7 @@ proc checkGenesNMfile {} {
     
     # DISPLAY:
     ##########
-    set g_AnnotSV(genes) $genesFileFormatted
+    set g_AnnotSV(genesFile) $genesFileFormatted
     
 }
 
@@ -136,7 +136,7 @@ proc checkGenesENSTfile {} {
     
     # DISPLAY:
     ##########
-    set g_AnnotSV(genes) $GenesENSTfileFormatted
+    set g_AnnotSV(genesFile) $GenesENSTfileFormatted
 }
 
 
@@ -146,13 +146,19 @@ proc checkGenesENSTfile {} {
 ##   - the one with the most of "bp from CDS" (=CDSlength)
 ##   - if x transcript with same "bp from CDS", the one with the most of "bp from UTR, exon, intron" (=txLength)
 ##
-## Creation of tmpFullAndSplitBedFile ($g_AnnotSV(outputDir)/$g_AnnotSV(outputFile).tmp)
+## Creation of FullAndSplitBedFile ($g_AnnotSV(outputDir)/$g_AnnotSV(outputFile).tmp)
 ## -> formatted and sorted
 proc genesAnnotation {} {
 
     global g_AnnotSV
     global g_Lgenes
 
+
+    # Check the -svtBEDcol and -samplesidBEDcol options
+    # Create the -svtTSVcol variable
+    #####################################################################################
+    checksvtBEDcol $g_AnnotSV(bedFile)
+    checksamplesidBEDcol $g_AnnotSV(bedFile)
 
     # Bedfile should be sorted and should not have "chr" in the first column
     ########################################################################
@@ -203,31 +209,31 @@ proc genesAnnotation {} {
 
     # OUTPUT:
     ###############
-    set tmpFullAndSplitBedFile "$g_AnnotSV(outputDir)/$g_AnnotSV(outputFile).tmp"
-    set linesSplitByGene_File "$tmpFullAndSplitBedFile.tmp"
-    file delete -force $tmpFullAndSplitBedFile
-    file delete -force $linesSplitByGene_File
+    set FullAndSplitBedFile "$g_AnnotSV(outputDir)/$g_AnnotSV(outputFile).tmp"
+    set splitBedFile "$FullAndSplitBedFile.tmp"
+    file delete -force $FullAndSplitBedFile
+    file delete -force $splitBedFile
 
 
     # Intersect of the input SV bedfile with the genes annotations
     ##############################################################
     ## -> Creation of the split annotations
-    if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(bedFile) -b $g_AnnotSV(genes) -wa -wb > $linesSplitByGene_File} Message]} {
+    if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(bedFile) -b $g_AnnotSV(genesFile) -wa -wb > $splitBedFile} Message]} {
 	puts "-- genesAnnotation --"
-	puts "$g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(bedFile) -b $g_AnnotSV(genes) -wa -wb > $linesSplitByGene_File"
+	puts "$g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(bedFile) -b $g_AnnotSV(genesFile) -wa -wb > $splitBedFile"
 	puts "$Message"
 	puts "Exit with error"
 	exit 2
     }
-    if {[file size $linesSplitByGene_File] eq 0} {
+    if {[file size $splitBedFile] eq 0} {
 	puts "\tno intersection between SV and gene annotation"
 	set n 0
 	while {$n < [llength $L_Bed]} {
-	    WriteTextInFile "[lindex $L_Bed $n]\tfull" "$tmpFullAndSplitBedFile"
+	    WriteTextInFile "[lindex $L_Bed $n]\tfull" "$FullAndSplitBedFile"
 	    incr n
 	}
 	## Delete temporary file
-	file delete -force $linesSplitByGene_File
+	file delete -force $splitBedFile
 	return
     }
 
@@ -245,38 +251,64 @@ proc genesAnnotation {} {
 	}
     }
 
-    # Parse
-    ###############
+    # Parse the "splitBedFile" and create the "FullAndSplitBedFile"
+    ###############################################################
     set L_allGenesOverlapped {}
-    set L "[FirstLineFromFile $linesSplitByGene_File]"
+    set L_genes {}
+    set L "[FirstLineFromFile $splitBedFile]"
     set Ls [split $L "\t"]
     set splitSVleft [lindex $Ls 1]
     set splitSVright [lindex $Ls 2]
-    # SV/oldSV defined with: "chrom, start, end":
-    set oldSplitSV "[join [lrange $Ls 0 2] "\t"]"
-    set L_genes {}
+    
+    # oldsplitSV ("chrom, start, end, SVtype")
+    if {$g_AnnotSV(svtBEDcol) ne "-1"} {
+	set SVtype "\t[lindex $Ls "$g_AnnotSV(svtBEDcol)"]"
+    } else {
+	set SVtype ""
+    }
+    set shortOldSplitSV "[join [lrange $Ls 0 2] "\t"]"
+    set oldSplitSV "[join [lrange $Ls 0 2] "\t"]$SVtype"
+    
+    # SVfromBED ("chrom, start, end, SVtype")
     set n 0
-exit
+    set Ls_fromBED "[split [lindex $L_Bed $n] "\t"]"
+    if {$g_AnnotSV(svtBEDcol) ne "-1"} {
+	set SVtypeFromBED "\t[lindex $Ls_fromBED "$g_AnnotSV(svtBEDcol)"]"
+    } else {
+	set SVtypeFromBED ""
+    }
+    set SVfromBED "[join [lrange $Ls_fromBED 0 2] "\t"]$SVtypeFromBED"
+    
+    # We have several annotations for 1 SV: 1 by gene.
+    #
     # Keep only 1 transcript by gene:
     #   - the one selected by the user with the "-txFile" option
     #   - the one with the most of "bp from CDS" (=CDSlength)
     #   - if x transcript with same "bp from CDS", the one with the most of "bp from UTR, exon, intron" (=txLength)
-    # We have several annotations for 1 SV: 1 by gene.
-    set f [open $linesSplitByGene_File]
+    set f [open $splitBedFile]
     while {![eof $f]} {
-
 	set L [gets $f]
 	if {$L eq ""} {continue}
 	set Ls [split $L "\t"]
-	set splitSV "[join [lrange $Ls 0 2] "\t"]"
-	if {$splitSV ne $oldSplitSV} {
-	    while {![regexp "^$splitSV" [lindex $L_Bed $n]]} {
-		# Insertion of the "full length" SV line (not present in the $linesSplitByGene_File file, if not covering a gene)
-		WriteTextInFile "[lindex $L_Bed $n]\tfull" "$tmpFullAndSplitBedFile"
-		if {[join [lrange [lindex $L_Bed $n] 0 2] "\t"] eq $oldSplitSV} {
-		    # Treatment of the "split by gene" SV line
-		    set L_genes [lsort -unique $L_genes]
-		    set g_Lgenes($oldSplitSV) [join $L_genes "/"]
+	
+	# splitSV ("chrom, start, end, SVtype")
+	if {$g_AnnotSV(svtBEDcol) ne "-1"} {
+	    set SVtype "\t[lindex $Ls "$g_AnnotSV(svtBEDcol)"]"
+	} else {
+	    set SVtype ""
+	}
+	set splitSV "[join [lrange $Ls 0 2] "\t"]$SVtype"
+	
+	if {$splitSV ne $oldSplitSV} {;# new annotated SV line (all the split lines are done for the oldSV) => we write all information about the oldSV
+	    while {$SVfromBED ne $splitSV} {
+		# Writing of the "full" SV line (not present in the $splitBedFile file, if not covering a gene)
+		WriteTextInFile "[lindex $L_Bed $n]\tfull" "$FullAndSplitBedFile"
+		
+		# Writing of 1 "split" line...
+		if {$SVfromBED eq $oldSplitSV} {
+		    set L_genes [lsort -unique $L_genes]		    
+		    set g_Lgenes($shortOldSplitSV) [join $L_genes "/"]
+		    # ...for each gene overlapped by the SV
 		    foreach gene $L_genes {
 			set bestCDSl -1
 			set bestTxL -1
@@ -291,19 +323,27 @@ exit
 				}
 			    }
  			}
-			WriteTextInFile "$bestAnn\t$bestCDSl\t$bestTxL\tsplit" "$tmpFullAndSplitBedFile"
+			WriteTextInFile "$bestAnn\t$bestCDSl\t$bestTxL\tsplit" "$FullAndSplitBedFile"
 		    }
 		    set splitSVleft [lindex $Ls 1]
 		    set splitSVright [lindex $Ls 2]
 		    unset L_annot
 		    unset L_txLength
 		    unset L_CDSlength
-			# check the catch
+		    # check the catch
 		    catch {unset Finish}
 		    set L_genes {}	     
 		    set oldSplitSV "$splitSV"
+		    regexp "\[^\t\]+\t\[^\t\]+\t\[^\t\]+" $oldSplitSV shortOldSplitSV
 		}
 		incr n
+		set Ls_fromBED "[split [lindex $L_Bed $n] "\t"]"
+		if {$g_AnnotSV(svtBEDcol) ne "-1"} {
+		    set SVtypeFromBED "\t[lindex $Ls_fromBED "$g_AnnotSV(svtBEDcol)"]"
+		} else {
+		    set SVtypeFromBED ""
+		}
+		set SVfromBED "[join [lrange $Ls_fromBED 0 2] "\t"]$SVtypeFromBED"
 	    }
 	}
 	set txName [lindex $Ls end-4]
@@ -311,6 +351,7 @@ exit
 	lappend L_allGenesOverlapped $gene
 
 	# Look if the annotation line of a user selected transcript has already been registered for this gene
+	# If yes, no need to recalculate the txStart, txEnd, CDSstart...
 	if {[info exists Finish($gene)]} {continue}
 
 	# No preferred transcript annotation registered at this step, continue the selection with the CDS/Tx lengths
@@ -367,19 +408,17 @@ exit
     }
     close $f
 
-
     # Treatment for the last SV of the file
     ########################################
+    
+    # Writing of the "full" SV line (not present in the $splitBedFile file, if not covering a gene)
     # Insertion of the "full length" SV line
-    while {![regexp "^$splitSV" [lindex $L_Bed $n]]} {
-	WriteTextInFile "[lindex $L_Bed $n]\tfull" "$tmpFullAndSplitBedFile"
-	incr n
-    }
-    WriteTextInFile "[lindex $L_Bed $n]\tfull" "$tmpFullAndSplitBedFile"
+    WriteTextInFile "[lindex $L_Bed $n]\tfull" "$FullAndSplitBedFile"
     incr n
+
     # Treatment of the "split by gene" SV line
     set L_genes [lsort -unique $L_genes]
-    set g_Lgenes($oldSplitSV) [join $L_genes "/"]
+    set g_Lgenes($shortOldSplitSV) [join $L_genes "/"]
     foreach gene $L_genes {
 	set bestCDSl -1
 	set bestTxL -1
@@ -394,16 +433,17 @@ exit
 		}
 	    }
 	}
-	WriteTextInFile "$bestAnn\t$bestCDSl\t$bestTxL\tsplit" "$tmpFullAndSplitBedFile"
+	WriteTextInFile "$bestAnn\t$bestCDSl\t$bestTxL\tsplit" "$FullAndSplitBedFile"
     }
+    
     # Insertion of the last "full length" SV lines
     while {$n < [llength $L_Bed]} {
-	WriteTextInFile "[lindex $L_Bed $n]\tfull" "$tmpFullAndSplitBedFile"
+	WriteTextInFile "[lindex $L_Bed $n]\tfull" "$FullAndSplitBedFile"
 	incr n
     }
 
     ## Delete temporary file
-    file delete -force $linesSplitByGene_File
+    file delete -force $splitBedFile
 
     ## Preparation of the phenotype-driven analysis (Exomiser)
     #puts "\t...[llength $L_allGenesOverlapped] overlapped genes"
