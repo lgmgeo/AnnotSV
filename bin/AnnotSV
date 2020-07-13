@@ -68,6 +68,7 @@ set auto_path [linsert $::auto_path 0 $g_AnnotSV(tclDir)/tcllib]
 source $g_AnnotSV(tclDir)/AnnotSV-1000g.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-clingen.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-config.tcl
+source $g_AnnotSV(tclDir)/AnnotSV-cosmic.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-ddd.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-dgv.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-exomiser.tcl
@@ -208,6 +209,9 @@ checkRepeatFile
 
 # Annotation with GeneHancer?
 checkGHfiles
+
+# Annotation with COSMIC?
+checkCOSMICfile
 
 # Users BED regions annotations files (from $ANNOTSV/share/AnnotSV/Annotations_$g_AnnotSV(organism)/Users/GRCh*/*ncludedIn*/*.bed)
 checkUsersBED

@@ -53,6 +53,9 @@ proc OrganizeAnnotation {} {
 	} else {
 	    set g_AnnotSV(formatColNumber) 6
 	}
+	if {[lsearch -exact $g_AnnotSV(outputColHeader) "Samples_ID"] ne "-1"} {
+	    incr g_AnnotSV(formatColNumber) +1
+	}
 	set g_AnnotSV(SVinputInfo) 1 ; # The created bedfile contains only the info to report
     } else {
 	# SVinputFile = BED

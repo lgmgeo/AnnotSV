@@ -92,6 +92,8 @@ GHtype
 GHgene_elite			*
 GHgene_not_elite		*
 GHtissue
+COSMIC_ID
+COSMIC_MUT_TYP
 TADcoordinates
 ENCODEexperiments
 GCcontent_left
