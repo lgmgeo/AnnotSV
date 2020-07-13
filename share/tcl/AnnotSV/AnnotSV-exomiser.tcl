@@ -145,10 +145,18 @@ proc searchforGeneID {geneName} {
 	# A1BG-AS1        503538  NCRNA00181      FLJ23569
 	foreach L [LinesFromFile "$NCBIgeneDir/results.txt"] {
 	    set Ls [split $L "\t"]
-	    set Approved_symbol [lindex $Ls 0]
-	    set NCBI_gene_ID [lindex $Ls 1]
-	    set Previous_symbol [lindex $Ls 2]
-	    set Alias_symbol [lindex $Ls 3]
+	    if {[regexp "Approved symbol" $L]} {
+		set i_approuved [lsearch -exact $Ls "Approved symbol"]
+		set i_ncbi [lsearch -exact $Ls "NCBI gene ID"]
+		set i_previous [lsearch -exact $Ls "Previous symbol"]
+		set i_alias [lsearch -exact $Ls "Alias symbol"]
+		continue
+	    }
+	    set Approved_symbol [lindex $Ls $i_approuved]
+	    set NCBI_gene_ID [lindex $Ls $i_ncbi]
+	    set Previous_symbol [lindex $Ls $i_previous]
+	    set Alias_symbol [lindex $Ls $i_alias]
+	    
 	    set geneID($Approved_symbol) $NCBI_gene_ID
 	    set geneID($Previous_symbol) $NCBI_gene_ID
 	    set geneID($Alias_symbol) $NCBI_gene_ID
