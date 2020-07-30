@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.3.3                                                                                            #
+# AnnotSV 2.4                                                                                              #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
@@ -11,25 +11,26 @@
 For more details, please see the README file.
 
 
-	- Add of the "-tx" option to report either NM or ENST transcripts (NCBI or ENSEMBL) 
-	  => Rename the transcript feature from "NM" to "tx"
-	  => Rename the genes directory from "RefGene" to "Genes"
-	- Add bugfix concerning the CDS length and tx length calculation
-	- Add bugfix concerning annotation of 2 SV with the same coordinates but 2 different types (DEL, DUP...)
-
-July 05, 2020: AnnotSV version 2.3.3
-	- Update of the annotations (cf the "Versions of the annotations sources" section of the README)
-	- Use of the “bcftools” toolset (Li, 2011) to fix a bug with multiallelic sites from VCF input file(s)
-	  => bcftools is now required if using VCF input file(s)
+July 30, 2020: AnnotSV version 2.4
+	- Update of the annotations sources (see the corresponding README section)
+	- Add of the COSMIC SV dataset (Cancer)
+	- AnnotSV now reports either RefSeq or Ensembl gene transcripts. Use the new "-tx" option to report either NM or ENST transcripts
+	  => The « NM » column has been renamed « tx »
+	  => The “RefGene” directory has been renamed "Genes"
 	- Add of the "Samples_ID" feature (report of the sample names for which the SV was called)
+	  => Can be disabled in the AnnotSV configfile
 	- Include the new "-externalGeneFiles" option to pass external gene file(s) path in the command line
 	- Integration of 4 Tcl packages (http/tar/csv/json) in the AnnotSV distribution
+	- Use of the “bcftools” toolset (Li, 2011) to fix a bug with multiallelic sites from VCF input file(s)
+	  => bcftools is now required if using VCF input file(s)
+	- Fix the output columns order not being the same depending on the system environment
 	- "1000g_AF" and "1000g_max_AF" features are not reported anymore
+	- Add bugfix concerning the CDS length and tx length calculation
+	- Add bugfix concerning annotation of 2 SV with the same coordinates but from different types (DEL, DUP...)
 	- Add bugfix with gzipped VCF files as input
-	- Fix the output columns order - whatever the machines
 	- Add bugfix concerning the running of bash scripts (illegal use of | or |& in command)
 	- Add bugfix concerning the use of the "-snvIndelFiles" and "-candidateSnvIndelSamples" options
-	- Add bugfix for the exomiser use
+	- Add bugfix to the Exomiser module
 	- Add bugfix concerning the AnnotSV installation when PREFIX is not the current directory
 	- Add bugfix concerning the use of a big "candidateGenesFile"
 

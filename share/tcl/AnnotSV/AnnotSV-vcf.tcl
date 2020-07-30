@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.3.3                                                                                            #
+# AnnotSV 2.4                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -374,7 +374,9 @@ proc VCFsToBED {SV_VCFfiles} {
 	    
 	    if {$VCFheaderNotPresent} {
 		set VCFheaderNotPresent 0
-		puts "WARNING:\n$VCFfile: no VCF header line (prefixed with \"#CHROM\"). Check your VCF.\n"
+		puts "ERROR:\n$VCFfile: no VCF header line (prefixed with \"#CHROM\"). Check your VCF."
+		puts "Exit with error\n"
+		exit 2
 	    }
 
 	    # Consider only the SV (not the SNV/indel)

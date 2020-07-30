@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.3.3                                                                                            #
+# AnnotSV 2.4                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -108,7 +108,7 @@ proc promoterAnnotation {SVchrom SVstart SVend} {
 
 
     set promoterDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/FtIncludedInSV/Promoter/$g_AnnotSV(genomeBuild)"
-    set promoterBEDfile "$promoterDir/promoter.$g_AnnotSV(promoterSize)bp.sorted.bed"
+    set promoterBEDfile "$promoterDir/promoter.$g_AnnotSV(promoterSize)bp.$g_AnnotSV(tx).sorted.bed"
     
     if {![info exists promoterText(DONE)]} {
 	

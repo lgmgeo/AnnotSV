@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.3.3                                                                                            #
+# AnnotSV 2.4                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -34,7 +34,7 @@ proc checkgnomADfile {} {
     ## Check if gnomAD file has been downloaded then formatted
     #########################################################
     set gnomADdir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/SVincludedInFt/gnomAD/$g_AnnotSV(genomeBuild)"
-    set gnomADfileDownloaded [glob -nocomplain "$gnomADdir/gnomad_v2_sv.sites.bed.gz"]
+    set gnomADfileDownloaded [glob -nocomplain "$gnomADdir/gnomad_v2.*_sv.sites.bed.gz"]
     set gnomADfileFormattedAndSorted  [glob -nocomplain "$gnomADdir/*_gnomAD_DUP_SV.sorted.bed"]
 
     if {$gnomADfileDownloaded eq "" && $gnomADfileFormattedAndSorted eq ""} {
@@ -91,12 +91,12 @@ proc checkgnomADfile {} {
 	    if {$L eq ""} {continue}
 	    set Ls [split $L "\t"] 
 
-	    if {[regexp "^#CHROM" $L]} {
-		set i_chrom      [lsearch -exact $Ls "#CHROM"];       if {$i_chrom == -1} {puts "Bad header line syntax. #CHROM column not found - Exit with error"; exit 2}
-		set i_start      [lsearch -exact $Ls "START"];        if {$i_start == -1} {puts "Bad header line syntax. START column not found - Exit with error"; exit 2}
-		set i_end        [lsearch -exact $Ls "END"];          if {$i_end == -1} {puts "Bad header line syntax. END column not found - Exit with error"; exit 2}
-		set i_svid       [lsearch -exact $Ls "NAME"];         if {$i_svid == -1} {puts "Bad header line syntax. NAME column not found - Exit with error"; exit 2}
-		set i_svtype     [lsearch -exact $Ls "SVTYPE"];       if {$i_svtype == -1} {puts "Bad header line syntax. SVTYPE column not found - Exit with error"; exit 2}
+	    if {[regexp "^#chrom" $L]} {
+		set i_chrom      [lsearch -exact $Ls "#chrom"];       if {$i_chrom == -1} {puts "Bad header line syntax. #CHROM column not found - Exit with error"; exit 2}
+		set i_start      [lsearch -exact $Ls "start"];        if {$i_start == -1} {puts "Bad header line syntax. START column not found - Exit with error"; exit 2}
+		set i_end        [lsearch -exact $Ls "end"];          if {$i_end == -1} {puts "Bad header line syntax. END column not found - Exit with error"; exit 2}
+		set i_svid       [lsearch -exact $Ls "name"];         if {$i_svid == -1} {puts "Bad header line syntax. NAME column not found - Exit with error"; exit 2}
+		set i_svtype     [lsearch -exact $Ls "svtype"];       if {$i_svtype == -1} {puts "Bad header line syntax. SVTYPE column not found - Exit with error"; exit 2}
 		set i_an         [lsearch -exact $Ls "AN"];           if {$i_an == -1} {puts "Bad header line syntax. AN column not found - Exit with error"; exit 2}
 		set i_nhet       [lsearch -exact $Ls "N_HET"];        if {$i_nhet == -1} {puts "Bad header line syntax. N_HET column not found - Exit with error"; exit 2}
 		set i_nhomalt    [lsearch -exact $Ls "N_HOMALT"];     if {$i_nhomalt == -1} {puts "Bad header line syntax. N_HOMALT column not found - Exit with error"; exit 2}
@@ -110,11 +110,13 @@ proc checkgnomADfile {} {
 	    set end        [lindex $Ls $i_end]
 	    set svid       [lindex $Ls $i_svid]
 	    set SVTYPE     [lindex $Ls $i_svtype]
+	    regsub ":.+" $SVTYPE "" SVTYPE
+	    
 	    # WARNING:
 	    # - MCNV have multiple coma-separated-values for nhet, nhomalt, af and popmaxaf... 
 	    #   => We need to keep only 1 value (for the ranking)
-	    # - Look at the "gnomad_v2_sv.sites.bed" file:
-	    #   445858 lines of which only 1148 are MCNV
+	    # - "gnomad_v2_sv.sites.bed"      => 445858 lines of which only 1148 are MCNV
+	    #   "gnomad_v2.1_sv.sites.bed.gz" => 387478 lines of which only 1108 are MCNV (<=> "CN=0")
 	    #   => We remove these SV from the annotation files
 	    #
 	    # if {$SVTYPE == "MCNV"} {set SVTYPE "DUP"} ;# MCNV = multiallelic CNV = CNV2, CNV3...
@@ -159,6 +161,8 @@ proc checkgnomADfile {} {
 }
 
 
+# WARNING for the INS:
+# In v2.1, end(INS)-start(INS)=2  ; It was not always the case in v2.0 ...
 
 # Return the overlapped SV annotation only with the gnomAD SV of the same SVtype
 # If no SVtype is provided, no gnomAD annotation is returned (but gnomAD SV ID of different SVtype are stored in GD_ID_others)
@@ -223,7 +227,7 @@ proc gnomADannotation {SVchrom SVstart SVend SVtype L_i} {
 		set gnomAD_length [expr {$gnomAD_end-$gnomAD_start}]
 		set SVtoAnn_length [expr {$SVtoAnn_end-$SVtoAnn_start}]
 		# The gnomAD SV is an insertion or a breakpoint
-		if {$gnomAD_length<1} {
+		if {$gnomAD_length<1} { ;# In gnomad v2.1, all INS are defined with end = start + 2. This line was used with gnomad v2.1
 		    set gnomAD_length 1
 		} 	
 		# The SV to annotate is an insertion or a breakpoint
