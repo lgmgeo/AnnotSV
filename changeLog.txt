@@ -11,6 +11,9 @@
 For more details, please see the README file.
 
 
+	- Add bugfix for gnomAD annotations
+	- Add the in-frame / out-of-frame information from overlapping genes (frameshift column)
+
 July 30, 2020: AnnotSV version 2.4
 	- Update of the annotations sources (see the corresponding README section)
 	- Add of the COSMIC SV dataset (Cancer)

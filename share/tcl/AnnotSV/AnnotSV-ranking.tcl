@@ -315,29 +315,37 @@ proc SVranking {L_annotations ref alt} {
     }
 
     ## category 4 = likely pathogenic 
-    ##           SV that overlaps a morbid gene (or its enhancer) (with at least 1bp)
+    ##           SV that overlaps a "dosage sensitive" morbid gene (or its enhancer) (with at least 1bp)
     ##           or for a del: SV that overlaps a gene (or its enhancer) with a pLI > 0.9 or with HI_CGscore of 3 or 2
     ##           or for a dup: SV that overlaps a gene (or its enhancer) with a TriS_CGscore of 3 or 2
     ###################################################################
 
-    # Check if a SV overlaps a morbid gene 
+    # Clingen, score = 40 : "Evidence suggests the gene is not dosage sensitive"
+    # Not a dosage sensitive gene:
+    #   >> DEL with HI_CGscore = 40
+    #   >> DUP with TriS_CGscore = 40
+    set notADosageSensitiveGene "unknown"
+
+    # Check if a SV overlaps a morbid gene
     set morbidGenes [lindex $Ls $g_i(morbidGenes)]
     if {[regexp "yes" $morbidGenes]} {
-	set ranking "4"	
-	lappend L_rankingExplanations "$AnnotSV_ID\t$AnnotSVtype\t$genes\t$ranking\tmorbid gene overlapped"
-	return $ranking
+        set ranking "4"
+        lappend L_rankingExplanations "$AnnotSV_ID\t$AnnotSVtype\t$genes\t$ranking\tmorbid gene overlapped"
+        return $ranking
     }
-    # Check if a SV overlaps an enhancer associated to a morbid gene 
+    # Check if a SV overlaps an enhancer associated to a morbid gene
     if {[lindex $enhancer 0] eq "MorbidGenes"} {
-	set ranking "4"	
-	lappend L_rankingExplanations "$AnnotSV_ID\t$AnnotSVtype\t$genes\t$ranking\tenhancer of a morbid gene overlapped ([lrange $enhancer 1 end])"
-	return $ranking
+        set ranking "4"
+        lappend L_rankingExplanations "$AnnotSV_ID\t$AnnotSVtype\t$genes\t$ranking\tenhancer of a morbid gene overlapped ([lrange $enhancer 1 end])"
+        return $ranking
     }
-    
+
     # Check for a del:
     regsub "," [lindex $Ls $g_i(pLI)] "." pLI; # needed with -metrics=fr 
     set HI_CGscore [lindex $Ls $g_i(HI_CGscore)]
     if {[regexp -nocase "Del|Loss|<CN0>" $SVtype]} {
+	# Check if it is not a dosage sensitive gene    
+	if {$HI_CGscore eq "40"} {set notADosageSensitiveGene "yes"}
 	# Check SV that overlap a gene with a pLI > 0.9 or with HI_CGscore of 3 or 2
 	if {$pLI > 0.9} {    ; # {"">0.9} is false; code ok
 	    set ranking "4"	
@@ -359,6 +367,8 @@ proc SVranking {L_annotations ref alt} {
     # Check for a dup:
     set TriS_CGscore [lindex $Ls $g_i(TriS_CGscore)]
     if {[regexp -nocase "Dup|Gain|Multiplication|<CN\[2-9\]" $SVtype]} {
+        # Check if it is not a dosage sensitive gene
+        if {$TriS_CGscore eq "40"} {set notADosageSensitiveGene "yes"}
 	# Check SV that overlap a gene TriS_CGscore of 3 or 2
 	if {$TriS_CGscore eq 3 || $TriS_CGscore eq 2} {
 	    set ranking "4"	

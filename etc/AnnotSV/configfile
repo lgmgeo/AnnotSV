@@ -53,6 +53,7 @@ AnnotSV type			*
 Gene name			*
 tx				*
 CDS length			*
+frameshift			*
 tx length			*
 location			*
 location2			*

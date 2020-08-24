@@ -105,7 +105,7 @@ proc OrganizeAnnotation {} {
 	    }
 	}
     }
-    append headerOutput "\tAnnotSV type\tGene name\ttx\tCDS length\ttx length\tlocation\tlocation2\tintersectStart\tintersectEnd"
+    append headerOutput "\tAnnotSV type\tGene name\ttx\tCDS length\tframeshift\ttx length\tlocation\tlocation2\tintersectStart\tintersectEnd"
     
     ### Search for "ref" and "alt" information (to define the AnnotSV_ID)
     set i_ref [lsearch -exact [split $headerOutput "\t"] "REF"]
@@ -468,6 +468,14 @@ proc OrganizeAnnotation {} {
 	    set regionEnd ""
 	    set intersectStart ""
 	    set intersectEnd ""
+    	    if {[string is integer $CDSl]} {
+    	        if {[expr {$CDSl%3}] eq 0} {
+                    set frameshift "no"
+                } else {
+            	    set frameshift "yes"
+                } 
+            } else {set frameshift ""}
+
 	} else {
 	    set SV "[join [lrange $Ls 0 2] "\t"]"
 	    # full
@@ -482,8 +490,10 @@ proc OrganizeAnnotation {} {
 	    set location   ""
 	    set location2  ""
 	    set intersect  "\t"
+	    set frameshift ""
 	}	    
 
+	
 	if {$g_AnnotSV(candidateGenesFiltering) eq "yes"} {
 	    set test 0
 	    if {$geneName eq ""} {
@@ -904,19 +914,19 @@ proc OrganizeAnnotation {} {
 	if {$g_AnnotSV(SVinputInfo)} {
 	    set toadd [lrange $Ls 0 [expr {$theBEDlength-1}]]
 	    set toadd [linsert $toadd 3 $SVlength]
-	    set TextToWrite "$AnnotSV_ID\t[join $toadd "\t"]\t$AnnotSVtype\t$geneName\t$transcript\t$CDSl\t$txL\t$location\t$location2\t$intersect"
+	    set TextToWrite "$AnnotSV_ID\t[join $toadd "\t"]\t$AnnotSVtype\t$geneName\t$transcript\t$CDSl\t$frameshift\t$txL\t$location\t$location2\t$intersect"
 	} else {
 	    if {$g_AnnotSV(svtBEDcol) ne -1} { ; # SV type is required for the ranking
 		if {$g_AnnotSV(samplesidBEDcol) ne -1} {
-		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$SVtype\t$Samplesid\t$AnnotSVtype\t$geneName\t$transcript\t$CDSl\t$txL\t$location\t$location2\t$intersect"		    
+		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$SVtype\t$Samplesid\t$AnnotSVtype\t$geneName\t$transcript\t$CDSl\t$frameshift\t$txL\t$location\t$location2\t$intersect"  
 		} else {
-		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$SVtype\t$AnnotSVtype\t$geneName\t$transcript\t$CDSl\t$txL\t$location\t$location2\t$intersect"
+		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$SVtype\t$AnnotSVtype\t$geneName\t$transcript\t$CDSl\t$frameshift\t$txL\t$location\t$location2\t$intersect"
 		}
 	    } else {
 		if {$g_AnnotSV(samplesidBEDcol) ne -1} {
-		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$Samplesid\t$AnnotSVtype\t$geneName\t$transcript\t$CDSl\t$txL\t$location\t$location2\t$intersect"
+		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$Samplesid\t$AnnotSVtype\t$geneName\t$transcript\t$CDSl\t$frameshift\t$txL\t$location\t$location2\t$intersect"
 		} else {
-		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$AnnotSVtype\t$geneName\t$transcript\t$CDSl\t$txL\t$location\t$location2\t$intersect"
+		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$AnnotSVtype\t$geneName\t$transcript\t$CDSl\t$frameshift\t$txL\t$location\t$location2\t$intersect"
 		}
 	    }
 	}
