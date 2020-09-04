@@ -154,6 +154,9 @@ proc searchforGeneID {geneName} {
 	    }
 	    set Approved_symbol [lindex $Ls $i_approuved]
 	    set NCBI_gene_ID [lindex $Ls $i_ncbi]
+	    if {[regexp "\\\[" $NCBI_gene_ID]} { ;# some lines have bad "NCBI_gene_ID" : "CYP4F30P   4F-se9[6:7:8]   C2orf14   100132708"
+		continue
+	    }
 	    set Previous_symbol [lindex $Ls $i_previous]
 	    set Alias_symbol [lindex $Ls $i_alias]
 	    
