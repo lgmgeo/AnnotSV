@@ -92,7 +92,7 @@ OPTIONS
                                 Range values: [4-[, default = -1 (value not given)
 
 -tx:                            Origin of the transcripts (NCBI or ENSEMBL)
-                                Values: NM (default) or ENST
+                                Values: RefSeq (default) or ENSEMBL
 
 -txFile:                        Path of a file containing a list of preferred genes transcripts to be used in priority during the annotation
                                 (Preferred genes transcripts names should be tab or space separated)

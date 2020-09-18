@@ -70,7 +70,7 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(SVminSize)                "50"
     set g_AnnotSV(svtBEDcol)                "-1"
     set g_AnnotSV(svtTSVcol)                "-1" ;# not given in parameter
-    set g_AnnotSV(tx)                       "NM"
+    set g_AnnotSV(tx)                       "RefSeq"
     set g_AnnotSV(txFile)                   ""
     set g_AnnotSV(typeOfAnnotation)         "both"
     set g_AnnotSV(ranking)                  "1"
@@ -293,11 +293,11 @@ proc configureAnnotSV {argv} {
 	}
     }
 
-    # tx: It must be "NM" or "ENST"
-    if {$g_AnnotSV(tx) ne "NM" && $g_AnnotSV(tx) ne "ENST"} {
+    # tx: It must be "RefSeq" or "ENSEMBL"
+    if {$g_AnnotSV(tx) ne "RefSeq" && $g_AnnotSV(tx) ne "ENSEMBL"} {
 	puts "############################################################################"
 	puts "Bad option value: -tx = $g_AnnotSV(tx)"
-	puts "Should be \"NM\" or \"ENST\""
+	puts "Should be \"RefSeq\" or \"ENSEMBL\""
 	puts "############################################################################"
 	exit 2
     }

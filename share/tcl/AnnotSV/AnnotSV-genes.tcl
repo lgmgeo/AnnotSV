@@ -22,8 +22,8 @@
 ############################################################################################################
 
 
-## - Check and create if necessary the "genes.NM.sorted.bed" file
-proc checkGenesNMfile {} {
+## - Check and create if necessary the "genes.RefSeq.sorted.bed" file
+proc checkGenesRefSeqFile {} {
     
     global g_AnnotSV
     
@@ -32,7 +32,7 @@ proc checkGenesNMfile {} {
     set genesDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes/$g_AnnotSV(genomeBuild)"
     
     set genesFileDownloaded "[glob -nocomplain $genesDir/refGene.txt.gz]"
-    set genesFileFormatted "[glob -nocomplain $genesDir/genes.NM.sorted.bed]"
+    set genesFileFormatted "[glob -nocomplain $genesDir/genes.RefSeq.sorted.bed]"
     
     if {$genesFileDownloaded eq "" && $genesFileFormatted eq ""} {
 	puts "############################################################################"
@@ -47,13 +47,13 @@ proc checkGenesNMfile {} {
 	## Delete promoters files (need to be updated after the creation of new genes file)
 	##################################################################################### 
 	set promoterDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/FtIncludedInSV/Promoter/$g_AnnotSV(genomeBuild)"
-	foreach promFile [glob -nocomplain "$promoterDir/promoter.*bp.NM.sorted.bed"] {
+	foreach promFile [glob -nocomplain "$promoterDir/promoter.*bp.RefSeq.sorted.bed"] {
 	    file delete -force $promFile
 	}
 	
-	## - Create the "genes.NM.sorted.bed"
+	## - Create the "genes.RefSeq.sorted.bed"
 	#####################################
-	set genesFileFormatted "$genesDir/genes.NM.sorted.bed"
+	set genesFileFormatted "$genesDir/genes.RefSeq.sorted.bed"
 	puts "...creation of $genesFileFormatted ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 	puts "\t   (done only once during the first annotation)\n"
 	
@@ -97,7 +97,7 @@ proc checkGenesNMfile {} {
 	WriteTextInFile "sort -k1,1 -k2,2n $genesFileFormatted.tmp > $genesFileFormatted" $sortTmpFile
 	file attributes $sortTmpFile -permissions 0755
 	if {[catch {eval exec bash $sortTmpFile} Message]} {
-	    puts "-- checkGenesNMfile --"
+	    puts "-- checkGenesRefSeqFile --"
 	    puts "sort -k1,1 -k2,2n $genesFileFormatted.tmp > $genesFileFormatted"
 	    puts "$Message"
 	    puts "Exit with error"
@@ -115,20 +115,20 @@ proc checkGenesNMfile {} {
 }
 
 
-## - Check the "genes.ENST.sorted.bed" file
-proc checkGenesENSTfile {} {
+## - Check the "genes.ENSEMBL.sorted.bed" file
+proc checkGenesENSEMBLfile {} {
     
     global g_AnnotSV
     
-    ## Check if the formatted ENST genes file is present
-    ####################################################
+    ## Check if the formatted ENSEMBL genes file is present
+    #######################################################
     set genesDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes/$g_AnnotSV(genomeBuild)"
     
-    set GenesENSTfileFormatted [glob -nocomplain $genesDir/genes.ENST.sorted.bed]
+    set GenesENSEMBLfileFormatted [glob -nocomplain $genesDir/genes.ENSEMBL.sorted.bed]
     
-    if {$GenesENSTfileFormatted eq ""} {
+    if {$GenesENSEMBLfileFormatted eq ""} {
         puts "############################################################################"
-        puts "\"$GenesENSTfileFormatted\" doesn't exist"
+        puts "\"$GenesENSEMBLfileFormatted\" doesn't exist"
         puts "Please check your install - Exit with error."
         puts "############################################################################"
         exit 2
@@ -136,7 +136,7 @@ proc checkGenesENSTfile {} {
     
     # DISPLAY:
     ##########
-    set g_AnnotSV(genesFile) $GenesENSTfileFormatted
+    set g_AnnotSV(genesFile) $GenesENSEMBLfileFormatted
 }
 
 

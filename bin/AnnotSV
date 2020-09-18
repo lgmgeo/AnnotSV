@@ -155,11 +155,11 @@ if {[regexp "\\.vcf(.gz)?$" $g_AnnotSV(SVinputFile)]} {
     }
 }
 
-# Annotation of genes depending of the transcripts (NM or ENST) ?
-if {$g_AnnotSV(tx) eq "NM"} {
-    checkGenesNMfile
+# Annotation of genes depending of the transcripts (RefSeq or ENSEMBL) ?
+if {$g_AnnotSV(tx) eq "RefSeq"} {
+    checkGenesRefSeqFile
 } else {
-    checkGenesENSTfile
+    checkGenesENSEMBLfile
 }
 
 # Annotation with Promoters?

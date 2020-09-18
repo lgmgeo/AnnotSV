@@ -10,7 +10,14 @@
 
 For more details, please see the README file.
 
-
+	
+	- Change the names of the values for the "tx" option:
+		NM	>>  RefSeq
+		ENST	>>  ENSEMBL
+	  WARNING: 
+	  In the $ANNOTSV/share/AnnotSV/Annotations_*/Genes/GRCh3*/ directories, please rename:
+	  "genes.ENST.sorted.bed" to "genes.ENSEMBL.sorted.bed"
+	  "genes.NM.sorted.bed" to "genes.RefSeq.sorted.bed"
 	- For DEL and INS only : add the distance / type to the nearest splice site after considering both breakpoints (distNearestSS and nearestSStype columns)
 	- Add bugfix for gnomAD annotations
 	- Add the in-frame / out-of-frame information from overlapping genes (frameshift column)
