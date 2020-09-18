@@ -11,6 +11,7 @@
 For more details, please see the README file.
 
 
+	- For DEL and INS only : add the distance / type to the nearest splice site after considering both breakpoints (distNearestSS and nearestSStype columns)
 	- Add bugfix for gnomAD annotations
 	- Add the in-frame / out-of-frame information from overlapping genes (frameshift column)
 

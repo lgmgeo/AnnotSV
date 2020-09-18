@@ -57,6 +57,8 @@ frameshift			*
 tx length			*
 location			*
 location2			*
+distNearestSS                   *
+nearestSStype                   *
 intersectStart			*
 intersectEnd			*
 DGV_GAIN_IDs

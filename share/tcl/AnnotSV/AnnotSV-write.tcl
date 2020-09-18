@@ -105,8 +105,9 @@ proc OrganizeAnnotation {} {
 	    }
 	}
     }
-    append headerOutput "\tAnnotSV type\tGene name\ttx\tCDS length\tframeshift\ttx length\tlocation\tlocation2\tintersectStart\tintersectEnd"
-    
+    append headerOutput "\tAnnotSV type\tGene name\ttx\tCDS length\tframeshift\ttx length\tlocation\tlocation2\tdistNearestSS\tnearestSStype\tintersectStart\tintersectEnd"
+    	      
+
     ### Search for "ref" and "alt" information (to define the AnnotSV_ID)
     set i_ref [lsearch -exact [split $headerOutput "\t"] "REF"]
     set i_alt [lsearch -exact [split $headerOutput "\t"] "ALT"]
@@ -463,7 +464,13 @@ proc OrganizeAnnotation {} {
 	    set CDSl       [lindex $Ls end-2]
 	    set txL        [lindex $Ls end-1]
 	    set locationStart ""
-	    set locationEnd ""
+	    set locationEnd ""		
+	    set distNearestSSright ""
+	    set distNearestSSleft ""
+	    set distNearestSS ""
+	    set nearestSStypeRight ""
+	    set nearestSStypeLeft ""
+	    set nearestSStype ""
 	    set regionStart ""
 	    set regionEnd ""
 	    set intersectStart ""
@@ -475,7 +482,6 @@ proc OrganizeAnnotation {} {
             	    set frameshift "yes"
                 } 
             } else {set frameshift ""}
-
 	} else {
 	    set SV "[join [lrange $Ls 0 2] "\t"]"
 	    # full
@@ -489,6 +495,8 @@ proc OrganizeAnnotation {} {
 	    set txL        ""
 	    set location   ""
 	    set location2  ""
+	    set distNearestSS ""
+	    set nearestSStype ""
 	    set intersect  "\t"
 	    set frameshift ""
 	}	    
@@ -510,6 +518,7 @@ proc OrganizeAnnotation {} {
 
 
 	# Definition of "locationStart" and "locationEnd" variables
+	# Definition of "distNearestSS" and "nearestSStype" variables
 	if {$AnnotSVtype eq "split"} {
 	    set nbEx [expr {[llength [split $exonStarts ","]]-1}] ; # Example: "1652370,1657120,1660664,1661968," --> 1652370 1657120 1660664 1661968 {}
 	    
@@ -524,19 +533,24 @@ proc OrganizeAnnotation {} {
 		}
 	    }
 	    set i 0
+	    set previousB "[lindex [split $exonEnds ","] 0]"
 	    foreach A [split $exonStarts ","] B [split $exonEnds ","] {
 		if {$A eq "" || $B eq ""} {continue}
 		incr i
-		
+
 		# SV left
 		if {$SVleft<$B} {
 		    if {$SVleft>$A} {
+			set distNearestSSleft "[expr {$SVleft-$A}]"
+			set nearestSStypeLeft "5'"			
 			if {$strand eq "+"} {
 			    set locationStart "exon$i"
 			} else {
 			    set locationEnd "exon[expr {$nbEx-$i+1}]" ; # gene on the strand "-"
 			}
 		    } else {
+			set distNearestSSleft "[expr {$SVleft-$previousB}]"
+			set nearestSStypeLeft "5'"
 			if {$strand eq "+"} {
 			    if {$locationStart eq ""} {set locationStart "intron[expr {$i-1}]"}
 			} else {
@@ -547,12 +561,16 @@ proc OrganizeAnnotation {} {
 		# SV right	
 		if {$SVright<$B} {
 		    if {$SVright>$A} {
+			set distNearestSSright "[expr {$B-$SVright}]"
+			set nearestSStypeRight "3'"
 			if {$strand eq "+"} {
 			    set locationEnd "exon$i"; break
 			} else {
 			    set locationStart "exon[expr {$nbEx-$i+1}]"; break
 			}
 		    } else {
+			set distNearestSSright "[expr {$A-$SVright}]"
+			set nearestSStypeRight "3'"
 			if {$strand eq "+"} {
 			    set locationEnd "intron[expr {$i-1}]"; break
 			} else {
@@ -560,7 +578,8 @@ proc OrganizeAnnotation {} {
 			}
 		    }
 		}
-	    }
+		set previousB "$B"
+	    }	    
 	    if {$locationEnd eq "" || $locationStart eq ""} {     ; # SV finishes after tx end
 		if {$strand eq "+"} {
 		    set locationEnd "txEnd"
@@ -569,7 +588,26 @@ proc OrganizeAnnotation {} {
 		}
 	    }
 	    set location "${locationStart}-${locationEnd}"
-
+	    if {[regexp "DEL|INS" [normalizeSVtype $SVtype]]} { ;# DEL		
+		if {$location ne "txStart-txEnd"} {
+		    if {$distNearestSSright eq ""} {
+			if {$distNearestSSleft ne ""} {
+			    set distNearestSS "$distNearestSSleft"
+			    set nearestSStype "$nearestSStypeLeft"
+			}
+		    } elseif {$distNearestSSleft eq ""} {
+			set distNearestSS "$distNearestSSright"
+			set nearestSStype "$nearestSStypeRight"
+		    } elseif {$distNearestSSright < $distNearestSSleft} {  
+			set distNearestSS "$distNearestSSright"
+			set nearestSStype "$nearestSStypeRight"
+		    } else {
+			set distNearestSS "$distNearestSSleft"
+			set nearestSStype "$nearestSStypeLeft"
+		    }
+		}
+	    }
+	    
 	    # Definition of "regionStart" and "regionEnd" variables
 	    # Warning: some genes have CDSstart=CDSend=txEnd (<=> no CDS)
 	    if {$CDSstart eq $CDSend} {
@@ -887,7 +925,7 @@ proc OrganizeAnnotation {} {
 	# chrom txStart txEnd name2 name cdsStart cdsEnd exonStarts exonEnds
 	#
 	# headerOutput:
-	#  "Gene name\ttx\tCDS length\ttx length\tlocation\tlocation2\tintersectStart\tintersectEnd\tOMIM ID\tOMIM phenotype\tOMIM inheritance\t#hom\t#htz"
+	#  "Gene name\ttx\tCDS length\ttx length\tlocation\tlocation2\tdistNearestSS\tnearestSStype\tintersectStart\tintersectEnd\tOMIM ID\tOMIM phenotype\tOMIM inheritance\t#hom\t#htz"
 
 	# Insertion of the SV length in the fourth column:
 	set SVchrom [lindex $Ls 0]
@@ -914,19 +952,19 @@ proc OrganizeAnnotation {} {
 	if {$g_AnnotSV(SVinputInfo)} {
 	    set toadd [lrange $Ls 0 [expr {$theBEDlength-1}]]
 	    set toadd [linsert $toadd 3 $SVlength]
-	    set TextToWrite "$AnnotSV_ID\t[join $toadd "\t"]\t$AnnotSVtype\t$geneName\t$transcript\t$CDSl\t$frameshift\t$txL\t$location\t$location2\t$intersect"
+	    set TextToWrite "$AnnotSV_ID\t[join $toadd "\t"]\t$AnnotSVtype\t$geneName\t$transcript\t$CDSl\t$frameshift\t$txL\t$location\t$location2\t$distNearestSS\t$nearestSStype\t$intersect"
 	} else {
 	    if {$g_AnnotSV(svtBEDcol) ne -1} { ; # SV type is required for the ranking
 		if {$g_AnnotSV(samplesidBEDcol) ne -1} {
-		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$SVtype\t$Samplesid\t$AnnotSVtype\t$geneName\t$transcript\t$CDSl\t$frameshift\t$txL\t$location\t$location2\t$intersect"  
+		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$SVtype\t$Samplesid\t$AnnotSVtype\t$geneName\t$transcript\t$CDSl\t$frameshift\t$txL\t$location\t$location2\t$distNearestSS\t$nearestSStype\t$intersect"  
 		} else {
-		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$SVtype\t$AnnotSVtype\t$geneName\t$transcript\t$CDSl\t$frameshift\t$txL\t$location\t$location2\t$intersect"
+		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$SVtype\t$AnnotSVtype\t$geneName\t$transcript\t$CDSl\t$frameshift\t$txL\t$location\t$location2\t$distNearestSS\t$nearestSStype\t$intersect"
 		}
 	    } else {
 		if {$g_AnnotSV(samplesidBEDcol) ne -1} {
-		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$Samplesid\t$AnnotSVtype\t$geneName\t$transcript\t$CDSl\t$frameshift\t$txL\t$location\t$location2\t$intersect"
+		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$Samplesid\t$AnnotSVtype\t$geneName\t$transcript\t$CDSl\t$frameshift\t$txL\t$location\t$location2\t$distNearestSS\t$nearestSStype\t$intersect"
 		} else {
-		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$AnnotSVtype\t$geneName\t$transcript\t$CDSl\t$frameshift\t$txL\t$location\t$location2\t$intersect"
+		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$AnnotSVtype\t$geneName\t$transcript\t$CDSl\t$frameshift\t$txL\t$location\t$location2\t$distNearestSS\t$nearestSStype\t$intersect"
 		}
 	    }
 	}
