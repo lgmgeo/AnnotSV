@@ -81,8 +81,8 @@ proc configureAnnotSV {argv} {
     ###########################
     set lOptionsOk "annotationsDir bcftools bedtools candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering rankOutput reciprocal samplesidBEDcol snvIndelFiles snvIndelPASS SVinputFile SVinputInfo SVminSize svtBEDcol tx txFile typeOfAnnotation snvIndelSamples"
     set configFile "$g_AnnotSV(etcDir)/configfile"
-    if {[file exists "./configfile"]} {
-	set configFile "./configfile"
+    if {[file exists "[file dirname $g_AnnotSV(SVinputFile)]/configfile"]} {
+	set configFile "[file dirname $g_AnnotSV(SVinputFile)]/configfile"
     }
     puts "\t...configuration data from $configFile"
     set testColumnNames 0
