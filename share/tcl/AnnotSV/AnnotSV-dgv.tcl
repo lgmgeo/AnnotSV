@@ -106,13 +106,15 @@ proc checkDGVfiles {} {
 	}
 	close $f
 	set TexteToWrite ""
-	set i -1
 	foreach L [LinesFromFile $DGVfile1Downloaded] {
-	    incr i
-	    if {[eval expr {$i%3}]} {continue}
+
 	    set Ls [split $L "\t"]
 
-	    # 3 lines for each ID::
+	    # 3 lines for each ID:
+	    # Warning: the 3 lines do not necessarily follow each other...
+	    #          "outer_start" and "outer_end" values are the same on the 3 lines
+	    # => need to remove redundancy
+	    #
 	    # chr1    SV     copy_number_variation_region    812998  812998  .       .       .       ID=gssvG1;Name=gssvG1;variant_type=SV;variant_sub_type=Gain;outer_start=812998;inner_start=837847;inner_end=1477469;outer_end=1708649;inner_rank=10;num_variants=3;variants=nssv24621,nssv1423341,nssv1440790;num_studies=2;Studies=Perry2008,Park2010;num_platforms=2;Platforms=AgilentCustom_015685+015686+244K,Agilent24M;number_of_algorithms=1;algorithms=ADM2;num_samples=3;samples=NA18968,NA18969,NA19221;Frequency=5.45%;PopulationSummary=African 1:Asian 2:European 0:Mexican 0:MiddleEast 0:NativeAmerican 0:NorthAmerican 0:Oceania 0:SouthAmerican 0:Turkish 0:Admixed 0:Unknown 0;num_unique_samples_tested=55
 	    # chr1    SV     copy_number_variation_region    837847  1477469 .       .       .       ID=gssvG1;Name=gssvG1;variant_type=SV;variant_sub_type=Gain;outer_start=812998;inner_start=837847;inner_end=1477469;outer_end=1708649;inner_rank=10;num_variants=3;variants=nssv24621,nssv1423341,nssv1440790;num_studies=2;Studies=Perry2008,Park2010;num_platforms=2;Platforms=AgilentCustom_015685+015686+244K,Agilent24M;number_of_algorithms=1;algorithms=ADM2;num_samples=3;samples=NA18968,NA18969,NA19221;Frequency=5.45%;PopulationSummary=African 1:Asian 2:European 0:Mexican 0:MiddleEast 0:NativeAmerican 0:NorthAmerican 0:Oceania 0:SouthAmerican 0:Turkish 0:Admixed 0:Unknown 0;num_unique_samples_tested=55
 	    # chr1    SV     copy_number_variation_region    1708649 1708649 .       .       .       ID=gssvG1;Name=gssvG1;variant_type=SV;variant_sub_type=Gain;outer_start=812998;inner_start=837847;inner_end=1477469;outer_end=1708649;inner_rank=10;num_variants=3;variants=nssv24621,nssv1423341,nssv1440790;num_studies=2;Studies=Perry2008,Park2010;num_platforms=2;Platforms=AgilentCustom_015685+015686+244K,Agilent24M;number_of_algorithms=1;algorithms=ADM2;num_samples=3;samples=NA18968,NA18969,NA19221;Frequency=5.45%;PopulationSummary=African 1:Asian 2:European 0:Mexican 0:MiddleEast 0:NativeAmerican 0:NorthAmerican 0:Oceania 0:SouthAmerican 0:Turkish 0:Admixed 0:Unknown 0;num_unique_samples_tested=55
@@ -132,6 +134,7 @@ proc checkDGVfiles {} {
 	    lappend L_studFromGS {*}[split $studies ","]
 	    lappend TexteToWrite "$chr\t$start\t$end\t$ID\t$variantsubtype\t$studies\t$variants\t$samples"
 	}
+	set TexteToWrite [lsort -unique $TexteToWrite]
 	WriteTextInFile [join $TexteToWrite "\n"] $DGVfile1Formatted.tmp
 	# Sorting of the bedfile:
 	# Intersection with very large files can cause trouble with excessive memory usage.
