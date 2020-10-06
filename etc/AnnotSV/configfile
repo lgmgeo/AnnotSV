@@ -24,8 +24,6 @@
 
 -rankFiltering:             "1-5"
 
--rankOutput:                "no"
-
 -reciprocal:                "no"
 
 -snvindelPASS:              "0"
@@ -130,4 +128,5 @@ HUMAN_PHENO_EVIDENCE
 MOUSE_PHENO_EVIDENCE
 FISH_PHENO_EVIDENCE
 AnnotSV ranking
+ranking decision criteria
 

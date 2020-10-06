@@ -33,7 +33,7 @@ proc OrganizeAnnotation {} {
     global L_Candidates
     global g_SVLEN
     global g_ExtAnnotation
-    global L_rankingExplanations
+    global g_rankingExplanations
 
     # OUTPUT
     ###############
@@ -303,7 +303,11 @@ proc OrganizeAnnotation {} {
 	set g_AnnotSV(ranking) 0
     }  
     if {$g_AnnotSV(ranking)} {
-	append headerOutput "\tAnnotSV ranking"
+	if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "ranking decision criteria"] ne -1} {
+	    append headerOutput "\tAnnotSV ranking\tranking decision criteria"
+	} else {
+	    append headerOutput "\tAnnotSV ranking"
+	}
     } 
 
 
@@ -569,7 +573,7 @@ proc OrganizeAnnotation {} {
 			} else {
 			    set locationEnd "exon[expr {$nbEx-$i+1}]" ; # gene on the strand "-"
 			}
-		    } elseif {$SVleft>$previousB} {
+		    } elseif {$SVleft>=$previousB} {
 			# in an intron
 			set distNearestSSleftB "[expr {$SVleft-$previousB}]"
 			set distNearestSSleftA "[expr {$A-$SVleft}]"
@@ -612,7 +616,7 @@ proc OrganizeAnnotation {} {
 			    set locationStart "exon[expr {$nbEx-$i+1}]"
 			}
 			break
-		    } elseif {$SVright>$previousB} {
+		    } elseif {$SVright>=$previousB} {
 			# in an intron
 			set distNearestSSrightB "[expr {$SVright-$previousB}]"
 			set distNearestSSrightA "[expr {$A-$SVright}]"
@@ -1078,7 +1082,11 @@ proc OrganizeAnnotation {} {
 	    if {[lsearch -exact $g_AnnotSV(rankFiltering) $rank] eq -1} {
 		continue
 	    }
-	    append TextToWrite "\t$rank"
+	    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "ranking decision criteria"] ne -1} {
+		append TextToWrite "\t$rank\t$g_rankingExplanations($AnnotSV_ID)"
+	    } else {
+		append TextToWrite "\t$rank"
+	    }
 	}
 	lappend L_TextToWrite "$TextToWrite"	
     }
@@ -1108,17 +1116,4 @@ proc OrganizeAnnotation {} {
     regsub -all "\t" $headerOutput "; " t
     puts "\t$t\n"
 
-
-    # Output file that retraces the decisions that explain the ranking of each SV
-    if {$g_AnnotSV(rankOutput) eq "yes" && [info exists L_rankingExplanations]} {
-	if {[regexp "annotated" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile)]} {
-	    regsub "annotated" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) "ranking" rankingOutputFile
-	} else {
-	    regsub ".tsv$" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) ".ranking.tsv" rankingOutputFile
-	}
-	puts "\n\n...Writing of the ranking decision explanations:"
-	puts "   ($rankingOutputFile)"
-	ReplaceTextInFile "AnnotSV ID\tAnnotSV type\tGenes\tAnnotSV ranking\tRanking decision" $rankingOutputFile
-	WriteTextInFile [join $L_rankingExplanations "\n"] $rankingOutputFile
-    }	
 }

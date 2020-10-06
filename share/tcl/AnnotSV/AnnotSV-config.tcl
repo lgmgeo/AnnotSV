@@ -58,7 +58,6 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(overwrite)                "yes"
     set g_AnnotSV(promoterSize)             "500"
     set g_AnnotSV(rankFiltering)            "1-5"
-    set g_AnnotSV(rankOutput)               "no"
     set g_AnnotSV(reciprocal)               "no"
     set g_AnnotSV(samplesidBEDcol)          "-1"
     set g_AnnotSV(samplesidTSVcol)          "-1" ;# not given in parameter
@@ -79,7 +78,7 @@ proc configureAnnotSV {argv} {
     ###########################
     ## Load config file options
     ###########################
-    set lOptionsOk "annotationsDir bcftools bedtools candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering rankOutput reciprocal samplesidBEDcol snvIndelFiles snvIndelPASS SVinputFile SVinputInfo SVminSize svtBEDcol tx txFile typeOfAnnotation snvIndelSamples"
+    set lOptionsOk "annotationsDir bcftools bedtools candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering reciprocal samplesidBEDcol snvIndelFiles snvIndelPASS SVinputFile SVinputInfo SVminSize svtBEDcol tx txFile typeOfAnnotation snvIndelSamples"
     set configFile "$g_AnnotSV(etcDir)/configfile"
     if {[file exists "[file dirname $g_AnnotSV(SVinputFile)]/configfile"]} {
 	set configFile "[file dirname $g_AnnotSV(SVinputFile)]/configfile"
@@ -192,7 +191,7 @@ proc configureAnnotSV {argv} {
     }
 
     ## It must be: yes or no
-    foreach val {candidateGenesFiltering rankOutput} {
+    foreach val {candidateGenesFiltering} {
 	if {$g_AnnotSV($val) ne "yes" && $g_AnnotSV($val) ne "no"} {
 	    puts "############################################################################"
 	    puts "Bad option value: -$val = $g_AnnotSV($val)"
