@@ -466,7 +466,11 @@ proc OrganizeAnnotation {} {
 	    set locationStart ""
 	    set locationEnd ""		
 	    set distNearestSSright ""
+	    set distNearestSSrightA ""
+	    set distNearestSSrightB ""
 	    set distNearestSSleft ""
+	    set distNearestSSleftA ""
+	    set distNearestSSleftB ""
 	    set distNearestSS ""
 	    set nearestSStypeRight ""
 	    set nearestSStypeLeft ""
@@ -519,12 +523,15 @@ proc OrganizeAnnotation {} {
 
 	# Definition of "locationStart" and "locationEnd" variables
 	# Definition of "distNearestSS" and "nearestSStype" variables
+	# NearestSStype:
+	#   5' = splice donor site (on the right of the exon if strand +; else on the left) 
+	#   3' = splice acceptor site (on the left of the exon if strand +; else on the right)
 	if {$AnnotSVtype eq "split"} {
 	    set nbEx [expr {[llength [split $exonStarts ","]]-1}] ; # Example: "1652370,1657120,1660664,1661968," --> 1652370 1657120 1660664 1661968 {}
 	    
 	    set tx_left [lindex [split $exonStarts ","] 0]
 	    set tx_right [lindex [split $exonEnds ","] end-1]
-	    
+
 	    if {$SVleft<=$tx_left} {         ; # SV begins before tx start (or tx end for strand "-")
 		if {$strand eq "+"} {
 		    set locationStart "txStart"
@@ -532,50 +539,96 @@ proc OrganizeAnnotation {} {
 		    set locationEnd "txEnd"
 		}
 	    }
+
 	    set i 0
 	    set previousB "[lindex [split $exonEnds ","] 0]"
 	    foreach A [split $exonStarts ","] B [split $exonEnds ","] {
 		if {$A eq "" || $B eq ""} {continue}
 		incr i
-
 		# SV left
 		if {$SVleft<$B} {
 		    if {$SVleft>$A} {
-			set distNearestSSleft "[expr {$SVleft-$A}]"
-			set nearestSStypeLeft "5'"			
+			# in an exon
+			set distNearestSSleftA "[expr {$SVleft-$A}]"
+			set distNearestSSleftB "[expr {$B-$SVleft}]"
+			if {$i eq 1} { ;# Only 1 splice site on the first exon 
+			    set distNearestSSleft $distNearestSSleftB
+			    if {$strand eq "+"} {set nearestSStypeLeft "5'"} else {set nearestSStypeLeft "3'"}
+			} elseif {$i eq $nbEx} { ;# Only 1 splice site on the last exon 
+			    set distNearestSSleft $distNearestSSleftA
+			    if {$strand eq "+"} {set nearestSStypeLeft "3'"} else {set nearestSStypeLeft "5'"}
+			} elseif {$distNearestSSleftA < $distNearestSSleftB} {
+			    set distNearestSSleft $distNearestSSleftA
+			    if {$strand eq "+"} {set nearestSStypeLeft "3'"} else {set nearestSStypeLeft "5'"}
+			} else {
+			    set distNearestSSleft $distNearestSSleftB
+			    if {$strand eq "+"} {set nearestSStypeLeft "5'"} else {set nearestSStypeLeft "3'"}
+			}
 			if {$strand eq "+"} {
 			    set locationStart "exon$i"
 			} else {
 			    set locationEnd "exon[expr {$nbEx-$i+1}]" ; # gene on the strand "-"
 			}
-		    } else {
-			set distNearestSSleft "[expr {$SVleft-$previousB}]"
-			set nearestSStypeLeft "5'"
-			if {$strand eq "+"} {
-			    if {$locationStart eq ""} {set locationStart "intron[expr {$i-1}]"}
+		    } elseif {$SVleft>$previousB} {
+			# in an intron
+			set distNearestSSleftB "[expr {$SVleft-$previousB}]"
+			set distNearestSSleftA "[expr {$A-$SVleft}]"
+			if {$distNearestSSleftB < $distNearestSSleftA} {
+			    set distNearestSSleft $distNearestSSleftB
+			    if {$strand eq "+"} {set nearestSStypeLeft "5'"} else {set nearestSStypeLeft "3'"}
 			} else {
-			    if {$locationEnd eq ""} {set locationEnd "intron[expr {$nbEx-$i+1}]"}
+			    set distNearestSSleft $distNearestSSleftA
+			    if {$strand eq "+"} {set nearestSStypeLeft "3'"} else {set nearestSStypeLeft "5'"}
+			}
+			if {$strand eq "+"} {
+			    set locationStart "intron[expr {$i-1}]"
+			} else {
+			    set locationEnd "intron[expr {$nbEx-$i+1}]"
 			}
 		    }
 		}
 		# SV right	
 		if {$SVright<$B} {
 		    if {$SVright>$A} {
-			set distNearestSSright "[expr {$B-$SVright}]"
-			set nearestSStypeRight "3'"
-			if {$strand eq "+"} {
-			    set locationEnd "exon$i"; break
+			# in an exon
+			set distNearestSSrightA "[expr {$SVright-$A}]"
+			set distNearestSSrightB "[expr {$B-$SVright}]"
+			if {$i eq 1} { ;# Only 1 splice site on the first exon 
+			    set distNearestSSright $distNearestSSrightB
+			    if {$strand eq "+"} {set nearestSStypeRight "5'"} else {set nearestSStypeRight "3'"}
+			} elseif {$i eq $nbEx} { ;# Only 1 splice site on the last exon 
+			    set distNearestSSright $distNearestSSrightA
+			    if {$strand eq "+"} {set nearestSStypeRight "3'"} else {set nearestSStypeRight "5'"}
+			} elseif {$distNearestSSrightA < $distNearestSSrightB} {
+			    set distNearestSSright $distNearestSSrightA
+			    if {$strand eq "+"} {set nearestSStypeRight "3'"} else {set nearestSStypeRight "5'"}
 			} else {
-			    set locationStart "exon[expr {$nbEx-$i+1}]"; break
+			    set distNearestSSright $distNearestSSrightB
+			    if {$strand eq "+"} {set nearestSStypeRight "5'"} else {set nearestSStypeRight "3'"}
 			}
-		    } else {
-			set distNearestSSright "[expr {$A-$SVright}]"
-			set nearestSStypeRight "3'"
 			if {$strand eq "+"} {
-			    set locationEnd "intron[expr {$i-1}]"; break
+			    set locationEnd "exon$i"
 			} else {
-			    set locationStart "intron[expr {$nbEx-$i+1}]"; break
+			    set locationStart "exon[expr {$nbEx-$i+1}]"
 			}
+			break
+		    } elseif {$SVright>$previousB} {
+			# in an intron
+			set distNearestSSrightB "[expr {$SVright-$previousB}]"
+			set distNearestSSrightA "[expr {$A-$SVright}]"
+			if {$distNearestSSrightB < $distNearestSSrightA} {
+			    set distNearestSSright $distNearestSSrightB
+			    if {$strand eq "+"} {set nearestSStypeRight "5'"} else {set nearestSStypeRight "3'"}
+			} else {
+			    set distNearestSSright $distNearestSSrightA
+			    if {$strand eq "+"} {set nearestSStypeRight "3'"} else {set nearestSStypeRight "5'"}
+			}
+			if {$strand eq "+"} {
+			    set locationEnd "intron[expr {$i-1}]" 
+			} else {
+			    set locationStart "intron[expr {$nbEx-$i+1}]"
+			}
+			break
 		    }
 		}
 		set previousB "$B"
@@ -587,24 +640,23 @@ proc OrganizeAnnotation {} {
 		    set locationStart "txStart"
 		}
 	    }
+
 	    set location "${locationStart}-${locationEnd}"
-	    if {[regexp "DEL|INS" [normalizeSVtype $SVtype]]} { ;# DEL		
-		if {$location ne "txStart-txEnd"} {
-		    if {$distNearestSSright eq ""} {
-			if {$distNearestSSleft ne ""} {
-			    set distNearestSS "$distNearestSSleft"
-			    set nearestSStype "$nearestSStypeLeft"
-			}
-		    } elseif {$distNearestSSleft eq ""} {
-			set distNearestSS "$distNearestSSright"
-			set nearestSStype "$nearestSStypeRight"
-		    } elseif {$distNearestSSright < $distNearestSSleft} {  
-			set distNearestSS "$distNearestSSright"
-			set nearestSStype "$nearestSStypeRight"
-		    } else {
+	    if {$location ne "txStart-txEnd"} {
+		if {$distNearestSSright eq ""} {
+		    if {$distNearestSSleft ne ""} {
 			set distNearestSS "$distNearestSSleft"
 			set nearestSStype "$nearestSStypeLeft"
 		    }
+		} elseif {$distNearestSSleft eq ""} {
+		    set distNearestSS "$distNearestSSright"
+		    set nearestSStype "$nearestSStypeRight"
+		} elseif {$distNearestSSright < $distNearestSSleft} {  
+		    set distNearestSS "$distNearestSSright"
+		    set nearestSStype "$nearestSStypeRight"
+		} else {
+		    set distNearestSS "$distNearestSSleft"
+		    set nearestSStype "$nearestSStypeLeft"
 		}
 	    }
 	    
