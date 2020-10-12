@@ -22,63 +22,71 @@
 ############################################################################################################
 
 
-## - Check if the following file exist:
-#    - 'date'_Repeat.bed
-proc checkRepeatFile {} {
+## - Check if the downloaded "ENCODEblacklist.bed" file or the formatted "*_ENCODEblacklist.sorted.bed" file exist
+proc checkENCODEblacklistFile {} {
 
     global g_AnnotSV
 
-    ## Check if the repeat file has been downloaded then formatted
+    ## Check if the encodeblacklist file has been downloaded then formatted
     #############################################################
     set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/BreakpointsAnnotations"
-    set repeatFileDownloaded [glob -nocomplain "$extannDir/Repeat/$g_AnnotSV(genomeBuild)/Repeat.bed"]   
-    set repeatFileFormatted [glob -nocomplain "$extannDir/Repeat/$g_AnnotSV(genomeBuild)/*_Repeat.sorted.bed"]   
+    set encodeblacklistFileDownloaded [glob -nocomplain "$extannDir/ENCODEblacklist/$g_AnnotSV(genomeBuild)/ENCODEblacklist.bed"]   
+    set encodeblacklistFileFormatted [glob -nocomplain "$extannDir/ENCODEblacklist/$g_AnnotSV(genomeBuild)/*_ENCODEblacklist.sorted.bed"]   
 
-    if {$repeatFileDownloaded eq "" && $repeatFileFormatted eq ""} {
-	# No Repeat annotation
-	set g_AnnotSV(repeatAnn) 0
+    if {$encodeblacklistFileDownloaded eq "" && $encodeblacklistFileFormatted eq ""} {
+	# No ENCODEblacklist annotation
+	set g_AnnotSV(ENCODEblacklistAnn) 0
 	return
     } else {
-	# Repeat annotation
-	set g_AnnotSV(repeatAnn) 1
+	# ENCODEblacklist annotation
+	set g_AnnotSV(ENCODEblacklistAnn) 1
 	# Check if the user asked for these annotations in the configfile
 	set test 0
-	foreach col "Repeats_coord_left Repeats_type_left Repeats_coord_right Repeats_type_right" {
+	foreach col "ENCODE_blacklist_left ENCODE_blacklist_characteristics_left ENCODE_blacklist_right ENCODE_blacklist_characteristics_right" {
 	    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" $col] ne -1} {set test 1;break}
 	}
-	if {$test eq 0} {set g_AnnotSV(repeatAnn) 0; return}
+	if {$test eq 0} {set g_AnnotSV(ENCODEblacklistAnn) 0; return}
     }
 
-    if {[llength $repeatFileFormatted]>1} {
-	puts "Several repeat files exist:"
-	puts "$repeatFileFormatted"
-	puts "Keep only one: [lindex $repeatFileFormatted end]\n"
-	foreach repeat [lrange $repeatFileFormatted 0 end-1] {
-	    file rename -force $repeat $repeat.notused
+    if {[llength $encodeblacklistFileFormatted]>1} {
+	puts "Several ENCODE blacklist files exist:"
+	puts "$encodeblacklistFileFormatted"
+	puts "Keep only one: [lindex $encodeblacklistFileFormatted end]\n"
+	foreach encodeblacklist [lrange $encodeblacklistFileFormatted 0 end-1] {
+	    file rename -force $encodeblacklist $encodeblacklist.notused
 	}
 	return
     } 
 
-    if {$repeatFileFormatted eq ""} {
+    if {$encodeblacklistFileFormatted eq ""} {
 	# The downloaded file exist but not the formatted.
-	set repeatFileFormatted "$extannDir/Repeat/$g_AnnotSV(genomeBuild)/[clock format [clock seconds] -format "%Y%m%d"]_Repeat.sorted.bed"
-	file delete -force $repeatFileFormatted.tmp
+	set encodeblacklistFileFormatted "$extannDir/ENCODEblacklist/$g_AnnotSV(genomeBuild)/[clock format [clock seconds] -format "%Y%m%d"]_ENCODEblacklist.sorted.bed"
+	ReplaceTextInFile "#Chrom\tStart\tEnd\tENCODE_blacklist\tENCODE_blacklist_characteristics" $encodeblacklistFileFormatted.tmp
 
-	set f [open $repeatFileDownloaded]
+	set f [open $encodeblacklistFileDownloaded]
 	set i 0
 	set L_Text {}
 	while {![eof $f]} {
 	    set L [gets $f]
 	    if {$L eq ""} {continue}
-	    regsub "^chr" $L "" L
-	    lappend L_Text "$L"
+            if {[regexp "^#" $L]} {continue}
+
+            set Ls [split $L "\t"]
+            regsub "chr" [lindex $Ls 0] "" chrom
+            set start [lindex $Ls 1]
+            set end [lindex $Ls 2]
+            set IDencodeblacklist "${chrom}:${start}-${end}"
+	    set characteristics [lindex $Ls 3]
+	    
+	    lappend L_Text "$chrom\t$start\t$end\t$IDencodeblacklist\t$characteristics"
 	    if {$i>500000} {
-		WriteTextInFile [join $L_Text "\n"] $repeatFileFormatted.tmp
+		WriteTextInFile [join $L_Text "\n"] $encodeblacklistFileFormatted.tmp
 		set L_Text {}
 		set i 0
 	    }
+            incr i
 	}
-	WriteTextInFile [join $L_Text "\n"] $repeatFileFormatted.tmp
+	WriteTextInFile [join $L_Text "\n"] $encodeblacklistFileFormatted.tmp
 
 	# Sorting of the bedfile:
 	# Intersection with very large files can cause trouble with excessive memory usage.
@@ -87,18 +95,18 @@ proc checkRepeatFile {} {
 	ReplaceTextInFile "#!/bin/bash" $sortTmpFile
 	WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $sortTmpFile
 	WriteTextInFile "export LC_ALL=C" $sortTmpFile
-	WriteTextInFile "sort -k1,1 -k2,2n $repeatFileFormatted.tmp > $repeatFileFormatted" $sortTmpFile
+	WriteTextInFile "sort -k1,1 -k2,2n $encodeblacklistFileFormatted.tmp > $encodeblacklistFileFormatted" $sortTmpFile
 	file attributes $sortTmpFile -permissions 0755
 	if {[catch {eval exec bash $sortTmpFile} Message]} {
-	    puts "-- checkRepeatFile --"
-	    puts "sort -k1,1 -k2,2n $repeatFileFormatted.tmp > $repeatFileFormatted"
+	    puts "-- checkENCODEblacklistFile --"
+	    puts "sort -k1,1 -k2,2n $encodeblacklistFileFormatted.tmp > $encodeblacklistFileFormatted"
 	    puts "$Message"
 	    puts "Exit with error"
 	    exit 2
 	}
 	file delete -force $sortTmpFile 
-	file delete -force $repeatFileFormatted.tmp
-	file delete -force $repeatFileDownloaded
+	file delete -force $encodeblacklistFileFormatted.tmp
+	file delete -force $encodeblacklistFileDownloaded
 
 	close $f
 	
@@ -108,22 +116,22 @@ proc checkRepeatFile {} {
 
 
 
-proc RepeatAnnotation {BreakpointChrom BreakpointPos} {
+proc ENCODEblacklistAnnotation {BreakpointChrom BreakpointPos} {
 
     global g_AnnotSV
-    global g_Repeat_type
-    global g_Repeat_coord
-    global g_Repeat
+    global g_ENCODEblacklist_coord
+    global g_ENCODEblacklist_charact
+    global g_ENCODEblacklist
 
 
-    # headerOutput "Repeats_coord_left Repeats_type_left" or "Repeats_coord_right and Repeats_type_right"
-    # (RepeatAnnotation is executed for each breakpoint)
-    set g_Repeat(Empty) "\t"
+    # headerOutput "ENCODEblacklists_coord_left ENCODEblacklists_type_left" or "ENCODEblacklists_coord_right and ENCODEblacklists_type_right"
+    # (ENCODEblacklistAnnotation is executed for each breakpoint)
+    set g_ENCODEblacklist(Empty) "\t"
 
     set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/BreakpointsAnnotations"
-    set repeatFileFormatted [glob -nocomplain "$extannDir/Repeat/$g_AnnotSV(genomeBuild)/*_Repeat.sorted.bed"]
+    set encodeblacklistFileFormatted [glob -nocomplain "$extannDir/ENCODEblacklist/$g_AnnotSV(genomeBuild)/*_ENCODEblacklist.sorted.bed"]
 
-    if {![info exists g_Repeat(DONE)]} {
+    if {![info exists g_ENCODEblacklist(DONE)]} {
 	
 	# Creation of a bedfile with all breakpoints +/- 100 bp:
 	# => done during the GC content annotation (if "GC content" annotation is in the output (user defined))  
@@ -169,7 +177,7 @@ proc RepeatAnnotation {BreakpointChrom BreakpointPos} {
 	    WriteTextInFile "sort -k1,1 -k2,2n $tmpBreakpointsFile.tmp > $tmpBreakpointsFile" $sortTmpFile
 	    file attributes $sortTmpFile -permissions 0755
 	    if {[catch {eval exec bash $sortTmpFile} Message]} {
-		puts "-- RepeatAnnotation, sort --"
+		puts "-- ENCODEblacklistAnnotation, sort --"
 		puts "sort -k1,1 -k2,2n $tmpBreakpointsFile.tmp > $tmpBreakpointsFile"
 		puts "$Message"
 		puts "Exit with error"
@@ -181,19 +189,19 @@ proc RepeatAnnotation {BreakpointChrom BreakpointPos} {
 	}
 
 	# Intersect
-	regsub -nocase "(.formatted)?.bed$" $g_AnnotSV(bedFile) ".intersect.Repeat.bed" tmpRepeatFile
-	set tmpRepeatFile "$g_AnnotSV(outputDir)/[file tail $tmpRepeatFile]"
-	file delete -force $tmpRepeatFile
-	if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $tmpBreakpointsFile -b $repeatFileFormatted -wa -wb > $tmpRepeatFile} Message]} {
-	    puts "-- RepeatAnnotation, intersect --"
-	    puts "$g_AnnotSV(bedtools) intersect -sorted -a $tmpBreakpointsFile -b $repeatFileFormatted -wa -wb > $tmpRepeatFile"
+	regsub -nocase "(.formatted)?.bed$" $g_AnnotSV(bedFile) ".intersect.ENCODEblacklist.bed" tmpENCODEblacklistFile
+	set tmpENCODEblacklistFile "$g_AnnotSV(outputDir)/[file tail $tmpENCODEblacklistFile]"
+	file delete -force $tmpENCODEblacklistFile
+	if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $tmpBreakpointsFile -b $encodeblacklistFileFormatted -wa -wb > $tmpENCODEblacklistFile} Message]} {
+	    puts "-- ENCODEblacklistAnnotation, intersect --"
+	    puts "$g_AnnotSV(bedtools) intersect -sorted -a $tmpBreakpointsFile -b $encodeblacklistFileFormatted -wa -wb > $tmpENCODEblacklistFile"
 	    puts "$Message"
 	    puts "Exit with error"
 	    exit 2
 	}
 
-	# Loading g_Repeat for each SV breakpoint
-	set f [open $tmpRepeatFile]
+	# Loading g_ENCODEblacklist for each SV breakpoint
+	set f [open $tmpENCODEblacklistFile]
 	while {![eof $f]} {
 	    set L [gets $f]
 	    if {$L eq ""} {continue}
@@ -201,22 +209,23 @@ proc RepeatAnnotation {BreakpointChrom BreakpointPos} {
 	    
 	    set chrom [lindex $Ls 0]
 	    set breakpoint [lindex $Ls 3]
-	    set repeatStart [lindex $Ls 5]
-	    set repeatEnd [lindex $Ls 6]
-	    set repeatType [lindex $Ls 7]
-			    
-	    lappend g_Repeat_coord($chrom,$breakpoint) "$chrom:$repeatStart-$repeatEnd"
-	    lappend g_Repeat_type($chrom,$breakpoint) "$repeatType"
+	    #set encodeblacklistChrom [lindex $Ls 4]
+	    #set encodeblacklistStart [lindex $Ls 5]
+	    #set encodeblacklistEnd [lindex $Ls 6]
+	    #set encodeblacklistCoord [lindex $Ls 7]
+	    #set encodeblacklistCharact [lindex $Ls 8]
+  
+	    lappend g_ENCODEblacklist_coord($chrom,$breakpoint) [lindex $Ls 7]
+	    lappend g_ENCODEblacklist_charact($chrom,$breakpoint) [lindex $Ls 8]
 	}
 	
-	set g_Repeat(DONE) 1	
-	file delete -force $tmpRepeatFile
-
+	set g_ENCODEblacklist(DONE) 1	
+	file delete -force $tmpENCODEblacklistFile
     }
     
-    if {[info exist g_Repeat_coord($BreakpointChrom,$BreakpointPos)]} {
-	return "[join $g_Repeat_coord($BreakpointChrom,$BreakpointPos) "/"]\t[join $g_Repeat_type($BreakpointChrom,$BreakpointPos) "/"]"
+    if {[info exist g_ENCODEblacklist_coord($BreakpointChrom,$BreakpointPos)]} {
+	return "[join $g_ENCODEblacklist_coord($BreakpointChrom,$BreakpointPos) "/"]\t[join $g_ENCODEblacklist_charact($BreakpointChrom,$BreakpointPos) "/"]"
     } else {
-	return $g_Repeat(Empty)
+	return $g_ENCODEblacklist(Empty)
     }
 }

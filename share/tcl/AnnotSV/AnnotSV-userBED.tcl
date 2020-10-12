@@ -22,7 +22,7 @@
 ############################################################################################################
 
 
-# Check the Users BED regions annotations files (from .../Annotations_$g_AnnotSV(organism)/Users/GRCh*/*ncludedIn*/*.bed)
+# Check the Users BED regions annotations files (from .../Annotations_$g_AnnotSV(organism)/Users/GRCh*/*/*.bed)
 # Create : .../Annotations_$g_AnnotSV(organism)/Users/GRCh*/*ncludedIn*/*.formatted.sorted
 # (After the formatting step, the copy and/or linked users file(s) are deleted)
 proc checkUsersBED {} {
@@ -31,7 +31,7 @@ proc checkUsersBED {} {
     global g_numberOfAnnotationCol
 
     set userBEDdir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Users/$g_AnnotSV(genomeBuild)"
-    foreach userBEDfile [glob -nocomplain $userBEDdir/*ncludedIn*/*.bed] {
+    foreach userBEDfile [glob -nocomplain $userBEDdir/*/*.bed] {
 	# Create a formatted and sorted bedfile if it doesn't exist yet
 	# and create a *.header.tsv file associated
 	regsub -nocase "(.formatted.sorted)?.bed$" $userBEDfile ".bed" notFormattedFile

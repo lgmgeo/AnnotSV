@@ -268,6 +268,15 @@ proc OrganizeAnnotation {} {
     if {$g_AnnotSV(repeatAnn)} {
 	append headerOutput "\tRepeats_coord_left\tRepeats_type_left\tRepeats_coord_right\tRepeats_type_right"
     }
+    if {$g_AnnotSV(gapAnn)} {
+	append headerOutput "\tGap_left\tGap_right"
+    }
+    if {$g_AnnotSV(segdupAnn)} {
+	append headerOutput "\tSegDup_left\tSegDup_right"
+    }
+    if {$g_AnnotSV(ENCODEblacklistAnn)} {
+	append headerOutput "\tENCODE_blacklist_left\tENCODE_blacklist_characteristics_left\tENCODE_blacklist_right\tENCODE_blacklist_characteristics_right"
+    }
 
     ####### "Genes-based header"
     if {$g_AnnotSV(genesBasedAnn)} {
@@ -361,7 +370,9 @@ proc OrganizeAnnotation {} {
     puts "\t...Breakpoints annotations"
     if {$g_AnnotSV(gcContentAnn)} {puts "\t\t...GC content annotation"}
     if {$g_AnnotSV(repeatAnn)} {puts "\t\t...Repeat annotation"}
-
+    if {$g_AnnotSV(gapAnn)} {puts "\t\t...Gap annotation"}
+    if {$g_AnnotSV(segdupAnn)} {puts "\t\t...Segmental duplication annotation"}
+    if {$g_AnnotSV(ENCODEblacklistAnn)} {puts "\t\t...ENCODE blacklist annotation"}
 
 
 
@@ -937,6 +948,30 @@ proc OrganizeAnnotation {} {
 	    } else {set repeatText "\t\t\t"}
 	}
 
+	# Gap annotation 
+	if {$g_AnnotSV(gapAnn)} {
+	    if {$AnnotSVtype ne "split"} {	
+		set gapText "[GapAnnotation $SVchrom $SVleft]"
+		append gapText "\t[GapAnnotation $SVchrom $SVright]"
+	    } else {set gapText "\t"}
+	}
+
+	# Segmental duplication annotation
+	if {$g_AnnotSV(segdupAnn)} {
+	    if {$AnnotSVtype ne "split"} {	
+		set segdupText "[SegDupAnnotation $SVchrom $SVleft]"
+		append segdupText "\t[SegDupAnnotation $SVchrom $SVright]"
+	    } else {set segdupText "\t"}
+	}
+
+	# ENCODE blacklist annotation
+	if {$g_AnnotSV(ENCODEblacklistAnn)} {
+	    if {$AnnotSVtype ne "split"} {	
+		set ENCODEblacklistText "[ENCODEblacklistAnnotation $SVchrom $SVleft]"
+		append ENCODEblacklistText "\t[ENCODEblacklistAnnotation $SVchrom $SVright]"
+	    } else {set ENCODEblacklistText "\t\t\t"}
+	}
+
 	# GH annotation
 	if {$g_AnnotSV(GHann)} {
 	    if {$AnnotSVtype eq "split"} {
@@ -1072,6 +1107,15 @@ proc OrganizeAnnotation {} {
 	if {$g_AnnotSV(repeatAnn)} {
 	    append TextToWrite "\t$repeatText"
 	}
+	if {$g_AnnotSV(gapAnn)} {
+	    append TextToWrite "\t$gapText"
+	}
+	if {$g_AnnotSV(segdupAnn)} {
+	    append TextToWrite "\t$segdupText"
+	}
+	if {$g_AnnotSV(ENCODEblacklistAnn)} {
+	    append TextToWrite "\t$ENCODEblacklistText"
+	}	
 	####### "Genes-based annotations"
 	if {$g_AnnotSV(genesBasedAnn)} {
 	    append TextToWrite "\t$genesBasedText"

@@ -71,13 +71,16 @@ source $g_AnnotSV(tclDir)/AnnotSV-config.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-cosmic.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-ddd.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-dgv.tcl
+source $g_AnnotSV(tclDir)/AnnotSV-encodeblacklist.tcl
+source $g_AnnotSV(tclDir)/AnnotSV-exac.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-exomiser.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-extann.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-filteredVCF.tcl
-source $g_AnnotSV(tclDir)/AnnotSV-exac.tcl
+source $g_AnnotSV(tclDir)/AnnotSV-gap.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-gccontent.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-general.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-genehancer.tcl
+source $g_AnnotSV(tclDir)/AnnotSV-genes.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-gnomad.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-haploinsufficiency.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-help.tcl
@@ -86,8 +89,8 @@ source $g_AnnotSV(tclDir)/AnnotSV-omim.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-pathogenic-NR-SV.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-promoter.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-ranking.tcl
-source $g_AnnotSV(tclDir)/AnnotSV-genes.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-repeat.tcl
+source $g_AnnotSV(tclDir)/AnnotSV-segdup.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-tad.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-userBED.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-vcf.tcl
@@ -155,72 +158,79 @@ if {[regexp "\\.vcf(.gz)?$" $g_AnnotSV(SVinputFile)]} {
     }
 }
 
+## Genes annotations:
+#####################
+
 # Annotation of genes depending of the transcripts (RefSeq or ENSEMBL) ?
 if {$g_AnnotSV(tx) eq "RefSeq"} {
     checkGenesRefSeqFile
 } else {
     checkGenesENSEMBLfile
 }
-
-# Annotation with Promoters?
-checkPromoterFile
-
 # Annotation with OMIM?
 checkOMIMfile
 checkMorbidGenesfile
-
-# Annotation with DGV?
-checkDGVfiles
-
-# Annotation with the dbVar pathogenic NR SV?
-checkPathogenicNRSVfile
-
-# Annotation with GeneIntolerance (ExAC)?
-checkGeneIntoleranceFile
-checkCNVintoleranceFile
-
-# Annotation with DDD?
-checkDDDgeneFile
-checkDDDfrequencyFile
-
-# Annotation with 1000g?
-check1000gFile
-
-# Annotation with gnomAD? 
-checkgnomADfile
-
-# Annotation with IMH (Ira M. Hall's lab)? 
-checkIMHfile
-
 # Annotation with HI (Haploinsufficiency)?
 checkHIfile
-
 # Annotation with ClinGen?
 checkClinGenFile
-
-# Annotation with TAD?
-checkTADfiles
-
-# Annotation with GC content?
-checkFASTAfiles
-
-# Annotation with Repeat?
-checkRepeatFile
-
-# Annotation with GeneHancer?
-checkGHfiles
-
-# Annotation with COSMIC?
-checkCOSMICfile
-
-# Users BED regions annotations files (from $ANNOTSV/share/AnnotSV/Annotations_$g_AnnotSV(organism)/Users/GRCh*/*ncludedIn*/*.bed)
-checkUsersBED
-
 # Annotation with Exomiser?
 checkExomiserInstallation
 
+## SVincludedInFt:
+##################
 
-# Users Genes-based annotation files (from $ANNOTSV/Annotations_$g_AnnotSV(organism)/*/ and from user command lines "-externalGeneFiles")
+# Annotation with DGV?
+checkDGVfiles
+# Annotation with DDD?
+checkDDDgeneFile
+checkDDDfrequencyFile
+# Annotation with 1000g?
+check1000gFile
+# Annotation with GeneIntolerance (ExAC)?
+checkGeneIntoleranceFile
+checkCNVintoleranceFile
+# Annotation with gnomAD? 
+checkgnomADfile
+# Annotation with IMH (Ira M. Hall's lab)? 
+checkIMHfile
+
+## Breakpoint annotations:
+##########################
+
+# Annotation with GC content?
+checkFASTAfiles
+# Annotation with Repeat?
+checkRepeatFile
+# Annotation with Segmental Duplication?
+checkSegDupFile
+# Annotation with Gap?
+checkGapFile
+# Annotation with ENCODE blacklist?
+checkENCODEblacklistFile
+
+## FtIncludedInSV annotations:
+##############################
+
+# Annotation with Promoters?
+checkPromoterFile
+# Annotation with TAD?
+checkTADfiles
+# Annotation with the dbVar pathogenic NR SV?
+checkPathogenicNRSVfile
+# Annotation with GeneHancer?
+checkGHfiles
+# Annotation with COSMIC?
+checkCOSMICfile
+
+# Users BED regions annotations files:
+# (from $ANNOTSV/share/AnnotSV/Annotations_$g_AnnotSV(organism)/Users/GRCh*/*ncludedIn*/*.bed)
+##############################################################################################
+checkUsersBED
+
+# Users Genes-based annotation files:
+# (from $ANNOTSV/Annotations_$g_AnnotSV(organism)/*/ and from user command lines "-externalGeneFiles")
+######################################################################################################
 # g_AnnotSV(extann) has been initialized in AnnotSV-config.tcl
 # g_AnnotSV(extann) will be completed in AnnotSV-exomiser.tcl
 set genesBasedDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based"

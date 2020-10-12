@@ -214,7 +214,7 @@ proc GCcontentAnnotation {BreakpointChrom BreakpointPos} {
 		puts "$Message"
 	    }
 	}
-	# file delete -force $tmpBreakpointsFile; "tmpBreakpointsFile" is used later for the repeat annotation!
+	# file delete -force $tmpBreakpointsFile; "tmpBreakpointsFile" is used later for the other breakpoints annotation!
 
 	# Loading g_GCcontent for each SV breakpoint
 	set f [open $tmpNucFile]

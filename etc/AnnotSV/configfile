@@ -103,6 +103,14 @@ Repeats_coord_left
 Repeats_type_left
 Repeats_coord_right
 Repeats_type_right
+Gap_left
+Gap_right
+SegDup_left
+SegDup_right
+ENCODE_blacklist_left
+ENCODE_blacklist_characteristics_left
+ENCODE_blacklist_right
+ENCODE_blacklist_characteristics_right
 ACMG
 HI_CGscore			*
 TriS_CGscore			*

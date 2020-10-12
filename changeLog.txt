@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.4                                                                                              #
+# AnnotSV 2.5                                                                                              #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
@@ -10,17 +10,19 @@
 
 For more details, please see the README file.
 
-	
-	- Change the names of the values for the "tx" option:
-		NM	>>  RefSeq
-		ENST	>>  ENSEMBL
-	  WARNING: 
-	  In the $ANNOTSV/share/AnnotSV/Annotations_*/Genes/GRCh3*/ directories, please rename:
-	  "genes.ENST.sorted.bed" to "genes.ENSEMBL.sorted.bed"
-	  "genes.NM.sorted.bed" to "genes.RefSeq.sorted.bed"
-	- For DEL and INS only : add the distance / type to the nearest splice site after considering both breakpoints (distNearestSS and nearestSStype columns)
-	- Add bugfix for gnomAD annotations
+
+October 06, 2020: AnnotSV version 2.5
+	- Fix a critical bug for DGV annotation (GRCh38)
+	- Add the distance / type to the nearest splice site after considering both breakpoints (distNearestSS and nearestSStype columns)
 	- Add the in-frame / out-of-frame information from overlapping genes (frameshift column)
+	- Add decision criteria explaining the ranking (previously available as a separate file)
+	- Remove of the ranking decision output file (*.ranking.tsv)
+	- Add of the "Segmental Duplication" and "Gap" SV datasets
+	- Change the names of the values for the "tx" option:
+		NM      >>  RefSeq
+		ENST    >>  ENSEMBL	
+	- Add bugfix for exomiser use (don't use some badly formatted NCBI gene ID)
+	- Add bugfix allowing to use a configfile located in the same directory as the input file
 
 July 30, 2020: AnnotSV version 2.4
 	- Update of the annotations sources (see the corresponding README section)
