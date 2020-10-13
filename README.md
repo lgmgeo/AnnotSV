@@ -17,7 +17,7 @@ make PREFIX=. install-mouse-annotation
 
 3. Set the global environmental variable
 ```
-setenv ANNOTSV /’somewhere’/AnnotSV
+setenv ANNOTSV /path/to/install/AnnotSV
 ```
 
 
