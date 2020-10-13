@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.4                                                                                              #
+# AnnotSV 2.5                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -37,7 +37,7 @@ TCLVERSION           := tcl$(shell echo 'puts $${tcl_version};exit 0' | tclsh)
 TCLDIRDISTRIBUTED    := share/tcl
 TCLDIR               := $(SHAREDIR)/$(TCLVERSION)
 ANNOTSV              := AnnotSV
-VERSION              := 2.4
+VERSION              := 2.5
 RM                   := /bin/rm
 RMDIR                := /bin/rmdir
 MKDIR                := install -d

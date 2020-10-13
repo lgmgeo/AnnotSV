@@ -1,7 +1,7 @@
 #!/usr/bin/env tclsh
 
 ############################################################################################################
-# AnnotSV 2.4                                                                                              #
+# AnnotSV 2.5                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -113,7 +113,7 @@ if {![info exists g_AnnotSV(Version)]} {
 
 puts "AnnotSV $g_AnnotSV(Version)"
 puts ""
-puts "Copyright (C) 2017-2019 GEOFFROY Veronique"
+puts "Copyright (C) 2017-2020 GEOFFROY Veronique"
 puts ""
 puts "Please feel free to contact me for any suggestions or bug reports"
 puts "email: veronique.geoffroy@inserm.fr"

@@ -11,7 +11,8 @@
 For more details, please see the README file.
 
 
-October 06, 2020: AnnotSV version 2.5
+October 12, 2020: AnnotSV version 2.5
+	- Add of the "ENCODE blacklist", "Segmental Duplication" and "Gap" annotation datasets
 	- Fix a critical bug for DGV annotation (GRCh38)
 	- Add the distance / type to the nearest splice site after considering both breakpoints (distNearestSS and nearestSStype columns)
 	- Add the in-frame / out-of-frame information from overlapping genes (frameshift column)
