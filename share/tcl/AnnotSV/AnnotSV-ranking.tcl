@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.5                                                                                              #
+# AnnotSV 2.5.1                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -271,7 +271,7 @@ proc EnhancerInformation {Ls SVtype SVtoAnn} {
 ##   40         Evidence suggests the gene is not dosage sensitive
 ##
 ## HI = Haploinsufficiency  TriS = Triplosensitivity
-proc SVranking {L_annotations ref alt} {
+proc SVranking {L_annotations} {
 
     global g_AnnotSV
     global g_i
@@ -292,7 +292,7 @@ proc SVranking {L_annotations ref alt} {
     set SVtype [lindex $Ls $g_AnnotSV(svtTSVcol)]   
     set SVtoAnn [join [lrange $Ls 1 3] ","]
     set enhancer [EnhancerInformation $Ls $SVtype $SVtoAnn]
-    set AnnotSV_ID [settingOfTheAnnotSVID "[join [lrange $Ls 1 3] "_"]_$SVtype" "$ref" "$alt"]
+    set AnnotSV_ID "[lindex $Ls 0]" 
     set AnnotSVtype [lindex $Ls $g_i(full)]
     set genes [lindex $Ls $g_i(gene)]
 
@@ -453,7 +453,7 @@ proc SVranking {L_annotations ref alt} {
     ## category 2 = likely benign
     ##           < 70% SV overlapped with a benign SV + does not contain CDS from i) a morbid gene, ii) a morbid gene candidate and iii) a candidate gene
     ###################################################################    
-    set ranking "2"	
+    set ranking "2"
     set g_rankingExplanations($AnnotSV_ID) "< $g_AnnotSV(overlap)% SV overlapped with a benign SV + does not contain CDS from i) a morbid gene, ii) a morbid gene candidate and iii) a candidate gene"
     return $ranking
 }

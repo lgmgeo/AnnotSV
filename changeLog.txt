@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.5                                                                                              #
+# AnnotSV 2.5.1                                                                                            #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
@@ -11,6 +11,8 @@
 For more details, please see the README file.
 
 
+	- fix: Add bugfix when the "SV type" is badly formatted
+
 October 12, 2020: AnnotSV version 2.5
 	- Add of the "ENCODE blacklist", "Segmental Duplication" and "Gap" annotation datasets
 	- Fix a critical bug for DGV annotation (GRCh38)
@@ -18,7 +20,6 @@ October 12, 2020: AnnotSV version 2.5
 	- Add the in-frame / out-of-frame information from overlapping genes (frameshift column)
 	- Add decision criteria explaining the ranking (previously available as a separate file)
 	- Remove of the ranking decision output file (*.ranking.tsv)
-	- Add of the "Segmental Duplication" and "Gap" SV datasets
 	- Change the names of the values for the "tx" option:
 		NM      >>  RefSeq
 		ENST    >>  ENSEMBL	

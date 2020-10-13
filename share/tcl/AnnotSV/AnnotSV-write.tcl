@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.5                                                                                              #
+# AnnotSV 2.5.1                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -1122,7 +1122,7 @@ proc OrganizeAnnotation {} {
 	}
 	####### "Ranking"
 	if {$g_AnnotSV(ranking)} {
-	    set rank [SVranking $TextToWrite $ref $alt]
+	    set rank [SVranking $TextToWrite]
 	    if {[lsearch -exact $g_AnnotSV(rankFiltering) $rank] eq -1} {
 		continue
 	    }
