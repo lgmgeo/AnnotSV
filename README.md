@@ -18,7 +18,7 @@ make PREFIX=. install-mouse-annotation
 3. Set the global environmental variable as the location of the git repo on your system. 
 In csh:
 ```
-setenv ANNOTSV=/path/to/install/AnnotSV/
+setenv ANNOTSV /path/to/install/AnnotSV/
 ```
 For bash:
 ```
