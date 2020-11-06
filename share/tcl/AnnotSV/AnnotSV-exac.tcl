@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.5.1                                                                                            #
+# AnnotSV 2.5.2                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -30,7 +30,7 @@
 #    - fordist_cleaned_nonpsych_z_pli_rec_null_data.txt
 #
 ## - Check and create if necessary the following file:
-#    - 'date'_ExAC.pLI-Zscore.annotations.tsv.gz
+#    - 'date'_ExAC-Zscore.annotations.tsv.gz
 proc checkGeneIntoleranceFile {} {
 
     global g_AnnotSV
@@ -40,7 +40,7 @@ proc checkGeneIntoleranceFile {} {
     set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based"
 
     set GeneIntoleranceFileDownloaded [glob -nocomplain "$extannDir/ExAC/fordist_cleaned_nonpsych_z_pli_rec_null_data.txt"]
-    set GeneIntoleranceFileFormattedGzip [glob -nocomplain "$extannDir/ExAC/*_GeneIntolerance.pLI-Zscore.annotations.tsv.gz"]
+    set GeneIntoleranceFileFormattedGzip [glob -nocomplain "$extannDir/ExAC/*_GeneIntolerance-Zscore.annotations.tsv.gz"]
 
     if {$GeneIntoleranceFileDownloaded eq "" && $GeneIntoleranceFileFormattedGzip eq ""} {
 	# No "Gene Intolerance" annotation
@@ -58,21 +58,20 @@ proc checkGeneIntoleranceFile {} {
     }
 
     if {$GeneIntoleranceFileFormattedGzip eq ""} {
-	## Create : 'date'_GeneIntolerance.pLI-Zscore.annotations.tsv.gz   ; # Header: chr start end syn_z mis_z pLI
-	set GeneIntoleranceFileFormatted "$extannDir/ExAC/[clock format [clock seconds] -format "%Y%m%d"]_GeneIntolerance.pLI-Zscore.annotations.tsv"
+	## Create : 'date'_GeneIntolerance-Zscore.annotations.tsv.gz   ; # Header: chr start end syn_z mis_z 
+	set GeneIntoleranceFileFormatted "$extannDir/ExAC/[clock format [clock seconds] -format "%Y%m%d"]_GeneIntolerance-Zscore.annotations.tsv"
 
-	puts "...GeneIntolerance configuration for pLI and Z scores annotation from ExAC ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+	puts "...GeneIntolerance configuration for Z scores annotation from ExAC ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 
 	puts "\t...creation of $GeneIntoleranceFileFormatted.gz"
 	puts "\t   (done only once during the first GeneIntolerance annotation)\n"
 
-	set TexteToWrite {genes\tsynZ_ExAC\tmisZ_ExAC\tpLI_ExAC}
+	set TexteToWrite {genes\tsynZ_ExAC\tmisZ_ExAC}
 	foreach L [LinesFromFile $GeneIntoleranceFileDownloaded] {
 	    if {[regexp  "^transcript" $L]} {
 		set i_gene    [lsearch -regexp $L "^gene"]; if {$i_gene == -1} {puts "Bad syntax into $GeneIntoleranceFileDownloaded.\ngene field not found - Exit with error"; exit 2}
 		set i_synZ    [lsearch -regexp $L "^syn_z"]; if {$i_synZ == -1} {puts "Bad syntax into $GeneIntoleranceFileDownloaded.\nsyn_z field not found - Exit with error"; exit 2}
 		set i_misZ    [lsearch -regexp $L "^mis_z"]; if {$i_misZ == -1} {puts "Bad syntax into $GeneIntoleranceFileDownloaded.\nmis_z field not found - Exit with error"; exit 2}
-		set i_pLI     [lsearch -regexp $L "^pLI"];   if {$i_pLI == -1} {puts "Bad syntax into $GeneIntoleranceFileDownloaded.\npLI field not found - Exit with error"; exit 2}
 		continue
 	    }
 	    set Ls [split $L "\t"]
@@ -80,9 +79,8 @@ proc checkGeneIntoleranceFile {} {
 	    set gene [lindex $Ls $i_gene]
 	    set synZ [lindex $Ls $i_synZ]
 	    set misZ [lindex $Ls $i_misZ]
-	    set pLI  [lindex $Ls $i_pLI]
 
-	    lappend TexteToWrite "$gene\t$synZ\t$misZ\t$pLI"
+	    lappend TexteToWrite "$gene\t$synZ\t$misZ"
 	}
 	WriteTextInFile [join $TexteToWrite "\n"] $GeneIntoleranceFileFormatted
 	if {[catch {exec gzip $GeneIntoleranceFileFormatted} Message]} {
@@ -153,7 +151,8 @@ proc checkCNVintoleranceFile {} {
     }
 
     if {$CNVintoleranceFileFormattedGzip eq ""} {
-	## Create : 'date'_ExAC.CNV-Zscore.annotations.tsv.gz ; # Header: chr start end syn_z mis_z pLI
+	## Create : 'date'_ExAC.CNV-Zscore.annotations.tsv.gz ; # Header: genes   delZ_ExAC       dupZ_ExAC       cnvZ_ExAC
+
 	set CNVintoleranceFileFormatted "$extannDir/ExAC/[clock format [clock seconds] -format "%Y%m%d"]_ExAC.CNV-Zscore.annotations.tsv"
 
 	puts "...ExAC CNV Intolerant Genes configuration ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"

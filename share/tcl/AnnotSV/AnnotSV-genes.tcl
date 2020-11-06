@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.5.1                                                                                            #
+# AnnotSV 2.5.2                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -36,7 +36,7 @@ proc checkGenesRefSeqFile {} {
     
     if {$genesFileDownloaded eq "" && $genesFileFormatted eq ""} {
 	puts "############################################################################"
-	puts "\"$genesFileDownloaded\" doesn't exist"
+	puts "\"$genesDir/refGene.txt.gz\" file doesn't exist"
 	puts "Please check your install - Exit with error."
 	puts "############################################################################"
 	exit 2
@@ -128,7 +128,7 @@ proc checkGenesENSEMBLfile {} {
     
     if {$GenesENSEMBLfileFormatted eq ""} {
         puts "############################################################################"
-        puts "\"$GenesENSEMBLfileFormatted\" doesn't exist"
+        puts "\"$genesDir/genes.ENSEMBL.sorted.bed\" doesn't exist"
         puts "Please check your install - Exit with error."
         puts "############################################################################"
         exit 2
@@ -237,7 +237,6 @@ proc genesAnnotation {} {
 	return
     }
 
-
     # List of the user selected transcripts
     #######################################
     set L_selectedTx {}
@@ -290,7 +289,6 @@ proc genesAnnotation {} {
 	set L [gets $f]
 	if {$L eq ""} {continue}
 	set Ls [split $L "\t"]
-	
 	# splitSV ("chrom, start, end, SVtype")
 	if {$g_AnnotSV(svtBEDcol) ne "-1"} {
 	    set SVtype "\t[lindex $Ls "$g_AnnotSV(svtBEDcol)"]"

@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.5.1                                                                                            #
+# AnnotSV 2.5.2                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -215,11 +215,6 @@ proc runExomiser {L_Genes L_HPO} {
     set infos [ContentFromFile $g_AnnotSV(etcDir)/application.properties]
     regsub "XXXX" $infos "$port" infos
     regsub "YYYY" $infos "$g_AnnotSV(annotationsDir)/Annotations_Exomiser/$hpoVersion" infos
-#    if {$g_AnnotSV(genomeBuild) eq "GRCh37"} {
-#	regsub "ZZZZ" $infos "hg19" infos
-#    } else {
-#	regsub "ZZZZ" $infos "hg38" infos
-#    }
     WriteTextInFile $infos $applicationPropertiesTmpFile
     # Start the REST service
     set exomiserStartServiceFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_exomiser.tmp"
@@ -233,7 +228,10 @@ proc runExomiser {L_Genes L_HPO} {
 	    set geneID [searchforGeneID $geneName]
 	    
 	    # Check if the information exists
-	    if {$geneID eq ""} {continue}
+	    if {$geneID eq ""} {
+		lappend L_output "$geneName\t-1.0\t\t\t"
+		continue
+	    }
 	    
 	    # Exomiser request
 	    set url "http://localhost:${port}/exomiser/api/prioritise/?phenotypes=${L_HPO}&prioritiser=hiphive&prioritiser-params=human,mouse,fish,ppi&genes=$geneID"
@@ -247,21 +245,31 @@ proc runExomiser {L_Genes L_HPO} {
 		puts "geneName: $geneName"
 		puts "$Message\n"
 		puts "$url"
+		lappend L_output "$geneName\t-1.0\t\t\t"
 		continue
 	    }
 	    
 	    # The exomiser http request can be used for x genes -> in this case, it returns in the results a list of dictionary, 1 for each gene
 	    # If the http request is only for 1 gene, the result is a list of 1 dict.
 	    # => We use only the first element of the results, which is a dict (a list of key-value)
-	    if {[catch {set d_results [lindex [dict get $d_all "results"] 0]} Message]} {continue}
+	    if {[catch {set d_results [lindex [dict get $d_all "results"] 0]} Message]} {
+		lappend L_output "$geneName\t-1.0\t\t\t"
+		continue
+	    }
 	    # dict for {theKey theValue} $d_results {
 	    #    puts "$theKey -> $theValue\n"
 	    # }	    
 	    
-	    if {[catch {set EXOMISER_GENE_PHENO_SCORE [dict get $d_results "score"]} Message]} {continue}
+	    if {[catch {set EXOMISER_GENE_PHENO_SCORE [dict get $d_results "score"]} Message]} {
+		lappend L_output "$geneName\t-1.0\t\t\t"
+		continue
+	    }
 	    set EXOMISER_GENE_PHENO_SCORE [format "%.4f" $EXOMISER_GENE_PHENO_SCORE]
 	    
-	    if {[catch {set d_phenotypeEvidence [dict get $d_results "phenotypeEvidence"]} Message]} {continue}
+	    if {[catch {set d_phenotypeEvidence [dict get $d_results "phenotypeEvidence"]} Message]} {
+		lappend L_output "$geneName\t-1.0\t\t\t"
+		continue
+	    }
 	    # -> return a list of dictionary, 1 for each organism:
 	    # puts [llength $d_phenotypeEvidence] ; # = 2 (HUMAN + MOUSE)
 	    

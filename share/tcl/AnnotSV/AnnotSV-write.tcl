@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.5.1                                                                                            #
+# AnnotSV 2.5.2                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -105,7 +105,7 @@ proc OrganizeAnnotation {} {
 	    }
 	}
     }
-    append headerOutput "\tAnnotSV type\tGene name\ttx\tCDS length\tframeshift\ttx length\tlocation\tlocation2\tdistNearestSS\tnearestSStype\tintersectStart\tintersectEnd"
+    append headerOutput "\tAnnotSV type\tGene name\ttx\ttx start\ttx end\toverlapped tx length\toverlapped CDS length\tframeshift\tNumber of exons\tlocation\tlocation2\tdistNearestSS\tnearestSStype\tintersectStart\tintersectEnd"
     	      
 
     ### Search for "ref" and "alt" information (to define the AnnotSV_ID)
@@ -494,6 +494,7 @@ proc OrganizeAnnotation {} {
 	    set regionEnd ""
 	    set intersectStart ""
 	    set intersectEnd ""
+	    set nbExons [expr {[llength [split $exonStarts ","]]-1}]
     	    if {[string is integer $CDSl]} {
     	        if {[expr {$CDSl%3}] eq 0} {
                     set frameshift "no"
@@ -511,12 +512,15 @@ proc OrganizeAnnotation {} {
 	    }
 	    set transcript ""
 	    set CDSl       ""
+	    set txStart    ""
+	    set txEnd      ""
 	    set txL        ""
 	    set location   ""
 	    set location2  ""
 	    set distNearestSS ""
 	    set nearestSStype ""
 	    set intersect  "\t"
+	    set nbExons    ""
 	    set frameshift ""
 	}	    
 
@@ -856,7 +860,13 @@ proc OrganizeAnnotation {} {
 		if {[info exists g_AnnotSV(extann)] && $g_AnnotSV(extann) != ""} {	
 		    if {$geneName eq ""} {
 			foreach F [ExternalAnnotations L_Files] {
-			    lappend L_genesBasedText {*}"[lrepeat $nbColumns($F) ""]"
+			    if {[regexp "_exomiser_gene_pheno.tmp.tsv$" $F]} {
+				# The "EXOMISER_GENE_PHENO_SCORE" value is set to -1 if no gene is overlapped by the SV
+				lappend L_genesBasedText "-1.0"
+				lappend L_genesBasedText {*}"[lrepeat [expr {$nbColumns($F)-1}] ""]"
+			    } else {
+				lappend L_genesBasedText {*}"[lrepeat $nbColumns($F) ""]"
+			    }
 			}
 		    } else {
 			set allGenesFromFullLine [split $geneName "/"]
@@ -865,16 +875,16 @@ proc OrganizeAnnotation {} {
 			    # First, we search for the annotation of each gene that we merge with a "/"
 			    set L_AnnotFound {} 
 			    foreach g $allGenesFromFullLine {
-				set AnnotFound "[ExternalAnnotations $F $g]"		
+				set AnnotFound "[ExternalAnnotations $F $g]"
 				if {$AnnotFound eq ""} {
 				    set AnnotFound "[join [lrepeat $nbColumns($F) ""] "\t"]"
 				} 
 				lappend L_AnnotFound "$AnnotFound"		
 			    }
 			    set tutu [MergeAnnotation $L_AnnotFound $nbColumns($F)]
-			    
+
 			    # Second (for full lines), we doesn't keep the annotation of all genes (value is set to empty), 
-			    # except for scores and percentages where we keep the max value
+			    # except for "decimal" scores and percentages where we keep the max value
 			    # (in order not to have value such "1.5/////-0.2////")
 			    # and except for OMIM number where we keep all the numbers
 			    set L_newGenesBasedText ""
@@ -1016,7 +1026,7 @@ proc OrganizeAnnotation {} {
 	# chrom txStart txEnd name2 name cdsStart cdsEnd exonStarts exonEnds
 	#
 	# headerOutput:
-	#  "Gene name\ttx\tCDS length\ttx length\tlocation\tlocation2\tdistNearestSS\tnearestSStype\tintersectStart\tintersectEnd\tOMIM ID\tOMIM phenotype\tOMIM inheritance\t#hom\t#htz"
+	#  "Gene name\ttx\ttx Start\ttx End\ttx length\tnb exons\tCDS length\tframeshift\tlocation\tlocation2\tdistNearestSS\tnearestSStype\tintersectStart\tintersectEnd\tOMIM ID\tOMIM phenotype\tOMIM inheritance\t#hom\t#htz"
 
 	# Insertion of the SV length in the fourth column:
 	set SVchrom [lindex $Ls 0]
@@ -1043,19 +1053,19 @@ proc OrganizeAnnotation {} {
 	if {$g_AnnotSV(SVinputInfo)} {
 	    set toadd [lrange $Ls 0 [expr {$theBEDlength-1}]]
 	    set toadd [linsert $toadd 3 $SVlength]
-	    set TextToWrite "$AnnotSV_ID\t[join $toadd "\t"]\t$AnnotSVtype\t$geneName\t$transcript\t$CDSl\t$frameshift\t$txL\t$location\t$location2\t$distNearestSS\t$nearestSStype\t$intersect"
+	    set TextToWrite "$AnnotSV_ID\t[join $toadd "\t"]\t$AnnotSVtype\t$geneName\t$transcript\t$txStart\t$txEnd\t$txL\t$CDSl\t$frameshift\t$nbExons\t$location\t$location2\t$distNearestSS\t$nearestSStype\t$intersect"
 	} else {
 	    if {$g_AnnotSV(svtBEDcol) ne -1} { ; # SV type is required for the ranking
 		if {$g_AnnotSV(samplesidBEDcol) ne -1} {
-		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$SVtype\t$Samplesid\t$AnnotSVtype\t$geneName\t$transcript\t$CDSl\t$frameshift\t$txL\t$location\t$location2\t$distNearestSS\t$nearestSStype\t$intersect"  
+		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$SVtype\t$Samplesid\t$AnnotSVtype\t$geneName\t$transcript\t$txStart\t$txEnd\t$txL\t$CDSl\t$frameshift\t$nbExons\t$location\t$location2\t$distNearestSS\t$nearestSStype\t$intersect"  
 		} else {
-		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$SVtype\t$AnnotSVtype\t$geneName\t$transcript\t$CDSl\t$frameshift\t$txL\t$location\t$location2\t$distNearestSS\t$nearestSStype\t$intersect"
+		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$SVtype\t$AnnotSVtype\t$geneName\t$transcript\t$txStart\t$txEnd\t$txL\t$CDSl\t$frameshift\t$nbExons\t$location\t$location2\t$distNearestSS\t$nearestSStype\t$intersect"
 		}
 	    } else {
 		if {$g_AnnotSV(samplesidBEDcol) ne -1} {
-		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$Samplesid\t$AnnotSVtype\t$geneName\t$transcript\t$CDSl\t$frameshift\t$txL\t$location\t$location2\t$distNearestSS\t$nearestSStype\t$intersect"
+		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$Samplesid\t$AnnotSVtype\t$geneName\t$transcript\t$txStart\t$txEnd\t$txL\t$CDSl\t$frameshift\t$nbExons\t$location\t$location2\t$distNearestSS\t$nearestSStype\t$intersect"
 		} else {
-		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$AnnotSVtype\t$geneName\t$transcript\t$CDSl\t$frameshift\t$txL\t$location\t$location2\t$distNearestSS\t$nearestSStype\t$intersect"
+		    set TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength\t$AnnotSVtype\t$geneName\t$transcript\t$txStart\t$txEnd\t$txL\t$CDSl\t$frameshift\t$nbExons\t$location\t$location2\t$distNearestSS\t$nearestSStype\t$intersect"
 		}
 	    }
 	}

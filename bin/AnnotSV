@@ -1,7 +1,7 @@
 #!/usr/bin/env tclsh
 
 ############################################################################################################
-# AnnotSV 2.5.1                                                                                            #
+# AnnotSV 2.5.2                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -85,6 +85,7 @@ source $g_AnnotSV(tclDir)/AnnotSV-gnomad.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-haploinsufficiency.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-help.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-imh.tcl
+source $g_AnnotSV(tclDir)/AnnotSV-loeuf-pLI.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-omim.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-pathogenic-NR-SV.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-promoter.tcl
@@ -176,6 +177,8 @@ checkHIfile
 checkClinGenFile
 # Annotation with Exomiser?
 checkExomiserInstallation
+# Annotation with LOEUF
+checkLOEUFfile
 
 ## SVincludedInFt:
 ##################

@@ -50,9 +50,12 @@ Samples_ID
 AnnotSV type			*
 Gene name			*
 tx				*
-CDS length			*
+tx start			*
+tx end				*
+Number of exons				
+overlapped tx length            *
+overlapped CDS length		*
 frameshift			*
-tx length			*
 location			*
 location2			*
 distNearestSS                   *
@@ -122,10 +125,12 @@ DDD_pmids
 HI_DDDpercent
 synZ_ExAC
 misZ_ExAC
-pLI_ExAC			*
 delZ_ExAC
 dupZ_ExAC
 cnvZ_ExAC
+LOEUF_bin
+pLI_ExAC			*
+pLI_gnomAD			*
 morbidGenes			*
 morbidGenesCandidates		*
 Mim Number
