@@ -468,10 +468,10 @@ proc VCFsToBED {SV_VCFfiles} {
 		set ciposleft [lindex [split $cipos ","] 0]
 		set ciendright [lindex [split $ciend ","] end]
 		if {$ciposleft < 0} {
-		    incr pos $ciposleft
+		    catch {incr pos $ciposleft}
 		}
 		if {$ciendright > 0} {
-		    incr end $ciendright
+		    catch {incr end $ciendright}
 		}
 	    }
 

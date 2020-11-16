@@ -42,36 +42,37 @@
 #------------------------
 # Output column names are listed below.
 # In order to disable default annotations provided by AnnotSV, some column names (the ones that are not marked with an *) can be commented with a hash character ("#") by the user.
-AnnotSV ID 			*
-SV chrom 			*
-SV start 			*
-SV end 				*
-SV length			*
-SV type				*
+AnnotSV ID                      *
+SV chrom                        *
+SV start                        *
+SV end                          *
+SV length                       *
+SV type                         *
 Samples_ID
-AnnotSV type			*
-Gene name			*
-tx				*
-tx start			*
-tx end				*
-Number of exons				
+AnnotSV type                    *
+Gene name                       *
+Number of genes                 *
+tx                              *
+tx start                        *
+tx end                          *
+Number of exons
 overlapped tx length            *
-overlapped CDS length		*
-frameshift			*
-location			*
-location2			*
+overlapped CDS length           *
+frameshift                      *
+location                        *
+location2                       *
 distNearestSS                   *
 nearestSStype                   *
-intersectStart			*
-intersectEnd			*
+intersectStart                  *
+intersectEnd                    *
 DGV_GAIN_IDs
 DGV_GAIN_n_samples_with_SV
-DGV_GAIN_n_samples_tested	*
-DGV_GAIN_Frequency		*
+DGV_GAIN_n_samples_tested       *
+DGV_GAIN_Frequency              *
 DGV_LOSS_IDs
 DGV_LOSS_n_samples_with_SV
-DGV_LOSS_n_samples_tested	*
-DGV_LOSS_Frequency		*
+DGV_LOSS_n_samples_tested       *
+DGV_LOSS_Frequency              *
 GD_ID
 GD_AN
 GD_N_HET
@@ -89,14 +90,14 @@ IMH_ID
 IMH_AF
 IMH_ID_others
 promoters
-dbVar_event			*
+dbVar_event                     *
 dbVar_variant		
-dbVar_status			*
+dbVar_status                    *
 GHid_elite
 GHid_not_elite
 GHtype
-GHgene_elite			*
-GHgene_not_elite		*
+GHgene_elite                    *
+GHgene_not_elite                *
 GHtissue
 COSMIC_ID
 COSMIC_MUT_TYP
@@ -117,8 +118,8 @@ ENCODE_blacklist_characteristics_left
 ENCODE_blacklist_right
 ENCODE_blacklist_characteristics_right
 ACMG
-HI_CGscore			*
-TriS_CGscore			*
+HI_CGscore                      *
+TriS_CGscore                    *
 DDD_status
 DDD_mode
 DDD_consequence
@@ -131,10 +132,10 @@ delZ_ExAC
 dupZ_ExAC
 cnvZ_ExAC
 LOEUF_bin
-pLI_ExAC			*
-pLI_gnomAD			*
-morbidGenes			*
-morbidGenesCandidates		*
+pLI_ExAC                        *
+pLI_gnomAD                      *
+morbidGenes                     *
+morbidGenesCandidates           *
 Mim Number
 Phenotypes
 Inheritance
