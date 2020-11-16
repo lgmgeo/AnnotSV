@@ -10,13 +10,16 @@
 
 For more details, please see the README file.
 
+	- feat: By default, AnnotSV now expands the "start" and "end" SV positions with the VCF confidence intervals (CIPOS, CIEND) around the breakpoints (see the "includeCI" option)
+
+
 November 06, 2020, AnnotSV version 2.5.2
 	- feat: Add the pLI annotation from gnomAD (pLI_gnomAD), update the pLI annotation from ExAC (pLI_ExAC)
 	- feat: Add the "LOEUF_bin" annotation (gnomAD)
 	- feat: Add the "tx start", "tx end" and "Number of exons" annotations 
 		The "tx length" column has been renamed "tx length overlapped"
 	  	The "CDS length" column has been renamed "CDS length overlapped" 
-	- feat: If not provided, the EXOMISER_GENE_PHENO_SCORE is set to "-1.0". 
+	- feat: If not provided, the EXOMISER_GENE_PHENO_SCORE is set to "-1.0"
 	- Update README.md
 
 October 13, 2020: AnnotSV version 2.5.1

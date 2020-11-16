@@ -36,6 +36,9 @@ OPTIONS
                                 Values: use comma, semicolon or space separated class values, default = ""
                                 (e.g.: "HP:0001156,HP:0001363,HP:0011304")
 
+-includeCI:                     To expand the "start" and "end" SV positions with the VCF confidence intervals (CIPOS, CIEND) around the breakpoints
+                                Values: yes (default) or no
+
 -metrics:                       Changing numerical values from frequencies to us or fr metrics (e.g. 0.2 or 0,2)
                                 Values: us (default) or fr
 

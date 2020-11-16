@@ -201,7 +201,7 @@ proc EnhancerInformation {Ls SVtype SVtoAnn} {
     #########################################################################################################
     # Check for a del:
     set thegenes "DEL"
-    if {[regexp -nocase "Del|Loss|<CN0>" $SVtype]} {
+    if {[regexp -nocase "Del|Loss|<CN0>|<CN1>" $SVtype]} {
 	foreach g $L_enhancersAssociatedGenes {
 	    if {[lsearch -exact $L_DEL $g] ne -1} {
 		lappend thegenes $g
@@ -214,7 +214,7 @@ proc EnhancerInformation {Ls SVtype SVtoAnn} {
     #########################################################################################
     # Check for a dup:
     set thegenes "DUP"
-    if {[regexp -nocase "Dup|Gain|Multiplication|<CN\[2-9\]" $SVtype]} {
+    if {[regexp -nocase "Dup|Gain|Multiplication|<CN\[3-9\]" $SVtype]} {
 	foreach g $L_enhancersAssociatedGenes {
 	    if {[lsearch -exact $L_DUP $g] ne -1} {
 		lappend thegenes $g
@@ -302,12 +302,12 @@ proc SVranking {L_annotations} {
     set dbVar_status [lindex $Ls $g_i(dbVar_status)]
     if {$dbVar_status ne ""} {
 	set dbVar_event [lindex $Ls $g_i(dbVar_event)]
-	if {[regexp -nocase "Del|Loss|<CN0>" $SVtype] && [regexp -nocase "Del|Loss|<CN0>" $dbVar_event]} {
+	if {[regexp -nocase "Del|Loss|<CN0>|<CN1>" $SVtype] && [regexp -nocase "Del|Loss|<CN0>|<CN1>" $dbVar_event]} {
 	    set ranking "5"	
 	    set g_rankingExplanations($AnnotSV_ID) "LOSS: pathogenic SV overlapped"
 	    return $ranking
 	}
-	if {[regexp -nocase "Dup|Gain|Multiplication|<CN\[2-9\]" $SVtype] && [regexp -nocase "Dup|Gain|Multiplication|<CN\[2-9\]" $dbVar_event]} {
+	if {[regexp -nocase "Dup|Gain|Multiplication|<CN\[3-9\]" $SVtype] && [regexp -nocase "Dup|Gain|Multiplication|<CN\[3-9\]" $dbVar_event]} {
 	    set ranking "5"	
 	    set g_rankingExplanations($AnnotSV_ID) "GAIN: pathogenic SV overlapped"
 	    return $ranking
@@ -343,7 +343,7 @@ proc SVranking {L_annotations} {
     # Check for a del:
     regsub "," [lindex $Ls $g_i(pLI)] "." pLI; # needed with -metrics=fr 
     set HI_CGscore [lindex $Ls $g_i(HI_CGscore)]
-    if {[regexp -nocase "Del|Loss|<CN0>" $SVtype]} {
+    if {[regexp -nocase "Del|Loss|<CN0>|<CN1>" $SVtype]} {
 	# Check if it is not a dosage sensitive gene    
 	if {$HI_CGscore eq "40"} {set notADosageSensitiveGene "yes"}
 	# Check SV that overlap a gene with a pLI > 0.9 or with HI_CGscore of 3 or 2
@@ -366,7 +366,7 @@ proc SVranking {L_annotations} {
     
     # Check for a dup:
     set TriS_CGscore [lindex $Ls $g_i(TriS_CGscore)]
-    if {[regexp -nocase "Dup|Gain|Multiplication|<CN\[2-9\]" $SVtype]} {
+    if {[regexp -nocase "Dup|Gain|Multiplication|<CN\[3-9\]" $SVtype]} {
         # Check if it is not a dosage sensitive gene
         if {$TriS_CGscore eq "40"} {set notADosageSensitiveGene "yes"}
 	# Check SV that overlap a gene TriS_CGscore of 3 or 2
@@ -431,13 +431,13 @@ proc SVranking {L_annotations} {
     regsub ","  [lindex $Ls $g_i(LOSSfreq)] "." LOSSfreq; # needed with -metrics=fr 
     regsub ","  [lindex $Ls $g_i(GDPOPMAXAF)] "." GDPOPMAXAF; # needed with -metrics=fr 
 
-    if {[regexp -nocase "Del|Loss|<CN0>" $SVtype]} {
+    if {[regexp -nocase "Del|Loss|<CN0>|<CN1>" $SVtype]} {
 	if {$LOSStot > $g_AnnotSV(minTotalNumber) && $LOSSfreq > 0.01} {
 	    set ranking "1"	
 	    set g_rankingExplanations($AnnotSV_ID) "> $g_AnnotSV(overlap)% SV overlapped with a frequent SV + does not contain CDS from i) a morbid gene, ii) a morbid gene candidate and iii) a candidate gene"
 	    return $ranking
 	}
-    } elseif {[regexp -nocase "Dup|Gain|Multiplication|<CN\[2-9\]" $SVtype]} {
+    } elseif {[regexp -nocase "Dup|Gain|Multiplication|<CN\[3-9\]" $SVtype]} {
 	if {$GAINtot > $g_AnnotSV(minTotalNumber) && $GAINfreq > 0.01} {
 	    set ranking "1"	
 	    set g_rankingExplanations($AnnotSV_ID) "> $g_AnnotSV(overlap)% SV overlapped with a frequent SV + does not contain CDS from i) a morbid gene, ii) a morbid gene candidate and iii) a candidate gene"

@@ -12,6 +12,8 @@
 
 -hpo:                       ""
 
+-includeCI:                 "yes"
+
 -metrics:                   "us"
 
 -minTotalNumber:            "500"

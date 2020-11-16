@@ -44,23 +44,26 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(bedtools)                 "bedtools"
     set g_AnnotSV(candidateGenesFile)       ""
     set g_AnnotSV(candidateGenesFiltering)  "no"
-    set g_AnnotSV(extann)                   ""    ;# list of the “.../Annotations_$g_AnnotSV(organism)/*/*.tsv(.gz) files” <=> External gene annotation files
     set g_AnnotSV(candidateSnvIndelFiles)   ""
     set g_AnnotSV(candidateSnvIndelSamples) ""
+    set g_AnnotSV(extann)                   ""    ;# list of the “.../Annotations_$g_AnnotSV(organism)/*/*.tsv(.gz) files” <=> External gene annotation files
     set g_AnnotSV(externalGeneFiles)        ""
     set g_AnnotSV(genomeBuild)              "GRCh37"
     set g_AnnotSV(hpo)                      ""    ;# "HP:0030684,HP:0085622"
+    set g_AnnotSV(includeCI)                "yes"
     set g_AnnotSV(metrics)                  "us"
     set g_AnnotSV(minTotalNumber)           "500"
+    set g_AnnotSV(outputColHeader)          ""    ;# not given in parameter
     set g_AnnotSV(outputDir)                ""
     set g_AnnotSV(outputFile)               ""
     set g_AnnotSV(overlap)                  "70"
     set g_AnnotSV(overwrite)                "yes"
     set g_AnnotSV(promoterSize)             "500"
     set g_AnnotSV(rankFiltering)            "1-5"
+    set g_AnnotSV(ranking)                  "1"   ;# not given in parameter
     set g_AnnotSV(reciprocal)               "no"
     set g_AnnotSV(samplesidBEDcol)          "-1"
-    set g_AnnotSV(samplesidTSVcol)          "-1" ;# not given in parameter
+    set g_AnnotSV(samplesidTSVcol)          "-1"  ;# not given in parameter
     set g_AnnotSV(snvIndelFiles)            ""
     set g_AnnotSV(snvIndelPASS)             "0"
     set g_AnnotSV(snvIndelSamples)          ""
@@ -68,17 +71,15 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(SVinputInfo)              "1"
     set g_AnnotSV(SVminSize)                "50"
     set g_AnnotSV(svtBEDcol)                "-1"
-    set g_AnnotSV(svtTSVcol)                "-1" ;# not given in parameter
+    set g_AnnotSV(svtTSVcol)                "-1"  ;# not given in parameter
     set g_AnnotSV(tx)                       "RefSeq"
     set g_AnnotSV(txFile)                   ""
     set g_AnnotSV(typeOfAnnotation)         "both"
-    set g_AnnotSV(ranking)                  "1"
-    set g_AnnotSV(outputColHeader)          ""
 
     ###########################
     ## Load config file options
     ###########################
-    set lOptionsOk "annotationsDir bcftools bedtools candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering reciprocal samplesidBEDcol snvIndelFiles snvIndelPASS SVinputFile SVinputInfo SVminSize svtBEDcol tx txFile typeOfAnnotation snvIndelSamples"
+    set lOptionsOk "annotationsDir bcftools bedtools candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo includeCI metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering reciprocal samplesidBEDcol snvIndelFiles snvIndelPASS snvIndelSamples SVinputFile SVinputInfo SVminSize svtBEDcol tx txFile typeOfAnnotation"
     set configFile "$g_AnnotSV(etcDir)/configfile"
     if {[file exists "[file dirname $g_AnnotSV(SVinputFile)]/configfile"]} {
 	set configFile "[file dirname $g_AnnotSV(SVinputFile)]/configfile"
@@ -191,7 +192,7 @@ proc configureAnnotSV {argv} {
     }
 
     ## It must be: yes or no
-    foreach val {candidateGenesFiltering} {
+    foreach val {candidateGenesFiltering includeCI} {
 	if {$g_AnnotSV($val) ne "yes" && $g_AnnotSV($val) ne "no"} {
 	    puts "############################################################################"
 	    puts "Bad option value: -$val = $g_AnnotSV($val)"

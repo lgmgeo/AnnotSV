@@ -200,7 +200,7 @@ proc MergeAnnotation {L_ann numberOfannCol} {
 proc normalizeSVtype {SVtype} {
 
     # SVtype in which category: DUP? DEL? INV? INS? None?
-    if {[regexp -nocase "del|loss|<CN0>" $SVtype]} {
+    if {[regexp -nocase "del|loss|<CN0>|<CN1>" $SVtype]} {
 	set SVtype "DEL"
     } elseif {[regexp -nocase "dup|gain|MCNV" $SVtype ]} {
 	set SVtype "DUP"

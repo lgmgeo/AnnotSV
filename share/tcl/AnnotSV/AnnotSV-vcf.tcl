@@ -394,6 +394,8 @@ proc VCFsToBED {SV_VCFfiles} {
             if {[regexp "SVLEN=(\[0-9-\]+)" $INFOcol match SVLEN]} {set svlen $SVLEN} else {set svlen ""}
 	    if {[regexp ";END=(\[0-9\]+)" $INFOcol match END] || [regexp "^END=(\[0-9\]+)" $INFOcol match END]} {set end $END} else {set end ""}
 	    if {[regexp "SVTYPE=(\[^;\]+)" $INFOcol match SVTYPE]} {set svtype $SVTYPE} else {set svtype ""}      
+	    if {[regexp "CIPOS=(\[^;\]+)" $INFOcol match CIPOS]} {set cipos $CIPOS} else {set cipos ""}      
+	    if {[regexp "CIEND=(\[^;\]+)" $INFOcol match CIEND]} {set ciend $CIEND} else {set ciend ""}
 	    if {[regexp "^<" $alt]} {
 		# Type2
 		if {$end eq ""} {
@@ -457,6 +459,21 @@ proc VCFsToBED {SV_VCFfiles} {
 
 	    if {$end < $pos} {set tutu $end; set end $pos; set pos $tutu}
 	    if {$end eq $pos} {set end [expr {$pos+1}]}
+
+	    if {$g_AnnotSV(includeCI) eq "yes"} {
+		# Correction of the "start" / "end" SV positions by using the confidence interval around the boundaries:
+		##INFO=<ID=CIPOS,Number=2,Type=Integer,Description="Confidence interval around POS for imprecise variants">
+		##INFO=<ID=CIEND,Number=2,Type=Integer,Description="Confidence interval around END for imprecise variants">
+		# e.g. CIPOS=-10,10;CIEND=-10,10;  or  CIPOS=-6,5;CIEND=-6,5;  or  CIPOS=-410,410;CIEND=-410,410
+		set ciposleft [lindex [split $cipos ","] 0]
+		set ciendright [lindex [split $ciend ","] end]
+		if {$ciposleft < 0} {
+		    incr pos $ciposleft
+		}
+		if {$ciendright > 0} {
+		    incr end $ciendright
+		}
+	    }
 
 	    set AnnotSV_ID [settingOfTheAnnotSVID "${chrom}_${pos}_${end}_${svtype}" "$ref" "$alt"]
 
