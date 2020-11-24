@@ -9,6 +9,7 @@
 
 
 For more details, please see the README file.
+	- feat: Add the merge of different available regulatory elements annotations (RefSeq/ENSEMBL, EnhancerAtlas, GeneHancer)
 	- feat: Add the number of overlapped genes in the "full" annotation lines
 	- feat: By default, AnnotSV now expands the "start" and "end" SV positions with the VCF confidence intervals (CIPOS, CIEND) around the breakpoints (see the "includeCI" option)
 

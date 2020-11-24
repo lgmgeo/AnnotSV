@@ -175,34 +175,25 @@ proc searchforGeneID {geneName} {
 
 
 
-# Creation of the temporary $geneBasedTmp file:
-# HEADER =
-# genes   EXOMISER_GENE_PHENO_SCORE   HUMAN_PHENO_EVIDENCE   MOUSE_PHENO_EVIDENCE   FISH_PHENO_EVIDENCE
-#
+# Creation of the g_Exomiser variable:
+# g_Exomiser($geneName) = EXOMISER_GENE_PHENO_SCORE\tHUMAN_PHENO_EVIDENCE\tMOUSE_PHENO_EVIDENCE\tFISH_PHENO_EVIDENCE
+#\t-1.0\t\t\t"
 # INPUTS:
 # L_genes: e.g. "FGFR2"
 # L_HPO:   e.g. "HP:0001156,HP:0001363,HP:0011304,HP:0010055"
-#
-# OUTPUT:
-# If the request failed, return ""
-# else return "$geneBasedTmp"
 #
 # INFO: This proc is run from "AnnotSV-genes.tcl"
 proc runExomiser {L_Genes L_HPO} {
     
     global g_AnnotSV
     global hpoVersion
-
-    puts "...running Exomiser"
+    global g_Exomiser
+    
+    puts "...running Exomiser on [llength $L_Genes] gene names ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
     # Tcl 8.5 is required for use of the json package.
     package require http
     package require json 1.3.3
     
-    # Outputfile
-    set geneBasedTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_exomiser_gene_pheno.tmp.tsv"
-    set L_output {"genes\tEXOMISER_GENE_PHENO_SCORE\tHUMAN_PHENO_EVIDENCE\tMOUSE_PHENO_EVIDENCE\tFISH_PHENO_EVIDENCE"}	
-    file delete -force $geneBasedTmpFile
-
     # Creation of the temporary "application.properties" file
     if {[catch {set port [exec bash $g_AnnotSV(bashDir)/searchForAFreePortNumber.bash]} Message]} {
 	puts "$Message"
@@ -228,10 +219,7 @@ proc runExomiser {L_Genes L_HPO} {
 	    set geneID [searchforGeneID $geneName]
 	    
 	    # Check if the information exists
-	    if {$geneID eq ""} {
-		lappend L_output "$geneName\t-1.0\t\t\t"
-		continue
-	    }
+	    if {$geneID eq ""} {continue}
 	    
 	    # Exomiser request
 	    set url "http://localhost:${port}/exomiser/api/prioritise/?phenotypes=${L_HPO}&prioritiser=hiphive&prioritiser-params=human,mouse,fish,ppi&genes=$geneID"
@@ -245,7 +233,6 @@ proc runExomiser {L_Genes L_HPO} {
 		puts "geneName: $geneName"
 		puts "$Message\n"
 		puts "$url"
-		lappend L_output "$geneName\t-1.0\t\t\t"
 		continue
 	    }
 	    
@@ -253,7 +240,6 @@ proc runExomiser {L_Genes L_HPO} {
 	    # If the http request is only for 1 gene, the result is a list of 1 dict.
 	    # => We use only the first element of the results, which is a dict (a list of key-value)
 	    if {[catch {set d_results [lindex [dict get $d_all "results"] 0]} Message]} {
-		lappend L_output "$geneName\t-1.0\t\t\t"
 		continue
 	    }
 	    # dict for {theKey theValue} $d_results {
@@ -261,13 +247,11 @@ proc runExomiser {L_Genes L_HPO} {
 	    # }	    
 	    
 	    if {[catch {set EXOMISER_GENE_PHENO_SCORE [dict get $d_results "score"]} Message]} {
-		lappend L_output "$geneName\t-1.0\t\t\t"
 		continue
 	    }
 	    set EXOMISER_GENE_PHENO_SCORE [format "%.4f" $EXOMISER_GENE_PHENO_SCORE]
 	    
 	    if {[catch {set d_phenotypeEvidence [dict get $d_results "phenotypeEvidence"]} Message]} {
-		lappend L_output "$geneName\t-1.0\t\t\t"
 		continue
 	    }
 	    # -> return a list of dictionary, 1 for each organism:
@@ -304,7 +288,7 @@ proc runExomiser {L_Genes L_HPO} {
 	    set MOUSE_PHENO_EVIDENCE [lsort -unique $MOUSE_PHENO_EVIDENCE]
 	    set FISH_PHENO_EVIDENCE  [lsort -unique $FISH_PHENO_EVIDENCE]
 	    
-	    lappend L_output "$geneName\t$EXOMISER_GENE_PHENO_SCORE\t[join $HUMAN_PHENO_EVIDENCE " / "]\t[join $MOUSE_PHENO_EVIDENCE " / "]\t[join $FISH_PHENO_EVIDENCE " / "]"	
+	    set g_Exomiser($geneName) "$EXOMISER_GENE_PHENO_SCORE\t[join $HUMAN_PHENO_EVIDENCE " / "]\t[join $MOUSE_PHENO_EVIDENCE " / "]\t[join $FISH_PHENO_EVIDENCE " / "]"
 	}
 	
 	# End the REST service
@@ -318,18 +302,35 @@ proc runExomiser {L_Genes L_HPO} {
     
     # Remove tmp files
     file delete -force $applicationPropertiesTmpFile
-
-    # If some gene annotations have been done...
-    if {[llength $L_output] > 1} {
-	# Write the tmp Exomiser file, with a score for each gene overlapped with an SV
-	WriteTextInFile [join $L_output "\n"] $geneBasedTmpFile
-	# Assign this file to be used for Genes-based annotation (first position in the list of files)
-	lappend g_AnnotSV(extann) $geneBasedTmpFile
-	set g_AnnotSV(genesBasedAnn) 1
-	# Save the name of the file, will need to be deleted after the use (at the end of AnnotSV-write.tcl)
-	set g_AnnotSV(exomiserTmpFile) "$geneBasedTmpFile"
-    }
+    
 
     return ""
 }
 
+
+# g_Exomiser($geneName) = EXOMISER_GENE_PHENO_SCORE\tHUMAN_PHENO_EVIDENCE\tMOUSE_PHENO_EVIDENCE\tFISH_PHENO_EVIDENCE
+# Return either only the score or all the annotation:
+# what = "score" or "all"
+proc ExomiserAnnotation {GeneName what} {
+    
+    global g_Exomiser
+
+    if {$what eq "all"} {
+	# Return all the annotation (EXOMISER_GENE_PHENO_SCORE HUMAN_PHENO_EVIDENCE MOUSE_PHENO_EVIDENCE FISH_PHENO_EVIDENCE) => for gene annotations
+	if {[info exists g_Exomiser($GeneName)]} {
+	    return $g_Exomiser($GeneName)
+	} else {
+	    return "-1.0\t\t\t"
+	}
+    } elseif {$what eq "score"} {
+	# Return only the score (EXOMISER_GENE_PHENO_SCORE) => for regulatory elements annotations
+	if {[info exists g_Exomiser($GeneName)]} {
+	    return [lindex [split $g_Exomiser($GeneName) "\t"] 0]
+	} else {
+	    return "-1.0"
+	}
+	
+    } else {
+	puts "proc ExomiserAnnotation: Bad option value for \"what\" ($what)"
+    }
+}

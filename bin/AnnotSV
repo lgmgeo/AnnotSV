@@ -79,7 +79,6 @@ source $g_AnnotSV(tclDir)/AnnotSV-filteredVCF.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-gap.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-gccontent.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-general.tcl
-source $g_AnnotSV(tclDir)/AnnotSV-genehancer.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-genes.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-gnomad.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-haploinsufficiency.tcl
@@ -88,7 +87,7 @@ source $g_AnnotSV(tclDir)/AnnotSV-imh.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-loeuf-pLI.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-omim.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-pathogenic-NR-SV.tcl
-source $g_AnnotSV(tclDir)/AnnotSV-promoter.tcl
+source $g_AnnotSV(tclDir)/AnnotSV-regulatoryelements.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-ranking.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-repeat.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-segdup.tcl
@@ -215,14 +214,16 @@ checkENCODEblacklistFile
 ## FtIncludedInSV annotations:
 ##############################
 
-# Annotation with Promoters?
+# Annotation with Regulatory Elements?
 checkPromoterFile
+checkEAfiles
+checkGHfiles
 # Annotation with TAD?
 checkTADfiles
 # Annotation with the dbVar pathogenic NR SV?
 checkPathogenicNRSVfile
 # Annotation with GeneHancer?
-checkGHfiles
+#checkGHfiles
 # Annotation with COSMIC?
 checkCOSMICfile
 
@@ -265,7 +266,7 @@ puts "\tAnnotSV has been run with these arguments:"
 puts "\t******************************************"
 set lKey [array names g_AnnotSV]
 foreach key [lsort $lKey] {
-    if {[regexp "Ann|bashDir|bedFile|docDir|etcDir|extann|GHann|gnomADann|IMHann|installDir|NRSVann|outputColHeader|ranking|genes|samplesidTSVcol|svtTSVcol|tclDir|userDir|Version$" $key]} {continue}
+    if {[regexp "EAann|Ann|bashDir|bedFile|docDir|etcDir|extann|GHann|gnomADann|IMHann|installDir|NRSVann|outputColHeader|ranking|genes|samplesidTSVcol|svtTSVcol|tclDir|userDir|Version$" $key]} {continue}
     if {$g_AnnotSV($key) eq ""} {continue}
     puts "\t-$key $g_AnnotSV($key)"
 }

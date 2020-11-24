@@ -115,6 +115,7 @@ proc checkGenesRefSeqFile {} {
 }
 
 
+
 ## - Check the "genes.ENSEMBL.sorted.bed" file
 proc checkGenesENSEMBLfile {} {
     
@@ -138,6 +139,7 @@ proc checkGenesENSEMBLfile {} {
     ##########
     set g_AnnotSV(genesFile) $GenesENSEMBLfileFormatted
 }
+
 
 
 ## Annotate the SV bedFile with the genes file.
@@ -209,7 +211,7 @@ proc genesAnnotation {} {
 
     # OUTPUT:
     ###############
-    set FullAndSplitBedFile "$g_AnnotSV(outputDir)/$g_AnnotSV(outputFile).tmp"
+    set FullAndSplitBedFile "$g_AnnotSV(outputDir)/$g_AnnotSV(outputFile).tmp" ;# DON'T REMOVE IT! Used in AnnotSV-write.tcl
     set splitBedFile "$FullAndSplitBedFile.tmp"
     file delete -force $FullAndSplitBedFile
     file delete -force $splitBedFile
@@ -226,7 +228,7 @@ proc genesAnnotation {} {
 	exit 2
     }
     if {[file size $splitBedFile] eq 0} {
-	puts "\tno intersection between SV and gene annotation"
+	puts "...no intersection between SV and gene annotation"
 	set n 0
 	while {$n < [llength $L_Bed]} {
 	    WriteTextInFile "[lindex $L_Bed $n]\tfull" "$FullAndSplitBedFile"
@@ -443,13 +445,12 @@ proc genesAnnotation {} {
     ## Delete temporary file
     file delete -force $splitBedFile
 
-    ## Preparation of the phenotype-driven analysis (Exomiser)
-    #puts "\t...[llength $L_allGenesOverlapped] overlapped genes"
-    if {$g_AnnotSV(hpo) ne ""} {
-	set L_allGenesOverlapped [lsort -unique $L_allGenesOverlapped]
-	runExomiser "$L_allGenesOverlapped" "$g_AnnotSV(hpo)"
-    }
-
+    
+    ## Annotate the SV bedFile with the regulatory elements files
+    ## (Preparation of the phenotype-driven analysis (Exomiser) will be done there)
+    set L_allGenesOverlapped [lsort -unique $L_allGenesOverlapped]
+    regulatoryElementsAnnotation $L_allGenesOverlapped
+    
     ## Memo:
     ## The same SV can be annotated on several genes. Warning: annotations are not necessarily group by gene. Example:
     #     1       144676654       144680028       DEL     SGT161364       NBPF8   NR_102405       0       3375    intron5-intron5 144676654       144680028
@@ -462,3 +463,5 @@ proc genesAnnotation {} {
 
     return
 }
+
+

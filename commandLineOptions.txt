@@ -65,6 +65,9 @@ OPTIONS
 -reciprocal:                    Use of a reciprocal overlap between SV and features (only for annotations with features overlapping the SV)
                                 Values: no (default) or yes
 
+-REreport:                      Create a report to link the annotated SV and the overlapped regulatory elements (coordinates and sources)
+                                Values: no (default) or yes
+
 -samplesidBEDcol:               Number of the column reporting the samples ID for which the SV was called (if the input SV file is a BED)
                                 Range values: [4-[, default = -1 (value not given)
                                 (Samples ID should be comma or space separated)
@@ -91,7 +94,7 @@ OPTIONS
 -svtBEDcol:                     Number of the column describing the SV type (DEL, DUP) if the input SV file is a BED
                                 Range values: [4-[, default = -1 (value not given)
 
--tx:                            Origin of the transcripts (NCBI or ENSEMBL)
+-tx:                            Origin of the transcripts (RefSeq or ENSEMBL)
                                 Values: RefSeq (default) or ENSEMBL
 
 -txFile:                        Path of a file containing a list of preferred genes transcripts to be used in priority during the annotation
