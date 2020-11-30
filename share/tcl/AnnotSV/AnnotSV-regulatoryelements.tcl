@@ -65,7 +65,7 @@ proc isAnENSEMBLgeneName {geneName} {
 
 
 
-## - Check and create if necessary the "promoter.XXXbp.sorted.bed" file.
+## - Check and create if necessary the "promoter_XXXbp_*_GRCh*.sorted.bed" file.
 proc checkPromoterFile {} {
 
     global g_AnnotSV
@@ -79,7 +79,7 @@ proc checkPromoterFile {} {
     if {![file exists $regElementsDir]} {file mkdir $regElementsDir}
 
     set genesFileFormatted "$genesDir/genes.$g_AnnotSV(tx).sorted.bed"
-    set promoterFormatted "$regElementsDir/promoter.$g_AnnotSV(promoterSize)bp.$g_AnnotSV(tx).sorted.bed"
+    set promoterFormatted "$regElementsDir/promoter_$g_AnnotSV(promoterSize)bp_${g_AnnotSV(tx)}_$g_AnnotSV(genomeBuild).sorted.bed"
 
     if {![file exists $promoterFormatted]} {
 	
@@ -110,7 +110,7 @@ proc checkPromoterFile {} {
 	    if {![info exists L_prom($chrom)]} {continue}
 	    set L_prom($chrom) [lsort -command AscendingSortOnElement0 [lsort -command AscendingSortOnElement1 [lsort -unique $L_prom($chrom)]]]
 	    foreach prom $L_prom($chrom) {
-		lappend L_allProm "$chrom\t$prom\t$g_AnnotSV(tx)_promoter\t[join [lsort -unique $genesProm($chrom\t$prom)] ";"]"
+		lappend L_allProm "$chrom\t$prom\t${g_AnnotSV(tx)}_promoter\t[join [lsort -unique $genesProm($chrom\t$prom)] ";"]"
 	    }
 	}
 	WriteTextInFile [join $L_allProm "\n"] $promoterFormatted.tmp
@@ -160,7 +160,7 @@ proc checkEAfiles {} {
     set EARefSeqFileFormattedGRCh37 "$regElementsDir/$g_AnnotSV(genomeBuild)/EA_RefSeq_$g_AnnotSV(genomeBuild).sorted.bed" ;# GRCh38 version should be manually created by lift over
     set EAENSEMBLfileFormattedGRCh37 "$regElementsDir/$g_AnnotSV(genomeBuild)/EA_ENSEMBL_$g_AnnotSV(genomeBuild).sorted.bed" ;# GRCh38 version should be manually created by lift over
 
-    set necessaryEAfile "$regElementsDir/$g_AnnotSV(genomeBuild)/EA_$g_AnnotSV(tx)_$g_AnnotSV(genomeBuild).sorted.bed"
+    set necessaryEAfile "$regElementsDir/$g_AnnotSV(genomeBuild)/EA_${g_AnnotSV(tx)}_$g_AnnotSV(genomeBuild).sorted.bed"
     if {[file exists $necessaryEAfile]} {set g_AnnotSV(EAann) 1}
 
     if {[file exists $EARefSeqFileFormattedGRCh37] && [file exists $EAENSEMBLfileFormattedGRCh37]} {
@@ -294,7 +294,7 @@ proc checkEAfiles {} {
 	}
     }
     
-    set necessaryEAfile "$regElementsDir/$g_AnnotSV(genomeBuild)/EA_$g_AnnotSV(tx)_$g_AnnotSV(genomeBuild).sorted.bed"
+    set necessaryEAfile "$regElementsDir/$g_AnnotSV(genomeBuild)/EA_${g_AnnotSV(tx)}_$g_AnnotSV(genomeBuild).sorted.bed"
     if {[file exists $necessaryEAfile]} {set g_AnnotSV(EAann) 1}
 }
 
@@ -468,15 +468,12 @@ proc checkGHfiles {} {
 	set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.tmp.bash"
 	ReplaceTextInFile "#!/bin/bash" $sortTmpFile
 	WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $sortTmpFile
-
-
-
 	WriteTextInFile "export LC_ALL=C" $sortTmpFile
 	WriteTextInFile "sort -k1,1 -k2,2n [set $GHfile].tmp >> [set $GHfile]" $sortTmpFile
 	file attributes $sortTmpFile -permissions 0755
 	if {[catch {eval exec bash $sortTmpFile} Message]} {
 	    puts "-- checkGHfiles --"
-	    puts "sort -k1,1 -k2,2n [set $GHfile].tmp >> $GHfile"
+	    puts "sort -k1,1 -k2,2n [set $GHfile].tmp >> [set $GHfile]"
 	    puts "$Message"
 	    puts "Exit with error"
 	    exit 2
@@ -513,9 +510,9 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
 
     set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)"
     set L_REfiles {}
-    lappend L_REfiles "$extannDir/FtIncludedInSV/RegulatoryElements/$g_AnnotSV(genomeBuild)/EA_$g_AnnotSV(tx)_$g_AnnotSV(genomeBuild).sorted.bed"     ;#EnhancerAtlas
-    lappend L_REfiles "$extannDir/FtIncludedInSV/RegulatoryElements/$g_AnnotSV(genomeBuild)/GH_$g_AnnotSV(tx)_$g_AnnotSV(genomeBuild).sorted.bed"     ;#GeneHancer
-    lappend L_REfiles "$extannDir/FtIncludedInSV/RegulatoryElements/$g_AnnotSV(genomeBuild)/promoter.$g_AnnotSV(promoterSize)bp.$g_AnnotSV(tx).sorted.bed" ;# promoter
+    lappend L_REfiles "$extannDir/FtIncludedInSV/RegulatoryElements/$g_AnnotSV(genomeBuild)/EA_${g_AnnotSV(tx)}_$g_AnnotSV(genomeBuild).sorted.bed"     ;#EnhancerAtlas
+    lappend L_REfiles "$extannDir/FtIncludedInSV/RegulatoryElements/$g_AnnotSV(genomeBuild)/GH_${g_AnnotSV(tx)}_$g_AnnotSV(genomeBuild).sorted.bed"     ;#GeneHancer
+    lappend L_REfiles "$extannDir/FtIncludedInSV/RegulatoryElements/$g_AnnotSV(genomeBuild)/promoter_${g_AnnotSV(promoterSize)}bp_${g_AnnotSV(tx)}_$g_AnnotSV(genomeBuild).sorted.bed" ;# promoter
     foreach reFile $L_REfiles {
 	if {![file exists $reFile]} {continue}
 	if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(bedFile) -b $reFile -wa -wb >> $SV_RE_intersectBEDfile} Message]} {

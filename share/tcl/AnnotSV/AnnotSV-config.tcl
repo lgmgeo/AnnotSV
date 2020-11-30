@@ -56,7 +56,7 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(outputColHeader)          ""    ;# not given in parameter
     set g_AnnotSV(outputDir)                ""
     set g_AnnotSV(outputFile)               ""
-    set g_AnnotSV(overlap)                  "70"
+    set g_AnnotSV(overlap)                  "100"
     set g_AnnotSV(overwrite)                "yes"
     set g_AnnotSV(promoterSize)             "500"
     set g_AnnotSV(rankFiltering)            "1-5"
@@ -87,6 +87,7 @@ proc configureAnnotSV {argv} {
     }
     puts "\t...configuration data from $configFile"
     set testColumnNames 0
+    set  g_AnnotSV(outputColHeader) {B_gain_source B_gain_coord B_loss_source B_loss_coord}
     foreach L [LinesFromFile $configFile] {
 	if {[regexp "^# AnnotSV Output columns:" $L]} {set testColumnNames 1} 
 	if {[regexp "^#" $L]} {continue}
@@ -488,7 +489,7 @@ proc configureAnnotSV {argv} {
 
     # Some annotation columns are essential for the ranking: can not be removed by the user
     set g_AnnotSV(genesBasedAnn) 1
-    foreach col "DGV_GAIN_n_samples_tested DGV_GAIN_Frequency DGV_LOSS_n_samples_tested DGV_LOSS_Frequency dbVar_event dbVar_status morbidGenes morbidGenesCandidates GHgene_elite GHgene_not_elite pLI_ExAC HI_CGscore TriS_CGscore" {
+    foreach col "DGV_GAIN_n_samples_tested DGV_GAIN_Frequency DGV_LOSS_n_samples_tested DGV_LOSS_Frequency dbVar_event dbVar_status morbidGenes morbidGenesCandidates GHgene_elite GHgene_not_elite pLI_ExAC HI_CGscore TS_CGscore" {
 	if {[lsearch -exact "$g_AnnotSV(outputColHeader)" $col] eq -1} {
 	    lappend g_AnnotSV(outputColHeader) $col
 	}

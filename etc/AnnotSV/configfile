@@ -42,6 +42,7 @@
 #------------------------
 # Output column names are listed below.
 # In order to disable default annotations provided by AnnotSV, some column names (the ones that are not marked with an *) can be commented with a hash character ("#") by the user.
+
 AnnotSV ID                      *
 SV chrom                        *
 SV start                        *
@@ -50,6 +51,8 @@ SV length                       *
 SV type                         *
 Samples_ID
 AnnotSV type                    *
+
+# Genes annotations:
 Gene name                       *
 Number of genes                 *
 tx                              *
@@ -65,31 +68,21 @@ distNearestSS                   *
 nearestSStype                   *
 intersectStart                  *
 intersectEnd                    *
-DGV_GAIN_IDs
-DGV_GAIN_n_samples_with_SV
-DGV_GAIN_n_samples_tested       *
-DGV_GAIN_Frequency              *
-DGV_LOSS_IDs
-DGV_LOSS_n_samples_with_SV
-DGV_LOSS_n_samples_tested       *
-DGV_LOSS_Frequency              *
-GD_ID
-GD_AN
-GD_N_HET
-GD_N_HOMALT
-GD_AF
-GD_POPMAX_AF
-GD_ID_others
-DDD_SV
-DDD_DUP_n_samples_with_SV
-DDD_DUP_Frequency
-DDD_DEL_n_samples_with_SV
-DDD_DEL_Frequency
-1000g_event
-IMH_ID
-IMH_AF
-IMH_ID_others
-promoters
+
+# Regulatory Elements annotations:
+RE_gene_exomiser                *
+
+# Annotations with benign genes or genomic regions:
+B_gain_source                   *
+B_gain_coord                    *
+B_loss_source                   *
+B_loss_coord                    *
+B_ins_source                    
+B_ins_coord                     
+B_inv_source                    
+B_inv_coord
+
+# Annotations with pathogenic genes or genomic regions:
 dbVar_event                     *
 dbVar_variant		
 dbVar_status                    *
@@ -101,6 +94,8 @@ GHgene_not_elite                *
 GHtissue
 COSMIC_ID
 COSMIC_MUT_TYP
+
+# Breakpoints annotations
 TADcoordinates
 ENCODEexperiments
 GCcontent_left
@@ -117,6 +112,8 @@ ENCODE_blacklist_left
 ENCODE_blacklist_characteristics_left
 ENCODE_blacklist_right
 ENCODE_blacklist_characteristics_right
+
+# Gene-based annotations:
 ACMG
 HI_CGscore                      *
 TriS_CGscore                    *
@@ -143,6 +140,8 @@ EXOMISER_GENE_PHENO_SCORE
 HUMAN_PHENO_EVIDENCE
 MOUSE_PHENO_EVIDENCE
 FISH_PHENO_EVIDENCE
+
+# Ranking:
 AnnotSV ranking
 ranking decision criteria
 

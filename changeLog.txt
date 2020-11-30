@@ -9,6 +9,9 @@
 
 
 For more details, please see the README file.
+	- feat: Add benign SV annotation (from multiple sources)
+	- feat: The "overlap" option default is set to 100 % to implement the 2019 ACMG classification guidelines to assess SV pathogenicity
+	- feat: The "TriS_CGscore" column has been renamed "TS_CGscore"
 	- feat: Add the merge of different available regulatory elements annotations (RefSeq/ENSEMBL, EnhancerAtlas, GeneHancer)
 	- feat: Add the number of overlapped genes in the "full" annotation lines
 	- feat: By default, AnnotSV now expands the "start" and "end" SV positions with the VCF confidence intervals (CIPOS, CIEND) around the breakpoints (see the "includeCI" option)
@@ -18,8 +21,8 @@ November 06, 2020, AnnotSV version 2.5.2
 	- feat: Add the pLI annotation from gnomAD (pLI_gnomAD), update the pLI annotation from ExAC (pLI_ExAC)
 	- feat: Add the "LOEUF_bin" annotation (gnomAD)
 	- feat: Add the "tx start", "tx end" and "Number of exons" annotations 
-		The "tx length" column has been renamed "tx length overlapped"
-	  	The "CDS length" column has been renamed "CDS length overlapped" 
+		The "tx length" column has been renamed "overlapped tx length"
+	  	The "CDS length" column has been renamed "overlapped CDS length" 
 	- feat: If not provided, the EXOMISER_GENE_PHENO_SCORE is set to "-1.0"
 	- Update README.md
 

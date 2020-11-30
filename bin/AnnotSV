@@ -65,12 +65,11 @@ set g_AnnotSV(bashDir)    "$g_AnnotSV(installDir)/share/bash/AnnotSV"
 set auto_path [linsert $::auto_path 0 $g_AnnotSV(tclDir)/tcllib]
 
 
-source $g_AnnotSV(tclDir)/AnnotSV-1000g.tcl
+source $g_AnnotSV(tclDir)/AnnotSV-benignsv.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-clingen.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-config.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-cosmic.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-ddd.tcl
-source $g_AnnotSV(tclDir)/AnnotSV-dgv.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-encodeblacklist.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-exac.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-exomiser.tcl
@@ -80,10 +79,8 @@ source $g_AnnotSV(tclDir)/AnnotSV-gap.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-gccontent.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-general.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-genes.tcl
-source $g_AnnotSV(tclDir)/AnnotSV-gnomad.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-haploinsufficiency.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-help.tcl
-source $g_AnnotSV(tclDir)/AnnotSV-imh.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-loeuf-pLI.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-omim.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-pathogenic-NR-SV.tcl
@@ -178,24 +175,17 @@ checkClinGenFile
 checkExomiserInstallation
 # Annotation with LOEUF
 checkLOEUFfile
+# Annotation with DDD?
+checkDDDgeneFile
 
 ## SVincludedInFt:
 ##################
+# Annotations with benign genes or genomic regions?
+checkBenignFiles
 
-# Annotation with DGV?
-checkDGVfiles
-# Annotation with DDD?
-checkDDDgeneFile
-checkDDDfrequencyFile
-# Annotation with 1000g?
-check1000gFile
 # Annotation with GeneIntolerance (ExAC)?
 checkGeneIntoleranceFile
 checkCNVintoleranceFile
-# Annotation with gnomAD? 
-checkgnomADfile
-# Annotation with IMH (Ira M. Hall's lab)? 
-checkIMHfile
 
 ## Breakpoint annotations:
 ##########################
@@ -222,8 +212,6 @@ checkGHfiles
 checkTADfiles
 # Annotation with the dbVar pathogenic NR SV?
 checkPathogenicNRSVfile
-# Annotation with GeneHancer?
-#checkGHfiles
 # Annotation with COSMIC?
 checkCOSMICfile
 

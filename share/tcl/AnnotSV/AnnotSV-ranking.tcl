@@ -75,7 +75,7 @@ proc SVprepareRanking {L_header} {
 
     set g_i(pLI)       [lsearch -regexp $Ls "pLI"];       if {$g_i(pLI) == -1} {unset g_i; return}  
     set g_i(HI_CGscore)   [lsearch -regexp $Ls "HI_CGscore"];   if {$g_i(HI_CGscore) == -1} {unset g_i; return}  
-    set g_i(TriS_CGscore) [lsearch -regexp $Ls "TriS_CGscore"]; if {$g_i(TriS_CGscore) == -1} {unset g_i; return}  
+    set g_i(TS_CGscore) [lsearch -regexp $Ls "TS_CGscore"]; if {$g_i(TS_CGscore) == -1} {unset g_i; return}  
 
     # If we have all the needed information, ranking will be done
     set g_AnnotSV(ranking) 1
@@ -87,7 +87,7 @@ proc SVprepareRanking {L_header} {
 #########
 # - MorbidGenes            : SV overlaps an enhancer associated to a morbid gene                             (<=> ranking = 4)
 # - DEL                    : SV overlaps an enhancer of a gene with a pLI > 0.9 or with HI_CGscore of 3 or 2 (<=> ranking = 4)
-# - DUP                    : SV overlaps the enhancer of a gene with a TriS_CGscore of 3 or 2                (<=> ranking = 4)
+# - DUP                    : SV overlaps the enhancer of a gene with a TS_CGscore of 3 or 2                  (<=> ranking = 4)
 # - MorbidGenesCandidates  : SV overlaps an enhancer associated to a morbid gene candidate                   (<=> ranking = 3)
 # - Candidates             : SV overlaps an enhancer associated to a gene candidate (given by the user)      (<=> ranking = 3)
 # - NotUsed                : No GeneHancer annotation available
@@ -127,7 +127,7 @@ proc EnhancerInformation {Ls SVtype SVtoAnn} {
 	    }
 	}
 	# L_DEL: List of genes with a pLI > 0.9 or with HI_CGscore of 3 or 2
-	# L_DUP: List of genes with a TriS_CGscore of 3 or 2
+	# L_DUP: List of genes with a TS_CGscore of 3 or 2
 	set ExACdir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based/ExAC"
 	set ExACfile [glob -nocomplain "$ExACdir/*_GeneIntolerance.pLI-Zscore.annotations.tsv.gz"]
 	set L_DEL {}
@@ -150,8 +150,8 @@ proc EnhancerInformation {Ls SVtype SVtoAnn} {
 		if {$HI_CGscore eq "2" || $HI_CGscore eq "3"} {
 		    lappend L_DEL [lindex $Ls 0]
 		}
-		set TriS_CGscore [lindex $Ls 2] 
-		if {$TriS_CGscore eq "2" || $TriS_CGscore eq "3"} {
+		set TS_CGscore [lindex $Ls 2] 
+		if {$TS_CGscore eq "2" || $TS_CGscore eq "3"} {
 		    lappend L_DUP [lindex $Ls 0]
 		}
  
@@ -210,7 +210,7 @@ proc EnhancerInformation {Ls SVtype SVtoAnn} {
     }
     if {$thegenes ne "DEL"} {return "$thegenes"}
 
-    # Check if the SV overlaps an enhancer associated to a gene with a TriS_CGscore of 3 or 2
+    # Check if the SV overlaps an enhancer associated to a gene with a TS_CGscore of 3 or 2
     #########################################################################################
     # Check for a dup:
     set thegenes "DUP"
@@ -256,11 +256,11 @@ proc EnhancerInformation {Ls SVtype SVtoAnn} {
 ## category 4 = likely pathogenic 
 ##           SV that overlaps a morbid gene (or its enhancer) (with at least 1bp)
 ##           or for a del: SV that overlap a gene (or its enhancer) with a pLI > 0.9 or with HI_CGscore of 3 or 2
-##           or for a dup: SV that overlap a gene (or its enhancer) TriS_CGscore of 3 or 2
+##           or for a dup: SV that overlap a gene (or its enhancer) TS_CGscore of 3 or 2
 ## category 5 = pathogenic
 ##           SV that overlaps a pathogenic SV (with at least 1bp)
 
-## ClinGen HI_CGscore and TriS_CGscore explanations:
+## ClinGen HI_CGscore and TS_CGscore explanations:
 ####################################################
 ##   Rating	Possible Clinical Interpretation
 ##   ------     --------------------------------
@@ -270,7 +270,7 @@ proc EnhancerInformation {Ls SVtype SVtoAnn} {
 ##   0	        No evidence for dosage pathogenicity
 ##   40         Evidence suggests the gene is not dosage sensitive
 ##
-## HI = Haploinsufficiency  TriS = Triplosensitivity
+## HI = Haploinsufficiency  TS = Triplosensitivity
 proc SVranking {L_annotations} {
 
     global g_AnnotSV
@@ -317,13 +317,13 @@ proc SVranking {L_annotations} {
     ## category 4 = likely pathogenic 
     ##           SV that overlaps a "dosage sensitive" morbid gene (or its enhancer) (with at least 1bp)
     ##           or for a del: SV that overlaps a gene (or its enhancer) with a pLI > 0.9 or with HI_CGscore of 3 or 2
-    ##           or for a dup: SV that overlaps a gene (or its enhancer) with a TriS_CGscore of 3 or 2
+    ##           or for a dup: SV that overlaps a gene (or its enhancer) with a TS_CGscore of 3 or 2
     ###################################################################
 
     # Clingen, score = 40 : "Evidence suggests the gene is not dosage sensitive"
     # Not a dosage sensitive gene:
     #   >> DEL with HI_CGscore = 40
-    #   >> DUP with TriS_CGscore = 40
+    #   >> DUP with TS_CGscore = 40
     set notADosageSensitiveGene "unknown"
 
     # Check if a SV overlaps a morbid gene
@@ -365,20 +365,20 @@ proc SVranking {L_annotations} {
     }
     
     # Check for a dup:
-    set TriS_CGscore [lindex $Ls $g_i(TriS_CGscore)]
+    set TS_CGscore [lindex $Ls $g_i(TS_CGscore)]
     if {[regexp -nocase "Dup|Gain|Multiplication|<CN\[3-9\]" $SVtype]} {
         # Check if it is not a dosage sensitive gene
-        if {$TriS_CGscore eq "40"} {set notADosageSensitiveGene "yes"}
-	# Check SV that overlap a gene TriS_CGscore of 3 or 2
-	if {$TriS_CGscore eq 3 || $TriS_CGscore eq 2} {
+        if {$TS_CGscore eq "40"} {set notADosageSensitiveGene "yes"}
+	# Check SV that overlap a gene TS_CGscore of 3 or 2
+	if {$TS_CGscore eq 3 || $TS_CGscore eq 2} {
 	    set ranking "4"	
-	    set g_rankingExplanations($AnnotSV_ID) "GAIN: TriS_CGscore = $TriS_CGscore"
+	    set g_rankingExplanations($AnnotSV_ID) "GAIN: TS_CGscore = $TS_CGscore"
 	    return $ranking
 	}
-	# Check SV that overlap the enhancer of a gene TriS_CGscore of 3 or 2
+	# Check SV that overlap the enhancer of a gene TS_CGscore of 3 or 2
 	if {[lindex $enhancer 0] eq "DUP"} {
 	    set ranking "4"	
-	    set g_rankingExplanations($AnnotSV_ID) "GAIN: overlap the enhancer of a gene with a TriS_CGscore of 3 or 2 ([lrange $enhancer 1 end])"
+	    set g_rankingExplanations($AnnotSV_ID) "GAIN: overlap the enhancer of a gene with a TS_CGscore of 3 or 2 ([lrange $enhancer 1 end])"
 	    return $ranking
 	}
     }

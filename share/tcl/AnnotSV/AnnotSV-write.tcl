@@ -117,72 +117,14 @@ proc OrganizeAnnotation {} {
     set i_ref [expr {$i_ref-2}] ;# (-2) because of the insertion of the END and SVTYPE values.
     set i_alt [expr {$i_alt-2}] ;# (-2) because of the insertion of the END and SVTYPE values.
 
-    ####### "DGV header"
-    if {$g_AnnotSV(dgvAnn)} {
-	set g_AnnotSV(dgvAnn_i) ""
-	set j 0
-	foreach col "DGV_GAIN_IDs DGV_GAIN_n_samples_with_SV DGV_GAIN_n_samples_tested DGV_GAIN_Frequency DGV_LOSS_IDs DGV_LOSS_n_samples_with_SV DGV_LOSS_n_samples_tested DGV_LOSS_Frequency" {
-	    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" $col] ne -1} {
-		append headerOutput "\t$col"
-		lappend g_AnnotSV(dgvAnn_i) $j
-	    }
-	    incr j
-	}
-	if {$g_AnnotSV(dgvAnn_i) eq ""} {set g_AnnotSV(dgvAnn) 0}
+    ####### "Benign SV header"
+    foreach svtype "gain loss ins inv" {
+	if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^B_[string tolower ${svtype}]_"] eq -1} { continue }
+	append headerOutput "\tB_${svtype}_source\tB_${svtype}_coord"
     }
 
-    ####### "gnomAD header"
-    if {$g_AnnotSV(gnomADann)} {
-	set g_AnnotSV(gnomADann_i) ""
-	set j 0
-	foreach col "GD_ID GD_AN GD_N_HET GD_N_HOMALT GD_AF GD_POPMAX_AF GD_ID_others" {
-	    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" $col] ne -1} {
-		append headerOutput "\t$col"
-		lappend g_AnnotSV(gnomADann_i) $j
-	    }
-	    incr j
-	}
-	if {$g_AnnotSV(gnomADann_i) eq ""} {set g_AnnotSV(gnomADann) 0}
-    }
-
-    ####### "DDD freq header"
-    if {$g_AnnotSV(DDDfreqAnn)} {
-	set g_AnnotSV(DDDfreqAnn_i) ""
-	set j 0
-	foreach col "DDD_SV DDD_DUP_n_samples_with_SV DDD_DUP_Frequency DDD_DEL_n_samples_with_SV DDD_DEL_Frequency" {
-	    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" $col] ne -1} {
-		append headerOutput "\t$col"
-		lappend g_AnnotSV(DDDfreqAnn_i) $j
-	    }
-	    incr j
-	}
-	if {$g_AnnotSV(DDDfreqAnn_i) eq ""} {set g_AnnotSV(DDDfreqAnn) 0}
-    }
-
-    ####### "1000g header"
-    if {$g_AnnotSV(1000gAnn)} {
-	if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "1000g_event"] ne -1} {
-	    append headerOutput "\t1000g_event"
-	} else {
-	    set g_AnnotSV(1000gAnn) 0
-	}
-    }
-
-    ####### "IMH header"
-    if {$g_AnnotSV(IMHann)} {
-	set g_AnnotSV(IMHann_i) ""
-	set j 0
-	foreach col "IMH_ID IMH_AF IMH_ID_others" {
-	    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" $col] ne -1} {
-		append headerOutput "\t$col"
-		lappend g_AnnotSV(IMHann_i) $j
-	    }
-	    incr j
-	}
-	if {$g_AnnotSV(IMHann_i) eq ""} {set g_AnnotSV(IMHann) 0}
-    }
     set usersDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Users/$g_AnnotSV(genomeBuild)"
-    ####### "SVincludedInFt header"
+    ####### usersDir: "SVincludedInFt header"
     if {[glob -nocomplain $usersDir/SVincludedInFt/*.formatted.sorted.bed] ne ""} {
 	foreach formattedUserBEDfile [glob -nocomplain $usersDir/SVincludedInFt/*.formatted.sorted.bed] {
 	    regsub -nocase ".formatted.sorted.bed$" $formattedUserBEDfile ".header.tsv" userHeaderFile
@@ -319,23 +261,23 @@ proc OrganizeAnnotation {} {
     puts "\n...listing of the annotations to realized ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
     puts "\t...Genes annotation" 
     puts "\t(with $g_AnnotSV(genesFile))"
-    ####### "Genes-based annotations"
-    puts "\t...Genes-based annotations"
-    if {$g_AnnotSV(genesBasedAnn)} {
-	puts "[join $g_ExtAnnotation(display) "\n"]"
-    }
+    
     ####### "Regulatory elements annotations"
     puts "\t...Regulatory elements annotations"
     if {$g_AnnotSV(promAnn)} {puts "\t\t...Promoter annotations"}
     if {$g_AnnotSV(EAann)} {puts "\t\t...EnhancerAtlas annotations"}
-    if {$g_AnnotSV(GHAnn)} {puts "\t\t...GeneHancer annotations"}    
-    ####### "SVincludedInFt"
-    puts "\t...Annotations with features overlapping the SV"
-    if {$g_AnnotSV(dgvAnn)} {puts "\t\t...DGV Gold Standard frequency annotation"}
-    if {$g_AnnotSV(gnomADann)} {puts "\t\t...gnomAD frequency annotation"}
-    if {$g_AnnotSV(DDDfreqAnn)} {puts "\t\t...DDD frequency annotation"}
-    if {$g_AnnotSV(1000gAnn)} {puts "\t\t...1000g events annotation"}
-    if {$g_AnnotSV(IMHann)} {puts "\t\t...Ira M. Hall's lab frequency annotation"}
+    if {$g_AnnotSV(GHAnn)} {puts "\t\t...GeneHancer annotations"}
+    
+    #######  Annotations with benign genes or genomic regions (SVincludedInFt)
+    puts "\t...Annotations with benign genes or genomic regions"
+    puts "\t\t>>> gnomAD annotation"
+    puts "\t\t>>> ClinVar annotation"
+    puts "\t\t>>> ClinGen annotation"
+    puts "\t\t>>> DGV annotation"
+    puts "\t\t>>> DDD annotation"
+    puts "\t\t>>> 1000g annotation"
+    puts "\t\t>>> Ira M. Hall's lab annotation"
+    # "SVincludedInFt"
     foreach formattedUserBEDfile [glob -nocomplain $usersDir/SVincludedInFt/*.formatted.sorted.bed] {
 	puts "\t\t...[file tail $formattedUserBEDfile]"
 	regsub -nocase ".formatted.sorted.bed$" $formattedUserBEDfile ".header.tsv" userHeaderFile
@@ -367,6 +309,11 @@ proc OrganizeAnnotation {} {
     if {$g_AnnotSV(segdupAnn)} {puts "\t\t...Segmental duplication annotation"}
     if {$g_AnnotSV(ENCODEblacklistAnn)} {puts "\t\t...ENCODE blacklist annotation"}
 
+    ####### "Genes-based annotations"
+    puts "\t...Genes-based annotations"
+    if {$g_AnnotSV(genesBasedAnn)} {
+	puts "[join $g_ExtAnnotation(display) "\n"]"
+    }
     ####### "Exomiser annotation"
     if {$g_AnnotSV(hpo) ne ""} {puts "\t...Exomiser annotations"}
 
@@ -381,7 +328,7 @@ proc OrganizeAnnotation {} {
 
     
     #######################################################################################################
-    ##   Prepare the intersection between "SV / genes" and "annotation BED files" (DGV, dbVar...):
+    ##   Prepare the intersection between "SV / genes" and "annotation BED files" (benign SV...):
     ##
     ##   => creation of $g_AnnotSV(fullAndSplitBedFile),
     ##      a bedfile with the coordinates (only 3 columns: chrom, start and end) of:
@@ -766,50 +713,12 @@ proc OrganizeAnnotation {} {
 	    } 
 	} 
 	
-	# DGV annotation
-	if {$g_AnnotSV(dgvAnn)} {
-	    if {$AnnotSVtype eq "split"} {
-		set dgvText "[DGVannotation $SVchrom $intersectStart $intersectEnd $g_AnnotSV(dgvAnn_i)]"
-	    } else {
-		set dgvText "[DGVannotation $SVchrom $SVleft $SVright $g_AnnotSV(dgvAnn_i)]"
-	    } 
-	}
-
-	# gnomAD annotations
-	if {$g_AnnotSV(gnomADann)} {
-	    if {$AnnotSVtype eq "split"} {
-		set gnomADtext "[gnomADannotation $SVchrom $intersectStart $intersectEnd $SVtype $g_AnnotSV(gnomADann_i)]"
-	    } else {
-		set gnomADtext "[gnomADannotation $SVchrom $SVleft $SVright $SVtype $g_AnnotSV(gnomADann_i)]"
-	    } 
-	}
-
-	# DDD frequency + gene annotations
-	if {$g_AnnotSV(DDDfreqAnn)} {
-	    if {$AnnotSVtype eq "split"} {
-		set dddText "[DDDfrequencyAnnotation $SVchrom $intersectStart $intersectEnd $g_AnnotSV(DDDfreqAnn_i)]"
-	    } else {
-		set dddText "[DDDfrequencyAnnotation $SVchrom $SVleft $SVright $g_AnnotSV(DDDfreqAnn_i)]"
-	    } 
-	}
-
-	# 1000g annotations
-	if {$g_AnnotSV(1000gAnn)} {
-	    if {$AnnotSVtype eq "split"} {
-		set 1000gText "[1000gAnnotation $SVchrom $intersectStart $intersectEnd]"
-	    } else {
-		set 1000gText "[1000gAnnotation $SVchrom $SVleft $SVright]"
-	    } 
-	}
-
-	# Ira M. Hall's lab annotations
-	if {$g_AnnotSV(IMHann)} {
-	    if {$AnnotSVtype eq "split"} {
-		set IMHtext "[IMHannotation $SVchrom $intersectStart $intersectEnd $SVtype $g_AnnotSV(IMHann_i)]"
-	    } else {
-		set IMHtext "[IMHannotation $SVchrom $SVleft $SVright $SVtype $g_AnnotSV(IMHann_i)]"
-	    } 
-	}
+	# Annotations with benign genes or genomic regions (SVincludedInFt)
+	if {$AnnotSVtype eq "split"} {
+	    set benignText "[benignSVannotation $SVchrom $intersectStart $intersectEnd]"
+	} else {
+	    set benignText "[benignSVannotation $SVchrom $SVleft $SVright]"
+	} 
 
 	# dbVar pathogenic NR SV annotation
 	if {$g_AnnotSV(NRSVann)} {
@@ -909,7 +818,7 @@ proc OrganizeAnnotation {} {
 				    foreach valueByGene [split $valueByColumn "/"] {
 					if {[regexp "ClinGenAnnotations.tsv" $F]} {
 					    set max ""
-					    # For ClinGen file (HI_CGscore + TriS_CGscore), the values are ordered as follow: 
+					    # For ClinGen file (HI_CGscore + TS_CGscore), the values are ordered as follow: 
 					    # 3 > 2 > 1 > 0 > 40 > 30 > Not yet evaluated
 					    # We only report 3, 2 or 1 in a full line
 					    if {[lsearch -exact {3 2 1} $valueByGene] ne -1} {
@@ -1095,28 +1004,17 @@ proc OrganizeAnnotation {} {
 	####### "Basic gene annotations"
 	append TextToWrite "\t$geneName\t$NbGenes\t$transcript\t$txStart\t$txEnd\t$txL\t$CDSl\t$frameshift\t$nbExons\t$location\t$location2\t$distNearestSS\t$nearestSStype\t$intersect"
 
-	####### "Regulatory elements"
+	####### "Regulatory elements annotations"
 	append TextToWrite "\t$reText"
 	
-	####### "SVincludedInFt"
-	if {$g_AnnotSV(dgvAnn)} {
-	    append TextToWrite "\t$dgvText"
-	}
-	if {$g_AnnotSV(gnomADann)} {
-	    append TextToWrite "\t$gnomADtext"
-	}
-	if {$g_AnnotSV(DDDfreqAnn)} {
-	    append TextToWrite "\t$dddText"
-	}
-	if {$g_AnnotSV(1000gAnn)} {
-	    append TextToWrite "\t$1000gText"
-	}
-	if {$g_AnnotSV(IMHann)} {
-	    append TextToWrite "\t$IMHtext"
-	}
+	#######  "Annotations with benign genes or genomic regions (SVincludedInFt)"
+	append TextToWrite "\t$benignText"
+	
+	#######  "Users: SVincludedInFt"
 	if {[glob -nocomplain $usersDir/SVincludedInFt/*.formatted.sorted.bed] ne ""} { ; # Don't put {$SVincludedInFTtext ne ""}: the user BED could have only 1 annotation column, and so $UserText can be equel to "" (without "\t")
 	    append TextToWrite "\t$SVincludedInFTtext"
 	}
+	
 	####### "FtIncludedInSV"
 	if {$g_AnnotSV(NRSVann)} {
 	    append TextToWrite "\t$NRSVtext"
@@ -1133,6 +1031,7 @@ proc OrganizeAnnotation {} {
 	if {[glob -nocomplain $usersDir/FtIncludedInSV/*.formatted.sorted.bed] ne ""} { ; # Don't put {$FtIncludedInSVtext ne ""}: the user BED could have only 1 annotation column, and so $UserText can be equel to "" (without "\t")
 	    append TextToWrite "\t$FtIncludedInSVtext"
 	}
+	
 	####### "Breakpoints annotations"
 	if {$g_AnnotSV(gcContentAnn)} {
 	    append TextToWrite "\t$gcContentText"
