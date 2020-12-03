@@ -83,7 +83,7 @@ source $g_AnnotSV(tclDir)/AnnotSV-haploinsufficiency.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-help.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-loeuf-pLI.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-omim.tcl
-source $g_AnnotSV(tclDir)/AnnotSV-pathogenic-NR-SV.tcl
+source $g_AnnotSV(tclDir)/AnnotSV-pathogenicsv.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-regulatoryelements.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-ranking.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-repeat.tcl
@@ -158,6 +158,8 @@ if {[regexp "\\.vcf(.gz)?$" $g_AnnotSV(SVinputFile)]} {
 ## Genes annotations:
 #####################
 
+puts "...checking the annotation data sources"
+
 # Annotation of genes depending of the transcripts (RefSeq or ENSEMBL) ?
 if {$g_AnnotSV(tx) eq "RefSeq"} {
     checkGenesRefSeqFile
@@ -189,7 +191,6 @@ checkCNVintoleranceFile
 
 ## Breakpoint annotations:
 ##########################
-
 # Annotation with GC content?
 checkFASTAfiles
 # Annotation with Repeat?
@@ -203,6 +204,8 @@ checkENCODEblacklistFile
 
 ## FtIncludedInSV annotations:
 ##############################
+# Annotations with pathogenic genes or genomic regions?
+checkPathogenicFiles
 
 # Annotation with Regulatory Elements?
 checkPromoterFile
@@ -210,8 +213,6 @@ checkEAfiles
 checkGHfiles
 # Annotation with TAD?
 checkTADfiles
-# Annotation with the dbVar pathogenic NR SV?
-checkPathogenicNRSVfile
 # Annotation with COSMIC?
 checkCOSMICfile
 
@@ -249,12 +250,14 @@ if {$g_AnnotSV(extann) eq ""} {set g_AnnotSV(genesBasedAnn) 0} else {set g_Annot
 
 
 # DISPLAY
+puts ""
+puts "...listing arguments"
 puts "\t******************************************"
 puts "\tAnnotSV has been run with these arguments:"
 puts "\t******************************************"
 set lKey [array names g_AnnotSV]
 foreach key [lsort $lKey] {
-    if {[regexp "EAann|Ann|bashDir|bedFile|docDir|etcDir|extann|GHann|gnomADann|IMHann|installDir|NRSVann|outputColHeader|ranking|genes|samplesidTSVcol|svtTSVcol|tclDir|userDir|Version$" $key]} {continue}
+    if {[regexp "EAann|Ann|bashDir|bedFile|docDir|etcDir|extann|installDir|outputColHeader|ranking|genes|samplesidTSVcol|svtTSVcol|tclDir|userDir|Version$" $key]} {continue}
     if {$g_AnnotSV($key) eq ""} {continue}
     puts "\t-$key $g_AnnotSV($key)"
 }

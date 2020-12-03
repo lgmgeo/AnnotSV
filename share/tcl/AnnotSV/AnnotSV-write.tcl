@@ -135,18 +135,10 @@ proc OrganizeAnnotation {} {
 	append headerOutput "\t[join $SVincludedInFtHeader "\t"]"
     }
 
-    ####### "NR SV header"
-    if {$g_AnnotSV(NRSVann)} {
-	set g_AnnotSV(NRSVann_i) ""
-	set j 0
-	foreach col "dbVar_event dbVar_variant dbVar_status" {
-	    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" $col] ne -1} {
-		append headerOutput "\t$col"
-		lappend g_AnnotSV(NRSVann_i) $j
-	    }
-	    incr j
-	}
-	if {$g_AnnotSV(NRSVann_i) eq ""} {set g_AnnotSV(NRSVann) 0}
+    ####### "Pathogenic SV header"
+    foreach svtype "gain loss ins inv" {
+	if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^P_[string tolower ${svtype}]_"] eq -1} { continue }
+	append headerOutput "\tP_${svtype}_phen\tP_${svtype}_hpo\tP_${svtype}_source\tP_${svtype}_coord"
     }
 
     ####### "TAD header"
@@ -270,13 +262,13 @@ proc OrganizeAnnotation {} {
     
     #######  Annotations with benign genes or genomic regions (SVincludedInFt)
     puts "\t...Annotations with benign genes or genomic regions"
-    puts "\t\t>>> gnomAD annotation"
-    puts "\t\t>>> ClinVar annotation"
-    puts "\t\t>>> ClinGen annotation"
-    puts "\t\t>>> DGV annotation"
-    puts "\t\t>>> DDD annotation"
-    puts "\t\t>>> 1000g annotation"
-    puts "\t\t>>> Ira M. Hall's lab annotation"
+    puts "\t\t...gnomAD annotation"
+    puts "\t\t...ClinVar annotation"
+    puts "\t\t...ClinGen annotation"
+    puts "\t\t...DGV annotation"
+    puts "\t\t...DDD annotation"
+    puts "\t\t...1000g annotation"
+    puts "\t\t...Ira M. Hall's lab annotation"
     # "SVincludedInFt"
     foreach formattedUserBEDfile [glob -nocomplain $usersDir/SVincludedInFt/*.formatted.sorted.bed] {
 	puts "\t\t...[file tail $formattedUserBEDfile]"
@@ -287,9 +279,13 @@ proc OrganizeAnnotation {} {
 	set nColHeader [llength $L_headerColName]
 	puts "\t\t($nColHeader annotations columns: [join $L_headerColName ", "])"
     }
+    #######  Annotations with pathogenic genes or genomic regions (FtIncludedInSV)
+    puts "\t...Annotations with pathogenic genes or genomic regions"
+    puts "\t\t...dbVar annotation"
+    puts "\t\t...ClinVar annotation"
+    puts "\t\t...ClinGen annotation"
     ####### "FtIncludedInSV"
-    puts "\t...Annotations with features overlapped with the SV"
-    if {$g_AnnotSV(NRSVann)} {puts "\t\t...dbVar_pathogenic_NR_SV annotation"}
+    puts "\t...Annotations with features overlapped with the SV ($g_AnnotSV(overlap) %)"
     if {$g_AnnotSV(tadAnn)} {puts "\t\t...TAD annotation"}
     foreach formattedUserBEDfile [glob -nocomplain $usersDir/FtIncludedInSV/*.formatted.sorted.bed] {
 	puts "\t\t...[file tail $formattedUserBEDfile]"
@@ -323,7 +319,7 @@ proc OrganizeAnnotation {} {
     ########################################################################
     ################### Display: annotation in progress ####################
     ########################################################################
-    puts "\n\n...annotation in progress ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
+    puts "\n...annotation in progress ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
 
 
     
@@ -720,14 +716,23 @@ proc OrganizeAnnotation {} {
 	    set benignText "[benignSVannotation $SVchrom $SVleft $SVright]"
 	} 
 
-	# dbVar pathogenic NR SV annotation
-	if {$g_AnnotSV(NRSVann)} {
+	# User SVincludedInFt BED annotations. 
+	set L_SVincludedInFtText {}
+   	foreach formattedUserBEDfile [glob -nocomplain $usersDir/SVincludedInFt/*.formatted.sorted.bed] {
 	    if {$AnnotSVtype eq "split"} {
-		set NRSVtext "[pathogenicNRSVannotation $SVchrom $intersectStart $intersectEnd $g_AnnotSV(NRSVann_i)]"
+		lappend L_SVincludedInFtText "[userBEDannotation $formattedUserBEDfile $SVchrom $intersectStart $intersectEnd]"
 	    } else {
-		set NRSVtext "[pathogenicNRSVannotation $SVchrom $SVleft $SVright $g_AnnotSV(NRSVann_i)]"
+		lappend L_SVincludedInFtText "[userBEDannotation $formattedUserBEDfile $SVchrom $SVleft $SVright]"
 	    } 
 	}
+	set SVincludedInFTtext [join $L_SVincludedInFtText "\t"]
+
+	# Annotations with pathogenic genes or genomic regions (FtIncludedInSV)
+	if {$AnnotSVtype eq "split"} {
+	    set pathogenicText "[pathogenicSVannotation $SVchrom $intersectStart $intersectEnd]"
+	} else {
+	    set pathogenicText "[pathogenicSVannotation $SVchrom $SVleft $SVright]"
+	} 
 
 	# User FtIncludedInSV BED annotations. 
 	set L_FtIncludedInSVtext {}
@@ -739,17 +744,6 @@ proc OrganizeAnnotation {} {
 	    } 
 	}
 	set FtIncludedInSVtext [join $L_FtIncludedInSVtext "\t"]
-
-	# User SVincludedInFt BED annotations. 
-	set L_SVincludedInFtText {}
-   	foreach formattedUserBEDfile [glob -nocomplain $usersDir/SVincludedInFt/*.formatted.sorted.bed] {
-	    if {$AnnotSVtype eq "split"} {
-		lappend L_SVincludedInFtText "[userBEDannotation $formattedUserBEDfile $SVchrom $intersectStart $intersectEnd]"
-	    } else {
-		lappend L_SVincludedInFtText "[userBEDannotation $formattedUserBEDfile $SVchrom $SVleft $SVright]"
-	    } 
-	}
-	set SVincludedInFTtext [join $L_SVincludedInFtText "\t"]
 
 	# Genes-based annotations.
 	if {$g_AnnotSV(genesBasedAnn)} {
@@ -1015,10 +1009,10 @@ proc OrganizeAnnotation {} {
 	    append TextToWrite "\t$SVincludedInFTtext"
 	}
 	
+	#######  "Annotations with pathogenic genes or genomic regions (FtIncludedInSV)"
+	append TextToWrite "\t$pathogenicText"
+	
 	####### "FtIncludedInSV"
-	if {$g_AnnotSV(NRSVann)} {
-	    append TextToWrite "\t$NRSVtext"
-	}
 	if {$g_AnnotSV(tadAnn)} {
 	    append TextToWrite "\t$tadText"
 	}

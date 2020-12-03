@@ -87,7 +87,6 @@ proc configureAnnotSV {argv} {
     }
     puts "\t...configuration data from $configFile"
     set testColumnNames 0
-    set  g_AnnotSV(outputColHeader) {B_gain_source B_gain_coord B_loss_source B_loss_coord}
     foreach L [LinesFromFile $configFile] {
 	if {[regexp "^# AnnotSV Output columns:" $L]} {set testColumnNames 1} 
 	if {[regexp "^#" $L]} {continue}
@@ -146,7 +145,7 @@ proc configureAnnotSV {argv} {
     ########################################
     ## Checking of the configuration options
     ########################################
-    puts "\t...checking configuration data and files\n"
+    puts "\t...checking all these configuration data\n"
 
     ## annotationsDir: It must be an existing directory (or "" for the default)
     if {$g_AnnotSV(annotationsDir) eq ""} {
@@ -489,7 +488,7 @@ proc configureAnnotSV {argv} {
 
     # Some annotation columns are essential for the ranking: can not be removed by the user
     set g_AnnotSV(genesBasedAnn) 1
-    foreach col "DGV_GAIN_n_samples_tested DGV_GAIN_Frequency DGV_LOSS_n_samples_tested DGV_LOSS_Frequency dbVar_event dbVar_status morbidGenes morbidGenesCandidates GHgene_elite GHgene_not_elite pLI_ExAC HI_CGscore TS_CGscore" {
+    foreach col "morbidGenes morbidGenesCandidates pLI_ExAC HI_CGscore TS_CGscore B_gain_source B_gain_coord B_loss_source B_loss_coord P_gain_phen P_gain_hpo P_gain_source P_gain_coord P_loss_phen P_loss_hpo P_loss_source P_loss_coord" {
 	if {[lsearch -exact "$g_AnnotSV(outputColHeader)" $col] eq -1} {
 	    lappend g_AnnotSV(outputColHeader) $col
 	}

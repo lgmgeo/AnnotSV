@@ -22,87 +22,104 @@
 ############################################################################################################
 
 
-# Creation (if needed) of:
+# Creation / update (if some data source files are presents) of:
 # - $benignLossFile_Sorted
 # - $benignGainFile_Sorted
-#
-# WARNING: All the different sources should have been downloaded before to run this proc
+# - $benignInsFile_Sorted
+# - $benignInvFile_Sorted
 proc checkBenignFiles {} {
 
     global g_AnnotSV
 
     foreach genomeBuild {GRCh37 GRCh38} {
 	set benignDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/SVincludedInFt/BenignSV/$genomeBuild"
+
+	# Files to create / update
 	set benignLossFile_Sorted "$benignDir/benign_Loss_SV_$genomeBuild.sorted.bed"
 	set benignGainFile_Sorted "$benignDir/benign_Gain_SV_$genomeBuild.sorted.bed"
 	set benignInsFile_Sorted "$benignDir/benign_Ins_SV_$genomeBuild.sorted.bed"
 	set benignInvFile_Sorted "$benignDir/benign_Inv_SV_$genomeBuild.sorted.bed"
 	
-	if {![file exists $benignLossFile_Sorted] || ![file exists $benignGainFile_Sorted]} {
-	    puts "\t...creation of the [file tail $benignLossFile_Sorted] and [file tail $benignGainFile_Sorted] files ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
-	    puts "\t   (done only once)"	    
-	    file delete -force $benignLossFile_Sorted
-	    file delete -force $benignGainFile_Sorted
-	    file delete -force $benignInsFile_Sorted
-	    file delete -force $benignInvFile_Sorted
+	# Text to write only if an update of the sources is requested (in the check* proc).
+	set g_AnnotSV(benignText) "\t...creation/update of the \"benign_*_SV_$genomeBuild.sorted.bed\" files ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])\n\t   (done only once)"	    
 
-	    # Creation of *.tmp.bed (not formatted and sorted)
-	    set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
-	    set benignGainFile_Tmp "$benignDir/benign_Gain_SV_$genomeBuild.tmp.bed"
-	    set benignInsFile_Tmp "$benignDir/benign_Ins_SV_$genomeBuild.tmp.bed"
-	    set benignInvFile_Tmp "$benignDir/benign_Inv_SV_$genomeBuild.tmp.bed"
-	    file delete -force $benignLossFile_Tmp
-	    file delete -force $benignGainFile_Tmp
-	    file delete -force $benignInsFile_Tmp
-	    file delete -force $benignInvFile_Tmp
-	    
-	    checkGnomADFile $genomeBuild
-	    checkDGV $genomeBuild
-	    checkDDD $genomeBuild
-	    check1000g $genomeBuild
-	    checkClinGenHITSfile $genomeBuild
-	    checkClinVarFile $genomeBuild
-	    checkIMH $genomeBuild
-	    
-	    # Creation of *.formatted.bed
-	    catch {checkBed $benignLossFile_Tmp $benignDir}
-	    catch {checkBed $benignGainFile_Tmp $benignDir}
-	    catch {checkBed $benignInsFile_Tmp $benignDir}
-	    catch {checkBed $benignInvFile_Tmp $benignDir}
-	    file delete -force $benignLossFile_Tmp
-	    file delete -force $benignGainFile_Tmp
-	    file delete -force $benignInsFile_Tmp
-	    file delete -force $benignInvFile_Tmp
+	# Creation of benign*File_Tmp (not formatted and sorted)
+	set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
+	set benignGainFile_Tmp "$benignDir/benign_Gain_SV_$genomeBuild.tmp.bed"
+	set benignInsFile_Tmp "$benignDir/benign_Ins_SV_$genomeBuild.tmp.bed"
+	set benignInvFile_Tmp "$benignDir/benign_Inv_SV_$genomeBuild.tmp.bed"
+	file delete -force $benignLossFile_Tmp
+	file delete -force $benignGainFile_Tmp
+	file delete -force $benignInsFile_Tmp
+	file delete -force $benignInvFile_Tmp	
+	checkGnomAD_benignFile $genomeBuild
+	checkDGV_benignFile $genomeBuild
+	checkDDD_benignFile $genomeBuild
+	check1000g_benignFile $genomeBuild
+	checkClinGenHITS_benignFile $genomeBuild
+	checkClinVar_benignFile $genomeBuild
+	checkIMH_benignFile $genomeBuild
+	catch {unset g_AnnotSV(benignText)}
 
-	    # Creation of *.sorted.bed:
-	    # Intersection with very large files can cause trouble with excessive memory usage.
-	    # A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm. 
-	    foreach SVtype {Loss Gain Ins Inv} {
-		set benignFile_TmpFormatted "$benignDir/benign_${SVtype}_SV_$genomeBuild.tmp.formatted.bed"
-		if {![file exist $benignFile_TmpFormatted]} {continue}
-		set benignFile_Sorted "$benignDir/benign_${SVtype}_SV_$genomeBuild.sorted.bed"
-		set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.tmp.bash"
-		ReplaceTextInFile "#!/bin/bash" $sortTmpFile
-		WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $sortTmpFile
-		WriteTextInFile "export LC_ALL=C" $sortTmpFile
-		WriteTextInFile "sort -k1,1 -k2,2n $benignFile_TmpFormatted >> $benignFile_Sorted" $sortTmpFile
-		file attributes $sortTmpFile -permissions 0755
-		if {[catch {eval exec bash $sortTmpFile} Message]} {
-		    puts "-- checkBenignFiles --"
-		    puts "sort -k1,1 -k2,2n $benignFile_TmpFormatted >> $benignFile_Sorted"
-		    puts "$Message"
-		    puts "Exit with error"
-		    exit 2
+	# Creation of *.tmp.formatted.bed
+	foreach SVtype {Loss Gain Ins Inv} {
+	    set benignFile_Sorted "$benignDir/benign_${SVtype}_SV_$genomeBuild.sorted.bed"
+	    set benignFile_Tmp "$benignDir/benign_${SVtype}_SV_$genomeBuild.tmp.bed"
+	    if {[file exists $benignFile_Tmp]} {
+		# Add the SV from $benign*File_Sorted 
+		if {[file exists $benignFile_Sorted]} {
+		    set id_file1 [open "$benignFile_Sorted" r]
+		    set id_file2 [open "$benignFile_Tmp" a]
+		    while { [gets $id_file1 line] >= 0 } {
+			puts $id_file2 $line
+		    }
+		    close $id_file1
+		    close $id_file2
 		}
-		file delete -force $sortTmpFile 
-		file delete -force $benignFile_TmpFormatted
+		# sort
+		catch {checkBed $benignFile_Tmp $benignDir}
+		file delete -force $benignFile_Tmp
 	    }
-
-	    # Display
-	    puts "\n"
+	}
+	
+	# Creation of *.sorted.bed:
+	# Intersection with very large files can cause trouble with excessive memory usage.
+	# A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm. 
+	foreach SVtype {Loss Gain Ins Inv} {
+	    set benignFile_TmpFormatted "$benignDir/benign_${SVtype}_SV_$genomeBuild.tmp.formatted.bed"
+	    if {![file exist $benignFile_TmpFormatted]} {continue}
+	    set benignFile_Sorted "$benignDir/benign_${SVtype}_SV_$genomeBuild.sorted.bed"
+	    set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.tmp.bash"
+	    ReplaceTextInFile "#!/bin/bash" $sortTmpFile
+	    WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $sortTmpFile
+	    WriteTextInFile "export LC_ALL=C" $sortTmpFile
+	    WriteTextInFile "sort -k1,1 -k2,2n $benignFile_TmpFormatted > $benignFile_Sorted" $sortTmpFile
+	    file attributes $sortTmpFile -permissions 0755
+	    if {[catch {eval exec bash $sortTmpFile} Message]} {
+		puts "-- checkBenignFiles --"
+		puts "sort -k1,1 -k2,2n $benignFile_TmpFormatted > $benignFile_Sorted"
+		puts "$Message"
+		puts "Exit with error"
+		exit 2
+	    }
+	    file delete -force $sortTmpFile 
+	    file delete -force $benignFile_TmpFormatted
 	}
     }
     
+    # Remove some columns from g_AnnotSV(outputColHeader) if the corresponding annotation file doesn't exist
+    foreach svtype {"Gain" "Loss" "Ins" "Inv"} {
+	set benignFile_Sorted "$benignDir/benign_${svtype}_SV_$genomeBuild.sorted.bed"
+	if {![file exists $benignFile_Sorted]} {
+	    set newList {}
+	    foreach e "$g_AnnotSV(outputColHeader)" {
+		if {[regexp "^B_[string tolower ${svtype}]_" $e]} {continue}
+		lappend newList $e
+	    }
+	    set g_AnnotSV(outputColHeader) $newList
+	}
+    }
+
     return
 }
 
@@ -117,7 +134,7 @@ proc checkBenignFiles {} {
 ##   - Benign_Inv_SV_$genomeBuild.tmp.bed
 ################################################################################################
 
-proc checkClinVarFile {genomeBuild} {
+proc checkClinVar_benignFile {genomeBuild} {
     
     global g_AnnotSV
     
@@ -128,6 +145,10 @@ proc checkClinVarFile {genomeBuild} {
 
     if {$ClinVarFileDownloaded ne ""} {
 	# We have some ClinVar annotations to add in $benign*File
+	if {[info exists g_AnnotSV(benignText)]} {
+	    puts $g_AnnotSV(benignText)
+	    unset g_AnnotSV(benignText)
+	}
 	puts "\t   >>> ClinVar parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 		
 	set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
@@ -203,19 +224,23 @@ proc checkClinVarFile {genomeBuild} {
 }
 
 
-proc checkClinGenHITSfile {genomeBuild} {
+proc checkClinGenHITS_benignFile {genomeBuild} {
     
     global g_AnnotSV
     
     ## Check if ClinGen files have been downloaded 
     ##############################################
     set benignDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/SVincludedInFt/BenignSV/$genomeBuild"
-    set ClinGenFileDownloaded1 [lindex [glob -nocomplain "$benignDir/ClinGen_gene_curation_list_$genomeBuild.tsv"] end]
-    set ClinGenFileDownloaded2 [lindex [glob -nocomplain "$benignDir/ClinGen_region_curation_list_$genomeBuild.tsv"] end]
+    set ClinGenFileDownloaded1 [glob -nocomplain "$benignDir/ClinGen_gene_curation_list_$genomeBuild.tsv"] 
+    set ClinGenFileDownloaded2 [glob -nocomplain "$benignDir/ClinGen_region_curation_list_$genomeBuild.tsv"] 
 
     
     if {$ClinGenFileDownloaded1 ne "" || $ClinGenFileDownloaded2 ne ""} {
 	# We have some ClinGen annotations to add in $benign*File
+	if {[info exists g_AnnotSV(benignText)]} {
+	    puts $g_AnnotSV(benignText)
+	    unset g_AnnotSV(benignText)
+	}
 	puts "\t   >>> ClinGen parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
     } else {return}
 
@@ -265,23 +290,22 @@ proc checkClinGenHITSfile {genomeBuild} {
 	    }
 	    close $f
 	}
-	
-	# Writing:
-	##########
-	puts "\t       ([llength $L_toWriteLoss] SV Loss + [llength $L_toWriteGain] SV Gain)"
- 	if {$L_toWriteLoss ne {}} {
-	    WriteTextInFile [join $L_toWriteLoss "\n"] $benignLossFile_Tmp
-	}
-	if {$L_toWriteGain ne {}} {
-	    WriteTextInFile [join $L_toWriteGain "\n"] $benignGainFile_Tmp
-	}
-
-	# Clean:
-	########
-	file delete -force $ClinGenFileDownloaded
     }
-  
-
+    
+    # Writing:
+    ##########
+    puts "\t       ([llength $L_toWriteLoss] SV Loss + [llength $L_toWriteGain] SV Gain)"
+    if {$L_toWriteLoss ne {}} {
+	WriteTextInFile [join $L_toWriteLoss "\n"] $benignLossFile_Tmp
+    }
+    if {$L_toWriteGain ne {}} {
+	WriteTextInFile [join $L_toWriteGain "\n"] $benignGainFile_Tmp
+    }
+    
+    # Clean:
+    ########
+    file delete -force $ClinGenFileDownloaded1
+    file delete -force $ClinGenFileDownloaded2
 
     return
 }
@@ -289,7 +313,7 @@ proc checkClinGenHITSfile {genomeBuild} {
 
 
 
-proc checkDGV {genomeBuild} {
+proc checkDGV_benignFile {genomeBuild} {
 
     global g_AnnotSV
 
@@ -300,6 +324,10 @@ proc checkDGV {genomeBuild} {
 
     if {$DGVfileDownloaded ne ""} {
 	# We have some DGV annotations to add in $benign*File
+	if {[info exists g_AnnotSV(benignText)]} {
+	    puts $g_AnnotSV(benignText)
+	    unset g_AnnotSV(benignText)
+	}
 	puts "\t   >>> DGV parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 	
 	set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
@@ -381,7 +409,7 @@ proc checkDGV {genomeBuild} {
 
 
 
-proc checkGnomADFile {genomeBuild} {
+proc checkGnomAD_benignFile {genomeBuild} {
     
     global g_AnnotSV
     
@@ -392,6 +420,10 @@ proc checkGnomADFile {genomeBuild} {
 
     if {$GnomADfileDownloaded ne ""} {
 	# We have some GnomAD annotations to add in $benign*File
+	if {[info exists g_AnnotSV(benignText)]} {
+	    puts $g_AnnotSV(benignText)
+	    unset g_AnnotSV(benignText)
+	}
 	puts "\t   >>> GnomAD parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 	
 	set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
@@ -484,7 +516,7 @@ proc checkGnomADFile {genomeBuild} {
 }
 
 
-proc checkDDD {genomeBuild} {
+proc checkDDD_benignFile {genomeBuild} {
 
     global g_AnnotSV
 
@@ -495,6 +527,10 @@ proc checkDDD {genomeBuild} {
 
     if {$DDDfileDownloaded ne ""} {
 	# We have some DDD annotations to add in $benign*File
+	if {[info exists g_AnnotSV(benignText)]} {
+	    puts $g_AnnotSV(benignText)
+	    unset g_AnnotSV(benignText)
+	}
 	puts "\t   >>> DDD parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 
 	set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
@@ -565,7 +601,7 @@ proc checkDDD {genomeBuild} {
     return
 }
 
-proc check1000g {genomeBuild} {
+proc check1000g_benignFile {genomeBuild} {
 
     global g_AnnotSV
 
@@ -576,6 +612,10 @@ proc check1000g {genomeBuild} {
 
     if {$1000gFileDownloaded ne ""} {
 	# We have some 1000g annotations to add in $benign*File
+	if {[info exists g_AnnotSV(benignText)]} {
+	    puts $g_AnnotSV(benignText)
+	    unset g_AnnotSV(benignText)
+	}
 	puts "\t   >>> 1000g parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 
 	set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
@@ -703,7 +743,7 @@ proc check1000g {genomeBuild} {
     return
 }
 
-proc checkIMH {genomeBuild} {
+proc checkIMH_benignFile {genomeBuild} {
 
     global g_AnnotSV
 
@@ -714,6 +754,10 @@ proc checkIMH {genomeBuild} {
 
     if {$IMHfileDownloaded ne ""} {
 	# We have some IMH annotations to add in $benign*File
+	if {[info exists g_AnnotSV(benignText)]} {
+	    puts $g_AnnotSV(benignText)
+	    unset g_AnnotSV(benignText)
+	}
 	puts "\t   >>> IMH parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 
 	set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
@@ -824,8 +868,7 @@ proc benignSVannotation {SVchrom SVstart SVend} {
 	foreach svtype {"gain" "loss" "ins" "inv"} {
 	    # Keep only the user requested columns (defined in the configfile)
 	    if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^B_${svtype}_"] eq -1} { continue }
-	    lappend L_benignText(Empty) ""
-	    lappend L_benignText(Empty) ""
+	    lappend L_benignText(Empty) {*}{"" ""}
 	}
 	set benignText(Empty) "[join $L_benignText(Empty) "\t"]"
 	

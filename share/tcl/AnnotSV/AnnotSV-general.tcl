@@ -236,7 +236,6 @@ proc checkBed {bedFile {bedDir ""} {mergeOverlap 0}} {
 
     if {[file exists $newBed]} {return 1}
 
-
     # Bedfile should be sorted, should not have "chr" in the first column, should not have 2 identical lines 
     ##############################################################################################################################################
     # If mergeOverlap is set to 1, should not have overlapping lines
@@ -251,7 +250,6 @@ proc checkBed {bedFile {bedDir ""} {mergeOverlap 0}} {
         set L [gets $f]
         if {$L eq ""} {continue}
         if {[regexp "^#" $L]} {set header $L; continue}
-
         if {[regsub "chr" [lindex $L 0] "" chrom] ne 0} {
             lappend L_Text($chrom) "[string range $L 3 end]"
         } else {
@@ -260,6 +258,7 @@ proc checkBed {bedFile {bedDir ""} {mergeOverlap 0}} {
 	lappend L_length [llength [split $L "\t"]]
     }
     close $f
+
     # With or without annotations?
     set L_length [lsort -unique $L_length]
     if {[llength $L_length] ne 1} {
@@ -518,4 +517,49 @@ proc checksvtBEDcol {bedFile} {
 	}
     }
     return
+}
+
+proc fromOMIMtoPhenotype {OMIM} {
+    global g_AnnotSV
+    global g_phen
+    global g_gene
+    
+    if { ! [info exists g_phen(DONE)]} {
+	set OMIMfile1 [glob -nocomplain "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based/OMIM/*_OMIM-1-annotations.tsv.gz"]
+	# 20201107_OMIM-1-annotations.tsv.gz 
+	# Header = genes   Mim Number
+	foreach L [LinesFromGZFile $OMIMfile1] {
+	    set Ls [split $L "\t"]
+	    set gene [lindex $Ls 0]
+	    set L_omim [split [lindex $Ls 1] ";"]
+	    foreach omim $L_omim {
+		lappend g_gene($omim) $gene
+	    }
+	}
+	
+	set OMIMfile2 [glob -nocomplain "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based/OMIM/*_OMIM-2-annotations.tsv.gz"]
+	# 20201107_OMIM-2-annotations.tsv.gz 
+	# Header = genes   Phenotypes      Inheritance	
+	foreach L [LinesFromGZFile $OMIMfile2] {
+	    set Ls [split $L "\t"]
+	    set gene [lindex $Ls 0]
+	    set phenotype [lindex $Ls 1]
+	    regsub -all "\\\{|\\\}|\\\[|\\\]" $phenotype "" phenotype
+	    set g_phen($gene) $phenotype
+	}
+	
+	set g_phen(DONE) 1 
+    }
+    
+    set phenotype ""
+    if {[info exists g_gene($OMIM)]} {
+	foreach gene $g_gene($OMIM) {
+	    if {[info exists g_phen($gene)]} {
+		lappend phenotype $g_phen($gene)
+	    }
+	}
+	set phenotype [join $phenotype "/"]
+    } 
+
+    return $phenotype
 }

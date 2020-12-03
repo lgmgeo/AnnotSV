@@ -527,7 +527,6 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
     set L_allRegulatedGenes {} ;# used for exomiser
     if {![file exists $SV_RE_intersectBEDfile ] || [file size $SV_RE_intersectBEDfile] eq 0} {
 	# No intersection between SV and regulatory elements
-	puts "...no intersection between SV and regulatory elements"
 	## Delete temporary file
 	file delete -force $SV_RE_intersectBEDfile
     } else {
@@ -548,9 +547,10 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
     }
 
     ## Display
-    puts "...[llength $L_allGenesOverlapped] genes overlapped with an SV"
+    puts "...searching for SV overlaps with a gene or a regulatory elements"
+    puts "\t...[llength $L_allGenesOverlapped] genes overlapped with an SV"
     set L_allRegulatedGenes [lsort -unique $L_allRegulatedGenes]
-    puts "...[llength $L_allRegulatedGenes] genes regulated by a regulatory element which is overlapped with an SV\n"
+    puts "\t...[llength $L_allRegulatedGenes] genes regulated by a regulatory element which is overlapped with an SV"
     
     ## Preparation of the phenotype-driven analysis (Exomiser)
     set L_allGenes $L_allGenesOverlapped

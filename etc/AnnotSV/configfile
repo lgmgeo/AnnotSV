@@ -18,7 +18,7 @@
 
 -minTotalNumber:            "500"
 
--overlap:                   70
+-overlap:                   100
 
 -overwrite:                 "yes"
 
@@ -83,15 +83,24 @@ B_inv_source
 B_inv_coord
 
 # Annotations with pathogenic genes or genomic regions:
-dbVar_event                     *
-dbVar_variant		
-dbVar_status                    *
-GHid_elite
-GHid_not_elite
-GHtype
-GHgene_elite                    *
-GHgene_not_elite                *
-GHtissue
+P_gain_phen 
+P_gain_hpo 
+P_gain_source 
+P_gain_coord 
+P_loss_phen 
+P_loss_hpo 
+P_loss_source 
+P_loss_coord
+P_ins_phen
+P_ins_hpo
+P_ins_source
+P_ins_coord
+P_inv_phen
+P_inv_hpo
+P_inv_source
+P_inv_coord
+
+# Cancer
 COSMIC_ID
 COSMIC_MUT_TYP
 
