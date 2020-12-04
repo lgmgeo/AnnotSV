@@ -501,7 +501,8 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
 
     global g_AnnotSV
     global g_re
-
+    global g_HITS
+    
     # Intersect of the input SV bedfile with the regulatory elements files
     ######################################################################
     ## Sorted SV bed file: $g_AnnotSV(bedFile)
@@ -550,7 +551,7 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
     puts "...searching for SV overlaps with a gene or a regulatory elements"
     puts "\t...[llength $L_allGenesOverlapped] genes overlapped with an SV"
     set L_allRegulatedGenes [lsort -unique $L_allRegulatedGenes]
-    puts "\t...[llength $L_allRegulatedGenes] genes regulated by a regulatory element which is overlapped with an SV"
+    puts "\t...[llength $L_allRegulatedGenes] genes regulated by a regulatory element which is overlapped with an SV\n"
     
     ## Preparation of the phenotype-driven analysis (Exomiser)
     set L_allGenes $L_allGenesOverlapped
@@ -560,8 +561,31 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
 	runExomiser "$L_allGenes" "$g_AnnotSV(hpo)" 
     }
 
+    ## HI/TS information for these regulated genes
+    set clingenDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based/ClinGen"
+    set ClinGenFileFormattedGzip [lindex [glob -nocomplain "$clingenDir/*_ClinGenAnnotations.tsv.gz"] end]
+    foreach g $L_allRegulatedGenes {
+	set t($g) 1
+    }
+    if {$ClinGenFileFormattedGzip ne ""} {
+	set f [open "| gzip -cd $ClinGenFileFormattedGzip"]
+	while {! [eof $f]} {
+	    set L [gets $f]
+	    set Ls [split $L "\t"]
+	    set gene [lindex $Ls 0]
+	    if {[info exists t($gene)]} {
+		set L_ann ""
+		set HI [lindex $Ls 1]; if {$HI ne "Not yet evaluated"} {lappend L_ann "HI=$HI"}
+		set TS [lindex $Ls 2]; if {$TS ne "Not yet evaluated"} {lappend L_ann "TS=$TS"}
+		if {$L_ann ne ""} {
+		    set g_HITS($gene) "[join $L_ann "; "]"
+		}
+	    }
+	}
+    }
+    
     return
-
+	
     
 ##     
 ##    # Complete the "fullAndSplitBedFile" ($g_AnnotSV(outputDir)/$g_AnnotSV(outputFile).tmp)

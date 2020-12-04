@@ -34,8 +34,8 @@ proc OrganizeAnnotation {} {
     global g_SVLEN
     global g_ExtAnnotation
     global g_rankingExplanations
-    global g_Exomiser
     global g_re
+    global g_HITS
     
     # OUTPUT
     ###############
@@ -250,7 +250,7 @@ proc OrganizeAnnotation {} {
     ##################################################################################
     ################### Display of the annotations to realize ########################
     ##################################################################################
-    puts "\n...listing of the annotations to realized ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
+    puts "...listing of the annotations to realized ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
     puts "\t...Genes annotation" 
     puts "\t(with $g_AnnotSV(genesFile))"
     
@@ -697,15 +697,23 @@ proc OrganizeAnnotation {} {
 	if {$AnnotSVtype eq "full"} {
 	    if {[info exists g_re($SVchrom\t$SVleft\t$SVright)]} {
 		set L_regulatedGenes $g_re($SVchrom\t$SVleft\t$SVright)
-		if {$g_AnnotSV(hpo) eq ""} {
-		    set reText [join $L_regulatedGenes ";"]
-		} else {
-		    foreach geneName "$L_regulatedGenes" {
-			set exomiserScore [ExomiserAnnotation $geneName "score"]
-			lappend reText "$geneName ($exomiserScore)"
+		foreach gName "$L_regulatedGenes" {
+		    set HITS ""
+		    catch {set HITS "$g_HITS($gName)"}
+		    if {$g_AnnotSV(hpo) ne ""} {
+			set exomiserScore "EX=[ExomiserAnnotation $gName "score"]"
+		    } else {set exomiserScore ""}
+
+		    set lAnn {}
+		    if {$HITS ne ""} {lappend lAnn $HITS}
+		    if {$exomiserScore ne ""} {lappend lAnn $exomiserScore}
+		    if {$lAnn ne ""} {
+			lappend reText "$gName ([join $lAnn "; "])"
+		    } else {
+			lappend reText "$gName"
 		    }
-		    set reText [join $reText ";"]
 		}
+		set reText [join $reText "; "]
 	    } 
 	} 
 	
@@ -812,7 +820,7 @@ proc OrganizeAnnotation {} {
 				    foreach valueByGene [split $valueByColumn "/"] {
 					if {[regexp "ClinGenAnnotations.tsv" $F]} {
 					    set max ""
-					    # For ClinGen file (HI_CGscore + TS_CGscore), the values are ordered as follow: 
+					    # For ClinGen file (HI + TS), the values are ordered as follow: 
 					    # 3 > 2 > 1 > 0 > 40 > 30 > Not yet evaluated
 					    # We only report 3, 2 or 1 in a full line
 					    if {[lsearch -exact {3 2 1} $valueByGene] ne -1} {
