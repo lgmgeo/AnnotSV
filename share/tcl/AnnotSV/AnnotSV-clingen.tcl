@@ -51,29 +51,29 @@ proc checkClinGenFile {} {
     }
     if {$ClinGenFileFormattedGzip eq ""} {
 	## - Create the 'date'_ClinGenAnnotations.tsv file.
-	##   Header: genes, HI_CGscore and TS_CGscore
+	##   Header: genes, HI and TS
 
 	set ClinGenFileFormatted "$clingenDir/[clock format [clock seconds] -format "%Y%m%d"]_ClinGenAnnotations.tsv"
 	puts "...creation of $ClinGenFileFormatted.gz ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])\n"
-	ReplaceTextInFile "genes\tHI_CGscore\tTS_CGscore" $ClinGenFileFormatted
+	ReplaceTextInFile "genes\tHI\tTS" $ClinGenFileFormatted
 
 	# Parsing of $ClinGenFileDownloaded
 	foreach L [LinesFromFile $ClinGenFileDownloaded] {
 	    set Ls [split $L "\t"]
 
 	    if {[regexp "^#Gene Symbol" $L]} {
-		set i_gene           [lsearch -exact $Ls "#Gene Symbol"];                      if {$i_gene == -1} {puts "Bad header line syntax. Gene Symbol column not found - Exit with error"; exit 2}
-		set i_HI_CGscore     [lsearch -exact $Ls "Haploinsufficiency Score"];          if {$i_HI_CGscore == -1} {puts "Bad header line syntax. Haploinsufficiency Score column not found - Exit with error"; exit 2}
-		set i_TS_CGscore   [lsearch -exact $Ls "Triplosensitivity Score"];           if {$i_TS_CGscore == -1} {puts "Bad header line syntax. Triplosensitivity Score column not found - Exit with error"; exit 2}
+		set i_gene [lsearch -exact $Ls "#Gene Symbol"];             if {$i_gene == -1} {puts "Bad header line syntax. Gene Symbol column not found - Exit with error"; exit 2}
+		set i_HI   [lsearch -exact $Ls "Haploinsufficiency Score"]; if {$i_HI == -1} {puts "Bad header line syntax. Haploinsufficiency Score column not found - Exit with error"; exit 2}
+		set i_TS   [lsearch -exact $Ls "Triplosensitivity Score"];  if {$i_TS == -1} {puts "Bad header line syntax. Triplosensitivity Score column not found - Exit with error"; exit 2}
 		continue
 	    }
 	    if {[regexp "^#" $L]} {continue}
 
 	    set gene [lindex $Ls $i_gene]
-	    set HI_CGscore [lindex $Ls $i_HI_CGscore]
-	    set TS_CGscore [lindex $Ls $i_TS_CGscore]
+	    set HI [lindex $Ls $i_HI]
+	    set TS [lindex $Ls $i_TS]
 
-	    lappend L_Texte "$gene\t$HI_CGscore\t$TS_CGscore"
+	    lappend L_Texte "$gene\t$HI\t$TS"
 	}
 
 	# creation of $ClinGenFileFormatted.gz
