@@ -54,7 +54,7 @@ proc checkGenesRefSeqFile {} {
 	## - Create the "genes.RefSeq.sorted.bed"
 	#####################################
 	set genesFileFormatted "$genesDir/genes.RefSeq.sorted.bed"
-	puts "...creation of $genesFileFormatted ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+	puts "\t...creation of $genesFileFormatted ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 	puts "\t   (done only once during the first annotation)\n"
 	
 	# Removing non-standard contigs (other than the standard 1-22,X,Y,MT) and sorting the file in karyotypic order
@@ -145,8 +145,8 @@ proc checkGenesENSEMBLfile {} {
 ## Annotate the SV bedFile with the genes file.
 ## Keep only 1 transcript annotation by gene:
 ##   - the one selected by the user with the "-txFile" option
-##   - the one with the most of "bp from CDS" (=CDSlength)
-##   - if x transcript with same "bp from CDS", the one with the most of "bp from UTR, exon, intron" (=txLength)
+##   - the one with the most of "bp from CDS" (=overlappedCDSlength)
+##   - if x transcript with same "bp from CDS", the one with the most of "bp from UTR, exon, intron" (=overlappedTxLength)
 ##
 ## Creation of FullAndSplitBedFile ($g_AnnotSV(outputDir)/$g_AnnotSV(outputFile).tmp)
 ## -> formatted and sorted
@@ -284,8 +284,8 @@ proc genesAnnotation {} {
     #
     # Keep only 1 transcript by gene:
     #   - the one selected by the user with the "-txFile" option
-    #   - the one with the most of "bp from CDS" (=CDSlength)
-    #   - if x transcript with same "bp from CDS", the one with the most of "bp from UTR, exon, intron" (=txLength)
+    #   - the one with the most of "bp" of overlapped CDS (=overlappedCDSlength)
+    #   - if x transcript with same "bp of overlapped CDS", the one with the most of "bp" of overlapped transcript (=overlapped "UTR, exon, intron" = overlappedTxLength)
     set f [open $splitBedFile]
     while {![eof $f]} {
 	set L [gets $f]
@@ -310,26 +310,32 @@ proc genesAnnotation {} {
 		    set g_Lgenes($shortOldSplitSV) [join $L_genes "/"]
 		    # ...for each gene overlapped by the SV
 		    foreach gene $L_genes {
-			set bestCDSl -1
+			set bestCDSlov -1
+			set bestCDSlcompl -1
 			set bestTxL -1
 			set bestAnn ""
-			foreach CDSl $L_CDSlength($gene) txL $L_txLength($gene) ann $L_annot($gene)  {
-			    if {$CDSl > $bestCDSl} {
-				set bestAnn $ann; set bestCDSl $CDSl; set bestTxL $txL; continue
+			foreach CDSlov $L_overlappedCDSlength($gene) CDSlcompl $L_completeCDSlength($gene) txL $L_overlappedTxLength($gene) ann $L_annot($gene)  {
+			    if {$CDSlov > $bestCDSlov} {
+				set bestAnn $ann; set bestCDSlov $CDSlov; set bestCDSlcompl $CDSlcompl; set bestTxL $txL; continue
 			    }
-			    if {$CDSl eq $bestCDSl} {
+			    if {$CDSlov eq $bestCDSlov} {
 				if {$txL > $bestTxL} {
-				    set bestAnn $ann; set bestCDSl $CDSl; set bestTxL $txL; continue
+				    set bestAnn $ann; set bestCDSlov $CDSlov; set bestCDSlcompl $CDSlcompl; set bestTxL $txL; continue
 				}
 			    }
  			}
-			WriteTextInFile "$bestAnn\t$bestCDSl\t$bestTxL\tsplit" "$FullAndSplitBedFile"
+			if {$bestCDSlcompl eq 0} {
+			    set percentCDS 0
+			} else {
+			    set percentCDS [expr {$bestCDSlov*100/$bestCDSlcompl}]
+			}
+			WriteTextInFile "$bestAnn\t$bestCDSlov\t$percentCDS\t$bestTxL\tsplit" "$FullAndSplitBedFile"
 		    }
 		    set splitSVleft [lindex $Ls 1]
 		    set splitSVright [lindex $Ls 2]
 		    unset L_annot
-		    unset L_txLength
-		    unset L_CDSlength
+		    unset L_overlappedTxLength
+		    unset L_overlappedCDSlength
 		    # check the catch
 		    catch {unset Finish}
 		    set L_genes {}	     
@@ -365,17 +371,36 @@ proc genesAnnotation {} {
 	set exonStarts [lindex $Ls end-1]
 	set exonEnds [lindex $Ls end]
 
-	# Calcul of txLength:
-	if {$txStart > $splitSVleft} {set start $txStart} else {set start $splitSVleft}
-	if {$txEnd < $splitSVright} {set end $txEnd} else {set end $splitSVright}
-	set txLength [expr {$end-$start}]
-	lappend L_txLength($gene) "$txLength"
+	# Calcul of overlappedTxLength:
+	if {$txStart > $splitSVleft} {set splitSV_start $txStart} else {set splitSV_start $splitSVleft}
+	if {$txEnd < $splitSVright} {set splitSV_end $txEnd} else {set splitSV_end $splitSVright}
+	set overlappedTxLength [expr {$splitSV_end-$splitSV_start}]
+	lappend L_overlappedTxLength($gene) "$overlappedTxLength"
 
-	# Calcul of CDSlength:
-	set CDSlength 0
+	# Calcul of completeCDSlength:
+	set completeCDSlength 0
 	foreach A [split $exonStarts ","] B [split $exonEnds ","] {
 	    if {$A eq "" || $B eq ""} {continue}
-	    set txEnd $B
+	    #set txEnd $B
+	    # Remove exon(s) not in the CDS:
+	    if {$A<$CDSstart} {
+		if {$B<$CDSstart} {continue}
+		incr completeCDSlength [expr {$B-$CDSstart}]
+		continue
+	    }
+	    if {$B>$CDSend} {
+		if {$A>$CDSend} {continue}
+		incr completeCDSlength [expr {$CDSend-$A}]
+		continue
+	    }
+	   incr completeCDSlength [expr {$B-$A}]
+	}
+	lappend L_completeCDSlength($gene) "$completeCDSlength"
+
+	# Calcul of overlappedCDSlength:
+	set overlappedCDSlength 0
+	foreach A [split $exonStarts ","] B [split $exonEnds ","] {
+	    if {$A eq "" || $B eq ""} {continue}
 	    # Remove exon(s) not in the CDS:
 	    if {$A<$CDSstart} {
 		if {$B<$CDSstart} {continue}
@@ -386,22 +411,23 @@ proc genesAnnotation {} {
 		set B $CDSend
 	    }
 	    # Intersect coding exon(s) with the SV:
-	    if {$start<$A} {
-		if {$end<$A} {break}
+	    if {$splitSV_start<$A} {
+		if {$splitSV_end<$A} {break}
 		set i $A
-	    } else {set i $start}
-	    if {$start>$B} {continue}
-	    if {$end<$B} {set j $end} else {set j $B}
-	    incr CDSlength [expr {$j-$i}]
+	    } else {set i $splitSV_start}
+	    if {$splitSV_start>$B} {continue}
+	    if {$splitSV_end<$B} {set j $splitSV_end} else {set j $B}
+	    incr overlappedCDSlength [expr {$j-$i}]
 	}
-	lappend L_CDSlength($gene) "$CDSlength"
+	lappend L_overlappedCDSlength($gene) "$overlappedCDSlength"
 
 	# Do we have a user selected transcript?
 	if {"$txName" ne "" && [lsearch -exact $L_selectedTx "$txName"] ne -1} {
 	    set L_annot($gene) {}
 	    lappend L_annot($gene) "$L"
-	    set L_txLength($gene) "$txLength"
-	    set L_CDSlength($gene) "$CDSlength"
+	    set L_overlappedTxLength($gene) "$overlappedTxLength"
+	    set L_overlappedCDSlength($gene) "$overlappedCDSlength"
+	    set L_completeCDSlength($gene) "$completeCDSlength"
 	    set Finish($gene) 1
 	}
 
@@ -420,20 +446,26 @@ proc genesAnnotation {} {
     set L_genes [lsort -unique $L_genes]
     set g_Lgenes($shortOldSplitSV) [join $L_genes "/"]
     foreach gene $L_genes {
-	set bestCDSl -1
+	set bestCDSlov -1
+	set bestCDSlcompl -1
 	set bestTxL -1
 	set bestAnn ""
-	foreach CDSl $L_CDSlength($gene) txL $L_txLength($gene) ann $L_annot($gene)  {
-	    if {$CDSl > $bestCDSl} {
-		set bestAnn $ann; set bestCDSl $CDSl; set bestTxL $txL; continue
+	foreach CDSlov $L_overlappedCDSlength($gene) CDSlcompl $L_completeCDSlength($gene) txL $L_overlappedTxLength($gene) ann $L_annot($gene)  {
+	    if {$CDSlov > $bestCDSlov} {
+		set bestAnn $ann; set bestCDSlov $CDSlov; set bestCDSlcompl $CDSlcompl; set bestTxL $txL; continue
 	    }
-	    if {$CDSl eq $bestCDSl} {
+	    if {$CDSlov eq $bestCDSlov} {
 		if {$txL > $bestTxL} {
-		    set bestAnn $ann; set bestCDSl $CDSl; set bestTxL $txL; continue
+		    set bestAnn $ann; set bestCDSlov $CDSlov; set bestCDSlcompl $CDSlcompl; set bestTxL $txL; continue
 		}
 	    }
 	}
-	WriteTextInFile "$bestAnn\t$bestCDSl\t$bestTxL\tsplit" "$FullAndSplitBedFile"
+	if {$bestCDSlcompl eq 0} {
+	    set percentCDS 0
+	} else {
+	    set percentCDS [expr {$bestCDSlov*100/$bestCDSlcompl}]
+	}
+	WriteTextInFile "$bestAnn\t$bestCDSlov\t$percentCDS\t$bestTxL\tsplit" "$FullAndSplitBedFile"
     }
     
     # Insertion of the last "full length" SV lines

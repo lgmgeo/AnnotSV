@@ -10,6 +10,7 @@
 
 For more details, please see the README file.
 
+	- feat: Add the percent of the CDS overlapped with the SV (in the "split" annotation lines)
 	- feat: Complete the “RE_gene" annotations
 		When available, the regulated gene name is detailed with associated haploinsufficiency (HI), triplosensitivity (TS) and exomiser (EX) scores
 

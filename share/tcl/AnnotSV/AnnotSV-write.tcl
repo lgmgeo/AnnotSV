@@ -108,7 +108,7 @@ proc OrganizeAnnotation {} {
 	    }
 	}
     }
-    append headerOutput "\tAnnotSV type\tGene name\tNumber of genes\ttx\ttx start\ttx end\toverlapped tx length\toverlapped CDS length\tframeshift\tNumber of exons\tlocation\tlocation2\tdistNearestSS\tnearestSStype\tintersectStart\tintersectEnd\tRE_gene_exomiser"
+    append headerOutput "\tAnnotSV type\tGene name\tNumber of genes\ttx\ttx start\ttx end\toverlapped tx length\toverlapped CDS length\toverlapped CDS percent\tframeshift\tNumber of exons\tlocation\tlocation2\tdistNearestSS\tnearestSStype\tintersectStart\tintersectEnd\tRE_gene_exomiser"
     	      
 
     ### Search for "ref" and "alt" information (to define the AnnotSV_ID)
@@ -344,8 +344,8 @@ proc OrganizeAnnotation {} {
 	    set SVchrom [lindex $Ls 0]
 	    set SVleft  [lindex $Ls 1]
 	    set SVright [lindex $Ls 2]
-	    set exonStarts [lindex $Ls end-4]
-	    set exonEnds   [lindex $Ls end-3]
+	    set exonStarts [lindex $Ls end-5]
+	    set exonEnds   [lindex $Ls end-4]
 	    set tx_left [lindex [split $exonStarts ","] 0]
 	    set tx_right [lindex [split $exonEnds ","] end-1]
 	    if {$SVleft<$tx_left} {set intersectStart "$tx_left"} else {set intersectStart "$SVleft"}
@@ -418,17 +418,18 @@ proc OrganizeAnnotation {} {
 
 	if {$AnnotSVtype eq "split"} {
 	    # split
-	    set txStart    [lindex $Ls end-11]
-	    set txEnd      [lindex $Ls end-10]
-	    set strand     [lindex $Ls end-9]
-	    set geneName   [lindex $Ls end-8]
+	    set txStart    [lindex $Ls end-12]
+	    set txEnd      [lindex $Ls end-11]
+	    set strand     [lindex $Ls end-10]
+	    set geneName   [lindex $Ls end-9]
 	    set NbGenes    ""
-	    set transcript [lindex $Ls end-7]
-	    set CDSstart   [lindex $Ls end-6]
-	    set CDSend     [lindex $Ls end-5]
-	    set exonStarts [lindex $Ls end-4]
-	    set exonEnds   [lindex $Ls end-3]
-	    set CDSl       [lindex $Ls end-2]
+	    set transcript [lindex $Ls end-8]
+	    set CDSstart   [lindex $Ls end-7]
+	    set CDSend     [lindex $Ls end-6]
+	    set exonStarts [lindex $Ls end-5]
+	    set exonEnds   [lindex $Ls end-4]
+	    set CDSl       [lindex $Ls end-3]
+	    set CDSpercent [lindex $Ls end-2]
 	    set txL        [lindex $Ls end-1]
 	    set locationStart ""
 	    set locationEnd ""		
@@ -466,6 +467,7 @@ proc OrganizeAnnotation {} {
 	    }
 	    set transcript ""
 	    set CDSl       ""
+	    set CDSpercent ""
 	    set txStart    ""
 	    set txEnd      ""
 	    set txL        ""
@@ -1004,7 +1006,7 @@ proc OrganizeAnnotation {} {
 	append TextToWrite "\t$AnnotSVtype"
 
 	####### "Basic gene annotations"
-	append TextToWrite "\t$geneName\t$NbGenes\t$transcript\t$txStart\t$txEnd\t$txL\t$CDSl\t$frameshift\t$nbExons\t$location\t$location2\t$distNearestSS\t$nearestSStype\t$intersect"
+	append TextToWrite "\t$geneName\t$NbGenes\t$transcript\t$txStart\t$txEnd\t$txL\t$CDSl\t$CDSpercent\t$frameshift\t$nbExons\t$location\t$location2\t$distNearestSS\t$nearestSStype\t$intersect"
 
 	####### "Regulatory elements annotations"
 	append TextToWrite "\t$reText"
