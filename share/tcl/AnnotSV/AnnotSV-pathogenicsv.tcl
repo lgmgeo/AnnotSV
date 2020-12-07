@@ -55,6 +55,7 @@ proc checkPathogenicFiles {} {
 	checkdbVar_PathogenicFile $genomeBuild
 	checkClinVar_PathogenicFile $genomeBuild
 	checkClinGenHITS_pathogenicFile $genomeBuild
+	checkOMIM_PathogenicFile $genomeBuild
 	catch {unset g_AnnotSV(pathogenicText)}
     
 	# Creation of *.formatted.bed
@@ -179,7 +180,7 @@ proc checkClinVar_PathogenicFile {genomeBuild} {
 	    
 	    set ref [lindex $Ls 3]
 	    set alt [lindex $Ls 4]
-	    set SVlength [expr {abs([string length $ref]-[string length $alt])}]
+	    set SVlength [expr {abs([string length $ref]-[string length $alt])+1}]
 	    if {$SVlength < $g_AnnotSV(SVminSize)} {continue}
 	    set chrom [lindex $Ls 0]
 	    set start [lindex $Ls 1]
@@ -423,6 +424,74 @@ proc checkdbVar_PathogenicFile {genomeBuild} {
     file delete -force $dbVarFileDownloaded2
     file delete -force $dbVarFileDownloaded3  
 
+    return
+}
+
+
+proc checkOMIM_PathogenicFile {genomeBuild} {
+
+    global g_AnnotSV
+
+    ## Check if ClinVar file has been downloaded 
+    ############################################
+    set pathogenicDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/FtIncludedInSV/PathogenicSV/$genomeBuild"
+    set OMIMfileDownloaded [glob -nocomplain "$pathogenicDir/morbidmap.txt"]
+
+
+    if {$OMIMfileDownloaded ne ""} {
+	# We have some OMIM annotations to add in $pathogenicLossFile
+	if {[info exists g_AnnotSV(pathogenicText)]} {
+	    puts $g_AnnotSV(pathogenicText)
+	    unset g_AnnotSV(pathogenicText)
+	}
+	puts "\t   >>> OMIM morbid genes parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+
+	# Genes coordinates
+	set genesDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes/$g_AnnotSV(genomeBuild)"
+	set genesFileFormatted "[glob -nocomplain $genesDir/genes.$g_AnnotSV(tx).sorted.bed]"
+	foreach L [LinesFromFile $genesFileFormatted] {
+	    set Ls [split $L "\t"]
+	    set geneName [lindex $Ls 4]
+	    set chrom($geneName) [lindex $Ls 0]
+	    set start($geneName) [lindex $Ls 1]
+	    set end($geneName)   [lindex $Ls 2]
+	}
+
+	# Morbid genes
+	set L_toWriteLoss {}
+	set f [open "$OMIMfileDownloaded"]
+	set L_HPO ""
+	while {! [eof $f]} {
+	    set L [gets $f]
+	    set Ls [split $L "\t"]
+	    if {[regexp "^#" $L]} {continue}
+	    regsub -all "\\\{|\\\}|\\\[|\\\]" [lindex $Ls 0] "" phenotype
+	    set L_genes [split [lindex $Ls 1] ", "]	    
+	    foreach g $L_genes {
+		if {[info exists chrom($g)]} {
+		    set coord "$chrom($g):$start($g)"
+		    append coord "-$end($g)"
+		    set toWrite "$chrom($g)\t$start($g)\t$end($g)\t$phenotype\t$L_HPO\tmorbid:$g\t$coord"
+		    lappend L_toWriteLoss "$toWrite"
+		}
+	    } 
+	}
+	close $f
+	
+	# Writing:
+	##########
+	puts "\t       ([llength $L_toWriteLoss] SV Loss)"
+	set pathogenicLossFile_Tmp "$pathogenicDir/pathogenic_Loss_SV_$genomeBuild.tmp.bed"
+ 	if {$L_toWriteLoss ne {}} {
+	    WriteTextInFile [join $L_toWriteLoss "\n"] $pathogenicLossFile_Tmp
+	}
+	
+	# Clean:
+	########
+	file delete -force $OMIMfileDownloaded
+    }
+
+   
     return
 }
 

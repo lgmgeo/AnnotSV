@@ -10,10 +10,10 @@
 
 For more details, please see the README file.
 
+	- feat: Add a new source in the pathogenic SV annotation (OMIM morbid genes)
 	- feat: Add the percent of the CDS overlapped with the SV (in the "split" annotation lines)
 	- feat: Complete the “RE_gene" annotations
 		When available, the regulated gene name is detailed with associated haploinsufficiency (HI), triplosensitivity (TS) and exomiser (EX) scores
-
 	- feat: Rename of the "TS_CGscore" and "HI_CGscore" columns
 		The "TS_CGscore" column has been renamed "TS"
 		The "HI_CGscore" column has been renamed "HI"
