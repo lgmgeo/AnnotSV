@@ -82,7 +82,7 @@ proc startTheRESTservice {applicationPropertiesTmpFile port exomiserStartService
 	    set idService ""
 	} else {
 	    # The REST service has been successfully started
-	    puts "\t...idService = $idService"
+	    puts "\t...idService = $idService\n"
 	}
     }
     return $idService

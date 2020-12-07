@@ -10,6 +10,7 @@
 
 For more details, please see the README file.
 
+	- feat: Add pathogenic SNV/indel annotation (from ClinVar)
 	- feat: Add a new source in the pathogenic SV annotation (OMIM morbid genes)
 	- feat: Add the percent of the CDS overlapped with the SV (in the "split" annotation lines)
 	- feat: Complete the “RE_gene" annotations

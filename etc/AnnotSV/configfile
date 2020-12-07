@@ -100,6 +100,10 @@ P_inv_hpo
 P_inv_source
 P_inv_coord
 
+# Annotations with pathogenic snv/indel:
+P_snvindel_nb
+P_snvindel_phen
+
 # Cancer
 COSMIC_ID
 COSMIC_MUT_TYP

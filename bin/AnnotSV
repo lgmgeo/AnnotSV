@@ -84,6 +84,7 @@ source $g_AnnotSV(tclDir)/AnnotSV-help.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-loeuf-pLI.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-omim.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-pathogenicsv.tcl
+source $g_AnnotSV(tclDir)/AnnotSV-pathogenicsnvindel.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-regulatoryelements.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-ranking.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-repeat.tcl
@@ -206,7 +207,8 @@ checkENCODEblacklistFile
 ##############################
 # Annotations with pathogenic genes or genomic regions?
 checkPathogenicFiles
-
+# Annotations with pathogenic SNV/indel?
+checkPathoSNVindelFile
 # Annotation with Regulatory Elements?
 checkPromoterFile
 checkEAfiles

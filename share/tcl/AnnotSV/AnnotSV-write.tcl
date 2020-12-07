@@ -141,6 +141,11 @@ proc OrganizeAnnotation {} {
 	append headerOutput "\tP_${svtype}_phen\tP_${svtype}_hpo\tP_${svtype}_source\tP_${svtype}_coord"
     }
 
+    ####### "Pathogenic snv/indel header"
+    if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^P_snvindel_"] ne -1} { 
+	append headerOutput "\tP_snvindel_nb\tP_snvindel_phen"
+    }
+    
     ####### "TAD header"
     if {$g_AnnotSV(tadAnn)} {
 	set g_AnnotSV(tadAnn_i) ""
@@ -284,6 +289,8 @@ proc OrganizeAnnotation {} {
     puts "\t\t...dbVar annotation"
     puts "\t\t...ClinVar annotation"
     puts "\t\t...ClinGen annotation"
+    #######  Annotations with pathogenic snv/indel(FtIncludedInSV)
+    puts "\t...Annotations with pathogenic snv/indel"
     ####### "FtIncludedInSV"
     puts "\t...Annotations with features overlapped with the SV ($g_AnnotSV(overlap) %)"
     if {$g_AnnotSV(tadAnn)} {puts "\t\t...TAD annotation"}
@@ -744,6 +751,13 @@ proc OrganizeAnnotation {} {
 	    set pathogenicText "[pathogenicSVannotation $SVchrom $SVleft $SVright]"
 	} 
 
+	# Annotations with pathogenic snv/indel (FtIncludedInSV)
+	if {$AnnotSVtype eq "split"} {
+	    set pathoSNVindelText "[pathoSNVindelAnnotation $SVchrom $intersectStart $intersectEnd]"
+	} else {
+	    set pathoSNVindelText "[pathoSNVindelAnnotation $SVchrom $SVleft $SVright]"
+	} 
+
 	# User FtIncludedInSV BED annotations. 
 	set L_FtIncludedInSVtext {}
    	foreach formattedUserBEDfile [glob -nocomplain $usersDir/FtIncludedInSV/*.formatted.sorted.bed] {
@@ -1021,6 +1035,9 @@ proc OrganizeAnnotation {} {
 	
 	#######  "Annotations with pathogenic genes or genomic regions (FtIncludedInSV)"
 	append TextToWrite "\t$pathogenicText"
+	
+	#######  "Annotations with pathogenic snv/indel (FtIncludedInSV)"
+	append TextToWrite "\t$pathoSNVindelText"
 	
 	####### "FtIncludedInSV"
 	if {$g_AnnotSV(tadAnn)} {
