@@ -155,6 +155,7 @@ MOUSE_PHENO_EVIDENCE
 FISH_PHENO_EVIDENCE
 
 # Ranking:
-AnnotSV ranking
+AnnotSV ranking score
 ranking decision criteria
+AnnotSV ranking class
 

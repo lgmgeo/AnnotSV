@@ -22,7 +22,13 @@
 ############################################################################################################
 
 
+proc DescendingSortOnElement0 {X Y {N 0}} {
+    return [expr {[lindex $X $N]<[lindex $Y $N]}]
+}
 proc DescendingSortOnElement1 {X Y {N 1}} {
+    return [expr {[lindex $X $N]<[lindex $Y $N]}]
+}
+proc DescendingSortOnElement2 {X Y {N 2}} {
     return [expr {[lindex $X $N]<[lindex $Y $N]}]
 }
 proc AscendingSortOnElement0 {X Y {N 0}} {
@@ -31,7 +37,7 @@ proc AscendingSortOnElement0 {X Y {N 0}} {
 proc AscendingSortOnElement1 {X Y {N 1}} {
     return [expr {[lindex $X $N]>[lindex $Y $N]}]
 }
-proc AscendingSortOnElement2 {X Y {N 1}} {
+proc AscendingSortOnElement2 {X Y {N 2}} {
     return [expr {[lindex $X $N]>[lindex $Y $N]}]
 }
 proc AscendingSortOnElement4 {X Y {N 4}} {

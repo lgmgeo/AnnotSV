@@ -488,7 +488,7 @@ proc configureAnnotSV {argv} {
 
     # Some annotation columns are essential for the ranking: can not be removed by the user
     set g_AnnotSV(genesBasedAnn) 1
-    foreach col "morbidGenes morbidGenesCandidates pLI_ExAC HI_CGscore TS_CGscore B_gain_source B_gain_coord B_loss_source B_loss_coord P_gain_phen P_gain_hpo P_gain_source P_gain_coord P_loss_phen P_loss_hpo P_loss_source P_loss_coord" {
+    foreach col "{Gene name} {Number of gene} {AnnotSV type} RE_gene B_gain_source B_gain_coord B_loss_source B_loss_coord P_gain_phen P_gain_hpo P_gain_source P_gain_coord P_loss_phen P_loss_hpo P_loss_source P_loss_coord P_snvindel_nb HI TS pLI_gnomad LOEUF_bin HI_DDDpercent EXOMISER_GENE_PHENO_SCORE morbidGenes location location2 {overlapped CDS percent} frameshift {Number of exons}" {
 	if {[lsearch -exact "$g_AnnotSV(outputColHeader)" $col] eq -1} {
 	    lappend g_AnnotSV(outputColHeader) $col
 	}

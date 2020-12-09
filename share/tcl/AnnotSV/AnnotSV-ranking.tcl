@@ -27,433 +27,589 @@ proc SVprepareRanking {L_header} {
 
     global g_AnnotSV
     global g_i
-    global L_Candidates
 
-    # List of the candidate genes (given by the user)
-    set L_Candidates {}
-    if {$g_AnnotSV(candidateGenesFile) ne ""} {
-	set f [open $g_AnnotSV(candidateGenesFile)]
-        while {![eof $f]} {
-            set L [gets $f]
-	    lappend L_Candidates {*}[split $L " |\n|\t"]
-        }
-        close $f
-    }
 
     # Check if we have all the needed information for ranking
     # Before this checking, ranking can not be done
     set g_AnnotSV(ranking) 0
-
     set Ls [split $L_header "\t"]
 
     # The user is using a VCF SV input file: the svtTSVcol is necessarily the 6th in the corresponding output annotated file.tsv
     if {[regexp ".vcf$|.vcf.gz$" $g_AnnotSV(SVinputFile)]} {
 	set g_AnnotSV(svtTSVcol) 5
 	set g_AnnotSV(svtBEDcol) 3
-    } 
+    }
+
+    # "SV type" is compulsory for the ranking
+    if {$g_AnnotSV(svtTSVcol) eq -1} {return}
 
     # Check if we have all the needed information for ranking
     # unset g_i <=> no SV ranking  
-    set g_i(gene)     [lsearch -regexp $Ls "Gene name"];    if {$g_i(gene) == -1} {unset g_i; return}  
-    set g_i(full)     [lsearch -regexp $Ls "AnnotSV type"]; if {$g_i(full) == -1} {unset g_i; return}        
+    set g_i(gene)     [lsearch -regexp $Ls "Gene name"];      if {$g_i(gene) == -1} {unset g_i; return}  
+    set g_i(NbGenes)  [lsearch -regexp $Ls "Number of gene"]; if {$g_i(NbGenes) == -1} {unset g_i; return}  
+    set g_i(full)     [lsearch -regexp $Ls "AnnotSV type"];   if {$g_i(full) == -1} {unset g_i; return}        
 
-    set g_i(GAINtot)  [lsearch -regexp $Ls "DGV_GAIN_n_samples_tested"]; if {$g_i(GAINtot) == -1} {unset g_i; return}  
-    set g_i(GAINfreq) [lsearch -regexp $Ls "DGV_GAIN_Frequency"];        if {$g_i(GAINfreq) == -1} {unset g_i; return}  
-    set g_i(LOSStot)  [lsearch -regexp $Ls "DGV_LOSS_n_samples_tested"]; if {$g_i(LOSStot) == -1} {unset g_i; return}  
-    set g_i(LOSSfreq) [lsearch -regexp $Ls "DGV_LOSS_Frequency"];        if {$g_i(LOSSfreq) == -1} {unset g_i; return}  
-
-    set g_i(GDPOPMAXAF) [lsearch -regexp $Ls "GD_POPMAX_AF"];     if {$g_i(GDPOPMAXAF) == -1} {unset g_i; return}  
-
-    set g_i(dbVar_event)   [lsearch -regexp $Ls "dbVar_event"];   if {$g_i(dbVar_event) == -1} {unset g_i; return}  
-    set g_i(dbVar_status)  [lsearch -regexp $Ls "dbVar_status"];  if {$g_i(dbVar_status) == -1} {unset g_i; return}  
+    set g_i(REgene)   [lsearch -regexp $Ls "RE_gene"]; if {$g_i(REgene) == -1} {unset g_i; return}
     
-    set g_i(morbidGenes)           [lsearch -regexp $Ls "morbidGenes"];           if {$g_i(morbidGenes) == -1} {unset g_i; return}  
-    set g_i(morbidGenesCandidates) [lsearch -regexp $Ls "morbidGenesCandidates"]; if {$g_i(morbidGenesCandidates) == -1} {unset g_i; return}  
+    set g_i(Ploss)      [lsearch -regexp $Ls "P_loss_coord"];  if {$g_i(Ploss) == -1} {unset g_i; return}  
+    set g_i(Pgain)      [lsearch -regexp $Ls "P_gain_coord"];  if {$g_i(Pgain) == -1} {unset g_i; return}  
+    set g_i(Bloss)      [lsearch -regexp $Ls "B_loss_coord"];  if {$g_i(Bloss) == -1} {unset g_i; return}  
+    set g_i(Bgain)      [lsearch -regexp $Ls "B_gain_coord"];  if {$g_i(Bgain) == -1} {unset g_i; return}  
+    set g_i(Psnvindel)  [lsearch -regexp $Ls "P_snvindel_nb"]; if {$g_i(Psnvindel) == -1} {unset g_i; return} 
 
-    set g_i(GHgene_elite)          [lsearch -regexp $Ls "GHgene_elite"];         
-    set g_i(GHgene_not_elite)      [lsearch -regexp $Ls "GHgene_not_elite"];     
+    set g_i(HI) [lsearch -regexp $Ls "HI"];     if {$g_i(HI) == -1} {unset g_i; return}  
+    set g_i(TS) [lsearch -regexp $Ls "TS"];     if {$g_i(TS) == -1} {unset g_i; return}  
 
-    set g_i(pLI)       [lsearch -regexp $Ls "pLI"];       if {$g_i(pLI) == -1} {unset g_i; return}  
-    set g_i(HI_CGscore)   [lsearch -regexp $Ls "HI_CGscore"];   if {$g_i(HI_CGscore) == -1} {unset g_i; return}  
-    set g_i(TS_CGscore) [lsearch -regexp $Ls "TS_CGscore"]; if {$g_i(TS_CGscore) == -1} {unset g_i; return}  
+    set g_i(pLI)       [lsearch -regexp $Ls "pLI_gnomAD"];    if {$g_i(pLI) == -1} {unset g_i; return}  
+    set g_i(loeuf)     [lsearch -regexp $Ls "LOEUF_bin"];     if {$g_i(loeuf) == -1} {unset g_i; return}  
+    set g_i(HIpercent) [lsearch -regexp $Ls "HI_DDDpercent"]; if {$g_i(HIpercent) == -1} {unset g_i; return}  
+   
+    set g_i(exomiser)  [lsearch -regexp $Ls "EXOMISER_GENE_PHENO_SCORE"];  
+
+    set g_i(morbidGenes) [lsearch -regexp $Ls "morbidGenes"]; if {$g_i(morbidGenes) == -1} {unset g_i; return}   
+
+    set g_i(location)    [lsearch -regexp $Ls "location"];               if {$g_i(location) == -1} {unset g_i; return}  
+    set g_i(location2)   [lsearch -regexp $Ls "location2"];              if {$g_i(location2) == -1} {unset g_i; return} 
+    set g_i(CDSlength)   [lsearch -regexp $Ls "overlapped CDS length"];  if {$g_i(CDSlength) == -1} {unset g_i; return}
+    set g_i(CDSpercent)  [lsearch -regexp $Ls "overlapped CDS percent"]; if {$g_i(CDSpercent) == -1} {unset g_i; return} 
+    set g_i(frameshift)  [lsearch -regexp $Ls "frameshift"];             if {$g_i(frameshift) == -1} {unset g_i; return} 
+    set g_i(NbExons)     [lsearch -regexp $Ls "Number of exons"];        if {$g_i(NbExons) == -1} {unset g_i; return} 
 
     # If we have all the needed information, ranking will be done
     set g_AnnotSV(ranking) 1
 }
 
 
-# If enhancer annotations is available, check the gene-enhancer relations (look at the gene, if it is in a precise list)
-# Return:
-#########
-# - MorbidGenes            : SV overlaps an enhancer associated to a morbid gene                             (<=> ranking = 4)
-# - DEL                    : SV overlaps an enhancer of a gene with a pLI > 0.9 or with HI_CGscore of 3 or 2 (<=> ranking = 4)
-# - DUP                    : SV overlaps the enhancer of a gene with a TS_CGscore of 3 or 2                  (<=> ranking = 4)
-# - MorbidGenesCandidates  : SV overlaps an enhancer associated to a morbid gene candidate                   (<=> ranking = 3)
-# - Candidates             : SV overlaps an enhancer associated to a gene candidate (given by the user)      (<=> ranking = 3)
-# - NotUsed                : No GeneHancer annotation available
-proc EnhancerInformation {Ls SVtype SVtoAnn} {
+
+## Rank the pathogenicity of the "DEL" SV following the ACMG classification.
+## Creation of 2 global variables:
+## - g_rankingScore($AnnotSV_ID)
+## - g_rankingExplanations($AnnotSV_ID) 
+proc SVrankingLoss {L_annotations} {
+
     global g_AnnotSV
     global g_i
+    global g_rankingExplanations
+    global g_rankingScore
 
-    global rankingPreparation
-    global L_MorbidGenes
-    global L_DEL
-    global L_DUP
-    global L_MorbidGenesCandidates
-    global L_Candidates
+   
+    set Ls [split $L_annotations "\t"]
+    set AnnotSV_ID "[lindex $Ls 0]" 
 
-    global EliteGene
-    global NotEliteGene
-
-    # Do we have enhancer information?
-    ##################################
-    if {$g_i(GHgene_elite) == -1 || $g_i(GHgene_not_elite) == -1} {
-	return "NotUsed"
-    }
-
-
-    # Creation of different genes list to prepare the ranking:
-    ##########################################################
-    if {![info exists rankingPreparation]} {
-	set rankingPreparation 1
-
-	# List of the morbid genes:
-	set omimDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based/OMIM"
-	set MorbidGenesFileFormattedGzip [glob -nocomplain "$omimDir/*_morbidGenes.tsv.gz"]
-	set L_MorbidGenes {}
-	if {[file exists $MorbidGenesFileFormattedGzip]} {
-	    foreach L [LinesFromGZFile $MorbidGenesFileFormattedGzip] {
-		lappend L_MorbidGenes [lindex $L 0]
-	    }
+    # In case of SV redundancy in the input file
+    if {[info exists g_rankingScore($AnnotSV_ID)]} {return}
+    
+    set AnnotSVtype [lindex $Ls $g_i(full)]    
+    if {$AnnotSVtype eq "full"} {
+	
+	set NbGenes   [lindex $Ls $g_i(NbGenes)]
+	set REgene    [lindex $Ls $g_i(REgene)]
+	set Ploss     [lindex $Ls $g_i(Ploss)]
+	set Bloss     [lindex $Ls $g_i(Bloss)]
+	
+	## Section 1: Initial assessment of genomic content
+	####################################################################################################################
+	if {$REgene eq "" && $NbGenes eq "0"} {
+	    # 1B. Does NOT contain protein-coding or any known functionally important elements (- 0.60)
+	    set g_rankingScore($AnnotSV_ID) "-0.60"
+	    set g_rankingExplanations($AnnotSV_ID) "1B "
+	} else {
+	    # 1A. Contains protein-coding or other known functionally important elements (+ 0)
+	    set g_rankingScore($AnnotSV_ID) "0"
+	    set g_rankingExplanations($AnnotSV_ID) "1A "
 	}
-	# L_DEL: List of genes with a pLI > 0.9 or with HI_CGscore of 3 or 2
-	# L_DUP: List of genes with a TS_CGscore of 3 or 2
-	set ExACdir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based/ExAC"
-	set ExACfile [glob -nocomplain "$ExACdir/*_GeneIntolerance.pLI-Zscore.annotations.tsv.gz"]
-	set L_DEL {}
-	if {[file exists $ExACfile]} {
-	    foreach L [LinesFromGZFile $ExACfile] {
-		set Ls [split $L "\t"]
-		set pLI [lindex $Ls 3] 
-		if {$pLI > 0.9} {
-		    lappend L_DEL [lindex $Ls 0]
+	
+	## Section 2: Overlap with established/predicted haploinsufficiency (HI) or established benign genes/genomic regions
+	##            (Skip to section 3 if your copy-number loss DOES NOT overlap these types of genes/regions)
+	#####################################################################################################################
+	if {$Ploss ne ""} {
+	    # 2A. Complete overlap of an established HI gene/genomic region (+ 1)
+	    set g_rankingExplanations($AnnotSV_ID,2A) ""
+	} elseif {$Bloss ne ""} {
+	    # 2F. Completely contained within an established benign CNV region (- 1)
+	    set g_rankingExplanations($AnnotSV_ID,2F) ""
+	} elseif {0} {		
+	    # 2G. Overlaps an established benign CNV, but includes additional genomic material (+ 0)
+	    # Vero to improve
+	    set g_rankingExplanations($AnnotSV_ID,2G) ""
+	}
+	
+	## Section 3: Evaluation of gene number
+	####################################################################################################################
+	if {$NbGenes <= 24} {
+	    # 3A. 0-24 genes (+ 0)
+	    if {$NbGenes < 2} {
+		set g_rankingExplanations($AnnotSV_ID,3A) "+ 3A ($NbGenes gene) "
+	    } else {
+		set g_rankingExplanations($AnnotSV_ID,3A) "+ 3A ($NbGenes genes) "
+	    }
+	} elseif {$NbGenes <= 35} {
+	    # 3B. 25-34 genes (+ 0.45)
+	    set g_rankingExplanations($AnnotSV_ID,3B) "+ 3B ($NbGenes genes) "
+	} else {
+	    # 3C. 35+ genes (+ 0.90)
+	    set g_rankingExplanations($AnnotSV_ID,3C) "+ 3C ($NbGenes genes) "
+	} 
+	
+	## Section 4: Detailed evaluation of genomic content using cases from published literature, public databases, and/or internal lab data
+	##            (Skip to section 5 if either your CNV overlapped with an established HI gene/region in section 2,
+	##             OR there have been no reports associating either the CNV or any genes within the CNV with human phenotypes
+	##             caused by loss of function [LOF] or copy-number loss)
+	####################################################################################################################
+	
+	
+	## Section 5: Evaluation of inheritance pattern/family history for patient being studied			
+	####################################################################################################################
+	if {$REgene ne ""} {
+	    set L_infos [split $REgene ";"]
+	    set bestEx "0"
+	    foreach infos $L_infos {
+		if {[regexp "(.+?) \\\(.*?EX=(.+)\\\)$" $infos match g ex]} {
+		    regsub "," $ex "." ex
+		    if {$ex > $bestEx} {
+			set bestEx $ex
+			set bestG $g
+		    }
 		}
 	    }
-	}
-	set ClinGenDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based/ClinGen"
-	set CGfile [glob -nocomplain "$ClinGenDir/*_ClinGenAnnotations.tsv.gz"]
-	set L_DUP {}
-	if {[file exists $CGfile]} {
-	    foreach L [LinesFromGZFile $CGfile] {
-		set Ls [split $L "\t"]
-		set HI_CGscore [lindex $Ls 1] 
-		if {$HI_CGscore eq "2" || $HI_CGscore eq "3"} {
-		    lappend L_DEL [lindex $Ls 0]
-		}
-		set TS_CGscore [lindex $Ls 2] 
-		if {$TS_CGscore eq "2" || $TS_CGscore eq "3"} {
-		    lappend L_DUP [lindex $Ls 0]
-		}
- 
+	    if {$bestEx >= 0.7} {
+		# 5H. Inheritance information is unavailable or uninformative. The patient phenotype is highly specific and consistent with what has been described in similar cases (+ 0.30)
+		lappend g_rankingExplanations($AnnotSV_ID,5H) "RE:$bestG"
+	    } elseif {$bestEx >= 0.5} {
+		# 5G. Inheritance information is unavailable or uninformative. The patient phenotype is nonspecific, but is consistent with what has been described in similar cases (+ 0.10)
+		lappend g_rankingExplanations($AnnotSV_ID,5G) "RE:$bestG"
 	    }
 	}
-	# List of the morbid genes candidates:
-	set MorbidGenesCandidatesFileFormattedGzip [glob -nocomplain "$omimDir/*_morbidGenescandidates.tsv.gz"]
-	set L_MorbidGenesCandidates {}
-	if {[file exists $MorbidGenesCandidatesFileFormattedGzip]} {
-	    foreach L [LinesFromGZFile $MorbidGenesCandidatesFileFormattedGzip] {
-		lappend L_MorbidGenesCandidates [lindex $L 0]
-	    }
-	}
-    }
-
-
-    # Listing of the elite_genes and not_elite_genes overlapped by the SV
-    #####################################################################
-    set L_enhancersAssociatedGenes {}
-    set EG "[lindex $Ls $g_i(GHgene_elite)]"
-    if {[regexp "\\.\\.\\.$" $EG] && [info exists EliteGene($SVtoAnn)]} {       ;# AnnotSV restrict the number of overlapping reported features to 20. Keep back all the genes values
-	set EG $EliteGene($SVtoAnn)                                             ;# ok, there is no ";"
+	    
     } else {
-	set EG [split $EG ";"]
+	# Split lines
+	
+	## Section 2: Overlap with established/predicted haploinsufficiency (HI) or established benign genes/genomic regions
+	##            (Skip to section 3 if your copy-number loss DOES NOT overlap these types of genes/regions)
+	#####################################################################################################################
+	set HI [lindex $Ls $g_i(HI)]
+	set morbidGenes [lindex $Ls $g_i(morbidGenes)]
+	set gene       [lindex $Ls $g_i(gene)]
+	if {$HI eq "3" || $morbidGenes eq "yes"} {
+	    set location   [lindex $Ls $g_i(location)]
+	    set location2  [lindex $Ls $g_i(location2)]
+	    set CDSlength  [lindex $Ls $g_i(CDSlength)]
+	    set CDSpercent [lindex $Ls $g_i(CDSpercent)]
+	    regsub "," $CDSpercent "." CDSpercent
+	    set Psnvindel  [lindex $Ls $g_i(Psnvindel)]
+	    set NbExons    [lindex $Ls $g_i(NbExons)]
+
+	    if {[regexp "^5'UTR" $location2] && ![regexp "3'UTR$" $location2]} {
+		# 2C. Partial overlap with the 5’ end of an established HI gene (3’ end of the gene not involved)…
+		if {$CDSlength ne "0"} {
+		    # 2C-1. …and coding sequence is involved (+ 0.90)
+		    lappend g_rankingExplanations($AnnotSV_ID,2C-1) "$gene"
+		} else {
+		    # 2C-2. …and only the 5’ UTR is involved (+ 0)
+		    lappend g_rankingExplanations($AnnotSV_ID,2C-2) "$gene"		    
+		}
+	    } elseif {[regexp "3'UTR$" $location2] && ![regexp "^5'UTR" $location2]} {
+		# 2D. Partial overlap with the 3’ end of an established HI gene (5’ end of the gene not involved)…
+		if {![regexp "exon" $location]} {
+		    # 2D-1. …and only the 3’ untranslated region is involved (+ 0)
+		    lappend g_rankingExplanations($AnnotSV_ID,2D-1) "$gene"		    
+		} elseif {$location eq "^exon${NbExons}-3'UTR" && $Psnvindel ne ""} {
+		    # 2D-2. …and only the last exon is involved. Other established pathogenic snv/indel have been reported in the SV (+ 0.90)
+		    # Vero to improve: Other established pathogenic snv/indel have been reported in this exon
+		    lappend g_rankingExplanations($AnnotSV_ID,2D-2) "$gene"
+		} elseif {$location eq "^exon${NbExons}-3'UTR"} {
+		    # 2D-3. …and only the last exon is involved. No other established pathogenic snv/indel have been reported in the SV (+ 0.30)
+		    # Vero to improve: No other established pathogenic snv/indel have been reported in this exon
+		    lappend g_rankingExplanations($AnnotSV_ID,2D-3) "$gene"
+		} elseif {[regexp "exon" $location]} {	    
+		    # 2D-4. …and it includes other exons in addition to the last exon. Nonsense-mediated decay is expected to occur (+ 0.90)
+		    lappend g_rankingExplanations($AnnotSV_ID,2D-4) "$gene"		    
+		}
+	    } elseif {![regexp "txStart|txEnd" $location]} {
+		# 2E. Both breakpoints are within the same gene (intragenic CNV; gene-level sequence variant).
+		set frameshift [lindex $Ls $g_i(frameshift)]
+		if {$frameshift eq "yes"} {
+		    # 2E-1. frameshift (+ 0.90)
+		    lappend g_rankingExplanations($AnnotSV_ID,2E-1) "$gene"		    
+		} elseif {[regexp "exon" $location] && $Psnvindel ne "" && $CDSpercent >= 10} {
+		    # 2E-2. exon(s) overlapped AND pathogenic snv/indel overlapped AND SV removes > 10% of protein (+ 0.45)
+		    lappend g_rankingExplanations($AnnotSV_ID,2E-2) "$gene"		    
+		} elseif {[regexp "exon" $location] && $Psnvindel ne "" && $CDSpercent < 10} {
+		    # 2E-3. exon(s) overlapped AND pathogenic snv/indel overlapped AND SV removes < 10% of protein (+ 0.30)
+		    lappend g_rankingExplanations($AnnotSV_ID,2E-3) "$gene"		    
+		} 
+	    }
+	} else {
+	    set pLI        [lindex $Ls $g_i(pLI)]
+	    set loeuf      [lindex $Ls $g_i(loeuf)]
+	    set HIpercent  [lindex $Ls $g_i(HIpercent)]
+
+	    set i 0
+	    if {$pLI >= 0.9} {incr i}
+	    if {$HIpercent <= 10} {incr i}
+	    if {$loeuf < 2} {incr i} ;# loeuf = 0 or loeuf = 1
+	    if {$i >= 2} {
+		# 2H. Two or more HI predictors suggest that AT LEAST ONE gene in the interval is HI (+ 0.15)
+		lappend g_rankingExplanations($AnnotSV_ID,2H) "$gene"
+	    } 
+	}
+
+	## Section 5: Evaluation of inheritance pattern/family history for patient being studied			
+	####################################################################################################################
+	set exomiser   [lindex $Ls $g_i(exomiser)]
+	regsub "," $exomiser "." exomiser
+	if {$exomiser >= 0.7} {
+	    # 5H. Inheritance information is unavailable or uninformative. The patient phenotype is highly specific and consistent with what has been described in similar cases (+ 0.30)
+	    lappend g_rankingExplanations($AnnotSV_ID,5H) "$gene"
+	} elseif {$exomiser >= 0.5} {
+	    # 5G. Inheritance information is unavailable or uninformative. The patient phenotype is nonspecific, but is consistent with what has been described in similar cases (+ 0.10)
+	    lappend g_rankingExplanations($AnnotSV_ID,5G) "$gene"
+	}
     }
-    set NEG "[lindex $Ls $g_i(GHgene_not_elite)]"
-    if {[regexp "\\.\\.\\.$" $NEG] && [info exists NotEliteGene($SVtoAnn)]} {   ;# AnnotSV restrict the number of overlapping reported features to 20. Keep back all the genes values
-	set NEG $NotEliteGene($SVtoAnn)                                         ;# ok, there is no ";"
+   
+    return
+}
+
+proc achieveSVrankingLoss {AnnotSV_ID} {
+
+    global g_rankingScore
+    global g_rankingExplanations
+    global g_achieve
+    
+    # In case of SV redundancy in the input file
+    if {[info exists g_achieve($AnnotSV_ID)]} {return}
+    set g_achieve($AnnotSV_ID) ""
+    
+    if {![info exists g_rankingScore($AnnotSV_ID)]} {set g_rankingScore($AnnotSV_ID) ""; return}
+
+    ## Section 2: Overlap with established/predicted haploinsufficiency (HI) or established benign genes/genomic regions
+    ##            (Skip to section 3 if your copy-number loss DOES NOT overlap these types of genes/regions)
+    #####################################################################################################################
+    # Add the higher score of the section 2
+    if {[info exists g_rankingExplanations($AnnotSV_ID,2A)]} {
+	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+1}]
+	append g_rankingExplanations($AnnotSV_ID) "+ 2A (cf P_loss_source) "
+    } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2C-1)]} {
+	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.90}]
+	append g_rankingExplanations($AnnotSV_ID) "+ 2C-1 ([join $g_rankingExplanations($AnnotSV_ID,2C-1) "/"]) "
+    } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2D-2)]} {
+	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.90}]
+	append g_rankingExplanations($AnnotSV_ID) "+ 2D-2 ([join $g_rankingExplanations($AnnotSV_ID,2D-2) "/"]) "
+    } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2D-4)]} {
+	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.90}]
+	append g_rankingExplanations($AnnotSV_ID) "+ 2D-4 ([join $g_rankingExplanations($AnnotSV_ID,2D-4) "/"]) "
+    } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2E-1)]} {
+	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.90}]
+	append g_rankingExplanations($AnnotSV_ID) "+ 2E-1 ([join $g_rankingExplanations($AnnotSV_ID,2E-1) "/"]) "
+    } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2E-2)]} {
+	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.45}]
+	append g_rankingExplanations($AnnotSV_ID) "+ 2E-2 ([join $g_rankingExplanations($AnnotSV_ID,2E-2) "/"]) "
+    } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2D-3)]} {
+	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.30}]
+	append g_rankingExplanations($AnnotSV_ID) "+ 2D-3 ([join $g_rankingExplanations($AnnotSV_ID,2D-3) "/"]) "
+    } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2E-3)]} {
+	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.30}]
+	append g_rankingExplanations($AnnotSV_ID) "+ 2E-3 ([join $g_rankingExplanations($AnnotSV_ID,2E-3) "/"]) "
+    } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2H)]} {
+	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.15}]
+	append g_rankingExplanations($AnnotSV_ID) "+ 2H ([join $g_rankingExplanations($AnnotSV_ID,2H) "/"]) "
+    } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2C-2)]} {
+	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0}]
+	append g_rankingExplanations($AnnotSV_ID) "+ 2C-2 ([join $g_rankingExplanations($AnnotSV_ID,2C-2) "/"]) "
+    } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2D-1)]} {
+	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0}]
+	append g_rankingExplanations($AnnotSV_ID) "+ 2D-1 ([join $g_rankingExplanations($AnnotSV_ID,2D-1) "/"]) "
+    } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2G)]} {
+	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0}]
+	append g_rankingExplanations($AnnotSV_ID) "+ 2G "
+    } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2F)]} {
+	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)-1}]
+	append g_rankingExplanations($AnnotSV_ID) "+ 2F (cf B_loss_source) "
+    }
+
+    ## Section 3: Evaluation of gene number
+    ####################################################################################################################
+    # Add the higher score of the section 3
+    if {[info exists g_rankingExplanations($AnnotSV_ID,3C)]} {
+	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.90}]
+	append g_rankingExplanations($AnnotSV_ID) "$g_rankingExplanations($AnnotSV_ID,3C)"
+     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,3B)]} {
+	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.45}]
+	append g_rankingExplanations($AnnotSV_ID) "$g_rankingExplanations($AnnotSV_ID,3B)"
+     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,3A)]} {
+	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.00}]
+	append g_rankingExplanations($AnnotSV_ID) "$g_rankingExplanations($AnnotSV_ID,3A)"
+     } 
+    
+    ## Section 4: Detailed evaluation of genomic content using cases from published literature, public databases, and/or internal lab data
+    ##            (Skip to section 5 if either your CNV overlapped with an established HI gene/region in section 2,
+    ##             OR there have been no reports associating either the CNV or any genes within the CNV with human phenotypes
+    ##             caused by loss of function [LOF] or copy-number loss)
+    ####################################################################################################################
+    # Add the higher score of the section 4
+
+    
+    ## Section 5: Evaluation of inheritance pattern/family history for patient being studied			
+    ####################################################################################################################
+    # Add the higher score of the section 5
+    if {[info exists g_rankingExplanations($AnnotSV_ID,5H)]} {
+	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.30}]
+	append g_rankingExplanations($AnnotSV_ID) "+ 5H ([join $g_rankingExplanations($AnnotSV_ID,5H) "/"]) "
+    } elseif {[info exists g_rankingExplanations($AnnotSV_ID,5G)]} {
+	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.10}]
+	append g_rankingExplanations($AnnotSV_ID) "+ 5G ([join $g_rankingExplanations($AnnotSV_ID,5G) "/"]) "
+    }
+
+    return
+}
+
+    
+## Rank the pathogenicity of the "DUP" SV following the ACMG classification.
+## Creation of 2 global variables:
+## - g_rankingScore($AnnotSV_ID)
+## - g_rankingExplanations($AnnotSV_ID) 
+proc SVrankingGain {L_annotations} {
+
+    global g_AnnotSV
+    global g_i
+    global g_rankingExplanations
+    global g_rankingScore
+
+   
+    set Ls [split $L_annotations "\t"]
+    set AnnotSV_ID "[lindex $Ls 0]" 
+
+    set AnnotSVtype [lindex $Ls $g_i(full)]
+    
+    if {$AnnotSVtype eq "full"} {
+	
+	set NbGenes   [lindex $Ls $g_i(NbGenes)]
+	set REgene    [lindex $Ls $g_i(REgene)]
+	set Pgain     [lindex $Ls $g_i(Pgain)]
+	set Bgain     [lindex $Ls $g_i(Bgain)]
+	
+	## Section 1: Initial assessment of genomic content
+	####################################################################################################################
+	if {$REgene eq "" && $NbGenes eq "0"} {
+	    # 1B. Does NOT contain protein-coding or any known functionally important elements (- 0.60)
+	    set g_rankingScore($AnnotSV_ID) "-0.60"
+	    set g_rankingExplanations($AnnotSV_ID) "1B "
+	} else {
+	    # 1A. Contains protein-coding or other known functionally important elements (+ 0)
+	    set g_rankingScore($AnnotSV_ID) "0"
+	    set g_rankingExplanations($AnnotSV_ID) "1A "
+	}
+	
+	## Section 2: Overlap with established triplosensitive (TS), haploinsufficient (HI), or benign genes or genomic regions
+	##            (Skip to section 3 if the copy-number gain DOES NOT overlap these types of genes/regions)			
+	#####################################################################################################################
+	if {$Pgain ne ""} {
+	    # 2A. Complete overlap; the TS gene or minimal critical region is fully contained within the observed copy-number gain (+ 1)
+	    set g_rankingExplanations($AnnotSV_ID,2A) "+ 2A (cf P_gain_source) "
+	} elseif {$Bgain ne ""} {
+	    # 2D. Smaller than established benign copy-number gain, breakpoint(s) does not interrupt protein-coding genes (- 1)
+	    # Need to check with the split lines if breakpoint(s) does not interrupt protein-coding genes (cf location)
+	    set g_rankingExplanations($AnnotSV_ID,2D) ""
+	}
+	
+	## Section 3: Evaluation of gene number
+	####################################################################################################################
+	if {$NbGenes <= 34} {
+	    # 3A. 0-34 genes (+ 0)
+	    if {$NbGenes < 2} {
+		set g_rankingExplanations($AnnotSV_ID,3A) "+ 3A ($NbGenes gene) "
+	    } else {
+		set g_rankingExplanations($AnnotSV_ID,3A) "+ 3A ($NbGenes genes) "
+	    }
+	} elseif {$NbGenes <= 49} {
+	    # 3B. 35-49 genes (+ 0.45)
+	    set g_rankingExplanations($AnnotSV_ID,3B) "+ 3B ($NbGenes genes) "
+	} else {
+	    # 3C. 50 or more genes (+ 0.90)
+	    set g_rankingExplanations($AnnotSV_ID,3C) "+ 3C ($NbGenes genes) "
+	} 
+	
+	##  Section 4: Detailed evaluation of genomic content using cases from published literature, public databases, and/or internal lab data
+	##             (Note: If there have been no reports associating either the copy-number gain or any of the genes therein with human phenotypes caused by triplosensitivity, skip to section 5)  	
+	####################################################################################################################
+	
+	
+	## Section 5: Evaluation of inheritance pattern/family history for patient being studied			
+	####################################################################################################################
+	if {$REgene ne ""} {
+	    set L_infos [split $REgene ";"]
+	    set bestEx "0"
+	    foreach infos $L_infos {
+		if {[regexp "(.+?) \\\(.*?EX=(.+)\\\)$" $infos match g ex]} {
+		    regsub "," $ex "." ex
+		    if {$ex > $bestEx} {
+			set bestEx $ex
+			set bestG $g
+		    }
+		}
+	    }
+	    if {$bestEx >= 0.7} {
+		# 5H. Inheritance information is unavailable or uninformative. The patient phenotype is highly specific and consistent with what has been described in similar cases (+ 0.15)
+		lappend g_rankingExplanations($AnnotSV_ID,5H) "RE:$bestG"
+	    } elseif {$bestEx >= 0.5} {
+		# 5G. Inheritance information is unavailable or uninformative. The patient phenotype is nonspecific, but is consistent with what has been described in similar cases (+ 0.10)
+		lappend g_rankingExplanations($AnnotSV_ID,5G) "RE:$bestG"
+	    }
+	}
+	    
     } else {
-	set NEG [split $NEG ";"]
-    } 
-    set L_enhancersAssociatedGenes [lsort -unique [list {*}$EG {*}$NEG]]
+	# Split lines
+	
+	## Section 2: Overlap with established triplosensitive (TS), haploinsufficient (HI), or benign genes or genomic regions
+	##            (Skip to section 3 if the copy-number gain DOES NOT overlap these types of genes/regions)			
+	#####################################################################################################################
+	set HI          [lindex $Ls $g_i(HI)]
+	set morbidGenes [lindex $Ls $g_i(morbidGenes)]
+	set gene        [lindex $Ls $g_i(gene)]
+	set location    [lindex $Ls $g_i(location)]
+	set exomiser    [lindex $Ls $g_i(exomiser)]
+	regsub "," $exomiser "." exomiser
 
-
-    # Check if the SV overlaps an enhancer associated to a morbid gene 
-    ##################################################################
-    set thegenes "MorbidGenes"
-    foreach g $L_enhancersAssociatedGenes {
-	if {[lsearch -exact $L_MorbidGenes $g] ne -1} {
-	    lappend thegenes $g
+	if {[info exists g_rankingExplanations($AnnotSV_ID,2D)] && ![regexp "exon|intron" $location]} {
+	    # 2D. Smaller than established benign copy-number gain, breakpoint(s) does not interrupt protein-coding genes (- 1)
+	    set g_rankingExplanations($AnnotSV_ID,2D) "+ 2D (cf B_gain_source) "
 	}
-    }	
-    if {$thegenes ne "MorbidGenes"} {return "$thegenes"}
 
-
-    # Check if the SV overlaps an enhancer associated to a gene with a pLI > 0.9 or with HI_CGscore of 3 or 2
-    #########################################################################################################
-    # Check for a del:
-    set thegenes "DEL"
-    if {[regexp -nocase "Del|Loss|<CN0>|<CN1>" $SVtype]} {
-	foreach g $L_enhancersAssociatedGenes {
-	    if {[lsearch -exact $L_DEL $g] ne -1} {
-		lappend thegenes $g
+	if {$HI eq "3" || $morbidGenes eq "yes"} {
+	    set frameshift [lindex $Ls $g_i(frameshift)]
+	    
+	    if {![regexp "^txStart" $location] && ![regexp "txEnd$" $location]} {
+		# Both breakpoints are within the same HI gene 
+		if {$frameshift eq "yes"} {
+		    # 2I. Both breakpoints are within the same HI gene (gene-level sequence variant, possibly resulting in loss of function [LOF]).
+		    #     and frameshift (+ 0.9)
+		    lappend g_rankingExplanations($AnnotSV_ID,2I) "$gene"
+		}
+	    } elseif {![regexp "^txStart" $location] || ![regexp "txEnd$" $location]} {
+		# One breakpoint is within an established HI gene
+		if {$exomiser > 0.7} {
+		    # 2K. One breakpoint is within an established HI gene, patient’s phenotype is highly specific and consistent with what is expected for LOF of that gene (+ 0.45)
+		    lappend g_rankingExplanations($AnnotSV_ID,2K) "$gene"
+		}
 	    }
-	}	    
+	}
+
+	## Section 5: Evaluation of inheritance pattern/family history for patient being studied			
+	####################################################################################################################
+	if {$exomiser >= 0.7} {
+	    # 5H. Inheritance information is unavailable or uninformative. The patient phenotype is highly specific and consistent with what has been described in similar cases (+ 0.15)
+	    lappend g_rankingExplanations($AnnotSV_ID,5H) "$gene"
+	} elseif {$exomiser >= 0.5} {
+	    # 5G. Inheritance information is unavailable or uninformative. The patient phenotype is nonspecific, but is consistent with what has been described in similar cases (+ 0.10)
+	    lappend g_rankingExplanations($AnnotSV_ID,5G) "$gene"
+	}
     }
-    if {$thegenes ne "DEL"} {return "$thegenes"}
-
-    # Check if the SV overlaps an enhancer associated to a gene with a TS_CGscore of 3 or 2
-    #########################################################################################
-    # Check for a dup:
-    set thegenes "DUP"
-    if {[regexp -nocase "Dup|Gain|Multiplication|<CN\[3-9\]" $SVtype]} {
-	foreach g $L_enhancersAssociatedGenes {
-	    if {[lsearch -exact $L_DUP $g] ne -1} {
-		lappend thegenes $g
-	    }
-	}
-    }	    
-    if {$thegenes ne "DUP"} {return "$thegenes"}
-
-    # Check if the SV overlaps an enhancer associated to a morbid gene candidate
-    ############################################################################
-    set thegenes "MorbidGenesCandidates"
-    foreach g $L_enhancersAssociatedGenes {
-	if {[lsearch -exact $L_MorbidGenesCandidates $g] ne -1} {
-	    lappend thegenes $g
-	}
-    }	
-    if {$thegenes ne "MorbidGenesCandidates"} {return "$thegenes"}
-
-    # Check if the SV overlaps an enhancer associated to a candidate gene (given by the user)
-    #########################################################################################
-    set thegenes "Candidates"
-    foreach g $L_enhancersAssociatedGenes {
-	if {[lsearch -exact $L_Candidates $g] ne -1} {
-	    lappend thegenes $g
-	}
-    }	
-    if {$thegenes ne "Candidates"} {return "$thegenes"}
+   
+    return
 }
 
 
-## Rank the pathogenicity of the different SV as follows:
-#########################################################
-## category 1 = benign
-##           > 70% SV overlapped with a benign SV + does not overlap with i) a morbid gene, ii) a morbid gene candidate and iii) a candidate gene
-## category 2 = likely benign
-##           < 70% SV overlapped with a benign SV + does not overlap with i) a morbid gene, ii) a morbid gene candidate and iii) a candidate gene (or their enhancers)
-## category 3 = VOUS (variant of unknown significance)
-##           SV that overlaps i) a morbid gene candidate  (or its enhancer) and ii) a candidate gene  (or its enhancer) (with at least 1bp)
-## category 4 = likely pathogenic 
-##           SV that overlaps a morbid gene (or its enhancer) (with at least 1bp)
-##           or for a del: SV that overlap a gene (or its enhancer) with a pLI > 0.9 or with HI_CGscore of 3 or 2
-##           or for a dup: SV that overlap a gene (or its enhancer) TS_CGscore of 3 or 2
-## category 5 = pathogenic
-##           SV that overlaps a pathogenic SV (with at least 1bp)
+proc achieveSVrankingGain {AnnotSV_ID} {
 
-## ClinGen HI_CGscore and TS_CGscore explanations:
-####################################################
-##   Rating	Possible Clinical Interpretation
-##   ------     --------------------------------
-##   3	        Sufficient evidence for dosage pathogenicity
-##   2	        Some evidence for dosage pathogenicity
-##   1	        Little evidence for dosage pathogenicity
-##   0	        No evidence for dosage pathogenicity
-##   40         Evidence suggests the gene is not dosage sensitive
-##
-## HI = Haploinsufficiency  TS = Triplosensitivity
-proc SVranking {L_annotations} {
+    global g_rankingScore
+    global g_rankingExplanations
+
+    if {![info exists g_rankingScore($AnnotSV_ID)]} {set g_rankingScore($AnnotSV_ID) ""; return}
+    
+    ## Section 2: Overlap with established triplosensitive (TS), haploinsufficient (HI), or benign genes or genomic regions
+    ##            (Skip to section 3 if the copy-number gain DOES NOT overlap these types of genes/regions)			
+    #####################################################################################################################
+    # Add the higher score of the section 2
+    if {[info exists g_rankingExplanations($AnnotSV_ID,2A)]} {
+	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+1}]
+	append g_rankingExplanations($AnnotSV_ID) "+ 2A (cf P_loss_source) "
+    } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2D)] && $g_rankingExplanations($AnnotSV_ID,2D) eq "+ 2D (cf B_gain_source) "} {
+	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)-1}]
+	append g_rankingExplanations($AnnotSV_ID) "+ 2D (cf B_gain_source) "
+    } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2I)]} {
+	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.9}]
+	append g_rankingExplanations($AnnotSV_ID) "+ 2I ([join $g_rankingExplanations($AnnotSV_ID,2I) "/"]) "
+    } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2K)]} {
+	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.45}]
+	append g_rankingExplanations($AnnotSV_ID) "+ 2K ([join $g_rankingExplanations($AnnotSV_ID,2K) "/"]) "
+    }
+	      
+    ## Section 3: Evaluation of gene number
+    ####################################################################################################################
+    # Add the higher score of the section 3
+    if {[info exists g_rankingExplanations($AnnotSV_ID,3C)]} {
+	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.90}]
+	append g_rankingExplanations($AnnotSV_ID) "$g_rankingExplanations($AnnotSV_ID,3C)"
+    } elseif {[info exists g_rankingExplanations($AnnotSV_ID,3B)]} {
+	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.45}]
+	append g_rankingExplanations($AnnotSV_ID) "$g_rankingExplanations($AnnotSV_ID,3B)"
+    } elseif {[info exists g_rankingExplanations($AnnotSV_ID,3A)]} {
+	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.00}]
+	append g_rankingExplanations($AnnotSV_ID) "$g_rankingExplanations($AnnotSV_ID,3A)"
+    } 
+    
+    ## Section 4: Detailed evaluation of genomic content using cases from published literature, public databases, and/or internal lab data
+    ##            (Note: If there have been no reports associating either the copy-number gain or any of the genes therein with human phenotypes caused by triplosensitivity, skip to section 5)		 
+    ####################################################################################################################
+    # Add the higher score of the section 4
+    
+    
+    ## Section 5: Evaluation of inheritance patterns/family history for patient being studied			
+    ####################################################################################################################
+    # Add the higher score of the section 5
+    if {![info exists g_rankingExplanations($AnnotSV_ID,2K)]} {
+	if {[info exists g_rankingExplanations($AnnotSV_ID,5H)]} {
+	    set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.15}]
+	    append g_rankingExplanations($AnnotSV_ID) "+ 5H ([join $g_rankingExplanations($AnnotSV_ID,5H) "/"]) "
+	} elseif {[info exists g_rankingExplanations($AnnotSV_ID,5G)]} {
+	    set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.10}]
+	    append g_rankingExplanations($AnnotSV_ID) "+ 5G ([join $g_rankingExplanations($AnnotSV_ID,5G) "/"]) "
+	}
+    }
+    
+    return
+}
+
+
+
+
+## Rank the pathogenicity of the "INS" SV.
+## Creation of 2 global variables:
+## - g_rankingScore($AnnotSV_ID)
+## - g_rankingExplanations($AnnotSV_ID) 
+proc SVrankingINS {L_annotations} {
 
     global g_AnnotSV
     global g_i
-    global L_Candidates
     global g_rankingExplanations
-
-    # Check if we have enougth information to do the ranking:
-    #########################################################
-    set ranking ""
-    if {$g_AnnotSV(svtTSVcol) eq -1} {return $ranking}
-    if {!$g_AnnotSV(ranking)} {return $ranking}
-
-
-    # Ranking!!
-    ###########
+    global g_rankingScore
 
     set Ls [split $L_annotations "\t"]
-    set SVtype [lindex $Ls $g_AnnotSV(svtTSVcol)]   
-    set SVtoAnn [join [lrange $Ls 1 3] ","]
-    set enhancer [EnhancerInformation $Ls $SVtype $SVtoAnn]
     set AnnotSV_ID "[lindex $Ls 0]" 
-    set AnnotSVtype [lindex $Ls $g_i(full)]
-    set genes [lindex $Ls $g_i(gene)]
 
-    ## category 5 = pathogenic
-    ##              SV that overlap a pathogenic SV (with at least 1bp)
-    ###################################################################
-    set dbVar_status [lindex $Ls $g_i(dbVar_status)]
-    if {$dbVar_status ne ""} {
-	set dbVar_event [lindex $Ls $g_i(dbVar_event)]
-	if {[regexp -nocase "Del|Loss|<CN0>|<CN1>" $SVtype] && [regexp -nocase "Del|Loss|<CN0>|<CN1>" $dbVar_event]} {
-	    set ranking "5"	
-	    set g_rankingExplanations($AnnotSV_ID) "LOSS: pathogenic SV overlapped"
-	    return $ranking
-	}
-	if {[regexp -nocase "Dup|Gain|Multiplication|<CN\[3-9\]" $SVtype] && [regexp -nocase "Dup|Gain|Multiplication|<CN\[3-9\]" $dbVar_event]} {
-	    set ranking "5"	
-	    set g_rankingExplanations($AnnotSV_ID) "GAIN: pathogenic SV overlapped"
-	    return $ranking
-	}
-    }
-
-    ## category 4 = likely pathogenic 
-    ##           SV that overlaps a "dosage sensitive" morbid gene (or its enhancer) (with at least 1bp)
-    ##           or for a del: SV that overlaps a gene (or its enhancer) with a pLI > 0.9 or with HI_CGscore of 3 or 2
-    ##           or for a dup: SV that overlaps a gene (or its enhancer) with a TS_CGscore of 3 or 2
-    ###################################################################
-
-    # Clingen, score = 40 : "Evidence suggests the gene is not dosage sensitive"
-    # Not a dosage sensitive gene:
-    #   >> DEL with HI_CGscore = 40
-    #   >> DUP with TS_CGscore = 40
-    set notADosageSensitiveGene "unknown"
-
-    # Check if a SV overlaps a morbid gene
-    set morbidGenes [lindex $Ls $g_i(morbidGenes)]
-    if {[regexp "yes" $morbidGenes]} {
-        set ranking "4"
-        set g_rankingExplanations($AnnotSV_ID) "Morbid gene overlapped"
-        return $ranking
-    }
-    # Check if a SV overlaps an enhancer associated to a morbid gene
-    if {[lindex $enhancer 0] eq "MorbidGenes"} {
-        set ranking "4"
-        set g_rankingExplanations($AnnotSV_ID) "Enhancer of a morbid gene overlapped ([lrange $enhancer 1 end])"
-        return $ranking
-    }
-
-    # Check for a del:
-    regsub "," [lindex $Ls $g_i(pLI)] "." pLI; # needed with -metrics=fr 
-    set HI_CGscore [lindex $Ls $g_i(HI_CGscore)]
-    if {[regexp -nocase "Del|Loss|<CN0>|<CN1>" $SVtype]} {
-	# Check if it is not a dosage sensitive gene    
-	if {$HI_CGscore eq "40"} {set notADosageSensitiveGene "yes"}
-	# Check SV that overlap a gene with a pLI > 0.9 or with HI_CGscore of 3 or 2
-	if {$pLI > 0.9} {    ; # {"">0.9} is false; code ok
-	    set ranking "4"	
-	    set g_rankingExplanations($AnnotSV_ID) "LOSS: pLI ($pLI) > 0.9"
-	    return $ranking
-	} elseif {$HI_CGscore eq 3 || $HI_CGscore eq 2} {   
-	    set ranking "4"	
-	    set g_rankingExplanations($AnnotSV_ID) "LOSS: HI_CGscore = $HI_CGscore"
-	    return $ranking
-	}
-	# Check SV that overlap the enhancer of a gene with a pLI > 0.9 or with HI_CGscore of 3 or 2
-	if {[lindex $enhancer 0] eq "DEL"} {
-	    set ranking "4"	
-	    set g_rankingExplanations($AnnotSV_ID) "LOSS: overlap the enhancer of a gene with a pLI > 0.9 or with a HI_CGscore of 3 or 2 ([lrange $enhancer 1 end])"
-	    return $ranking
-	}
-    }
+    set g_rankingScore($AnnotSV_ID) ""
+    set g_rankingExplanations($AnnotSV_ID) ""
     
-    # Check for a dup:
-    set TS_CGscore [lindex $Ls $g_i(TS_CGscore)]
-    if {[regexp -nocase "Dup|Gain|Multiplication|<CN\[3-9\]" $SVtype]} {
-        # Check if it is not a dosage sensitive gene
-        if {$TS_CGscore eq "40"} {set notADosageSensitiveGene "yes"}
-	# Check SV that overlap a gene TS_CGscore of 3 or 2
-	if {$TS_CGscore eq 3 || $TS_CGscore eq 2} {
-	    set ranking "4"	
-	    set g_rankingExplanations($AnnotSV_ID) "GAIN: TS_CGscore = $TS_CGscore"
-	    return $ranking
-	}
-	# Check SV that overlap the enhancer of a gene TS_CGscore of 3 or 2
-	if {[lindex $enhancer 0] eq "DUP"} {
-	    set ranking "4"	
-	    set g_rankingExplanations($AnnotSV_ID) "GAIN: overlap the enhancer of a gene with a TS_CGscore of 3 or 2 ([lrange $enhancer 1 end])"
-	    return $ranking
-	}
-    }
-    
-    
-    ## category 3 = VOUS (variant of unknown significance)
-    ##           SV that overlap an enhancer or a CDS from i) a morbid gene candidate and ii) a candidate gene (with at least 1bp)
-    ###################################################################
-
-    # Check if a SV overlaps a morbid gene candidate
-    set morbidGenesCandidates [lindex $Ls $g_i(morbidGenesCandidates)]
-    if {[regexp "yes" $morbidGenesCandidates]} {
-	set ranking "3"	
-	set g_rankingExplanations($AnnotSV_ID) "Morbid gene candidate overlapped"
-	return $ranking
-    }
-    # Check if a SV overlaps an enhancer associated to a morbid gene candidate
-    if {[lindex $enhancer 0] eq "MorbidGenesCandidates"} {
-	set ranking "3"	
-	set g_rankingExplanations($AnnotSV_ID) "Enhancer of a morbid gene candidate overlapped ([lrange $enhancer 1 end])"
-	return $ranking
-    }
-
-    if {$g_AnnotSV(candidateGenesFile) ne ""} {
-	# Check if a SV overlaps a CDS from a candidate gene (with at least 1bp)
-	foreach gene [split $genes "/"] {
-	    if {$gene ne "" && [lsearch -exact $L_Candidates $gene] ne -1} {
-		set ranking "3"	
-		set g_rankingExplanations($AnnotSV_ID) "Candidate gene overlapped ($gene)"
-		return $ranking
-	    }
-	}
-	# Check if a SV overlaps the enhancer from a candidate gene (with at least 1bp)
-	if {[lindex $enhancer 0] eq "Candidates"} {
-	    set ranking "3"	
-	    set g_rankingExplanations($AnnotSV_ID) "Enhancer of a candidate gene overlapped ([lrange $enhancer 1 end])"
-	    return $ranking
-	}
-    }
+    return
+}
 
 
-    ## category 1 = benign 
-    ##           > 70% SV overlapped with a benign SV
-    ##           > 70% SV overlapped with a frequent SV from gnomAD (GD_POPMAX_AF)
-    ##           + does not contain CDS from i) a morbid gene, ii) a morbid gene candidate and iii) a candidate gene
-    ###################################################################
-    set GAINtot [lindex $Ls $g_i(GAINtot)] 
-    regsub ","  [lindex $Ls $g_i(GAINfreq)] "." GAINfreq; # needed with -metrics=fr 
-    set LOSStot [lindex $Ls $g_i(LOSStot)]
-    regsub ","  [lindex $Ls $g_i(LOSSfreq)] "." LOSSfreq; # needed with -metrics=fr 
-    regsub ","  [lindex $Ls $g_i(GDPOPMAXAF)] "." GDPOPMAXAF; # needed with -metrics=fr 
+## Rank the pathogenicity of the "INV" SV.
+## Creation of 2 global variables:
+## - g_rankingScore($AnnotSV_ID)
+## - g_rankingExplanations($AnnotSV_ID) 
+proc SVrankingINV {L_annotations} {
 
-    if {[regexp -nocase "Del|Loss|<CN0>|<CN1>" $SVtype]} {
-	if {$LOSStot > $g_AnnotSV(minTotalNumber) && $LOSSfreq > 0.01} {
-	    set ranking "1"	
-	    set g_rankingExplanations($AnnotSV_ID) "> $g_AnnotSV(overlap)% SV overlapped with a frequent SV + does not contain CDS from i) a morbid gene, ii) a morbid gene candidate and iii) a candidate gene"
-	    return $ranking
-	}
-    } elseif {[regexp -nocase "Dup|Gain|Multiplication|<CN\[3-9\]" $SVtype]} {
-	if {$GAINtot > $g_AnnotSV(minTotalNumber) && $GAINfreq > 0.01} {
-	    set ranking "1"	
-	    set g_rankingExplanations($AnnotSV_ID) "> $g_AnnotSV(overlap)% SV overlapped with a frequent SV + does not contain CDS from i) a morbid gene, ii) a morbid gene candidate and iii) a candidate gene"
-	    return $ranking
-	}
-    }
-    if {$GDPOPMAXAF > 0.01} {
-	set ranking "1"	
-	set g_rankingExplanations($AnnotSV_ID) "> $g_AnnotSV(overlap)% SV overlapped with a frequent SV + does not contain CDS from i) a morbid gene, ii) a morbid gene candidate and iii) a candidate gene"
-	return $ranking
-    }
-    
-    ## category 2 = likely benign
-    ##           < 70% SV overlapped with a benign SV + does not contain CDS from i) a morbid gene, ii) a morbid gene candidate and iii) a candidate gene
-    ###################################################################    
-    set ranking "2"
-    set g_rankingExplanations($AnnotSV_ID) "< $g_AnnotSV(overlap)% SV overlapped with a benign SV + does not contain CDS from i) a morbid gene, ii) a morbid gene candidate and iii) a candidate gene"
-    return $ranking
+    global g_AnnotSV
+    global g_i
+    global g_rankingExplanations
+    global g_rankingScore
+
+    set Ls [split $L_annotations "\t"]
+    set AnnotSV_ID "[lindex $Ls 0]" 
+
+    set g_rankingScore($AnnotSV_ID) ""
+    set g_rankingExplanations($AnnotSV_ID) ""
+   
+    return
 }

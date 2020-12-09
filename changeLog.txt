@@ -10,29 +10,30 @@
 
 For more details, please see the README file.
 
-	- feat: Add pathogenic SNV/indel annotation (from ClinVar)
-	- feat: Add a new source in the pathogenic SV annotation (OMIM morbid genes)
-	- feat: Add the percent of the CDS overlapped with the SV (in the "split" annotation lines)
-	- feat: Complete the “RE_gene" annotations
-		When available, the regulated gene name is detailed with associated haploinsufficiency (HI), triplosensitivity (TS) and exomiser (EX) scores
-	- feat: Rename of the "TS_CGscore" and "HI_CGscore" columns
-		The "TS_CGscore" column has been renamed "TS"
-		The "HI_CGscore" column has been renamed "HI"
-	- feat: Update of the Exomiser data source 
+
+	- feat: Implemetation of the updated 2019 ACMG guidelines for SV ranking (replace the precedent one)
+		Add 3 annotation columns: AnnotSV ranking score; ranking decision criteria; AnnotSV ranking class
 	- feat: Add pathogenic SV annotation (from multiple sources)
-	        - Pathogenic SV sources: dbVar, ClinGen, ClinVar
-		- Add 12 annotation columns: P_gain_phen; P_gain_hpo; P_gain_source; P_gain_coord; P_loss_phen;P_loss_hpo; P_loss_source; P_loss_coord; 
-		  P_ins_phen; P_ins_hpo; P_ins_source; P_ins_coord; P_inv_phen; P_inv_hpo; P_inv_source; P_inv_coord
+		- Pathogenic SV sources: dbVar, ClinGen, ClinVar, OMIM morbid genes
+		- Add 12 annotation columns: P_gain_phen; P_gain_hpo; P_gain_source; P_gain_coord; P_loss_phen;P_loss_hpo; P_loss_source; P_loss_coord;
+		P_ins_phen; P_ins_hpo; P_ins_source; P_ins_coord; P_inv_phen; P_inv_hpo; P_inv_source; P_inv_coord
 		- Remove previous annotation columns from dbVar
 	- feat: Add benign SV annotation (from multiple sources)
 		- Benign SV sources: DGV, ClinVar, ClinGen, DDD, gnomAD, 1000g and IMH
 		- Add 8 annotation columns: B_gain_source; B_gain_coord; B_loss_source; B_loss_coord; B_ins_source; B_ins_coord; B_inv_source; B_inv_coord
-		- Remove previous annotation columns from DDD, DGV, gnomAD, 1000g and IMH	
-	- feat: The "overlap" option default is set to 100 % to implement the 2019 ACMG classification guidelines to assess SV pathogenicity
-	- feat: The "TriS_CGscore" column has been renamed "TS_CGscore"
+		- Remove previous annotation columns from DDD, DGV, gnomAD, 1000g and IMH
+	- feat: Add pathogenic SNV/indel annotation (from ClinVar)
 	- feat: Add the merge of different available regulatory elements annotations (RefSeq/ENSEMBL, EnhancerAtlas, GeneHancer)
+		When available, the regulated gene name is detailed with associated haploinsufficiency (HI), triplosensitivity (TS) and exomiser (EX) scores
+	- feat: Update of the annotation data source
+	- feat: The "overlap" option default is set to 100 % to implement the 2019 ACMG classification guidelines to assess SV pathogenicity
+	- feat: Add the percent of the CDS overlapped with the SV (in the "split" annotation lines)
 	- feat: Add the number of overlapped genes in the "full" annotation lines
-	- feat: By default, AnnotSV now expands the "start" and "end" SV positions with the VCF confidence intervals (CIPOS, CIEND) around the breakpoints (see the "includeCI" option)
+	- feat: By default, AnnotSV now expands the "start" and "end" SV positions with the VCF confidence intervals (CIPOS, CIEND) around the
+		breakpoints (see the "includeCI" option)
+	- feat: Rename of the "TriS_CGscore" and "HI_CGscore" columns
+		The "TriS_CGscore" column has been renamed "TS"
+		The "HI_CGscore" column has been renamed "HI"
 
 November 06, 2020, AnnotSV version 2.5.2
 	- feat: Add the pLI annotation from gnomAD (pLI_gnomAD), update the pLI annotation from ExAC (pLI_ExAC)

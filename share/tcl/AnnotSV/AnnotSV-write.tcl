@@ -33,6 +33,7 @@ proc OrganizeAnnotation {} {
     global L_Candidates
     global g_SVLEN
     global g_ExtAnnotation
+    global g_rankingScore
     global g_rankingExplanations
     global g_re
     global g_HITS
@@ -108,7 +109,7 @@ proc OrganizeAnnotation {} {
 	    }
 	}
     }
-    append headerOutput "\tAnnotSV type\tGene name\tNumber of genes\ttx\ttx start\ttx end\toverlapped tx length\toverlapped CDS length\toverlapped CDS percent\tframeshift\tNumber of exons\tlocation\tlocation2\tdistNearestSS\tnearestSStype\tintersectStart\tintersectEnd\tRE_gene_exomiser"
+    append headerOutput "\tAnnotSV type\tGene name\tNumber of genes\ttx\ttx start\ttx end\toverlapped tx length\toverlapped CDS length\toverlapped CDS percent\tframeshift\tNumber of exons\tlocation\tlocation2\tdistNearestSS\tnearestSStype\tintersectStart\tintersectEnd\tRE_gene"
     	      
 
     ### Search for "ref" and "alt" information (to define the AnnotSV_ID)
@@ -238,12 +239,14 @@ proc OrganizeAnnotation {} {
 	puts "Not provided (svtBEDcol = -1)"
 	puts "=> No SV ranking"
 	set g_AnnotSV(ranking) 0
-    }  
+    }
     if {$g_AnnotSV(ranking)} {
+	append headerOutput "\tAnnotSV ranking score"
 	if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "ranking decision criteria"] ne -1} {
-	    append headerOutput "\tAnnotSV ranking\tranking decision criteria"
-	} else {
-	    append headerOutput "\tAnnotSV ranking"
+	    append headerOutput "\tranking decision criteria"
+	}
+	if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "AnnotSV ranking class"] ne -1} {
+	    append headerOutput "\tAnnotSV ranking class"
 	}
     }
     
@@ -253,11 +256,11 @@ proc OrganizeAnnotation {} {
 
 
     ##################################################################################
-    ################### Display of the annotations to realize ########################
+    ################### Display of the annotations to be realize #####################
     ##################################################################################
-    puts "...listing of the annotations to realized ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
+    puts "...listing of the annotations to be realized ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
     puts "\t...Genes annotation" 
-    puts "\t(with $g_AnnotSV(genesFile))"
+    puts "\t\t...$g_AnnotSV(tx) annotation"
     
     ####### "Regulatory elements annotations"
     puts "\t...Regulatory elements annotations"
@@ -395,7 +398,6 @@ proc OrganizeAnnotation {} {
     ################### Parse the "FullAndSplitBedFile" ####################
     ########################################################################
 
-    set L_TextToWrite {}
     set f [open "$FullAndSplitBedFile"]
     while {! [eof $f]} {
         set L [gets $f]
@@ -967,7 +969,10 @@ proc OrganizeAnnotation {} {
 	regsub "chr" [lindex $Ls $i_alt] "" alt
 
 	# Creation of the AnnotSV ID (chrom_start_end_SVtype_i)
-	set AnnotSV_ID [settingOfTheAnnotSVID "${SVchrom}_${SVstart}_${SVend}_$SVtype" "$ref" "$alt"]
+	# (SV type should not have any space or special car)
+	regsub -all "\[ .():;\]" $SVtype "_" SVtypeTmp
+	set AnnotSV_ID [settingOfTheAnnotSVID "${SVchrom}_${SVstart}_${SVend}_$SVtypeTmp" "$ref" "$alt"]
+	
 	# Report of the SV length
 	#set SVlength [expr {$SVend-$SVstart}] ; # No! Wrong for an insertion, a BND or a translocation
 	if {[info exists g_SVLEN($AnnotSV_ID)]} {
@@ -975,7 +980,7 @@ proc OrganizeAnnotation {} {
 	} else {
 	    if {[regexp "DEL" [normalizeSVtype $SVtype]]} { ;# DEL
 		set SVlength [expr {$SVstart-$SVend}]
-	    } elseif {[normalizeSVtype $SVtype] eq "INV" || $SVtype eq "DUP" || [regexp -nocase "<CN(\[0-9\]+)>" $SVtype]} { ;# DUP or INV
+	    } elseif {[regexp "DUP|INV" [normalizeSVtype $SVtype]]} { ;# DUP or INV
 		set SVlength [expr {$SVend-$SVstart}]
 	    } else {set SVlength ""}
 	}
@@ -996,7 +1001,7 @@ proc OrganizeAnnotation {} {
 
 	
 	#################################################################################
-	################### creation of the "L_TextToWrite" variable ####################
+	############# creation of the "L_TextToWrite(AnnotSV_ID)" variable ##############
 	#################################################################################
 	
 	set TextToWrite ""
@@ -1077,31 +1082,142 @@ proc OrganizeAnnotation {} {
 	if {$g_AnnotSV(hpo) ne ""} {
 	    append TextToWrite "\t$exomiserText"
 	}
-	####### "Ranking annotations"  ( => done through "$TextToWrite" )
-	if {$g_AnnotSV(ranking)} {
-	    set rank [SVranking $TextToWrite]
-	    # To select the SV of a user-defined specific class (from 1 to 5)
-	    if {[lsearch -exact $g_AnnotSV(rankFiltering) $rank] eq -1} {
-		continue
+	
+	####### "Memorize the AnnotSV_ID to then order the output lines"
+	## Done only the first time an AnnotSV_ID is met
+	## (not for the split lines + not in case of SV redundancy in the SV input file)
+	if {![info exists L_TextToWrite($AnnotSV_ID)]} {
+	    lappend L_AnnotSV_ID $AnnotSV_ID
+	    if {$g_AnnotSV(hpo) ne ""} {
+		set bestExomiserScore($AnnotSV_ID) "[lindex [split $exomiserText "\t"] 0]"
 	    }
-	    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "ranking decision criteria"] ne -1} {
-		append TextToWrite "\t$rank\t$g_rankingExplanations($AnnotSV_ID)"
+	}
+	    
+	####### "Ranking annotations"
+	# Determine the SV ranking score in several steps:
+	# 1 - score computed with the full line
+	# 2 - score recomputed with the split lines
+	if {$g_AnnotSV(ranking)} {
+	    set SVtype [normalizeSVtype $SVtype] ;# DEL or DUP or INS or INV or None
+	    if {$SVtype eq "DEL"} {
+		SVrankingLoss "$TextToWrite" ;# Creation of $g_rankingScore($AnnotSV_ID) and $g_rankingExplanations($AnnotSV_ID) 
+	    } elseif {$SVtype eq "DUP"} {
+		SVrankingGain "$TextToWrite" ;# Creation of $g_rankingScore($AnnotSV_ID) and $g_rankingExplanations($AnnotSV_ID) 
+	    } elseif {$SVtype eq "INS"} {
+		SVrankingINS "$TextToWrite" ;# Creation of $g_rankingScore($AnnotSV_ID) and $g_rankingExplanations($AnnotSV_ID) 
+	    } elseif {$SVtype eq "INV"} {
+		SVrankingINV "$TextToWrite" ;# Creation of $g_rankingScore($AnnotSV_ID) and $g_rankingExplanations($AnnotSV_ID) 
 	    } else {
-		append TextToWrite "\t$rank"
+		set g_rankingScore($AnnotSV_ID) ""
+		set g_rankingExplanations($AnnotSV_ID) ""
 	    }
 	}
 
-	###### End of 1 annotation line
-	lappend L_TextToWrite "$TextToWrite"	
+	####### Define $L_TextToWrite($AnnotSV_ID)
+	lappend L_TextToWrite($AnnotSV_ID) "$TextToWrite"
     }
     close $f
-
+        
     
+    ## Finalize the ranking
+    #######################
+    if {$g_AnnotSV(ranking)} {
+	# Some input BED file can have the same SV descibed on several lines
+	foreach AnnotSV_ID [lsort -unique $L_AnnotSV_ID] {
+	    if {$SVtype eq "DEL"} {
+		achieveSVrankingLoss $AnnotSV_ID
+	    } elseif {$SVtype eq "DUP"} {
+		achieveSVrankingGain $AnnotSV_ID
+	    }  
+	}
+    }
+
+
     ################################################
     ################### Writing ####################
     ################################################
     puts "\n...writing of $outputFile ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
-    WriteTextInFile [join $L_TextToWrite "\n"] "$outputFile"
+    set L_lineCompleted ""
+    
+    # If the ranking is provided, the SV in the output are classified:
+    # >>  from the higher to the lower ranking score
+    # >>  or (if equal), from the higher to the lower exomiser score
+    # >>  or (if equal), in the sorted order of the BED
+    if {$g_AnnotSV(ranking)} {
+	foreach AnnotSV_ID $L_AnnotSV_ID {	    
+	    if {![info exists bestExomiserScore($AnnotSV_ID)]} {set bestExomiserScore($AnnotSV_ID) "-1"}
+	    if {$g_rankingScore($AnnotSV_ID) eq ""} {set score "-99"} else {set score $g_rankingScore($AnnotSV_ID)}
+	    lappend L_AnnotSV_ID_completed "$AnnotSV_ID $score $bestExomiserScore($AnnotSV_ID)"
+	}
+	set L_AnnotSV_ID [lsort -command DescendingSortOnElement1 [lsort -command DescendingSortOnElement2 $L_AnnotSV_ID_completed]]
+    }
+    
+    set i 0
+    foreach AnnotSV_ID $L_AnnotSV_ID {
+	set AnnotSV_ID [lindex $AnnotSV_ID 0]
+	set full 1
+	foreach fullOrSplitLine $L_TextToWrite($AnnotSV_ID) {
+	    set lineCompleted ""
+	    if {$full} {
+		# Ranking available only for the full lines
+		set notSelected 0
+		append lineCompleted "$fullOrSplitLine"
+		if {$g_AnnotSV(ranking)} {
+		    append lineCompleted "\t$g_rankingScore($AnnotSV_ID)"
+		    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "ranking decision criteria"] ne -1} {
+			append lineCompleted "\t$g_rankingExplanations($AnnotSV_ID)"
+		    }
+		    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "AnnotSV ranking class"] ne -1} {
+			if {$g_rankingScore($AnnotSV_ID) eq ""} {
+			    set class ""
+			} elseif {$g_rankingScore($AnnotSV_ID) >= "0.99"} {
+			    set class 5
+			} elseif {$g_rankingScore($AnnotSV_ID) >= "0.9"} {
+			    set class 4
+			} elseif {$g_rankingScore($AnnotSV_ID) >= "-0.9"} {
+			    set class 3
+			} elseif {$g_rankingScore($AnnotSV_ID) >= "-0.99"} {
+			    set class 2
+			} else {
+			    set class 1
+			}
+			append lineCompleted "\t$class"	  
+			# To select the SV of a user-defined specific class (from 1 to 5)
+			if {$g_AnnotSV(rankFiltering) ne {1 2 3 4 5} && [lsearch -exact $g_AnnotSV(rankFiltering) $class] eq -1} {
+			    set notSelected 1
+			    continue
+			}
+		    }
+		}
+		set full 0
+	    } else {
+		if {$notSelected} {continue}
+		# Ranking not available for the split lines
+		append lineCompleted "$fullOrSplitLine"
+		if {$g_AnnotSV(ranking)} {
+		    append lineCompleted "\t"
+		    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "ranking decision criteria"] ne -1} {
+			append lineCompleted "\t"
+		    }
+		    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "AnnotSV ranking class"] ne -1} {
+			append lineCompleted "\t"
+		    }
+		}
+	    }
+	    lappend L_lineCompleted "$lineCompleted"
+
+	    # To avoid a segmentation fault
+	    incr i
+	    if {$i > 10000} {
+		WriteTextInFile [join $L_lineCompleted "\n"] "$outputFile"
+		set L_lineCompleted {}
+		set i 0
+	    }
+	}
+    }
+        
+
+    WriteTextInFile [join $L_lineCompleted "\n"] "$outputFile"
 
 
     
