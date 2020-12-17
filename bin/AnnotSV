@@ -169,7 +169,7 @@ if {$g_AnnotSV(tx) eq "RefSeq"} {
 }
 # Annotation with OMIM?
 checkOMIMfile
-checkMorbidGenesfile
+checkMorbidfile
 # Annotation with HI (Haploinsufficiency)?
 checkHIfile
 # Annotation with ClinGen?
@@ -223,17 +223,17 @@ checkCOSMICfile
 ##############################################################################################
 checkUsersBED
 
-# Users Genes-based annotation files:
+# Users Gene-based annotation files:
 # (from $ANNOTSV/Annotations_$g_AnnotSV(organism)/*/ and from user command lines "-externalGeneFiles")
 ######################################################################################################
 # g_AnnotSV(extann) has been initialized in AnnotSV-config.tcl
 # g_AnnotSV(extann) will be completed in AnnotSV-exomiser.tcl
-set genesBasedDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based"
-foreach annotFile [glob -nocomplain $genesBasedDir/*/*.tsv] {
+set geneBasedDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based"
+foreach annotFile [glob -nocomplain $geneBasedDir/*/*.tsv] {
     if {[regexp "_DGV_samplesInStudies.tsv$" $annotFile]} {continue}
     lappend g_AnnotSV(extann) $annotFile
 }
-foreach annotFile [glob -nocomplain $genesBasedDir/*/*.tsv.gz] {
+foreach annotFile [glob -nocomplain $geneBasedDir/*/*.tsv.gz] {
     lappend g_AnnotSV(extann) $annotFile
 }
 set userDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Users/" 
@@ -247,7 +247,7 @@ foreach annotFile $g_AnnotSV(externalGeneFiles) {
     lappend g_AnnotSV(extann) $annotFile
 }
 # Depending of the organism, genes based annotation can be absent:
-if {$g_AnnotSV(extann) eq ""} {set g_AnnotSV(genesBasedAnn) 0} else {set g_AnnotSV(genesBasedAnn) 1} 
+if {$g_AnnotSV(extann) eq ""} {set g_AnnotSV(geneBasedAnn) 0} else {set g_AnnotSV(geneBasedAnn) 1} 
 
 
 

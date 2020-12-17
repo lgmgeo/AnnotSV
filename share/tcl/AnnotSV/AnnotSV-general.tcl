@@ -155,8 +155,8 @@ proc isNotAnRS {rs} {
 #
 # Output (= a tsv text):
 # ----------------------
-# Annotation desired for g1/g2/g3: 
-# <=> Output = L_newAnn = "g1C1/g2C1/g3C1\tg1C2/g2C2/g3/C2"
+# Annotation desired for g1;g2;g3: 
+# <=> Output = L_newAnn = "g1C1;g2C1;g3C1\tg1C2;g2C2;g3C2"
 # 
 proc MergeAnnotation {L_ann numberOfannCol} {
 
@@ -189,8 +189,10 @@ proc MergeAnnotation {L_ann numberOfannCol} {
 	    lappend annByCol $tann($g,$c)
 	}
 	incr c 
-	set 1ann [join $annByCol "/"]
-	if {[regexp "^( |/)+$" $1ann]} {set 1ann ""}
+	set 1ann [join $annByCol ";"]
+	regsub -all ";;+" $1ann ";" 1ann
+	regsub "^;" $1ann "" 1ann
+	regsub ";$" $1ann "" 1ann
 	lappend L_newAnn $1ann
     }
     set toreturn [join $L_newAnn "\t"]
@@ -517,55 +519,11 @@ proc checksvtBEDcol {bedFile} {
 		# 0 is the first element of an informatic list: -1
 		# AND 2 columns (AnnotSV ID + SV length) are added: +2
 		# Finally: +1
-		incr g_AnnotSV(svtBEDcol) -1 ;# number of the "SV TYPE" column in the input BED file
-		set g_AnnotSV(svtTSVcol) [expr {$g_AnnotSV(svtBEDcol) +2}] ;# number of the "SV TYPE" column in the output TSV file
+		incr g_AnnotSV(svtBEDcol) -1 ;# number of the "SV_type" column in the input BED file
+		set g_AnnotSV(svtTSVcol) [expr {$g_AnnotSV(svtBEDcol) +2}] ;# number of the "SV_type" column in the output TSV file
 	    }
 	}
     }
     return
 }
 
-proc fromOMIMtoPhenotype {OMIM} {
-    global g_AnnotSV
-    global g_phen
-    global g_gene
-    
-    if { ! [info exists g_phen(DONE)]} {
-	set OMIMfile1 [glob -nocomplain "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based/OMIM/*_OMIM-1-annotations.tsv.gz"]
-	# 20201107_OMIM-1-annotations.tsv.gz 
-	# Header = genes   Mim Number
-	foreach L [LinesFromGZFile $OMIMfile1] {
-	    set Ls [split $L "\t"]
-	    set gene [lindex $Ls 0]
-	    set L_omim [split [lindex $Ls 1] ";"]
-	    foreach omim $L_omim {
-		lappend g_gene($omim) $gene
-	    }
-	}
-	
-	set OMIMfile2 [glob -nocomplain "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based/OMIM/*_OMIM-2-annotations.tsv.gz"]
-	# 20201107_OMIM-2-annotations.tsv.gz 
-	# Header = genes   Phenotypes      Inheritance	
-	foreach L [LinesFromGZFile $OMIMfile2] {
-	    set Ls [split $L "\t"]
-	    set gene [lindex $Ls 0]
-	    set phenotype [lindex $Ls 1]
-	    regsub -all "\\\{|\\\}|\\\[|\\\]" $phenotype "" phenotype
-	    set g_phen($gene) $phenotype
-	}
-	
-	set g_phen(DONE) 1 
-    }
-    
-    set phenotype ""
-    if {[info exists g_gene($OMIM)]} {
-	foreach gene $g_gene($OMIM) {
-	    if {[info exists g_phen($gene)]} {
-		lappend phenotype $g_phen($gene)
-	    }
-	}
-	set phenotype [join $phenotype "/"]
-    } 
-
-    return $phenotype
-}

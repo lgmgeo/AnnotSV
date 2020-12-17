@@ -124,7 +124,7 @@ proc ENCODEblacklistAnnotation {BreakpointChrom BreakpointPos} {
     global g_ENCODEblacklist
 
 
-    # headerOutput "ENCODEblacklists_coord_left ENCODEblacklists_type_left" or "ENCODEblacklists_coord_right and ENCODEblacklists_type_right"
+    # headerOutput "ENCODE_blacklists_coord_left ENCODE_blacklists_type_left" or "ENCODE_blacklists_coord_right and ENCODE_blacklists_type_right"
     # (ENCODEblacklistAnnotation is executed for each breakpoint)
     set g_ENCODEblacklist(Empty) "\t"
 
@@ -224,7 +224,7 @@ proc ENCODEblacklistAnnotation {BreakpointChrom BreakpointPos} {
     }
     
     if {[info exist g_ENCODEblacklist_coord($BreakpointChrom,$BreakpointPos)]} {
-	return "[join $g_ENCODEblacklist_coord($BreakpointChrom,$BreakpointPos) "/"]\t[join $g_ENCODEblacklist_charact($BreakpointChrom,$BreakpointPos) "/"]"
+	return "[join $g_ENCODEblacklist_coord($BreakpointChrom,$BreakpointPos) ";"]\t[join $g_ENCODEblacklist_charact($BreakpointChrom,$BreakpointPos) ";"]"
     } else {
 	return $g_ENCODEblacklist(Empty)
     }

@@ -40,6 +40,7 @@ proc configureAnnotSV {argv} {
     #######################
     puts "\t...configuration data by default"
     set g_AnnotSV(annotationsDir)           ""
+    set g_AnnotSV(annotationMode)           "both"
     set g_AnnotSV(bcftools)                 "bcftools"
     set g_AnnotSV(bedtools)                 "bedtools"
     set g_AnnotSV(candidateGenesFile)       ""
@@ -75,12 +76,11 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(svtTSVcol)                "-1"  ;# not given in parameter
     set g_AnnotSV(tx)                       "RefSeq"
     set g_AnnotSV(txFile)                   ""
-    set g_AnnotSV(typeOfAnnotation)         "both"
 
     ###########################
     ## Load config file options
     ###########################
-    set lOptionsOk "annotationsDir bcftools bedtools candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo includeCI metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering reciprocal REreport samplesidBEDcol snvIndelFiles snvIndelPASS snvIndelSamples SVinputFile SVinputInfo SVminSize svtBEDcol tx txFile typeOfAnnotation"
+    set lOptionsOk "annotationsDir annotationMode bcftools bedtools candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo includeCI metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering reciprocal REreport samplesidBEDcol snvIndelFiles snvIndelPASS snvIndelSamples SVinputFile SVinputInfo SVminSize svtBEDcol tx txFile"
     set configFile "$g_AnnotSV(etcDir)/configfile"
     if {[file exists "[file dirname $g_AnnotSV(SVinputFile)]/configfile"]} {
 	set configFile "[file dirname $g_AnnotSV(SVinputFile)]/configfile"
@@ -359,10 +359,10 @@ proc configureAnnotSV {argv} {
     }
 
     ## It must be "both", "full" or "split"
-    set L_typeOfAnnotation {both full split}
-    if {[lsearch -exact $L_typeOfAnnotation "$g_AnnotSV(typeOfAnnotation)"] eq -1} {
+    set L_annotationMode {both full split}
+    if {[lsearch -exact $L_annotationMode "$g_AnnotSV(annotationMode)"] eq -1} {
 	puts "############################################################################"
-	puts "Bad option value: -typeOfAnnotation = $g_AnnotSV(typeOfAnnotation)"
+	puts "Bad option value: -annotationMode = $g_AnnotSV(annotationMode)"
 	puts "Should be \"both\", \"full\" or \"split\""
 	puts "############################################################################"
 	exit 2
@@ -488,7 +488,7 @@ proc configureAnnotSV {argv} {
 
     # Some annotation columns are essential for the ranking: can not be removed by the user
     set g_AnnotSV(genesBasedAnn) 1
-    foreach col "{Gene name} {Number of gene} {AnnotSV type} RE_gene B_gain_source B_gain_coord B_loss_source B_loss_coord P_gain_phen P_gain_hpo P_gain_source P_gain_coord P_loss_phen P_loss_hpo P_loss_source P_loss_coord P_snvindel_nb HI TS pLI_gnomad LOEUF_bin HI_DDDpercent EXOMISER_GENE_PHENO_SCORE morbidGenes location location2 {overlapped CDS percent} frameshift {Number of exons}" {
+    foreach col "Annotation_mode Gene_name Gene_Count RE_gene B_gain_source B_gain_coord B_loss_source B_loss_coord P_gain_phen P_gain_hpo P_gain_source P_gain_coord P_loss_phen P_loss_hpo P_loss_source P_loss_coord P_snvindel_nb HI TS Gnomad_pLI LOEUF_bin DDD_HI_percent Exomiser_gene_pheno_score OMIM_morbid Location Location2 Overlapped_CDS_percent Frameshift Exon_count" {
 	if {[lsearch -exact "$g_AnnotSV(outputColHeader)" $col] eq -1} {
 	    lappend g_AnnotSV(outputColHeader) $col
 	}

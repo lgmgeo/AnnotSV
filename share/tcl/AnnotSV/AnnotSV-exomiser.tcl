@@ -96,7 +96,7 @@ proc checkExomiserInstallation {} {
     global g_AnnotSV
     global hpoVersion
     
-    set NCBIgeneDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based/NCBIgeneID" 
+    set NCBIgeneDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/NCBIgeneID" 
     if {![regexp "Human" $g_AnnotSV(organism)]} {
 	## Checked the organism
 	set g_AnnotSV(hpo) ""
@@ -138,7 +138,7 @@ proc searchforGeneID {geneName} {
 
     if {![array exists geneID]} {
 
-	set NCBIgeneDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based/NCBIgeneID" 
+	set NCBIgeneDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/NCBIgeneID" 
 	# Header:
 	# "Approved symbol" "NCBI gene ID"    "Previous symbol" "Alias symbol"
 	# A1BG    1 
@@ -288,7 +288,7 @@ proc runExomiser {L_Genes L_HPO} {
 	    set MOUSE_PHENO_EVIDENCE [lsort -unique $MOUSE_PHENO_EVIDENCE]
 	    set FISH_PHENO_EVIDENCE  [lsort -unique $FISH_PHENO_EVIDENCE]
 	    
-	    set g_Exomiser($geneName) "$EXOMISER_GENE_PHENO_SCORE\t[join $HUMAN_PHENO_EVIDENCE " / "]\t[join $MOUSE_PHENO_EVIDENCE " / "]\t[join $FISH_PHENO_EVIDENCE " / "]"
+	    set g_Exomiser($geneName) "$EXOMISER_GENE_PHENO_SCORE\t[join $HUMAN_PHENO_EVIDENCE ";"]\t[join $MOUSE_PHENO_EVIDENCE ";"]\t[join $FISH_PHENO_EVIDENCE ";"]"
 	}
 	
 	# End the REST service

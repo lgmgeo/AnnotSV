@@ -355,15 +355,15 @@ proc VCFsToBED {SV_VCFfiles} {
 		    #CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  HG00096
 		    if {$g_AnnotSV(SVinputInfo)} {
 			if {[lsearch -exact $g_AnnotSV(outputColHeader) "Samples_ID"] eq "-1"} {
-			    set VCFheader "SV type\t[join [lrange $Ls 2 end] "\t"]"
+			    set VCFheader "SV_type\t[join [lrange $Ls 2 end] "\t"]"
 			} else {
-			    set VCFheader "SV type\tSamples_ID\t[join [lrange $Ls 2 end] "\t"]"
+			    set VCFheader "SV_type\tSamples_ID\t[join [lrange $Ls 2 end] "\t"]"
 			}
 		    } else {
 			if {[lsearch -exact $g_AnnotSV(outputColHeader) "Samples_ID"] eq "-1"} {
-			    set VCFheader "SV type\t[join [lrange $Ls 3 4] "\t"]\t[join [lrange $Ls 8 end] "\t"]"
+			    set VCFheader "SV_type\t[join [lrange $Ls 3 4] "\t"]\t[join [lrange $Ls 8 end] "\t"]"
 			} else {
-			    set VCFheader "SV type\tSamples_ID\t[join [lrange $Ls 3 4] "\t"]\t[join [lrange $Ls 8 end] "\t"]"
+			    set VCFheader "SV_type\tSamples_ID\t[join [lrange $Ls 3 4] "\t"]\t[join [lrange $Ls 8 end] "\t"]"
 			}
 		    }
 		    set L_allSamples [lrange $Ls 9 end]
@@ -534,10 +534,10 @@ proc VCFsToBED {SV_VCFfiles} {
 	    #CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  HG00096
 	    if {$g_AnnotSV(SVinputInfo)} {
 		set length [llength [lrange $Ls 9 end]]
-		set VCFheader "SV type\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t[join [lrepeat $length ""] "\t"]"
+		set VCFheader "SV_type\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t[join [lrepeat $length ""] "\t"]"
 	    } else {
 		set length [llength [lrange $Ls 8 end]]
-		set VCFheader "SV type\tREF\tALT\t[join [lrepeat $length ""] "\t"]"
+		set VCFheader "SV_type\tREF\tALT\t[join [lrepeat $length ""] "\t"]"
 	    }
 	}
 

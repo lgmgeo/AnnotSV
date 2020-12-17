@@ -10,7 +10,9 @@
 
 For more details, please see the README file.
 
-
+	- test: New example for testing
+	- refactor: Rename column names
+	- refactor: Annotations are now always separated by semi-colon
 	- feat: Implemetation of the updated 2019 ACMG guidelines for SV ranking (replace the precedent one)
 		Add 3 annotation columns: AnnotSV ranking score; ranking decision criteria; AnnotSV ranking class
 	- feat: Add pathogenic SV annotation (from multiple sources)
@@ -24,7 +26,7 @@ For more details, please see the README file.
 		- Remove previous annotation columns from DDD, DGV, gnomAD, 1000g and IMH
 	- feat: Add pathogenic SNV/indel annotation (from ClinVar)
 	- feat: Add the merge of different available regulatory elements annotations (RefSeq/ENSEMBL, EnhancerAtlas, GeneHancer)
-		When available, the regulated gene name is detailed with associated haploinsufficiency (HI), triplosensitivity (TS) and exomiser (EX) scores
+		When available, the regulated gene name is detailed with associated haploinsufficiency (HI), triplosensitivity (TS), exomiser (EX) scores as well as OMIM morbid annotations
 	- feat: Update of the annotation data source
 	- feat: The "overlap" option default is set to 100 % to implement the 2019 ACMG classification guidelines to assess SV pathogenicity
 	- feat: Add the percent of the CDS overlapped with the SV (in the "split" annotation lines)

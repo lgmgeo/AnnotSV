@@ -22,7 +22,7 @@
 ############################################################################################################
 
 
-# Creation / update (if some data source files are presents) of:
+# Creation/update (if some data source files are presents) of:
 # - $pathoSNVindelBEDfile
 proc checkPathoSNVindelFile {} {
     
@@ -169,9 +169,9 @@ proc pathoSNVindelAnnotation {SVchrom SVstart SVend} {
 		set Ls [split $L "\t"]
 
 		set pathogenic_phen [lindex $Ls 3]
-		set pathogenic_hpo [lindex $Ls 4]
-		set pathogenic_source [lindex $Ls 5]
-		set pathogenic_coord [lindex $Ls 6]
+		#set pathogenic_hpo [lindex $Ls 4]
+		#set pathogenic_source [lindex $Ls 5]
+		#set pathogenic_coord [lindex $Ls 6]
 
 		set SVtoAnn_chrom [lindex $Ls 7]
 		set SVtoAnn_start [lindex $Ls 8]
@@ -198,10 +198,10 @@ proc pathoSNVindelAnnotation {SVchrom SVstart SVend} {
 	    if {[info exists L_allSVtoAnn]} {
 		foreach SVtoAnn [lsort -unique $L_allSVtoAnn] {						
 		    lappend L_pathoSNVindelText($SVtoAnn) $nb_snvindel($SVtoAnn)
-		    lappend L_pathoSNVindelText($SVtoAnn) "[join [lsort -unique $L_pathogenic_phen($SVtoAnn)] " / "]"
-		    #lappend L_pathoSNVindelText($SVtoAnn) "[join $L_pathogenic_hpo($SVtoAnn) " / "]"
-		    #lappend L_pathoSNVindelText($SVtoAnn) "[join $L_pathogenic_source($SVtoAnn) " / "]"
-		    #lappend L_pathoSNVindelText($SVtoAnn) "[join $L_pathogenic_coord($SVtoAnn) " / "]"
+		    lappend L_pathoSNVindelText($SVtoAnn) "[join [lsort -unique $L_pathogenic_phen($SVtoAnn)] ";"]"
+		    #lappend L_pathoSNVindelText($SVtoAnn) "[join $L_pathogenic_hpo($SVtoAnn) ";"]"
+		    #lappend L_pathoSNVindelText($SVtoAnn) "[join $L_pathogenic_source($SVtoAnn) ";"]"
+		    #lappend L_pathoSNVindelText($SVtoAnn) "[join $L_pathogenic_coord($SVtoAnn) ";"]"
 		    set pathoSNVindelText($SVtoAnn) [join $L_pathoSNVindelText($SVtoAnn) "\t"]
 		}
 	    }

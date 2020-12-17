@@ -34,7 +34,7 @@
 
 -SVminSize:                 50
 
--typeOfAnnotation:          "both"
+-annotationMode:            "both"
 
 
 #------------------------
@@ -43,34 +43,34 @@
 # Output column names are listed below.
 # In order to disable default annotations provided by AnnotSV, some column names (the ones that are not marked with an *) can be commented with a hash character ("#") by the user.
 
-AnnotSV ID                      *
-SV chrom                        *
-SV start                        *
-SV end                          *
-SV length                       *
-SV type                         *
+AnnotSV_ID                      *
+SV_chrom                        *
+SV_start                        *
+SV_end                          *
+SV_length                       *
+SV_type                         *
 Samples_ID
-AnnotSV type                    *
+Annotation_mode                 *
 
 # Genes annotations:
-Gene name                       *
-Number of genes                 *
-tx                              *
-tx start                        *
-tx end                          *
-Number of exons
-overlapped tx length            *
-overlapped CDS length           *
-frameshift                      *
-location                        *
-location2                       *
-distNearestSS                   *
-nearestSStype                   *
-intersectStart                  *
-intersectEnd                    *
+Gene_name                       *
+Gene_count                      *
+Tx                              *
+Tx_start                        *
+Tx_end                          *
+Exon_count
+Overlapped_tx_length            *
+Overlapped_CDS_length           *
+Frameshift                      *
+Location                        *
+Location2                       *
+Dist_nearest_SS                 *
+Nearest_SS_type                 *
+Intersect_start                 *
+Intersect_end                   *
 
 # Regulatory Elements annotations:
-RE_gene_exomiser                *
+RE_gene                         *
 
 # Annotations with benign genes or genomic regions:
 B_gain_source                   *
@@ -105,18 +105,18 @@ P_snvindel_nb
 P_snvindel_phen
 
 # Cancer
-COSMIC_ID
-COSMIC_MUT_TYP
+Cosmic_ID
+Cosmic_mut_typ
 
 # Breakpoints annotations
-TADcoordinates
-ENCODEexperiments
-GCcontent_left
-GCcontent_right
-Repeats_coord_left
-Repeats_type_left
-Repeats_coord_right
-Repeats_type_right
+TAD_coordinate
+ENCODE_experiment
+GC_content_left
+GC_content_right
+Repeat_coord_left
+Repeat_type_left
+Repeat_coord_right
+Repeat_type_right
 Gap_left
 Gap_right
 SegDup_left
@@ -134,28 +134,28 @@ DDD_status
 DDD_mode
 DDD_consequence
 DDD_disease
-DDD_pmids
-HI_DDDpercent
-synZ_ExAC
-misZ_ExAC
-delZ_ExAC
-dupZ_ExAC
-cnvZ_ExAC
+DDD_pmid
+DDD_HI_percent
+ExAC_synZ
+ExAC_misZ
+ExAC_delZ
+ExAC_dupZ
+ExAC_cnvZ
 LOEUF_bin
-pLI_ExAC                        *
-pLI_gnomAD                      *
-morbidGenes                     *
-morbidGenesCandidates           *
-Mim Number
-Phenotypes
-Inheritance
-EXOMISER_GENE_PHENO_SCORE
-HUMAN_PHENO_EVIDENCE
-MOUSE_PHENO_EVIDENCE
-FISH_PHENO_EVIDENCE
+ExAC_pLI                        
+GnomAD_pLI                      *
+OMIM_morbid                     *
+OMIM_morbid_candidate           *
+OMIM_ID
+OMIM_phenotype
+OMIM_inheritance
+Exomiser_gene_pheno_score
+Human_pheno_evidence
+Mouse_pheno_evidence
+Fish_pheno_evidence
 
 # Ranking:
-AnnotSV ranking score
-ranking decision criteria
-AnnotSV ranking class
+AnnotSV_ranking_score
+AnnotSV_ranking_criteria
+ACMG_class
 

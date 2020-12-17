@@ -922,8 +922,8 @@ proc benignSVannotation {SVchrom SVstart SVend} {
 		    if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^B_[string tolower ${svtype}]_"] eq -1} { continue }
 			
 		    if {[info exists L_benign_coord($SVtoAnn,$svtype)]} {
-			lappend L_benignText($SVtoAnn) "[join $L_benign_source($SVtoAnn,$svtype) " / "]"
-			lappend L_benignText($SVtoAnn) "[join $L_benign_coord($SVtoAnn,$svtype) " / "]"
+			lappend L_benignText($SVtoAnn) "[join [lsort -unique $L_benign_source($SVtoAnn,$svtype)] ";"]"
+			lappend L_benignText($SVtoAnn) "[join $L_benign_coord($SVtoAnn,$svtype) ";"]"
 		    } else {
 			lappend L_benignText($SVtoAnn) ""
 			lappend L_benignText($SVtoAnn) ""

@@ -43,7 +43,7 @@ proc checkDDDgeneFile {} {
 
     ## Check if the "DDD gene" file has been downloaded then formatted
     #################################################################
-    set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based"
+    set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based"
     set DDDfileDownloaded [glob -nocomplain "$extannDir/DDD/DDG2P.csv.gz"]
     set DDDfileFormattedGzip [glob -nocomplain "$extannDir/DDD/*_DDG2P.tsv.gz"]
 
@@ -81,7 +81,7 @@ proc updateDDDgeneFile {} {
 	return
     }
 
-    set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based"
+    set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based"
     set DDDfileDownloaded [glob -nocomplain "$extannDir/DDD/DDG2P.csv.gz"]
 
     ## Create : 'date'_DDG2P.tsv.gz
@@ -92,7 +92,7 @@ proc updateDDDgeneFile {} {
     puts "\t...creation of $DDDfileFormatted.gz"
     puts "\t   (done only once during the first DDD annotation)\n"
 
-    set TexteToWrite {genes\tDDD_status\tDDD_mode\tDDD_consequence\tDDD_disease\tDDD_pmids}
+    set TexteToWrite {genes\tDDD_status\tDDD_mode\tDDD_consequence\tDDD_disease\tDDD_pmid}
     foreach L [LinesFromGZFile $DDDfileDownloaded] {
 	if {[regexp  "^\"gene symbol" $L]} {
 	    set Ls [::csv::split $L]
@@ -114,21 +114,31 @@ proc updateDDDgeneFile {} {
 	set mutation [lindex $Ls $i_mutation]
 	set pmids [lindex $Ls $i_pmids]
 
-	lappend L_category($gene) "$category"
-	lappend L_allelic($gene) "$allelic"
-	lappend L_mutation($gene) "$mutation"
-	lappend L_disease($gene) "$disease"
-	lappend L_pmids($gene) "$pmids"
+	if {$category ne ""} {
+	    lappend L_category($gene) "$category"
+	}
+	if {$allelic ne ""} {
+	    lappend L_allelic($gene) "$allelic"
+	}
+	if {$mutation ne ""} {
+	    lappend L_mutation($gene) "$mutation"
+	}
+	if {$disease ne ""} {
+	    lappend L_disease($gene) "$disease"
+	}
+	if {$pmids ne ""} {
+	    lappend L_pmids($gene) "$pmids"
+	}
     }
 
     # Write outputfile (will be used as external annotation)
     set L_genes [lsort -unique $L_genes]
     foreach gene $L_genes {
-	set a [join $L_category($gene) "/"]; if {[regexp "^/+$" $a]} {set a ""}
-	set b [join $L_allelic($gene) "/"] ; if {[regexp "^/+$" $b]} {set b ""}
-	set c [join $L_mutation($gene) "/"]; if {[regexp "^/+$" $c]} {set c ""}
-	set d [join $L_disease($gene) "/"] ; if {[regexp "^/+$" $d]} {set d ""}
-	set e [join $L_pmids($gene) "/"]   ; if {[regexp "^/+$" $e]} {set e ""}
+	if {[info exists L_category($gene)]} {set a [join [lsort -unique $L_category($gene)] ";"]} else {set a ""}
+	if {[info exists L_allelic($gene) ]} {set b [join [lsort -unique $L_allelic($gene) ] ";"]} else {set b ""}
+	if {[info exists L_mutation($gene)]} {set c [join [lsort -unique $L_mutation($gene)] ";"]} else {set c ""}
+	if {[info exists L_disease($gene) ]} {set d [join [lsort -unique $L_disease($gene) ] ";"]} else {set d ""}
+	if {[info exists L_pmids($gene)   ]} {set e [join [lsort -unique $L_pmids($gene)   ] ";"]} else {set e ""} 
 	lappend TexteToWrite "$gene\t$a\t$b\t$c\t$d\t$e"
     }
 

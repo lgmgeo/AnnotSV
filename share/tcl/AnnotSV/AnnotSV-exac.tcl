@@ -37,7 +37,7 @@ proc checkGeneIntoleranceFile {} {
 
     ## Check if the GeneIntolerance file has been downloaded then formatted
     ######################################################################
-    set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based"
+    set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based"
 
     set GeneIntoleranceFileDownloaded [glob -nocomplain "$extannDir/ExAC/fordist_cleaned_nonpsych_z_pli_rec_null_data.txt"]
     set GeneIntoleranceFileFormattedGzip [glob -nocomplain "$extannDir/ExAC/*_GeneIntolerance-Zscore.annotations.tsv.gz"]
@@ -130,7 +130,7 @@ proc checkCNVintoleranceFile {} {
 
     ## Check if the CNVintoleranceFile has been downloaded then formatted
     ######################################################################
-    set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based"
+    set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based"
 
     set CNVintoleranceFileDownloaded [glob -nocomplain "$extannDir/ExAC/exac-final-cnv.gene.scores071316"]
     set CNVintoleranceFileFormattedGzip [glob -nocomplain "$extannDir/ExAC/*_ExAC.CNV-Zscore.annotations.tsv.gz"]

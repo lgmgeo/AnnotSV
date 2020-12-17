@@ -220,7 +220,7 @@ proc SegDupAnnotation {BreakpointChrom BreakpointPos} {
     }
     
     if {[info exist g_SegDup_coord($BreakpointChrom,$BreakpointPos)]} {
-	return "[join $g_SegDup_coord($BreakpointChrom,$BreakpointPos) "/"]"
+	return "[join $g_SegDup_coord($BreakpointChrom,$BreakpointPos) ";"]"
     } else {
 	return $g_SegDup(Empty)
     }

@@ -34,7 +34,7 @@ proc checkHIfile {} {
 
     ## Check if the HI file has been downloaded then formatted
     #########################################################
-    set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based"
+    set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based"
  
     set HIfileDownloaded [glob -nocomplain "$extannDir/DDD/HI_Predictions_Version3.bed.gz"]
     set HIfileFormattedGzip [glob -nocomplain "$extannDir/DDD/*_HI.tsv.gz"] 
@@ -56,7 +56,6 @@ proc checkHIfile {} {
 
     if {$HIfileFormattedGzip eq ""} {    
 	## Create : 'date'_HI.tsv     
-	# Header: chr start end syn_z mis_z pLI 
 
 	set HIfileFormatted "$extannDir/DDD/[clock format [clock seconds] -format "%Y%m%d"]_HI.tsv"
 
@@ -65,7 +64,7 @@ proc checkHIfile {} {
 	puts "\t...creation of $HIfileFormatted.gz"
 	puts "\t   (done only once during the first HI annotation)\n"
 
-	set TexteToWrite {genes\tHI_DDDpercent}
+	set TexteToWrite {genes\tDDD_HI_percent}
 	foreach L [LinesFromGZFile $HIfileDownloaded] {
 	    if {[regexp  "^track name" $L]} {continue}
 	    set Ls [split $L "\t"]

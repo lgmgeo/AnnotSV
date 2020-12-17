@@ -28,7 +28,7 @@ proc checkOMIMfile {} {
     global g_AnnotSV
 
 
-    set omimDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based/OMIM" 
+    set omimDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/OMIM" 
  
     ## Check if the OMIM file has been downloaded the formatted
     ##########################################################
@@ -36,8 +36,8 @@ proc checkOMIMfile {} {
     set OMIMfile1FormattedGzip [glob -nocomplain "$omimDir/*_OMIM-1-annotations.tsv.gz"]
     set OMIMfile2FormattedGzip [glob -nocomplain "$omimDir/*_OMIM-2-annotations.tsv.gz"]
 
-    if {$OMIMfileDownloaded eq "" && $OMIMfile1FormattedGzip eq ""} {
-	# No OMIM annotation
+    if {$OMIMfileDownloaded eq ""} {
+	# No OMIM annotation to do
 	return
     } 
 
@@ -62,14 +62,14 @@ proc checkOMIMfile {} {
 
     if {$OMIMfile1FormattedGzip eq "" || $OMIMfile2FormattedGzip eq ""} {     
 	## - Create the 'date'_OMIM-1-annotations.tsv and 'date'_OMIM-2-annotations.tsv files.
-	##   Header1: genes, Mim Number
-	##   Header2: genes, Phenotypes, Inheritance
+	##   Header1: genes, OMIM_ID
+	##   Header2: genes, OMIM_phenotype, OMIM_inheritance
 
 	set OMIMfile1Formatted "$omimDir/[clock format [clock seconds] -format "%Y%m%d"]_OMIM-1-annotations.tsv"
 	set OMIMfile2Formatted "$omimDir/[clock format [clock seconds] -format "%Y%m%d"]_OMIM-2-annotations.tsv"
 	puts "...creation of $OMIMfile1Formatted.gz and $OMIMfile2Formatted ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])\n"
-	ReplaceTextInFile "genes\tMim Number" $OMIMfile1Formatted
-	ReplaceTextInFile "genes\tPhenotypes\tInheritance" $OMIMfile2Formatted
+	ReplaceTextInFile "genes\tOMIM_ID" $OMIMfile1Formatted
+	ReplaceTextInFile "genes\tOMIM_phenotype\tOMIM_inheritance" $OMIMfile2Formatted
 	
 	# Parsing of $OMIMfileDownloaded
 	foreach L [LinesFromFile $OMIMfileDownloaded] {
@@ -101,24 +101,24 @@ proc checkOMIMfile {} {
 	    set inher {}
 	    foreach p [split $phenoTmp ";"] {
 		if {[regexp "(.*\\\(\[0-9\]+\\\)),? *(.*)" $p match 1pheno 1inher]} {
-		    lappend pheno $1pheno
+		    lappend pheno "$1pheno $1inher"
 		    lappend inher $1inher
 		}
 	    }
 	    set test [lsort -unique $pheno]
 	    if {[llength $test] eq 1} {
-		set pheno [lindex $pheno 0]
+		set pheno "$test"
 	    } else {
-		set pheno [join $pheno "/"]
+		set pheno [join $pheno ";"]
 	    }
 	    #if {[regexp "^/+$" $pheno]} {set pheno ""}
 	    if {$pheno eq ""} {continue}
 	    
 	    set test [lsort -unique $inher]
 	    if {[llength $test] eq 1} {
-		set inher [lindex $inher 0]
+		set inher "$test"
 	    } else {
-		set inher [join $inher "/"]
+		set inher [join $inher ";"]
 	    }
 	    #if {[regexp "^/+$" $inher]} {set inher ""}
 	    
@@ -139,14 +139,13 @@ proc checkOMIMfile {} {
 	# creation of $OMIMfileFormatted.gz
 	set L_genes [lsort -unique $L_genes]
 	# Header :
-	# Gene    Mim Number     
-	# Gene    Phenotypes      Inheritance
+	# Gene    OMIM_ID    
+	# Gene    OMIM_phenotype      OMIM_inheritance
 	foreach g $L_genes {
-	    set Pheno($g) "[join $Pheno($g) ";"]"
-	    
-	    set Inheritance($g) "[join $Inheritance($g) ";"]"
+	    set Pheno($g) "[join [lsort -unique $Pheno($g)] ";"]"
+	    set Inheritance($g) "[join [lsort -unique $Inheritance($g)] ";"]"
 	    if {[regexp "^;+$" $Inheritance($g)]} {set Inheritance($g) ""}
-	    WriteTextInFile "$g\t[join $Mim($g) ";"]" $OMIMfile1Formatted
+	    WriteTextInFile "$g\t[join [lsort -unique $Mim($g)] ";"]" $OMIMfile1Formatted
 	    WriteTextInFile "$g\t$Pheno($g)\t$Inheritance($g)" $OMIMfile2Formatted
 	}
 	if {[catch {exec gzip $OMIMfile1Formatted} Message]} {
@@ -165,61 +164,61 @@ proc checkOMIMfile {} {
 }
 
 ## - Check if the "morbidmap.txt" file exists.
-## - Check and create if necessary the 'date'_morbidgenes.tsv.gz file.
-## - Check and create if necessary the 'date'_morbidgenescandidates.tsv.gz file.
-proc checkMorbidGenesfile {} {
+## - Check and create if necessary the 'date'_morbid.tsv.gz file.
+## - Check and create if necessary the 'date'_morbidCandidate.tsv.gz file.
+proc checkMorbidfile {} {
 
     global g_AnnotSV
 
 
-    set omimDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based/OMIM" 
+    set omimDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/OMIM" 
  
-    ## Check if the MorbidGenes file has been downloaded the formatted
+    ## Check if the Morbid file has been downloaded the formatted
     ##################################################################
-    set MorbidGenesFileDownloaded [glob -nocomplain "$omimDir/morbidmap.txt"]
-    set MorbidGenesFileFormattedGzip [glob -nocomplain "$omimDir/*_morbidGenes.tsv.gz"]
-    set MorbidGenesCandidatesFileFormattedGzip [glob -nocomplain "$omimDir/*_morbidGenescandidates.tsv.gz"]
+    set MorbidFileDownloaded [glob -nocomplain "$omimDir/morbidmap.txt"]
+    set MorbidFileFormattedGzip [glob -nocomplain "$omimDir/*_morbid.tsv.gz"]
+    set MorbidCandidateFileFormattedGzip [glob -nocomplain "$omimDir/*_morbidCandidate.tsv.gz"]
 
-    if {$MorbidGenesFileDownloaded eq "" && $MorbidGenesFileFormattedGzip eq ""} {
-	# No MorbidGenes annotation
+    if {$MorbidFileDownloaded eq "" && $MorbidFileFormattedGzip eq ""} {
+	# No Morbid annotation
 	return
     } 
 
-    if {[llength $MorbidGenesFileFormattedGzip]>1} {
+    if {[llength $MorbidFileFormattedGzip]>1} {
 	puts "Several Morbid Genes files exist:"
-	puts "$MorbidGenesFileFormattedGzip"
-	puts "Keep only one: [lindex $MorbidGenesFileFormattedGzip end]\n"
-	foreach morbid [lrange $MorbidGenesFileFormattedGzip 0 end-1] {
+	puts "$MorbidFileFormattedGzip"
+	puts "Keep only one: [lindex $MorbidFileFormattedGzip end]\n"
+	foreach morbid [lrange $MorbidFileFormattedGzip 0 end-1] {
 	    file rename -force $morbid $morbid.notused
 	}
 	return
     } 
-    if {[llength $MorbidGenesCandidatesFileFormattedGzip]>1} {
-	puts "Several Morbid Genes candidates files exist:"
-	puts "$MorbidGenesCandidatesFileFormattedGzip"
-	puts "Keep only one: [lindex $MorbidGenesCandidatesFileFormattedGzip end]\n"
-	foreach morbid [lrange $MorbidGenesCandidatesFileFormattedGzip 0 end-1] {
+    if {[llength $MorbidCandidateFileFormattedGzip]>1} {
+	puts "Several Morbid Genes candidate files exist:"
+	puts "$MorbidCandidateFileFormattedGzip"
+	puts "Keep only one: [lindex $MorbidCandidateFileFormattedGzip end]\n"
+	foreach morbid [lrange $MorbidCandidateFileFormattedGzip 0 end-1] {
 	    file rename -force $morbid $morbid.notused
 	}
 	return
     } 
 
-    if {$MorbidGenesFileFormattedGzip eq ""} {     
-	## - Create the 'date'_morbidGenes.tsv file.
-	##   Header: genes, morbidGenes
-	## - Create the 'date'_morbidgenescandidates.tsv.gz file.
-	##   Header: genes, morbidGenesCandidates
+    if {$MorbidFileFormattedGzip eq ""} {     
+	## - Create the 'date'_morbid.tsv file.
+	##   Header: genes, OMIM_morbid
+	## - Create the 'date'_morbidCandidate.tsv.gz file.
+	##   Header: genes, OMIM_morbid_candidate
 
-	set MorbidGenesFileFormatted "$omimDir/[clock format [clock seconds] -format "%Y%m%d"]_morbidGenes.tsv"
-	set MorbidGenesCandidatesFileFormatted "$omimDir/[clock format [clock seconds] -format "%Y%m%d"]_morbidGenesCandidates.tsv"
-	puts "...creation of $MorbidGenesFileFormatted.gz and $MorbidGenesCandidatesFileFormatted ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])\n"
-	ReplaceTextInFile "genes\tmorbidGenes" $MorbidGenesFileFormatted
-	ReplaceTextInFile "genes\tmorbidGenesCandidates" $MorbidGenesCandidatesFileFormatted
+	set MorbidFileFormatted "$omimDir/[clock format [clock seconds] -format "%Y%m%d"]_morbid.tsv"
+	set MorbidCandidateFileFormatted "$omimDir/[clock format [clock seconds] -format "%Y%m%d"]_morbidCandidate.tsv"
+	puts "...creation of $MorbidFileFormatted.gz and $MorbidCandidateFileFormatted ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])\n"
+	ReplaceTextInFile "genes\tOMIM_morbid" $MorbidFileFormatted
+	ReplaceTextInFile "genes\tOMIM_morbid_candidate" $MorbidCandidateFileFormatted
 	
-	# Parsing of $MorbidGenesFileDownloaded
-	set L_morbidgenes {}
-	set L_morbidgenescandidates {}
-	foreach L [LinesFromFile $MorbidGenesFileDownloaded] {
+	# Parsing of $MorbidFileDownloaded
+	set L_morbid {}
+	set L_morbidCandidate {}
+	foreach L [LinesFromFile $MorbidFileDownloaded] {
 	    set Ls [split $L "\t"]
 
 	    # Header from the downloaded file:
@@ -240,6 +239,9 @@ proc checkMorbidGenesfile {} {
 	    ## (2) The disorder has been placed on the map by linkage or other statistical method; no mutation has been found.
 	    if {[regexp "\\\(1\\\)|\\\(2\\\)" $pheno]} {continue}
 
+	    ## The following lines are automatically either (3) or (4):
+	    ## (3) indicates that the molecular basis of the disorder is known; a mutation has been found in the gene.
+	    ## (4) indicates that a contiguous gene deletion or duplication syndrome, multiple genes are deleted or duplicated causing the phenotype.
 	    set gene [lindex $Ls $i_gene]
 	    set allGenes [split $gene ","]
 	    set allGenes [lsort -unique $allGenes]
@@ -249,37 +251,106 @@ proc checkMorbidGenesfile {} {
 		## "{ }", indicate mutations that contribute to susceptibility to multifactorial disorders (e.g., diabetes, asthma) or to susceptibility to infection (e.g., malaria).
 		## "?", before the phenotype name indicates that the relationship between the phenotype and gene is provisional. 	   
 		if {[regexp "^{.+}|^\\\?" $pheno]} {
-		    lappend L_morbidgenescandidates $g
+		    lappend L_morbidCandidate $g
 		} else {
-		    lappend L_morbidgenes $g
+		    lappend L_morbid $g
 		}
 	    }
 	}
 	
-	# creation of $MorbidGenesFileFormatted.gz
-	set L_morbidgenes [lsort -unique $L_morbidgenes]
-	## creted header: genes, morbidGenes
-	foreach g $L_morbidgenes {
-	    WriteTextInFile "$g\tyes" $MorbidGenesFileFormatted
+	# creation of $MorbidFileFormatted.gz
+	set L_morbid [lsort -unique $L_morbid]
+	## creted header: genes, OMIM_morbid
+	foreach g $L_morbid {
+	    WriteTextInFile "$g\tyes" $MorbidFileFormatted
 	}
-	if {[catch {exec gzip $MorbidGenesFileFormatted} Message]} {
-	    puts "-- checkMorbidGenesfile --"
-	    puts "gzip $MorbidGenesFileFormatted"
+	if {[catch {exec gzip $MorbidFileFormatted} Message]} {
+	    puts "-- checkMorbidfile --"
+	    puts "gzip $MorbidFileFormatted"
 	    puts "$Message\n"
 	}
 
-	# creation of $MorbidGenesCandidatesFileFormatted.gz
-	set L_morbidgenescandidates [lsort -unique $L_morbidgenescandidates]
-	## creted header: genes, morbidGenesCandidates
-	foreach g $L_morbidgenescandidates {
-	    WriteTextInFile "$g\tyes" $MorbidGenesCandidatesFileFormatted
+	# creation of $MorbidCandidateFileFormatted.gz
+	set L_morbidCandidate [lsort -unique $L_morbidCandidate]
+	## creted header: genes, OMIM_morbid_candidate
+	foreach g $L_morbidCandidate {
+	    WriteTextInFile "$g\tyes" $MorbidCandidateFileFormatted
 	}
-	if {[catch {exec gzip $MorbidGenesCandidatesFileFormatted} Message]} {
-	    puts "-- checkMorbidGenesfile --"
-	    puts "gzip $MorbidGenesCandidatesFileFormatted"
+	if {[catch {exec gzip $MorbidCandidateFileFormatted} Message]} {
+	    puts "-- checkMorbidfile --"
+	    puts "gzip $MorbidCandidateFileFormatted"
 	    puts "$Message\n"
 	}
 
-	file delete -force $MorbidGenesFileDownloaded
+	file delete -force $MorbidFileDownloaded
     }
+}
+
+
+proc fromOMIMtoPhenotype {OMIM} {
+    global g_AnnotSV
+    global g_phen
+    global g_gene
+    
+    if { ! [info exists g_phen(DONE)]} {
+	set OMIMfile1 [glob -nocomplain "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/OMIM/*_OMIM-1-annotations.tsv.gz"]
+	# 20201107_OMIM-1-annotations.tsv.gz 
+	# Header = genes   OMIM_ID
+	foreach L [LinesFromGZFile $OMIMfile1] {
+	    set Ls [split $L "\t"]
+	    set gene [lindex $Ls 0]
+	    set L_omim [split [lindex $Ls 1] ";"]
+	    foreach omim $L_omim {
+		lappend g_gene($omim) $gene
+	    }
+	}
+	
+	set OMIMfile2 [glob -nocomplain "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/OMIM/*_OMIM-2-annotations.tsv.gz"]
+	# 20201107_OMIM-2-annotations.tsv.gz 
+	# Header = genes   OMIM_phenotype      OMIM_inheritance	
+	foreach L [LinesFromGZFile $OMIMfile2] {
+	    set Ls [split $L "\t"]
+	    set gene [lindex $Ls 0]
+	    set phenotype [lindex $Ls 1]
+	    regsub -all "\\\{|\\\}|\\\[|\\\]" $phenotype "" phenotype
+	    regsub -all "/" $phenotype ";" phenotype
+	    set g_phen($gene) $phenotype
+	}
+	
+	set g_phen(DONE) 1 
+    }
+    
+    set phenotype ""
+    if {[info exists g_gene($OMIM)]} {
+	foreach gene $g_gene($OMIM) {
+	    if {[info exists g_phen($gene)]} {
+		lappend phenotype $g_phen($gene)
+	    }
+	}
+	set phenotype [join $phenotype ";"]
+    } 
+
+    return $phenotype
+}
+
+proc isMorbid {gene} {
+    global g_AnnotSV
+    global g_morbid
+    
+    if {![info exists g_morbid(DONE)]} {
+	set morbidFile [glob -nocomplain "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/OMIM/*_morbid.tsv.gz"]
+	set g_morbid(DONE) 1 
+	set f [open "| gzip -cd $morbidFile"]
+	while {! [eof $f]} {
+	    set L [gets $f]
+	    set g_morbid([lindex $L 0]) 1
+	}
+	close $f
+    }
+
+    if {[info exists g_morbid($gene)]} {
+	return "yes"
+    } else {
+	return "no"
+    } 
 }

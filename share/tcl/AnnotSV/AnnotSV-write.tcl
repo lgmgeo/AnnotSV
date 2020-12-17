@@ -47,7 +47,7 @@ proc OrganizeAnnotation {} {
     #########################################################################################
     ################### Writing of the header (first line of the output) ####################
     #########################################################################################
-    set headerOutput "AnnotSV ID\tSV chrom\tSV start\tSV end\tSV length"
+    set headerOutput "AnnotSV_ID\tSV_chrom\tSV_start\tSV_end\tSV_length"
     if {[info exist VCFheader]} {
 	# SVinputFile = VCF
 	append headerOutput "\t$VCFheader"
@@ -76,7 +76,7 @@ proc OrganizeAnnotation {} {
 		    puts "=> Can not report: $headerFromTheUser"
 		} else {
 		    if {$g_AnnotSV(svtBEDcol) ne -1} {
-			set headerFromTheUser [lreplace $headerFromTheUser $g_AnnotSV(svtBEDcol) $g_AnnotSV(svtBEDcol) "SV type"]
+			set headerFromTheUser [lreplace $headerFromTheUser $g_AnnotSV(svtBEDcol) $g_AnnotSV(svtBEDcol) "SV_type"]
 		    }
 		    if {$g_AnnotSV(samplesidBEDcol) ne -1} {
 			set headerFromTheUser [lreplace $headerFromTheUser $g_AnnotSV(samplesidBEDcol) $g_AnnotSV(samplesidBEDcol) "Samples_ID"]
@@ -85,11 +85,11 @@ proc OrganizeAnnotation {} {
 		}	
 	    } else {
 		# No header given by the user
-		set i 5 ; # headerOutput = "AnnotSV ID   SV chrom    SV start	   SV end	SV length"
+		set i 5 ; # headerOutput = "AnnotSV_ID   SV_chrom    SV_start	   SV_end	SV_length"
 		set j [expr {$theBEDlength+2}]
 		while {$i < $j} {
 		    if {$i eq $g_AnnotSV(svtTSVcol)} {
-			append headerOutput "\tSV type"
+			append headerOutput "\tSV_type"
 		    } elseif {$i eq $g_AnnotSV(samplesidTSVcol)} {
 			append headerOutput "\tSamples_ID"
 		    } else {
@@ -99,17 +99,17 @@ proc OrganizeAnnotation {} {
 		}
 	    }
 	} else {
-	    # At least the "SV type" and the "samples_ID" columns should be reported for the ranking
+	    # At least the "SV_type" and the "samples_ID" columns should be reported for the ranking
 	    if {$g_AnnotSV(svtTSVcol) ne -1} {
-		# The user doesn't want to keep all the columns from the SV BED input file. We keep only the "SV type" (for the ranking) 
-		append headerOutput "\tSV type"
+		# The user doesn't want to keep all the columns from the SV BED input file. We keep only the "SV_type" (for the ranking) 
+		append headerOutput "\tSV_type"
 	    }
 	    if {$g_AnnotSV(samplesidTSVcol) ne -1} {
 		append headerOutput "\tSamples_ID"
 	    }
 	}
     }
-    append headerOutput "\tAnnotSV type\tGene name\tNumber of genes\ttx\ttx start\ttx end\toverlapped tx length\toverlapped CDS length\toverlapped CDS percent\tframeshift\tNumber of exons\tlocation\tlocation2\tdistNearestSS\tnearestSStype\tintersectStart\tintersectEnd\tRE_gene"
+    append headerOutput "\tAnnotation_mode\tGene_name\tGene_count\tTx\tTx_start\tTx_end\tOverlapped_tx_length\tOverlapped_CDS_length\tOverlapped_CDS_percent\tFrameshift\tExon_count\tLocation\tLocation2\tDist_Nearest_SS\tNearest_SS_type\tIntersect_Start\tIntersect_End\tRE_gene"
     	      
 
     ### Search for "ref" and "alt" information (to define the AnnotSV_ID)
@@ -151,7 +151,7 @@ proc OrganizeAnnotation {} {
     if {$g_AnnotSV(tadAnn)} {
 	set g_AnnotSV(tadAnn_i) ""
 	set j 0
-	foreach col "TADcoordinates ENCODEexperiments" {
+	foreach col "TAD_coordinate ENCODE_experiment" {
 	    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" $col] ne -1} {
 		append headerOutput "\t$col"
 		lappend g_AnnotSV(tadAnn_i) $j
@@ -164,13 +164,13 @@ proc OrganizeAnnotation {} {
     ####### "VCF files header"
     if {$g_AnnotSV(snvIndelFiles) ne ""} {
 	foreach sample $g_AnnotSV(snvIndelSamples) {
-	    append headerOutput "\t#hom($sample)\t#htz($sample)\t#htz/allHom($sample)\t#htz/total(cohort)"
+	    append headerOutput "\tCount_hom($sample)\tCount_htz($sample)\tCount_htz/allHom($sample)\tCount_htz/total(cohort)"
 	}
-	append headerOutput "\t#total(cohort)"
+	append headerOutput "\tCount_total(cohort)"
     }
     if {$g_AnnotSV(candidateSnvIndelFiles) ne ""} {
 	foreach sample $g_AnnotSV(candidateSnvIndelSamples) {
-	    append headerOutput "\tcompound-htz($sample)"
+	    append headerOutput "\tcompound_htz($sample)"
 	}
     }
 
@@ -187,10 +187,10 @@ proc OrganizeAnnotation {} {
 
     ####### "Breakpoints header"
     if {$g_AnnotSV(gcContentAnn)} {
-	append headerOutput "\tGCcontent_left\tGCcontent_right"
+	append headerOutput "\tGC_content_left\tGC_content_right"
     }
     if {$g_AnnotSV(repeatAnn)} {
-	append headerOutput "\tRepeats_coord_left\tRepeats_type_left\tRepeats_coord_right\tRepeats_type_right"
+	append headerOutput "\tRepeat_coord_left\tRepeat_type_left\tRepeat_coord_right\tRepeat_type_right"
     }
     if {$g_AnnotSV(gapAnn)} {
 	append headerOutput "\tGap_left\tGap_right"
@@ -202,27 +202,27 @@ proc OrganizeAnnotation {} {
 	append headerOutput "\tENCODE_blacklist_left\tENCODE_blacklist_characteristics_left\tENCODE_blacklist_right\tENCODE_blacklist_characteristics_right"
     }
 
-    ####### "Genes-based header"
-    if {$g_AnnotSV(genesBasedAnn)} {
-	set L_allGenesBasedHeader ""
+    ####### "Gene-based header"
+    if {$g_AnnotSV(geneBasedAnn)} {
+	set L_allGeneBasedHeader ""
 	if {[info exists g_AnnotSV(extann)] && $g_AnnotSV(extann) ne ""} { ; # g_AnnotSV(extann) defined in the main
 	    ExternalAnnotations
 	    foreach F [ExternalAnnotations L_Files] {
 		# we remove the first "genes" column (not reported in output, used as an ID)
 		regsub "\[^\t\]+\t" [ExternalAnnotations $F Header] "" extannHeader
-		lappend L_allGenesBasedHeader {*}[split $extannHeader "\t"]
+		lappend L_allGeneBasedHeader {*}[split $extannHeader "\t"]
 	    }
 	}
-	set g_AnnotSV(genesBasedAnn_i) ""
+	set g_AnnotSV(geneBasedAnn_i) ""
 	set j 0
-	foreach col "$L_allGenesBasedHeader" {
+	foreach col "$L_allGeneBasedHeader" {
 	    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" $col] ne -1} {
 		append headerOutput "\t$col"
-		lappend g_AnnotSV(genesBasedAnn_i) $j
+		lappend g_AnnotSV(geneBasedAnn_i) $j
 	    }
 	    incr j
 	}
-	if {$g_AnnotSV(genesBasedAnn_i) eq ""} {set g_AnnotSV(genesBasedAnn) 0}
+	if {$g_AnnotSV(geneBasedAnn_i) eq ""} {set g_AnnotSV(geneBasedAnn) 0}
     }
  
     # Preparation for the ranking (from benign to pathogenic)
@@ -230,23 +230,23 @@ proc OrganizeAnnotation {} {
 
     ####### "Exomiser header"
     if {$g_AnnotSV(hpo) ne ""} {
-	append headerOutput "\tEXOMISER_GENE_PHENO_SCORE\tHUMAN_PHENO_EVIDENCE\tMOUSE_PHENO_EVIDENCE\tFISH_PHENO_EVIDENCE"
+	append headerOutput "\tExomiser_gene_pheno_score\tHuman_pheno_evidence\tMouse_pheno_evidence\tFish_pheno_evidence"
     }
     
     ####### "Ranking header"
-    if {$g_AnnotSV(svtTSVcol) eq -1 && $g_AnnotSV(organism) eq "Human"} { ; # SV type is required for the ranking of human SV
+    if {$g_AnnotSV(svtTSVcol) eq -1 && $g_AnnotSV(organism) eq "Human"} { ; # SV_type is required for the ranking of human SV
 	puts "\nWARNING: AnnotSV requires the SV type (duplication, deletion...) to classify the SV"
 	puts "Not provided (svtBEDcol = -1)"
 	puts "=> No SV ranking"
 	set g_AnnotSV(ranking) 0
     }
     if {$g_AnnotSV(ranking)} {
-	append headerOutput "\tAnnotSV ranking score"
-	if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "ranking decision criteria"] ne -1} {
-	    append headerOutput "\tranking decision criteria"
+	append headerOutput "\tAnnotSV_ranking_score"
+	if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "AnnotSV_ranking_criteria"] ne -1} {
+	    append headerOutput "\tAnnotSV_ranking_criteria"
 	}
-	if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "AnnotSV ranking class"] ne -1} {
-	    append headerOutput "\tAnnotSV ranking class"
+	if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "ACMG_class"] ne -1} {
+	    append headerOutput "\tACMG_class"
 	}
     }
     
@@ -315,9 +315,9 @@ proc OrganizeAnnotation {} {
     if {$g_AnnotSV(segdupAnn)} {puts "\t\t...Segmental duplication annotation"}
     if {$g_AnnotSV(ENCODEblacklistAnn)} {puts "\t\t...ENCODE blacklist annotation"}
 
-    ####### "Genes-based annotations"
-    puts "\t...Genes-based annotations"
-    if {$g_AnnotSV(genesBasedAnn)} {
+    ####### "Gene-based annotations"
+    puts "\t...Gene-based annotations"
+    if {$g_AnnotSV(geneBasedAnn)} {
 	puts "[join $g_ExtAnnotation(display) "\n"]"
     }
     ####### "Exomiser annotation"
@@ -349,8 +349,8 @@ proc OrganizeAnnotation {} {
         set L [gets $f]
 	if {$L eq ""} {continue}
 	set Ls [split $L "\t"]
-	set AnnotSVtype [lindex $Ls end]
-	if {$AnnotSVtype eq "split"} {
+	set AnnotationMode [lindex $Ls end]
+	if {$AnnotationMode eq "split"} {
 	    set SVchrom [lindex $Ls 0]
 	    set SVleft  [lindex $Ls 1]
 	    set SVright [lindex $Ls 2]
@@ -408,7 +408,7 @@ proc OrganizeAnnotation {} {
 	set SVchrom   [lindex $Ls 0]
 	set SVleft    [lindex $Ls 1]
 	set SVright   [lindex $Ls 2]
-	set AnnotSVtype   [lindex $Ls end]                 ;# full or split
+	set AnnotationMode   [lindex $Ls end]                 ;# full or split
 	if {$g_AnnotSV(svtBEDcol) ne -1} { 
 	    set SVtype [lindex $Ls "$g_AnnotSV(svtBEDcol)"]                     ;# DEL, DUP, <CN0>...
 	} else {
@@ -420,12 +420,12 @@ proc OrganizeAnnotation {} {
 	    set Samplesid ""
 	}
 
-	# For the use of the -typeOfAnnotation option: keep only the corresponding lines (full or split or both)
-	if {$g_AnnotSV(typeOfAnnotation) eq "full" && $AnnotSVtype eq "split"} {continue}
-	if {$g_AnnotSV(typeOfAnnotation) eq "split" && $AnnotSVtype eq "full"} {continue}
+	# For the use of the -annotationMode option: keep only the corresponding lines (full or split or both)
+	if {$g_AnnotSV(annotationMode) eq "full" && $AnnotationMode eq "split"} {continue}
+	if {$g_AnnotSV(annotationMode) eq "split" && $AnnotationMode eq "full"} {continue}
 
 
-	if {$AnnotSVtype eq "split"} {
+	if {$AnnotationMode eq "split"} {
 	    # split
 	    set txStart    [lindex $Ls end-12]
 	    set txEnd      [lindex $Ls end-11]
@@ -469,7 +469,7 @@ proc OrganizeAnnotation {} {
 	    # full
 	    if {[info exists g_Lgenes($SV)]} {
 		set geneName "$g_Lgenes($SV)"  ; # SV/oldSV defined with: "chrom, start, end, SVtype":	    set transcript         ""
-		set NbGenes "[llength [split $g_Lgenes($SV) "/"]]"
+		set NbGenes "[llength [split $g_Lgenes($SV) ";"]]"
 	    } else {
 		set geneName ""
 		set NbGenes 0
@@ -495,7 +495,7 @@ proc OrganizeAnnotation {} {
 	    if {$geneName eq ""} {
 		set test 1
 	    } else {
-		foreach g [split $geneName "/"] {
+		foreach g [split $geneName ";"] {
 		    if {[lsearch -exact $L_Candidates $g] eq -1} {
 			set test 1
 		    }
@@ -510,7 +510,7 @@ proc OrganizeAnnotation {} {
 	# NearestSStype:
 	#   5' = splice donor site (on the right of the exon if strand +; else on the left) 
 	#   3' = splice acceptor site (on the left of the exon if strand +; else on the right)
-	if {$AnnotSVtype eq "split"} {
+	if {$AnnotationMode eq "split"} {
 	    set nbEx [expr {[llength [split $exonStarts ","]]-1}] ; # Example: "1652370,1657120,1660664,1661968," --> 1652370 1657120 1660664 1661968 {}
 	    
 	    set tx_left [lindex [split $exonStarts ","] 0]
@@ -697,7 +697,7 @@ proc OrganizeAnnotation {} {
 	} 
 
 	# Definition of "intersectStart" and "intersectEnd" variables
-	if {$AnnotSVtype eq "split"} {
+	if {$AnnotationMode eq "split"} {
 	    if {$SVleft<$tx_left} {set intersectStart "$tx_left"} else {set intersectStart "$SVleft"}
 	    if {$SVright<$tx_right} {set intersectEnd "$SVright"} else {set intersectEnd "$tx_right"}
 	    set intersect "$intersectStart\t$intersectEnd"
@@ -705,10 +705,13 @@ proc OrganizeAnnotation {} {
 
 	# Regulatory elements annotation (only for the full lines)
 	set reText ""
-	if {$AnnotSVtype eq "full"} {
+	set L_genes [split $geneName ";"]
+	if {$AnnotationMode eq "full"} {
 	    if {[info exists g_re($SVchrom\t$SVleft\t$SVright)]} {
 		set L_regulatedGenes $g_re($SVchrom\t$SVleft\t$SVright)
 		foreach gName "$L_regulatedGenes" {
+		    # Because overlapping so many regulated genes is a problem, AnnotSV restrict the report of the regulated genes to the ones not present in "Gene_name".
+		    # if {[lsearch -exact $L_genes $gName] ne "-1"} {continue}
 		    set HITS ""
 		    catch {set HITS "$g_HITS($gName)"}
 		    if {$g_AnnotSV(hpo) ne ""} {
@@ -718,18 +721,19 @@ proc OrganizeAnnotation {} {
 		    set lAnn {}
 		    if {$HITS ne ""} {lappend lAnn $HITS}
 		    if {$exomiserScore ne ""} {lappend lAnn $exomiserScore}
+		    if {[isMorbid $gName] eq "yes"} {lappend lAnn "morbid"} 
 		    if {$lAnn ne ""} {
-			lappend reText "$gName ([join $lAnn "; "])"
+			lappend reText "$gName ([join $lAnn ";"])"
 		    } else {
 			lappend reText "$gName"
 		    }
 		}
-		set reText [join $reText "; "]
+		set reText [join $reText ";"]
 	    } 
 	} 
 	
 	# Annotations with benign genes or genomic regions (SVincludedInFt)
-	if {$AnnotSVtype eq "split"} {
+	if {$AnnotationMode eq "split"} {
 	    set benignText "[benignSVannotation $SVchrom $intersectStart $intersectEnd]"
 	} else {
 	    set benignText "[benignSVannotation $SVchrom $SVleft $SVright]"
@@ -738,7 +742,7 @@ proc OrganizeAnnotation {} {
 	# User SVincludedInFt BED annotations. 
 	set L_SVincludedInFtText {}
    	foreach formattedUserBEDfile [glob -nocomplain $usersDir/SVincludedInFt/*.formatted.sorted.bed] {
-	    if {$AnnotSVtype eq "split"} {
+	    if {$AnnotationMode eq "split"} {
 		lappend L_SVincludedInFtText "[userBEDannotation $formattedUserBEDfile $SVchrom $intersectStart $intersectEnd]"
 	    } else {
 		lappend L_SVincludedInFtText "[userBEDannotation $formattedUserBEDfile $SVchrom $SVleft $SVright]"
@@ -747,14 +751,14 @@ proc OrganizeAnnotation {} {
 	set SVincludedInFTtext [join $L_SVincludedInFtText "\t"]
 
 	# Annotations with pathogenic genes or genomic regions (FtIncludedInSV)
-	if {$AnnotSVtype eq "split"} {
+	if {$AnnotationMode eq "split"} {
 	    set pathogenicText "[pathogenicSVannotation $SVchrom $intersectStart $intersectEnd]"
 	} else {
 	    set pathogenicText "[pathogenicSVannotation $SVchrom $SVleft $SVright]"
 	} 
 
 	# Annotations with pathogenic snv/indel (FtIncludedInSV)
-	if {$AnnotSVtype eq "split"} {
+	if {$AnnotationMode eq "split"} {
 	    set pathoSNVindelText "[pathoSNVindelAnnotation $SVchrom $intersectStart $intersectEnd]"
 	} else {
 	    set pathoSNVindelText "[pathoSNVindelAnnotation $SVchrom $SVleft $SVright]"
@@ -763,7 +767,7 @@ proc OrganizeAnnotation {} {
 	# User FtIncludedInSV BED annotations. 
 	set L_FtIncludedInSVtext {}
    	foreach formattedUserBEDfile [glob -nocomplain $usersDir/FtIncludedInSV/*.formatted.sorted.bed] {
-	    if {$AnnotSVtype eq "split"} {
+	    if {$AnnotationMode eq "split"} {
 		lappend L_FtIncludedInSVtext "[userBEDannotation $formattedUserBEDfile $SVchrom $intersectStart $intersectEnd]"
 	    } else {
 		lappend L_FtIncludedInSVtext "[userBEDannotation $formattedUserBEDfile $SVchrom $SVleft $SVright]"
@@ -771,34 +775,34 @@ proc OrganizeAnnotation {} {
 	}
 	set FtIncludedInSVtext [join $L_FtIncludedInSVtext "\t"]
 
-	# Genes-based annotations.
-	if {$g_AnnotSV(genesBasedAnn)} {
-	    #   -> Number of columns from each Genes-based file
+	# Gene-based annotations.
+	if {$g_AnnotSV(geneBasedAnn)} {
+	    #   -> Number of columns from each Gene-based file
 	    if {[info exists g_AnnotSV(extann)] && $g_AnnotSV(extann) ne ""} {		    
 		foreach F [ExternalAnnotations L_Files] {
 		    set nbColumns($F) [expr {[llength [split [ExternalAnnotations $F Header] "\t"]]-1}]
 		}
 	    }
 	    #   -> Annotations
-	    set L_genesBasedText {}
-	    if {$AnnotSVtype eq "split"} {
+	    set L_geneBasedText {}
+	    if {$AnnotationMode eq "split"} {
 		######### split lines ###################################
 		if {[info exists g_AnnotSV(extann)] && $g_AnnotSV(extann) != ""} {		    
 		    foreach F [ExternalAnnotations L_Files] {
 			set AnnotFound "[ExternalAnnotations $F $geneName]"		
 			if {$AnnotFound eq ""} {
-			    lappend L_genesBasedText {*}"[lrepeat $nbColumns($F) ""]"
+			    lappend L_geneBasedText {*}"[lrepeat $nbColumns($F) ""]"
 			} else {		
-			    # Change metrics from "." to ","
 			    if {[set g_AnnotSV(metrics)] eq "fr"} {
+				# Change metrics from "." to ","
 				foreach valueByColumn [split $AnnotFound "\t"] {
 				    if {[regexp "^(-)?\[0-9\]+\\.\[0-9\]+$" $valueByColumn]} { ;# Only for the values like "0.5", "-25.3" 
 					regsub -all {\.} $valueByColumn "," valueByColumn				    
 				    }
-				    lappend L_genesBasedText "$valueByColumn"
+				    lappend L_geneBasedText "$valueByColumn"
 				} 
 			    } else {
-				lappend L_genesBasedText {*}[split $AnnotFound "\t"]
+				lappend L_geneBasedText {*}[split $AnnotFound "\t"]
 			    }
 			}
 		    }
@@ -808,13 +812,13 @@ proc OrganizeAnnotation {} {
 		if {[info exists g_AnnotSV(extann)] && $g_AnnotSV(extann) != ""} {	
 		    if {$geneName eq ""} {
 			foreach F [ExternalAnnotations L_Files] {
-			    lappend L_genesBasedText {*}"[lrepeat $nbColumns($F) ""]"
+			    lappend L_geneBasedText {*}"[lrepeat $nbColumns($F) ""]"
 			}
 		    } else {
-			set allGenesFromFullLine [split $geneName "/"]
+			set allGenesFromFullLine [split $geneName ";"]
 			foreach F [ExternalAnnotations L_Files] {
 			    
-			    # First, we search for the annotation of each gene that we merge with a "/"
+			    # First, we search for the annotation of each gene that we merge with a ";"
 			    set L_AnnotFound {} 
 			    foreach g $allGenesFromFullLine {
 				set AnnotFound "[ExternalAnnotations $F $g]"
@@ -829,13 +833,13 @@ proc OrganizeAnnotation {} {
 			    # except for "decimal" scores and percentages where we keep the max value
 			    # (in order not to have value such "1.5/////-0.2////")
 			    # and except for OMIM number where we keep all the numbers
-			    set L_newGenesBasedText ""
-			    if {$tutu eq ""} {lappend L_genesBasedText ""} ; #if {$tutu eq ""} => doesn't enter in the foreach
+			    set L_newGeneBasedText ""
+			    if {$tutu eq ""} {lappend L_geneBasedText ""} ; #if {$tutu eq ""} => doesn't enter in the foreach
 			    foreach valueByColumn [split $tutu "\t"] { 
 				if {$valueByColumn ne ""} {
 				    set isAScore 1
 				    set max -1000
-				    foreach valueByGene [split $valueByColumn "/"] {
+				    foreach valueByGene [split $valueByColumn ";"] {
 					if {[regexp "ClinGenAnnotations.tsv" $F]} {
 					    set max ""
 					    # For ClinGen file (HI + TS), the values are ordered as follow: 
@@ -864,29 +868,29 @@ proc OrganizeAnnotation {} {
 					if {[set g_AnnotSV(metrics)] eq "fr"} {
 					    regsub -all {\.} $max "," max
 					}
-					lappend L_newGenesBasedText $max
+					lappend L_newGeneBasedText $max
 				    } else {
-					lappend L_newGenesBasedText ""
+					lappend L_newGeneBasedText ""
 				    }
 				} else {
-				    lappend L_newGenesBasedText ""
+				    lappend L_newGeneBasedText ""
 				}
 			    }
-			    lappend L_genesBasedText {*}$L_newGenesBasedText
+			    lappend L_geneBasedText {*}$L_newGeneBasedText
 			}
 		    }
 		}
 	    }
-	    set genesBasedText ""
-	    foreach i $g_AnnotSV(genesBasedAnn_i) {
-		lappend genesBasedText [lindex $L_genesBasedText $i]
+	    set geneBasedText ""
+	    foreach i $g_AnnotSV(geneBasedAnn_i) {
+		lappend geneBasedText [lindex $L_geneBasedText $i]
 	    }	    
-	    set genesBasedText [join $genesBasedText "\t"]
+	    set geneBasedText [join $geneBasedText "\t"]
 	}
 
 	# GC content annotation
 	if {$g_AnnotSV(gcContentAnn)} {
-	    if {$AnnotSVtype eq "full"} {	
+	    if {$AnnotationMode eq "full"} {	
 		set gcContentText "[GCcontentAnnotation $SVchrom $SVleft]"
 		append gcContentText "\t[GCcontentAnnotation $SVchrom $SVright]"
 	    } else {set gcContentText "\t"}
@@ -894,7 +898,7 @@ proc OrganizeAnnotation {} {
 
 	# Repeat annotation
 	if {$g_AnnotSV(repeatAnn)} {
-	    if {$AnnotSVtype eq "full"} {	
+	    if {$AnnotationMode eq "full"} {	
 		set repeatText "[RepeatAnnotation $SVchrom $SVleft]"
 		append repeatText "\t[RepeatAnnotation $SVchrom $SVright]"
 	    } else {set repeatText "\t\t\t"}
@@ -902,7 +906,7 @@ proc OrganizeAnnotation {} {
 
 	# Gap annotation 
 	if {$g_AnnotSV(gapAnn)} {
-	    if {$AnnotSVtype eq "full"} {	
+	    if {$AnnotationMode eq "full"} {	
 		set gapText "[GapAnnotation $SVchrom $SVleft]"
 		append gapText "\t[GapAnnotation $SVchrom $SVright]"
 	    } else {set gapText "\t"}
@@ -910,7 +914,7 @@ proc OrganizeAnnotation {} {
 
 	# Segmental duplication annotation
 	if {$g_AnnotSV(segdupAnn)} {
-	    if {$AnnotSVtype eq "full"} {	
+	    if {$AnnotationMode eq "full"} {	
 		set segdupText "[SegDupAnnotation $SVchrom $SVleft]"
 		append segdupText "\t[SegDupAnnotation $SVchrom $SVright]"
 	    } else {set segdupText "\t"}
@@ -918,7 +922,7 @@ proc OrganizeAnnotation {} {
 
 	# ENCODE blacklist annotation
 	if {$g_AnnotSV(ENCODEblacklistAnn)} {
-	    if {$AnnotSVtype eq "full"} {	
+	    if {$AnnotationMode eq "full"} {	
 		set ENCODEblacklistText "[ENCODEblacklistAnnotation $SVchrom $SVleft]"
 		append ENCODEblacklistText "\t[ENCODEblacklistAnnotation $SVchrom $SVright]"
 	    } else {set ENCODEblacklistText "\t\t\t"}
@@ -926,7 +930,7 @@ proc OrganizeAnnotation {} {
 
 	# TAD annotation
 	if {$g_AnnotSV(tadAnn)} {
-	    if {$AnnotSVtype eq "split"} {
+	    if {$AnnotationMode eq "split"} {
 		set tadText "[TADannotation $SVchrom $intersectStart $intersectEnd $g_AnnotSV(tadAnn_i)]"
 	    } else {
 		set tadText "[TADannotation $SVchrom $SVleft $SVright $g_AnnotSV(tadAnn_i)]"
@@ -938,7 +942,7 @@ proc OrganizeAnnotation {} {
 	# - #total(cohort) variable
 	set HomHtz ""
 	if {$g_AnnotSV(snvIndelFiles) ne ""} {
-	    if {$AnnotSVtype eq "split"} {
+	    if {$AnnotationMode eq "split"} {
 		set HomHtz "[VCFannotation $SVchrom $intersectStart $intersectEnd $SVtype]"
 	    } else {
 		set HomHtz "[VCFannotation $SVchrom $SVleft $SVright $SVtype]"
@@ -948,7 +952,7 @@ proc OrganizeAnnotation {} {
 	# Calculate the compound-htz variable
 	set compound ""
 	if {$g_AnnotSV(candidateSnvIndelFiles) ne ""} {
-	    if {$AnnotSVtype eq "split"} {
+	    if {$AnnotationMode eq "split"} {
 		set compound [filteredVCFannotation $SVchrom $txStart $txEnd $Ls $headerOutput]
 	    } else {
 		set compound [filteredVCFannotation "FULL" "" "" "" ""]
@@ -958,8 +962,7 @@ proc OrganizeAnnotation {} {
 	# "bestAnn" annotation order: 
 	# chrom txStart txEnd name2 name cdsStart cdsEnd exonStarts exonEnds
 	#
-	# headerOutput:
-	#  "Gene name\tNumber of genes\ttx\ttx Start\ttx End\ttx length\tnb exons\tCDS length\tframeshift\tlocation\tlocation2\tdistNearestSS\tnearestSStype\tintersectStart\tintersectEnd\tOMIM ID\tOMIM phenotype\tOMIM inheritance\t#hom\t#htz"
+	# headerOutput "\tAnnotation_mode\tGene_name\tGene_count\tTx\tTx_start\tTx_end\tOverlapped_tx_length\tOverlapped_CDS_length\tOverlapped_CDS_percent\tFrameshift\tExon_count\tLocation\tLocation2\tDist_Nearest_SS\tNearest_SS_type\tIntersect_Start\tIntersect_End\tRE_gene"
 
 	# Insertion of the SV length in the fourth column:
 	set SVchrom [lindex $Ls 0]
@@ -969,7 +972,7 @@ proc OrganizeAnnotation {} {
 	regsub "chr" [lindex $Ls $i_alt] "" alt
 
 	# Creation of the AnnotSV ID (chrom_start_end_SVtype_i)
-	# (SV type should not have any space or special car)
+	# (SV_type should not have any space or special car)
 	regsub -all "\[ .():;\]" $SVtype "_" SVtypeTmp
 	set AnnotSV_ID [settingOfTheAnnotSVID "${SVchrom}_${SVstart}_${SVend}_$SVtypeTmp" "$ref" "$alt"]
 	
@@ -987,11 +990,11 @@ proc OrganizeAnnotation {} {
 	
 	####### "Exomiser annotation"
 	if {$g_AnnotSV(hpo) ne ""} {
-	    if {$AnnotSVtype eq "split"} {
+	    if {$AnnotationMode eq "split"} {
 		set exomiserText [ExomiserAnnotation $geneName "all"]
 	    } else {
 		set bestScore "-1.0"
-		foreach g [split $geneName "/"] {		    
+		foreach g [split $geneName ";"] {		    
 		    set score [ExomiserAnnotation $g "score"]
 		    if {$score > $bestScore} {set bestScore $score}
 		}
@@ -1013,7 +1016,7 @@ proc OrganizeAnnotation {} {
 	    append TextToWrite "$AnnotSV_ID\t[join $toadd "\t"]"
 	} else {
 	    append TextToWrite "$AnnotSV_ID\t[join [lrange $Ls 0 2] "\t"]\t$SVlength"
-	    if {$g_AnnotSV(svtBEDcol) ne -1} { ; # SV type is required for the ranking
+	    if {$g_AnnotSV(svtBEDcol) ne -1} { ; # SV_type is required for the ranking
 		append TextToWrite "\t$SVtype"
 		if {$g_AnnotSV(samplesidBEDcol) ne -1} {
 		    append TextToWrite "\t$Samplesid"  
@@ -1022,7 +1025,7 @@ proc OrganizeAnnotation {} {
 		append TextToWrite "\t$Samplesid"
 	    } 
 	}
-	append TextToWrite "\t$AnnotSVtype"
+	append TextToWrite "\t$AnnotationMode"
 
 	####### "Basic gene annotations"
 	append TextToWrite "\t$geneName\t$NbGenes\t$transcript\t$txStart\t$txEnd\t$txL\t$CDSl\t$CDSpercent\t$frameshift\t$nbExons\t$location\t$location2\t$distNearestSS\t$nearestSStype\t$intersect"
@@ -1074,9 +1077,9 @@ proc OrganizeAnnotation {} {
 	if {$g_AnnotSV(ENCODEblacklistAnn)} {
 	    append TextToWrite "\t$ENCODEblacklistText"
 	}	
-	####### "Genes-based annotations"
-	if {$g_AnnotSV(genesBasedAnn)} {
-	    append TextToWrite "\t$genesBasedText"
+	####### "Gene-based annotations"
+	if {$g_AnnotSV(geneBasedAnn)} {
+	    append TextToWrite "\t$geneBasedText"
 	}
 	####### "Exomiser annotation"
 	if {$g_AnnotSV(hpo) ne ""} {
@@ -1122,8 +1125,10 @@ proc OrganizeAnnotation {} {
     ## Finalize the ranking
     #######################
     if {$g_AnnotSV(ranking)} {
-	# Some input BED file can have the same SV descibed on several lines
+	# Some input BED file can have the same SV described on several lines
 	foreach AnnotSV_ID [lsort -unique $L_AnnotSV_ID] {
+	    set SVtype [lindex [split $AnnotSV_ID "_"] end-1]
+	    set SVtype [normalizeSVtype $SVtype]
 	    if {$SVtype eq "DEL"} {
 		achieveSVrankingLoss $AnnotSV_ID
 	    } elseif {$SVtype eq "DUP"} {
@@ -1144,6 +1149,8 @@ proc OrganizeAnnotation {} {
     # >>  or (if equal), from the higher to the lower exomiser score
     # >>  or (if equal), in the sorted order of the BED
     if {$g_AnnotSV(ranking)} {
+	# Before:            L_AnnotSV_ID is a list of {AnnotSV_ID} 
+	# After the foreach: L_AnnotSV_ID is a list of {AnnotSV_ID rankingScore exomiserScore} 
 	foreach AnnotSV_ID $L_AnnotSV_ID {	    
 	    if {![info exists bestExomiserScore($AnnotSV_ID)]} {set bestExomiserScore($AnnotSV_ID) "-1"}
 	    if {$g_rankingScore($AnnotSV_ID) eq ""} {set score "-99"} else {set score $g_rankingScore($AnnotSV_ID)}
@@ -1151,23 +1158,25 @@ proc OrganizeAnnotation {} {
 	}
 	set L_AnnotSV_ID [lsort -command DescendingSortOnElement1 [lsort -command DescendingSortOnElement2 $L_AnnotSV_ID_completed]]
     }
-    
+
+    set i_Annotation_mode [lsearch -exact [split $headerOutput "\t"] "Annotation_mode"]
     set i 0
     foreach AnnotSV_ID $L_AnnotSV_ID {
 	set AnnotSV_ID [lindex $AnnotSV_ID 0]
-	set full 1
 	foreach fullOrSplitLine $L_TextToWrite($AnnotSV_ID) {
+	    set AnnMo [lindex [split $fullOrSplitLine "\t"] $i_Annotation_mode]
 	    set lineCompleted ""
-	    if {$full} {
+
+	    if {$AnnMo eq "full"} {
 		# Ranking available only for the full lines
-		set notSelected 0
+		set notSelected 0  ; # To select the SV of a user-defined specific class (from 1 to 5)
 		append lineCompleted "$fullOrSplitLine"
 		if {$g_AnnotSV(ranking)} {
-		    append lineCompleted "\t$g_rankingScore($AnnotSV_ID)"
-		    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "ranking decision criteria"] ne -1} {
-			append lineCompleted "\t$g_rankingExplanations($AnnotSV_ID)"
+		    append lineCompleted "\t$g_rankingScore($AnnotSV_ID)" ;#rankingScore
+		    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "AnnotSV_ranking_criteria"] ne -1} {
+			append lineCompleted "\t$g_rankingExplanations($AnnotSV_ID)" ;#rankingExplanations
 		    }
-		    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "AnnotSV ranking class"] ne -1} {
+		    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "ACMG_class"] ne -1} {
 			if {$g_rankingScore($AnnotSV_ID) eq ""} {
 			    set class ""
 			} elseif {$g_rankingScore($AnnotSV_ID) >= "0.99"} {
@@ -1181,7 +1190,12 @@ proc OrganizeAnnotation {} {
 			} else {
 			    set class 1
 			}
-			append lineCompleted "\t$class"	  
+			append lineCompleted "\t$class"	;#ACMGclass
+			if {$class ne ""} {
+			    set g_ACMGclass($AnnotSV_ID,full) "full=$class"
+			} else {
+			    set g_ACMGclass($AnnotSV_ID,full) ""
+			}
 			# To select the SV of a user-defined specific class (from 1 to 5)
 			if {$g_AnnotSV(rankFiltering) ne {1 2 3 4 5} && [lsearch -exact $g_AnnotSV(rankFiltering) $class] eq -1} {
 			    set notSelected 1
@@ -1189,18 +1203,17 @@ proc OrganizeAnnotation {} {
 			}
 		    }
 		}
-		set full 0
 	    } else {
-		if {$notSelected} {continue}
+		if {$notSelected} {continue} ;# To select the SV of a user-defined specific class (from 1 to 5)
 		# Ranking not available for the split lines
 		append lineCompleted "$fullOrSplitLine"
 		if {$g_AnnotSV(ranking)} {
-		    append lineCompleted "\t"
-		    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "ranking decision criteria"] ne -1} {
-			append lineCompleted "\t"
+		    append lineCompleted "\t"  ;#rankingScore
+		    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "AnnotSV_ranking_criteria"] ne -1} {
+			append lineCompleted "\t" ;#rankingExplanations
 		    }
-		    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "AnnotSV ranking class"] ne -1} {
-			append lineCompleted "\t"
+		    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "ACMG_class"] ne -1} {
+			append lineCompleted "\t$g_ACMGclass($AnnotSV_ID,full)";#ACMGclass 
 		    }
 		}
 	    }

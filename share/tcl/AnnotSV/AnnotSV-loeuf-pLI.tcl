@@ -33,7 +33,7 @@ proc checkLOEUFfile {} {
 
     ## Check if the LOEUF file has been downloaded then formatted
     #############################################################
-    set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based"
+    set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based"
 
     set LOEUFfileDownloaded "$extannDir/gnomAD/gnomad.v2.1.1.lof_metrics.by_gene.txt" 
     set LOEUFformattedFile [glob -nocomplain "$extannDir/gnomAD/*_gnomAD.LOEUF.pLI.annotations.tsv*"]

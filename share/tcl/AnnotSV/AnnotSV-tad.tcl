@@ -45,7 +45,7 @@ proc checkTADfiles {} {
 	set g_AnnotSV(tadAnn) 1
 	# Check if the user asked for these annotations in the configfile
 	set test 0
-	foreach col "TADcoordinates ENCODEexperiments" {
+	foreach col "TAD_coordinate ENCODE_experiment" {
 	    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" $col] ne -1} {set test 1;break}
 	}
 	if {$test eq 0} {set g_AnnotSV(tadAnn) 0; return}
@@ -138,7 +138,7 @@ proc TADannotation {SVchrom SVstart SVend L_i} {
     
     if {![info exists tadText(DONE)]} {
 	
-	# headerOutput "TADcoordinates\tENCODEexperiments"
+	# headerOutput "TAD_coordinate\tENCODE_experiment"
 	set L_tadText(Empty) "{} {}"
 	foreach i $L_i {
 	    lappend tadText(Empty) "[lindex $L_tadText(Empty) $i]"
@@ -193,8 +193,8 @@ proc TADannotation {SVchrom SVstart SVend L_i} {
 		}
 		set overlap_length [expr {$overlap_end - $overlap_start}]
 		
-		# Keeping only TAD with > 70% (default) overlap with the SV
-		if {[expr {$overlap_length*100.0/$boundary_length}] < $g_AnnotSV(overlap)} {continue}
+		# Keeping only TAD with > 100% overlap with the SV
+		if {[expr {$overlap_length*100.0/$boundary_length}] < 100} {continue}
 		# No reciprocal overlap used for TAD (it would not make sense)
 	    }
 	    

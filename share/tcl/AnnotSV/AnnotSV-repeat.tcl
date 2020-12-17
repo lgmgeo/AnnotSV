@@ -43,7 +43,7 @@ proc checkRepeatFile {} {
 	set g_AnnotSV(repeatAnn) 1
 	# Check if the user asked for these annotations in the configfile
 	set test 0
-	foreach col "Repeats_coord_left Repeats_type_left Repeats_coord_right Repeats_type_right" {
+	foreach col "Repeat_coord_left Repeat_type_left Repeat_coord_right Repeat_type_right" {
 	    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" $col] ne -1} {set test 1;break}
 	}
 	if {$test eq 0} {set g_AnnotSV(repeatAnn) 0; return}
@@ -116,7 +116,7 @@ proc RepeatAnnotation {BreakpointChrom BreakpointPos} {
     global g_Repeat
 
 
-    # headerOutput "Repeats_coord_left Repeats_type_left" or "Repeats_coord_right and Repeats_type_right"
+    # headerOutput "Repeat_coord_left Repeat_type_left" or "Repeat_coord_right and Repeat_type_right"
     # (RepeatAnnotation is executed for each breakpoint)
     set g_Repeat(Empty) "\t"
 
@@ -215,7 +215,7 @@ proc RepeatAnnotation {BreakpointChrom BreakpointPos} {
     }
     
     if {[info exist g_Repeat_coord($BreakpointChrom,$BreakpointPos)]} {
-	return "[join $g_Repeat_coord($BreakpointChrom,$BreakpointPos) "/"]\t[join $g_Repeat_type($BreakpointChrom,$BreakpointPos) "/"]"
+	return "[join $g_Repeat_coord($BreakpointChrom,$BreakpointPos) ";"]\t[join $g_Repeat_type($BreakpointChrom,$BreakpointPos) ";"]"
     } else {
 	return $g_Repeat(Empty)
     }

@@ -47,7 +47,7 @@ proc checkFASTAfiles {} {
  	set g_AnnotSV(gcContentAnn) 1
 	# Check if the user asked for these annotations in the configfile
 	set test 0
-	foreach col "GCcontent_left GCcontent_right" {
+	foreach col "GC_content_left GC_content_right" {
 	    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" $col] ne -1} {set test 1;break}
 	}
 	if {$test eq 0} {set g_AnnotSV(gcContentAnn) 0; return}
@@ -131,10 +131,10 @@ proc GCcontentAnnotation {BreakpointChrom BreakpointPos} {
     global g_GCcontent
 
 
-    # headerOutput "GCcontent_left GCcontent_right"
+    # headerOutput "GC_content_left GC_content_right"
     # GCcontentAnnotation is executed for each breakpoint:
-    # - the left breakpoint -> GCcontent_left
-    # - the right one -> GCcontent_right
+    # - the left breakpoint -> GC_content_left
+    # - the right one -> GC_content_right
     set g_GCcontent(Empty) "" ; # Ok, no "\t" because we return only one value for each procedure call
 
     # Checking with the size of the chrom is needed

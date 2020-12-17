@@ -261,16 +261,17 @@ proc genesAnnotation {} {
     set splitSVleft [lindex $Ls 1]
     set splitSVright [lindex $Ls 2]
     
-    # oldsplitSV ("chrom, start, end, SVtype")
+    # oldsplitSV (all the line from the bedfile)
+    # Compulsory: In case of same SV presents several times in the bed file (but with different user annotation), all the lines should be kept
     if {$g_AnnotSV(svtBEDcol) ne "-1"} {
 	set SVtype "\t[lindex $Ls "$g_AnnotSV(svtBEDcol)"]"
     } else {
 	set SVtype ""
     }
-    set shortOldSplitSV "[join [lrange $Ls 0 2] "\t"]"
-    set oldSplitSV "[join [lrange $Ls 0 2] "\t"]$SVtype"
-    
-    # SVfromBED ("chrom, start, end, SVtype")
+    set shortOldSplitSV "[join [lrange $Ls 0 2] "\t"]"; # chrom, start, end
+    set oldSplitSV "[join [lrange $Ls 0 end-10] "\t"]"
+
+    # SVfromBED (all the line from the bedfile)
     set n 0
     set Ls_fromBED "[split [lindex $L_Bed $n] "\t"]"
     if {$g_AnnotSV(svtBEDcol) ne "-1"} {
@@ -278,7 +279,7 @@ proc genesAnnotation {} {
     } else {
 	set SVtypeFromBED ""
     }
-    set SVfromBED "[join [lrange $Ls_fromBED 0 2] "\t"]$SVtypeFromBED"
+    set SVfromBED "[join $Ls_fromBED "\t"]"
     
     # We have several annotations for 1 SV: 1 by gene.
     #
@@ -291,13 +292,13 @@ proc genesAnnotation {} {
 	set L [gets $f]
 	if {$L eq ""} {continue}
 	set Ls [split $L "\t"]
-	# splitSV ("chrom, start, end, SVtype")
+	# splitSV (all the line from the bedfile)
 	if {$g_AnnotSV(svtBEDcol) ne "-1"} {
 	    set SVtype "\t[lindex $Ls "$g_AnnotSV(svtBEDcol)"]"
 	} else {
 	    set SVtype ""
 	}
-	set splitSV "[join [lrange $Ls 0 2] "\t"]$SVtype"
+	set splitSV "[join [lrange $Ls 0 end-10] "\t"]"
 	
 	if {$splitSV ne $oldSplitSV} {;# new annotated SV line (all the split lines are done for the oldSV) => we write all information about the oldSV
 	    while {$SVfromBED ne $splitSV} {
@@ -307,7 +308,7 @@ proc genesAnnotation {} {
 		# Writing of 1 "split" line...
 		if {$SVfromBED eq $oldSplitSV} {
 		    set L_genes [lsort -unique $L_genes]		    
-		    set g_Lgenes($shortOldSplitSV) [join $L_genes "/"]
+		    set g_Lgenes($shortOldSplitSV) [join $L_genes ";"]
 		    # ...for each gene overlapped by the SV
 		    foreach gene $L_genes {
 			set bestCDSlov -1
@@ -340,7 +341,7 @@ proc genesAnnotation {} {
 		    catch {unset Finish}
 		    set L_genes {}	     
 		    set oldSplitSV "$splitSV"
-		    regexp "\[^\t\]+\t\[^\t\]+\t\[^\t\]+" $oldSplitSV shortOldSplitSV
+		    regexp "^\[^\t\]+\t\[^\t\]+\t\[^\t\]+" $oldSplitSV shortOldSplitSV
 		}
 		incr n
 		set Ls_fromBED "[split [lindex $L_Bed $n] "\t"]"
@@ -349,7 +350,7 @@ proc genesAnnotation {} {
 		} else {
 		    set SVtypeFromBED ""
 		}
-		set SVfromBED "[join [lrange $Ls_fromBED 0 2] "\t"]$SVtypeFromBED"
+		set SVfromBED "[join $Ls_fromBED "\t"]"
 	    }
 	}
 	set txName [lindex $Ls end-4]
@@ -444,7 +445,7 @@ proc genesAnnotation {} {
 
     # Treatment of the "split by gene" SV line
     set L_genes [lsort -unique $L_genes]
-    set g_Lgenes($shortOldSplitSV) [join $L_genes "/"]
+    set g_Lgenes($shortOldSplitSV) [join $L_genes ";"]
     foreach gene $L_genes {
 	set bestCDSlov -1
 	set bestCDSlcompl -1

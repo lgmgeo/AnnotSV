@@ -84,8 +84,8 @@ proc checkPromoterFile {} {
     if {![file exists $promoterFormatted]} {
 	
 	# Creation of the promoterFormatted 
-	puts "...$g_AnnotSV(tx) promoters configuration ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
-	puts "   (-promoterSize = $g_AnnotSV(promoterSize))\n"
+	puts "\t...$g_AnnotSV(tx) promoters configuration ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+	puts "\t   (-promoterSize = $g_AnnotSV(promoterSize))\n"
 	foreach L [LinesFromFile $genesFileFormatted] {
 	    # Line example:
 	    # 1       17368   17436   -       MIR6859-2       NR_107062       17436   17436   17368,  17436,
@@ -196,15 +196,15 @@ proc checkEAfiles {} {
     # H - The strand of DNA the gene located.
     # I - The predition score of the enhancer-gene interaction.
 
-    puts "...EnhancerAtlas configuration ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+    puts "\t...EnhancerAtlas configuration ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
     
     ## Creation of EA_*_GRCh37.sorted.bed
     ##########################################
     ##   - # Header: chr EAstart EAend EAtype EAgene
 
-    puts "\t...creation of [file tail $EARefSeqFileFormattedGRCh37] and [file tail $EAENSEMBLfileFormattedGRCh37]"
-    puts "\t   (done only once)"
-    puts "\t   For GRCh38 use, please lift over this GRCh37 file to GRCh38\n"
+    puts "\t\t...creation of [file tail $EARefSeqFileFormattedGRCh37] and [file tail $EAENSEMBLfileFormattedGRCh37]"
+    puts "\t\t   (done only once)"
+    puts "\t\t   For GRCh38 use, please lift over this GRCh37 file to GRCh38\n"
 
     file delete -force $EARefSeqFileFormattedGRCh37
     file delete -force $EAENSEMBLfileFormattedGRCh37
@@ -351,7 +351,7 @@ proc checkGHfiles {} {
     
     ## Downloaded GH files have been unzipped and are available
     ###########################################################
-    puts "...GeneHancer configuration ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+    puts "\t...GeneHancer configuration ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
     
     ## Creation of the 4 GH formatted files (RefSeq and ENSEMBL, GRCh37 and GRCh38)
     ##   - # Header: chr GHstart GHend GHtype GHgene
@@ -360,8 +360,8 @@ proc checkGHfiles {} {
     set GHENSEMBLfileFormatted37 "$regElementsDir/GRCh37/GH_ENSEMBL_GRCh37.sorted.bed"
     set GHENSEMBLfileFormatted38 "$regElementsDir/GRCh38/GH_ENSEMBL_GRCh38.sorted.bed"
 
-    puts "\t...creation of the 4 GH_*_GRCh3*.sorted.bed files"
-    puts "\t   (done only once)\n"
+    puts "\t\t...creation of the 4 GH_*_GRCh3*.sorted.bed files"
+    puts "\t\t   (done only once)\n"
 
     file delete -force $GHRefSeqFileFormatted37
     file delete -force $GHRefSeqFileFormatted38
@@ -524,7 +524,8 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
 	    exit 2
 	}
     }
-    
+
+    # Definition of the g_re($SVfromBED) variable (list all the regulated genes impacted by 1 SV)
     set L_allRegulatedGenes {} ;# used for exomiser
     if {![file exists $SV_RE_intersectBEDfile ] || [file size $SV_RE_intersectBEDfile] eq 0} {
 	# No intersection between SV and regulatory elements
@@ -562,7 +563,7 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
     }
 
     ## HI/TS information for these regulated genes
-    set clingenDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes-based/ClinGen"
+    set clingenDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/ClinGen"
     set ClinGenFileFormattedGzip [lindex [glob -nocomplain "$clingenDir/*_ClinGenAnnotations.tsv.gz"] end]
     foreach g $L_allRegulatedGenes {
 	set t($g) 1
@@ -578,7 +579,7 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
 		set HI [lindex $Ls 1]; if {$HI ne "Not yet evaluated"} {lappend L_ann "HI=$HI"}
 		set TS [lindex $Ls 2]; if {$TS ne "Not yet evaluated"} {lappend L_ann "TS=$TS"}
 		if {$L_ann ne ""} {
-		    set g_HITS($gene) "[join $L_ann "; "]"
+		    set g_HITS($gene) "[join $L_ann ";"]"
 		}
 	    }
 	}
@@ -600,11 +601,11 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
 ##    foreach L [LinesFromFile $fullAndSplitBedFile] {
 ##	set Ls [split $L "\t"]
 ##
-##	# AnnotSV type (full or split)
-##	set AnnotSVtype [lindex $Ls end]
+##	# Annotation_mode (full or split)
+##	set AnnotationMode [lindex $Ls end]
 ##	
 ##	# To write
-##	if {$AnnotSVtype eq "full"} {
+##	if {$AnnotationMode eq "full"} {
 ##	    if {$g_AnnotSV(svtBEDcol) ne "-1"} {
 ##		set SVtype "\t[lindex $Ls "$g_AnnotSV(svtBEDcol)"]"
 ##	    } else {

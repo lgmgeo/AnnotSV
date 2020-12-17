@@ -220,7 +220,7 @@ proc GapAnnotation {BreakpointChrom BreakpointPos} {
     }
     
     if {[info exist g_Gap_coord($BreakpointChrom,$BreakpointPos)]} {
-	return "[join $g_Gap_coord($BreakpointChrom,$BreakpointPos) "/"]"
+	return "[join $g_Gap_coord($BreakpointChrom,$BreakpointPos) ";"]"
     } else {
 	return $g_Gap(Empty)
     }

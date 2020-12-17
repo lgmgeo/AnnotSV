@@ -117,7 +117,7 @@ proc filteredVCFannotation {GENEchrom GENEstart GENEend Line headerOutput} {
 	if {![info exists L_samplesFromTheHeader]} {
 	    # Listing of all the samples in the VCF input files
 	    regsub ".*FORMAT\t" $headerOutput "" samples
-	    regsub "\tAnnotSV type.*" $samples "" samples
+	    regsub "\tAnnotation_mode.*" $samples "" samples
 	    set L_samplesFromTheHeader [split $samples "\t"]
 	}
 	

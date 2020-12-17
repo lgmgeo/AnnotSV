@@ -8,6 +8,9 @@ OPTIONS
 
 -annotationsDir:                Path of the annotations directory
 
+-annotationMode:                Selection of the type of annotation lines produced by AnnotSV
+                                Values: both (default), full or split
+
 -bcftools:                      Path of the bcftools local installation
 
 -bedtools:                      Path of the bedtools local installation
@@ -49,8 +52,8 @@ OPTIONS
 
 -outputFile:                    Output path and file name 
 
--overlap:                       Minimum overlap (%) between the features (DGV, DDD, promoter, TAD…) and the annotated SV to be reported
-                                Range values: [0-100], default = 70
+-overlap:                       Minimum overlap (%) between the user features and the annotated SV to be reported
+                                Range values: [0-100], default = 100
 
 -overwrite:                     To overwrite existing output results
                                 Values: yes (default) or no
@@ -62,7 +65,7 @@ OPTIONS
                                 Values: use comma separated class values, or use a dash to denote a range of values, default = "1-5"
                                 ( e.g.: "3,4,5" or "3-5")
 
--reciprocal:                    Use of a reciprocal overlap between SV and features (only for annotations with features overlapping the SV)
+-reciprocal:                    Use of a reciprocal overlap between SV and user features (only for annotations with features overlapping the SV)
                                 Values: no (default) or yes
 
 -REreport:                      Create a report to link the annotated SV and the overlapped regulatory elements (coordinates and sources)
@@ -99,7 +102,4 @@ OPTIONS
 
 -txFile:                        Path of a file containing a list of preferred genes transcripts to be used in priority during the annotation
                                 (Preferred genes transcripts names should be tab or space separated)
-
--typeOfAnnotation:              Description of the types of lines produced by AnnotSV
-                                Values: both (default), full or split
 

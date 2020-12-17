@@ -183,12 +183,13 @@ proc userBEDannotation {formattedSortedUserBEDfile SVchrom SVstart SVend} {
 	set i "$g_numberOfAnnotationCol($formattedSortedUserBEDfile)"
 	while {$i > 0} {
 	    foreach SVtoAnn [array names L_userBEDAnn_$i] {
+		set L_userBEDAnn_${i}($SVtoAnn) [lsort -unique [set L_userBEDAnn_${i}($SVtoAnn)]]
 		if {[llength [set L_userBEDAnn_${i}($SVtoAnn)]] > 50} {
 		    # Too long (often with large SV) and can cause trouble in a spreadsheet
 		    set L_userBEDAnn_${i}($SVtoAnn) [lrange [set L_userBEDAnn_${i}($SVtoAnn)] 0 50]
 		    lappend L_userBEDAnn_${i}($SVtoAnn) "..."
 		}
-		append userBEDtext($formattedSortedUserBEDfile,$SVtoAnn) "\t[join [set L_userBEDAnn_${i}($SVtoAnn)] "/"]"
+		append userBEDtext($formattedSortedUserBEDfile,$SVtoAnn) "\t[join [set L_userBEDAnn_${i}($SVtoAnn)] ";"]"
 	    }
 	    incr i -1
 	}
