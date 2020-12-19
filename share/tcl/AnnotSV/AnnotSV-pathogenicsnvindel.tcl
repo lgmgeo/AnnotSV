@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.5.2                                                                                            #
+# AnnotSV 3.0                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -36,7 +36,7 @@ proc checkPathoSNVindelFile {} {
 	
 	if {$ClinVarFileDownloaded ne ""} {
 	    # We have some ClinVar annotations to parse
-	    puts "\t   ...pathogenic SNV/indels configuration ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+	    puts "\t   ...$genomeBuild pathogenic SNV/indels configuration ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 	    
 	    set pathoSNVindelBEDfile "$pathoSNVindelDir/pathogenic_SNVindel_$genomeBuild.bed"
 	    file delete -force $pathoSNVindelBEDfile
@@ -155,11 +155,13 @@ proc pathoSNVindelAnnotation {SVchrom SVstart SVend} {
 	    file delete -force $tmpFile
 	    # -f 1.0 : the feature in B overlaps at least 100% of the A feature.
 	    if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $pathoSNVindelBEDfile -b $g_AnnotSV(fullAndSplitBedFile) -f 1.0 -wa -wb > $tmpFile} Message]} {
-		puts "-- pathoSNVindelAnnotation --"
-		puts "$g_AnnotSV(bedtools) intersect -sorted -a $pathoSNVindelBEDfile -b $g_AnnotSV(fullAndSplitBedFile) -f 1.0 -wa -wb > $tmpFile"
-		puts "$Message"
-		puts "Exit with error"
-		exit 2
+		if {[catch {exec $g_AnnotSV(bedtools) intersect -a $pathoSNVindelBEDfile -b $g_AnnotSV(fullAndSplitBedFile) -f 1.0 -wa -wb > $tmpFile} Message]} {
+		    puts "-- pathoSNVindelAnnotation --"
+		    puts "$g_AnnotSV(bedtools) intersect -sorted -a $pathoSNVindelBEDfile -b $g_AnnotSV(fullAndSplitBedFile) -f 1.0 -wa -wb > $tmpFile"
+		    puts "$Message"
+		    puts "Exit with error"
+		    exit 2
+		}
 	    }
 	    # Parse
 	    set f [open $tmpFile]

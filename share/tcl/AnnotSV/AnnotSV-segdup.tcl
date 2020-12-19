@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.5.2                                                                                            #
+# AnnotSV 3.0                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -192,11 +192,13 @@ proc SegDupAnnotation {BreakpointChrom BreakpointPos} {
 	set tmpSegDupFile "$g_AnnotSV(outputDir)/[file tail $tmpSegDupFile]"
 	file delete -force $tmpSegDupFile
 	if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $tmpBreakpointsFile -b $segdupFileFormatted -wa -wb > $tmpSegDupFile} Message]} {
-	    puts "-- SegDupAnnotation, intersect --"
-	    puts "$g_AnnotSV(bedtools) intersect -sorted -a $tmpBreakpointsFile -b $segdupFileFormatted -wa -wb > $tmpSegDupFile"
-	    puts "$Message"
-	    puts "Exit with error"
-	    exit 2
+	    if {[catch {exec $g_AnnotSV(bedtools) intersect -a $tmpBreakpointsFile -b $segdupFileFormatted -wa -wb > $tmpSegDupFile} Message]} {
+		puts "-- SegDupAnnotation, intersect --"
+		puts "$g_AnnotSV(bedtools) intersect -sorted -a $tmpBreakpointsFile -b $segdupFileFormatted -wa -wb > $tmpSegDupFile"
+		puts "$Message"
+		puts "Exit with error"
+		exit 2
+	    }
 	}
 
 	# Loading g_SegDup for each SV breakpoint

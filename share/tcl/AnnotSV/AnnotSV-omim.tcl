@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.5.2                                                                                            #
+# AnnotSV 3.0                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -67,7 +67,8 @@ proc checkOMIMfile {} {
 
 	set OMIMfile1Formatted "$omimDir/[clock format [clock seconds] -format "%Y%m%d"]_OMIM-1-annotations.tsv"
 	set OMIMfile2Formatted "$omimDir/[clock format [clock seconds] -format "%Y%m%d"]_OMIM-2-annotations.tsv"
-	puts "...creation of $OMIMfile1Formatted.gz and $OMIMfile2Formatted ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])\n"
+	puts "\t...creation of [file tail $OMIMfile1Formatted.gz] and [file tail $OMIMfile2Formatted] ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+	puts "\t   (in [file dirname $OMIMfile1Formatted.gz])"
 	ReplaceTextInFile "genes\tOMIM_ID" $OMIMfile1Formatted
 	ReplaceTextInFile "genes\tOMIM_phenotype\tOMIM_inheritance" $OMIMfile2Formatted
 	
@@ -86,6 +87,10 @@ proc checkOMIMfile {} {
 	    
 	    set gene1 [lindex $Ls $i_gene1]
 	    set gene2 [lindex $Ls $i_gene2]
+	    set allGenes [split $gene1 ","]
+	    lappend allGenes $gene2
+	    set allGenes [lsort -unique $allGenes]
+
 	    set mim [lindex $Ls $i_mim]
 	    set phenoTmp [lindex $Ls $i_pheno]
 	    regsub -all -nocase "Autosomal dominant" $phenoTmp "AD" phenoTmp
@@ -96,43 +101,31 @@ proc checkOMIMfile {} {
 	    regsub -all -nocase "Y-linked recessive" $phenoTmp "YLR" phenoTmp
 	    regsub -all -nocase "X-linked" $phenoTmp "XL" phenoTmp
 	    regsub -all -nocase "Y-linked" $phenoTmp "YL" phenoTmp
-	    
-	    set pheno {}
-	    set inher {}
+
 	    foreach p [split $phenoTmp ";"] {
-		if {[regexp "(.*\\\(\[0-9\]+\\\)),? *(.*)" $p match 1pheno 1inher]} {
-		    lappend pheno "$1pheno $1inher"
-		    lappend inher $1inher
+		if {[regexp " *(.*\\\(\[0-9\]+\\\)),? *(.*)" $p match 1pheno 1inher]} {
+		    if {$1inher ne ""} {
+			regsub -all " *, +" $1inher "," 1inher
+			foreach g $allGenes {
+			    regsub -all " " $g "" g
+			    if {$g eq ""} {continue}	
+			    lappend Pheno($g) "$1pheno $1inher"
+			    lappend Inheritance($g) {*}[split $1inher ";"]
+			}
+		    } else {
+			foreach g $allGenes {
+			    regsub -all " " $g "" g
+			    if {$g eq ""} {continue}	
+			    lappend Pheno($g) "$1pheno"
+			}
+		    }
+		    foreach g $allGenes {
+			regsub -all " " $g "" g
+			if {$g eq ""} {continue}
+			lappend L_genes $g
+			lappend Mim($g) $mim
+		    }
 		}
-	    }
-	    set test [lsort -unique $pheno]
-	    if {[llength $test] eq 1} {
-		set pheno "$test"
-	    } else {
-		set pheno [join $pheno ";"]
-	    }
-	    #if {[regexp "^/+$" $pheno]} {set pheno ""}
-	    if {$pheno eq ""} {continue}
-	    
-	    set test [lsort -unique $inher]
-	    if {[llength $test] eq 1} {
-		set inher "$test"
-	    } else {
-		set inher [join $inher ";"]
-	    }
-	    #if {[regexp "^/+$" $inher]} {set inher ""}
-	    
-	    set allGenes [split $gene1 ","]
-	    lappend allGenes $gene2
-	    set allGenes [lsort -unique $allGenes]
-	    foreach g $allGenes {
-		regsub -all " " $g "" g
-		if {$g eq ""} {continue}
-		lappend L_genes $g
-		
-		lappend Mim($g) $mim
-		lappend Pheno($g) $pheno
-		lappend Inheritance($g) $inher
 	    }
 	}
 	
@@ -143,6 +136,7 @@ proc checkOMIMfile {} {
 	# Gene    OMIM_phenotype      OMIM_inheritance
 	foreach g $L_genes {
 	    set Pheno($g) "[join [lsort -unique $Pheno($g)] ";"]"
+	    if {![info exists Inheritance($g)]} {set Inheritance($g) ""}
 	    set Inheritance($g) "[join [lsort -unique $Inheritance($g)] ";"]"
 	    if {[regexp "^;+$" $Inheritance($g)]} {set Inheritance($g) ""}
 	    WriteTextInFile "$g\t[join [lsort -unique $Mim($g)] ";"]" $OMIMfile1Formatted
@@ -211,7 +205,8 @@ proc checkMorbidfile {} {
 
 	set MorbidFileFormatted "$omimDir/[clock format [clock seconds] -format "%Y%m%d"]_morbid.tsv"
 	set MorbidCandidateFileFormatted "$omimDir/[clock format [clock seconds] -format "%Y%m%d"]_morbidCandidate.tsv"
-	puts "...creation of $MorbidFileFormatted.gz and $MorbidCandidateFileFormatted ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])\n"
+	puts "\t...creation of [file tail $MorbidFileFormatted.gz] and [file tail $MorbidCandidateFileFormatted] ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+	puts "\t   (in [file dirname $MorbidFileFormatted.gz])"
 	ReplaceTextInFile "genes\tOMIM_morbid" $MorbidFileFormatted
 	ReplaceTextInFile "genes\tOMIM_morbid_candidate" $MorbidCandidateFileFormatted
 	
@@ -333,21 +328,40 @@ proc fromOMIMtoPhenotype {OMIM} {
     return $phenotype
 }
 
+proc fromOMIMgeneToPhenotype {OMIMgene} {
+    global g_AnnotSV
+    global g_phen
+    global g_gene
+    
+    if { ! [info exists g_phen(DONE)]} {
+	fromOMIMtoPhenotype 617631 ;# use to initialize "g_phen" and "g_gene"
+    }
+
+    if {[info exists g_phen($OMIMgene)]} {
+	return $g_phen($OMIMgene)
+    } else {
+	return ""
+    }
+}
+
+
 proc isMorbid {gene} {
     global g_AnnotSV
     global g_morbid
     
     if {![info exists g_morbid(DONE)]} {
-	set morbidFile [glob -nocomplain "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/OMIM/*_morbid.tsv.gz"]
 	set g_morbid(DONE) 1 
-	set f [open "| gzip -cd $morbidFile"]
-	while {! [eof $f]} {
-	    set L [gets $f]
-	    set g_morbid([lindex $L 0]) 1
+	set morbidFile [glob -nocomplain "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/OMIM/*_morbid.tsv.gz"]
+	if {$morbidFile ne ""} { ;# Doesn't exists for Mouse
+	    set f [open "| gzip -cd $morbidFile"]
+	    while {! [eof $f]} {
+		set L [gets $f]
+		set g_morbid([lindex $L 0]) 1
+	    }
+	    close $f
 	}
-	close $f
     }
-
+    
     if {[info exists g_morbid($gene)]} {
 	return "yes"
     } else {

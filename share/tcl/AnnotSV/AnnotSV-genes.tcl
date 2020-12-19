@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.5.2                                                                                            #
+# AnnotSV 3.0                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -55,7 +55,7 @@ proc checkGenesRefSeqFile {} {
 	#####################################
 	set genesFileFormatted "$genesDir/genes.RefSeq.sorted.bed"
 	puts "\t...creation of $genesFileFormatted ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
-	puts "\t   (done only once during the first annotation)\n"
+	puts "\t   (done only once during the first annotation)"
 	
 	# Removing non-standard contigs (other than the standard 1-22,X,Y,MT) and sorting the file in karyotypic order
 	# -> create L_genesTXTsorted
@@ -218,22 +218,31 @@ proc genesAnnotation {} {
 
 
     # Intersect of the input SV bedfile with the genes annotations
-    ##############################################################
+    # + create the "FullAndSplitBedFile"
+    ###################################################################################################
+
+    set L_linesToWrite {}
+    set i_toWrite 0
     ## -> Creation of the split annotations
     if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(bedFile) -b $g_AnnotSV(genesFile) -wa -wb > $splitBedFile} Message]} {
-	puts "-- genesAnnotation --"
-	puts "$g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(bedFile) -b $g_AnnotSV(genesFile) -wa -wb > $splitBedFile"
-	puts "$Message"
-	puts "Exit with error"
-	exit 2
+	if {[catch {exec $g_AnnotSV(bedtools) intersect -a $g_AnnotSV(bedFile) -b $g_AnnotSV(genesFile) -wa -wb > $splitBedFile} Message]} {
+	    puts "-- genesAnnotation --"
+	    puts "$g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(bedFile) -b $g_AnnotSV(genesFile) -wa -wb > $splitBedFile"
+	    puts "$Message"
+	    puts "Exit with error"
+	    exit 2
+	}
     }
     if {[file size $splitBedFile] eq 0} {
 	puts "...no intersection between SV and gene annotation"
 	set n 0
 	while {$n < [llength $L_Bed]} {
-	    WriteTextInFile "[lindex $L_Bed $n]\tfull" "$FullAndSplitBedFile"
+	    lappend L_linesToWrite "[lindex $L_Bed $n]\tfull"
+	    incr i_toWrite
 	    incr n
 	}
+	WriteTextInFile [join $L_linesToWrite "\n"] "$FullAndSplitBedFile"
+
 	## Delete temporary file
 	file delete -force $splitBedFile
 	return
@@ -252,17 +261,17 @@ proc genesAnnotation {} {
 	}
     }
 
-    # Parse the "splitBedFile" and create the "FullAndSplitBedFile"
-    ###############################################################
+    # Parse the "splitBedFile" 
+    ##########################
     set L_allGenesOverlapped {}
     set L_genes {}
     set L "[FirstLineFromFile $splitBedFile]"
     set Ls [split $L "\t"]
     set splitSVleft [lindex $Ls 1]
     set splitSVright [lindex $Ls 2]
-    
-    # oldsplitSV (all the line from the bedfile)
-    # Compulsory: In case of same SV presents several times in the bed file (but with different user annotation), all the lines should be kept
+
+    # oldsplitSV (a complete line from the bedfile)
+    # Compulsory: In case of same SV presents several times in the bed file (but with different user annotation), a complete line should be kept
     if {$g_AnnotSV(svtBEDcol) ne "-1"} {
 	set SVtype "\t[lindex $Ls "$g_AnnotSV(svtBEDcol)"]"
     } else {
@@ -271,7 +280,7 @@ proc genesAnnotation {} {
     set shortOldSplitSV "[join [lrange $Ls 0 2] "\t"]"; # chrom, start, end
     set oldSplitSV "[join [lrange $Ls 0 end-10] "\t"]"
 
-    # SVfromBED (all the line from the bedfile)
+    # SVfromBED (a complete line from the bedfile)
     set n 0
     set Ls_fromBED "[split [lindex $L_Bed $n] "\t"]"
     if {$g_AnnotSV(svtBEDcol) ne "-1"} {
@@ -280,6 +289,22 @@ proc genesAnnotation {} {
 	set SVtypeFromBED ""
     }
     set SVfromBED "[join $Ls_fromBED "\t"]"
+	
+    # Particular case: only 1 SV is associated with split lines AND it is not the first SV of the BED.
+    while {$SVfromBED ne $oldSplitSV} {	
+	# Writing of the "full" SV line (not present in the $splitBedFile file, if not covering a gene)
+	lappend L_linesToWrite "[lindex $L_Bed $n]\tfull"
+	incr i_toWrite
+	incr n
+	set Ls_fromBED "[split [lindex $L_Bed $n] "\t"]"
+	if {$g_AnnotSV(svtBEDcol) ne "-1"} {
+	    set SVtypeFromBED "\t[lindex $Ls_fromBED "$g_AnnotSV(svtBEDcol)"]"
+	} else {
+	    set SVtypeFromBED ""
+	}
+	set SVfromBED "[join $Ls_fromBED "\t"]"
+    }
+
     
     # We have several annotations for 1 SV: 1 by gene.
     #
@@ -292,6 +317,7 @@ proc genesAnnotation {} {
 	set L [gets $f]
 	if {$L eq ""} {continue}
 	set Ls [split $L "\t"]
+
 	# splitSV (all the line from the bedfile)
 	if {$g_AnnotSV(svtBEDcol) ne "-1"} {
 	    set SVtype "\t[lindex $Ls "$g_AnnotSV(svtBEDcol)"]"
@@ -299,12 +325,18 @@ proc genesAnnotation {} {
 	    set SVtype ""
 	}
 	set splitSV "[join [lrange $Ls 0 end-10] "\t"]"
-	
+
 	if {$splitSV ne $oldSplitSV} {;# new annotated SV line (all the split lines are done for the oldSV) => we write all information about the oldSV
 	    while {$SVfromBED ne $splitSV} {
+
 		# Writing of the "full" SV line (not present in the $splitBedFile file, if not covering a gene)
-		WriteTextInFile "[lindex $L_Bed $n]\tfull" "$FullAndSplitBedFile"
-		
+		lappend L_linesToWrite "[lindex $L_Bed $n]\tfull"
+		incr i_toWrite
+		if {$i_toWrite > 10000} {
+		    WriteTextInFile [join $L_linesToWrite "\n"] "$FullAndSplitBedFile"
+		    set L_linesToWrite {}
+		    set $i_toWrite 0
+		}
 		# Writing of 1 "split" line...
 		if {$SVfromBED eq $oldSplitSV} {
 		    set L_genes [lsort -unique $L_genes]		    
@@ -330,7 +362,8 @@ proc genesAnnotation {} {
 			} else {
 			    set percentCDS [expr {$bestCDSlov*100/$bestCDSlcompl}]
 			}
-			WriteTextInFile "$bestAnn\t$bestCDSlov\t$percentCDS\t$bestTxL\tsplit" "$FullAndSplitBedFile"
+			lappend L_linesToWrite "$bestAnn\t$bestCDSlov\t$percentCDS\t$bestTxL\tsplit" 
+			incr i_toWrite
 		    }
 		    set splitSVleft [lindex $Ls 1]
 		    set splitSVright [lindex $Ls 2]
@@ -434,13 +467,14 @@ proc genesAnnotation {} {
 
     }
     close $f
-
+    
     # Treatment for the last SV of the file
     ########################################
     
     # Writing of the "full" SV line (not present in the $splitBedFile file, if not covering a gene)
     # Insertion of the "full length" SV line
-    WriteTextInFile "[lindex $L_Bed $n]\tfull" "$FullAndSplitBedFile"
+    lappend L_linesToWrite "[lindex $L_Bed $n]\tfull" 
+    incr i_toWrite
     incr n
 
     # Treatment of the "split by gene" SV line
@@ -466,14 +500,19 @@ proc genesAnnotation {} {
 	} else {
 	    set percentCDS [expr {$bestCDSlov*100/$bestCDSlcompl}]
 	}
-	WriteTextInFile "$bestAnn\t$bestCDSlov\t$percentCDS\t$bestTxL\tsplit" "$FullAndSplitBedFile"
+	lappend L_linesToWrite "$bestAnn\t$bestCDSlov\t$percentCDS\t$bestTxL\tsplit"
+	incr i_toWrite
     }
     
     # Insertion of the last "full length" SV lines
     while {$n < [llength $L_Bed]} {
-	WriteTextInFile "[lindex $L_Bed $n]\tfull" "$FullAndSplitBedFile"
+	lappend L_linesToWrite "[lindex $L_Bed $n]\tfull"
+	incr i_toWrite
 	incr n
     }
+
+    ## Writing
+    WriteTextInFile [join $L_linesToWrite "\n"] "$FullAndSplitBedFile"
 
     ## Delete temporary file
     file delete -force $splitBedFile
@@ -485,11 +524,15 @@ proc genesAnnotation {} {
     regulatoryElementsAnnotation $L_allGenesOverlapped
     
     ## Memo:
-    ## The same SV can be annotated on several genes. Warning: annotations are not necessarily group by gene. Example:
+    #
+    #  The same SV can be annotated on several genes. Warning: annotations are not necessarily group by gene. Example:
+    ##################################################################################################################
     #     1       144676654       144680028       DEL     SGT161364       NBPF8   NR_102405       0       3375    intron5-intron5 144676654       144680028
     #     1       144676654       144680028       DEL     SGT161364       NBPF9   NM_001277444    0       3375    intron8-intron8 144676654       144680028
     #     1       144676654       144680028       DEL     SGT161364       NBPF8   NR_102404       0       3375    intron6-intron6 144676654       144680028
+    #
     # It's due to the alternance of NBPF8 and NBPF9 in the genes file:
+    ##################################################################
     #     1       144614958       144830407       NBPF8   NR_102405       144830407       144830407       144614958,144618081,144619346,144619882,144621446,144813741,144814679,144815935,144816472,144817965,144823127,144823812,144824704,144825352,144826234,144826932,144827819,144828540,    144615303,144618296,144619419,144620094,144621656,144813844,144814894,144816008,144816678,144818017,144823179,144823985,144824756,144825525,144826286,144827105,144827928,144830407,
     #     1       144614958       145370304       NBPF9   NM_001277444    144615130       145368684       144614958,144615095,144615246,144617149,144618081,144619346,144619882,144621446,144813741,144814679,144815935,144816472,144817965,144821920,144823127,144823812,144824704,144825352,144826234,144826932,144827819,145313333,145314215,145314903,145315790,145368440,    144614998,144615246,144615303,144617252,144618296,144619419,144620094,144621656,144813844,144814894,144816008,144816678,144818017,144822084,144823179,144823985,144824756,144825525,144826286,144827105,144827928,145313506,145314267,145315076,145315899,145370304,
     #     1       144614958       144830407       NBPF8   NR_102404       144830407       144830407       144614958,144617149,144618081,144619346,144619882,144621446,144813741,144814679,144815935,144816472,144817965,144823127,144823812,144824704,144825352,144826234,144826932,144827819,144828540,  144615303,144617252,144618296,144619419,144620094,144621656,144813844,144814894,144816008,144816678,144818017,144823179,144823985,144824756,144825525,144826286,144827105,144827928,144830407,

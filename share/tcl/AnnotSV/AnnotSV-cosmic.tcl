@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.5.2                                                                                            #
+# AnnotSV 3.0                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -37,10 +37,10 @@ proc checkCOSMICfile {} {
 	set g_AnnotSV(COSMICann) 1
     } elseif {[file exists $COSMICfileDownloaded]} {
 	# Creation of "CosmicCompleteCNA_$g_AnnotSV(genomeBuild).sorted.bed"
-	puts "...COSMIC configuration ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+	puts "\t...COSMIC configuration ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 	set i 0
 	set f [open "| gzip -cd $COSMICfileDownloaded"]
-	puts "\t...reading $COSMICfileDownloaded"
+	puts "\t\t...reading $COSMICfileDownloaded"
 	while {![eof $f]} {
 	    set L [gets $f]
 	    set Ls [split $L "\t"]	    
@@ -63,7 +63,7 @@ proc checkCOSMICfile {} {
 	    lappend L_texteToWrite($chrom) "$chrom\t$start\t$end\t$id\t$cnvtype"
 	}
 	
-	puts "\t...creation of the COSMIC bed file in $extannDir/Users/$g_AnnotSV(genomeBuild)/FtIncludedInSV/"
+	puts "\t\t...creation of the COSMIC bed file in $extannDir/Users/$g_AnnotSV(genomeBuild)/FtIncludedInSV/"
 	WriteTextInFile $L_texteToWrite(Header) $COSMICfileFormatted
 	foreach chrom {1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y M MT} {
 	    if {![info exists L_texteToWrite($chrom)]} {continue}
@@ -81,7 +81,7 @@ proc checkCOSMICfile {} {
 
 	file delete -force $COSMICfileDownloaded
 	
-	puts "\t   done ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])\n"
+	puts "\t\t   done ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
  	set g_AnnotSV(COSMICann) 1	
     }
     

@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.5.2                                                                                            #
+# AnnotSV 3.0                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -52,9 +52,9 @@ proc checkPathogenicFiles {} {
 	file delete -force $pathogenicGainFile_Tmp
 	file delete -force $pathogenicInsFile_Tmp
 	file delete -force $pathogenicInvFile_Tmp	
-	checkdbVar_PathogenicFile $genomeBuild
 	checkClinVar_PathogenicFile $genomeBuild
 	checkClinGenHITS_pathogenicFile $genomeBuild
+	checkdbVar_PathogenicFile $genomeBuild
 	checkOMIM_PathogenicFile $genomeBuild
 	catch {unset g_AnnotSV(pathogenicText)}
     
@@ -435,7 +435,7 @@ proc checkOMIM_PathogenicFile {genomeBuild} {
     ## Check if OMIM file has been downloaded 
     #########################################
     set pathogenicDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/FtIncludedInSV/PathogenicSV/$genomeBuild"
-    set OMIMfileDownloaded [glob -nocomplain "$pathogenicDir/morbidmap.txt"]
+    set OMIMfileDownloaded [glob -nocomplain "$pathogenicDir/*_morbid.tsv.gz"]
 
 
     if {$OMIMfileDownloaded ne ""} {
@@ -457,52 +457,22 @@ proc checkOMIM_PathogenicFile {genomeBuild} {
 	    set end($geneName)   [lindex $Ls 2]
 	}
 
-	# Morbid genes
+	# Morbid genes 
 	set L_toWriteLoss {}
-	set f [open "$OMIMfileDownloaded"]
+	set f [open "| gzip -cd $OMIMfileDownloaded"]
 	set L_HPO ""
 	while {! [eof $f]} {
 	    set L [gets $f]
-	    set Ls [split $L "\t"]
-	    if {[regexp "^# Phenotype\t" $L]} {
-		set i_gene    [lsearch $Ls "Gene Symbols"];    if {$i_gene == -1} {puts "Bad header line syntax. Gene Symbols column not found - Exit with error"; exit 2}
-		set i_pheno   [lsearch $Ls "# Phenotype"];     if {$i_pheno == -1} {puts "Bad header line syntax. Phenotype column not found - Exit with error"; exit 2}
-		continue
+	    set g [lindex $L 0]
+	    if {$g eq ""} {continue}
+	    set pheno [fromOMIMgeneToPhenotype $g]
+	    if {[info exists chrom($g)]} {
+		set coord "$chrom($g):$start($g)"
+		append coord "-$end($g)"
+		regsub -all "{|}" $pheno "" pheno
+		set toWrite "$chrom($g)\t$start($g)\t$end($g)\t$pheno\t$L_HPO\tmorbid:$g\t$coord"
+		lappend L_toWriteLoss "$toWrite"
 	    }
-	    if {[regexp "^#" $L]} {continue}
-
-	    set pheno [lindex $Ls $i_pheno]
-
-	    ## "[ ]", indicate "nondiseases", mainly genetic variations that lead to apparently abnormal laboratory test values (e.g., dysalbuminemic euthyroidal hyperthyroxinemia).
-	    if {[regexp "^\\\[.+\\\]" $pheno]} {continue}  
-
-	    ## (1) The disorder is placed on the map based on its association with a gene, but the underlying defect is not known.
-	    ## (2) The disorder has been placed on the map by linkage or other statistical method; no mutation has been found.
-	    if {[regexp "\\\(1\\\)|\\\(2\\\)" $pheno]} {continue}
-
-	    ## The following lines are automatically either (3) or (4):
-	    ## (3) indicates that the molecular basis of the disorder is known; a mutation has been found in the gene.
-	    ## (4) indicates that a contiguous gene deletion or duplication syndrome, multiple genes are deleted or duplicated causing the phenotype.
-
-	    set gene [lindex $Ls $i_gene]
-	    set L_genes [split $gene ","]	    
-	    set L_genes [lsort -unique $L_genes]
-	    foreach g $L_genes {
-		regsub -all " " $g "" g
-		if {$g eq ""} {continue}
-		## "{ }", indicate mutations that contribute to susceptibility to multifactorial disorders (e.g., diabetes, asthma) or to susceptibility to infection (e.g., malaria).
-		## "?", before the phenotype name indicates that the relationship between the phenotype and gene is provisional. 	   
-		if {![regexp "^{.+}|^\\\?" $pheno]} {
-		    # morbid
-		    if {[info exists chrom($g)]} {
-			set coord "$chrom($g):$start($g)"
-			append coord "-$end($g)"
-			regsub -all "{|}" $pheno "" pheno
-			set toWrite "$chrom($g)\t$start($g)\t$end($g)\t$pheno\t$L_HPO\tmorbid:$g\t$coord"
-			lappend L_toWriteLoss "$toWrite"
-		    }
-		}
-	    } 
 	}
 	close $f
 	
@@ -560,11 +530,13 @@ proc pathogenicSVannotation {SVchrom SVstart SVend} {
 	    file delete -force $tmpFile
 	    # -f 1.0 : the feature in B overlaps at least 100% of the A feature.
 	    if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $pathogenicBEDfile -b $g_AnnotSV(fullAndSplitBedFile) -f 1.0 -wa -wb > $tmpFile} Message]} {
-		puts "-- pathogenicSVAnnotation, $svtype --"
-		puts "$g_AnnotSV(bedtools) intersect -sorted -a $pathogenicBEDfile -b $g_AnnotSV(fullAndSplitBedFile) -f 1.0 -wa -wb > $tmpFile"
-		puts "$Message"
-		puts "Exit with error"
-		exit 2
+		if {[catch {exec $g_AnnotSV(bedtools) intersect -a $pathogenicBEDfile -b $g_AnnotSV(fullAndSplitBedFile) -f 1.0 -wa -wb > $tmpFile} Message]} {
+		    puts "-- pathogenicSVAnnotation, $svtype --"
+		    puts "$g_AnnotSV(bedtools) intersect -sorted -a $pathogenicBEDfile -b $g_AnnotSV(fullAndSplitBedFile) -f 1.0 -wa -wb > $tmpFile"
+		    puts "$Message"
+		    puts "Exit with error"
+		    exit 2
+		}
 	    }
 	    # Parse
 	    set f [open $tmpFile]

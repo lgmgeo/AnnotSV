@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.5.2                                                                                            #
+# AnnotSV 3.0                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -59,10 +59,10 @@ proc checkHIfile {} {
 
 	set HIfileFormatted "$extannDir/DDD/[clock format [clock seconds] -format "%Y%m%d"]_HI.tsv"
 
-	puts "...HI configuration ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+	puts "\t...HI configuration ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 
-	puts "\t...creation of $HIfileFormatted.gz"
-	puts "\t   (done only once during the first HI annotation)\n"
+	puts "\t\t...creation of $HIfileFormatted.gz"
+	puts "\t\t   (done only once during the first HI annotation)"
 
 	set TexteToWrite {genes\tDDD_HI_percent}
 	foreach L [LinesFromGZFile $HIfileDownloaded] {

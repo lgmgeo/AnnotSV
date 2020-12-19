@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.5.2                                                                                            #
+# AnnotSV 3.0                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -35,8 +35,8 @@ proc checkLOEUFfile {} {
     #############################################################
     set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based"
 
-    set LOEUFfileDownloaded "$extannDir/gnomAD/gnomad.v2.1.1.lof_metrics.by_gene.txt" 
-    set LOEUFformattedFile [glob -nocomplain "$extannDir/gnomAD/*_gnomAD.LOEUF.pLI.annotations.tsv*"]
+    set LOEUFfileDownloaded [glob -nocomplain "$extannDir/gnomAD/gnomad.*.lof_metrics.by_gene.txt"]
+    set LOEUFformattedFile  [glob -nocomplain "$extannDir/gnomAD/*_gnomAD.LOEUF.pLI.annotations.tsv.gz"]
 
     if {$LOEUFfileDownloaded eq "" && $LOEUFformattedFile eq ""} {
 	# No "LOEUF" annotation
@@ -58,7 +58,7 @@ proc checkLOEUFfile {} {
 	set LOEUFformattedFile "$extannDir/gnomAD/[clock format [clock seconds] -format "%Y%m%d"]_gnomAD.LOEUF.pLI.annotations.tsv"
 
 	puts "\t...creation of $LOEUFformattedFile.gz ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
-	puts "\t   (done only once during the first LOEUF annotation)\n"
+	puts "\t   (done only once during the first LOEUF annotation)"
 
 	ReplaceTextInFile "genes\tLOEUF_bin\tpLI_gnomAD\tpLI_ExAC" $LOEUFformattedFile
 	foreach L [LinesFromFile $LOEUFfileDownloaded] {

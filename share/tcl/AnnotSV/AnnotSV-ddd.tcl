@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.5.2                                                                                            #
+# AnnotSV 3.0                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -87,10 +87,9 @@ proc updateDDDgeneFile {} {
     ## Create : 'date'_DDG2P.tsv.gz
     set DDDfileFormatted "$extannDir/DDD/[clock format [clock seconds] -format "%Y%m%d"]_DDG2P.tsv"
 
-    puts "...DDD genes configuration"
-
-    puts "\t...creation of $DDDfileFormatted.gz"
-    puts "\t   (done only once during the first DDD annotation)\n"
+    puts "\t...DDD genes configuration"
+    puts "\t\t...creation of $DDDfileFormatted.gz"
+    puts "\t\t   (done only once during the first DDD annotation)"
 
     set TexteToWrite {genes\tDDD_status\tDDD_mode\tDDD_consequence\tDDD_disease\tDDD_pmid}
     foreach L [LinesFromGZFile $DDDfileDownloaded] {

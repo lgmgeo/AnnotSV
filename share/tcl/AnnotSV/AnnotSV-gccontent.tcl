@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.5.2                                                                                            #
+# AnnotSV 3.0                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -76,9 +76,9 @@ proc updateFASTAfiles {} {
     set FASTAfileFormatted "$extannDir/GCcontent/$g_AnnotSV(genomeBuild)/$g_AnnotSV(genomeBuild)_chromFa.fasta"
     set ChromSizesFile "$extannDir/GCcontent/$g_AnnotSV(genomeBuild)/$g_AnnotSV(genomeBuild)_chromFa.chromSizes"
 
-    puts "...GC content configuration ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
-    puts "\t...creation of $FASTAfileFormatted"
-    puts "\t   (done only once during the first GC content annotation)\n"
+    puts "\t...GC content configuration ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+    puts "\t\t...creation of $FASTAfileFormatted"
+    puts "\t\t   (done only once during the first GC content annotation)"
 
     # Extracting files from the .tar.gz file
     set chan [open "|gzip -cd $FASTAfileDownloaded"]

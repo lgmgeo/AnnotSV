@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.5.2                                                                                            #
+# AnnotSV 3.0                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -44,6 +44,19 @@ proc OrganizeAnnotation {} {
     set outputFile "$g_AnnotSV(outputDir)/$g_AnnotSV(outputFile)" 
 
 
+    # List of the candidate genes (given by the user)
+    #################################################
+    set L_Candidates {}
+    if {$g_AnnotSV(candidateGenesFile) ne ""} {
+	set f [open $g_AnnotSV(candidateGenesFile)]
+	while {![eof $f]} {
+	    set L [gets $f]
+	    lappend L_Candidates {*}[split $L " |\n|\t"]
+	}
+	close $f
+    }
+
+    
     #########################################################################################
     ################### Writing of the header (first line of the output) ####################
     #########################################################################################
@@ -109,7 +122,7 @@ proc OrganizeAnnotation {} {
 	    }
 	}
     }
-    append headerOutput "\tAnnotation_mode\tGene_name\tGene_count\tTx\tTx_start\tTx_end\tOverlapped_tx_length\tOverlapped_CDS_length\tOverlapped_CDS_percent\tFrameshift\tExon_count\tLocation\tLocation2\tDist_Nearest_SS\tNearest_SS_type\tIntersect_Start\tIntersect_End\tRE_gene"
+    append headerOutput "\tAnnotation_mode\tGene_name\tGene_count\tTx\tTx_start\tTx_end\tOverlapped_tx_length\tOverlapped_CDS_length\tOverlapped_CDS_percent\tFrameshift\tExon_count\tLocation\tLocation2\tDist_nearest_SS\tNearest_SS_type\tIntersect_start\tIntersect_end\tRE_gene"
     	      
 
     ### Search for "ref" and "alt" information (to define the AnnotSV_ID)
@@ -118,6 +131,17 @@ proc OrganizeAnnotation {} {
     set i_ref [expr {$i_ref-2}] ;# (-2) because of the insertion of the END and SVTYPE values.
     set i_alt [expr {$i_alt-2}] ;# (-2) because of the insertion of the END and SVTYPE values.
 
+    ####### "Pathogenic SV header"
+    foreach svtype "gain loss ins inv" {
+	if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^P_[string tolower ${svtype}]_"] eq -1} { continue }
+	append headerOutput "\tP_${svtype}_phen\tP_${svtype}_hpo\tP_${svtype}_source\tP_${svtype}_coord"
+    }
+
+    ####### "Pathogenic snv/indel header"
+    if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^P_snvindel_"] ne -1} { 
+	append headerOutput "\tP_snvindel_nb\tP_snvindel_phen"
+    }
+    
     ####### "Benign SV header"
     foreach svtype "gain loss ins inv" {
 	if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^B_[string tolower ${svtype}]_"] eq -1} { continue }
@@ -136,17 +160,6 @@ proc OrganizeAnnotation {} {
 	append headerOutput "\t[join $SVincludedInFtHeader "\t"]"
     }
 
-    ####### "Pathogenic SV header"
-    foreach svtype "gain loss ins inv" {
-	if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^P_[string tolower ${svtype}]_"] eq -1} { continue }
-	append headerOutput "\tP_${svtype}_phen\tP_${svtype}_hpo\tP_${svtype}_source\tP_${svtype}_coord"
-    }
-
-    ####### "Pathogenic snv/indel header"
-    if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^P_snvindel_"] ne -1} { 
-	append headerOutput "\tP_snvindel_nb\tP_snvindel_phen"
-    }
-    
     ####### "TAD header"
     if {$g_AnnotSV(tadAnn)} {
 	set g_AnnotSV(tadAnn_i) ""
@@ -268,44 +281,60 @@ proc OrganizeAnnotation {} {
     if {$g_AnnotSV(EAann)} {puts "\t\t...EnhancerAtlas annotations"}
     if {$g_AnnotSV(GHAnn)} {puts "\t\t...GeneHancer annotations"}
     
-    #######  Annotations with benign genes or genomic regions (SVincludedInFt)
-    puts "\t...Annotations with benign genes or genomic regions"
-    puts "\t\t...gnomAD annotation"
-    puts "\t\t...ClinVar annotation"
-    puts "\t\t...ClinGen annotation"
-    puts "\t\t...DGV annotation"
-    puts "\t\t...DDD annotation"
-    puts "\t\t...1000g annotation"
-    puts "\t\t...Ira M. Hall's lab annotation"
-    # "SVincludedInFt"
-    foreach formattedUserBEDfile [glob -nocomplain $usersDir/SVincludedInFt/*.formatted.sorted.bed] {
-	puts "\t\t...[file tail $formattedUserBEDfile]"
-	regsub -nocase ".formatted.sorted.bed$" $formattedUserBEDfile ".header.tsv" userHeaderFile
-	set L1header [split [FirstLineFromFile $userHeaderFile] "\t"]
-	set L_headerColName [lrange $L1header 3 end]
-	# Number of columns of annotation in the user bedfile (without the 3 columns "chrom start end")
-	set nColHeader [llength $L_headerColName]
-	puts "\t\t($nColHeader annotations columns: [join $L_headerColName ", "])"
-    }
     #######  Annotations with pathogenic genes or genomic regions (FtIncludedInSV)
-    puts "\t...Annotations with pathogenic genes or genomic regions"
-    puts "\t\t...dbVar annotation"
-    puts "\t\t...ClinVar annotation"
-    puts "\t\t...ClinGen annotation"
+    if {$g_AnnotSV(organism) eq "Human"} {
+	puts "\t...Annotations with pathogenic genes or genomic regions"
+	puts "\t\t...dbVar annotation"
+	puts "\t\t...ClinVar annotation"
+	puts "\t\t...ClinGen annotation"
+    }
+    
     #######  Annotations with pathogenic snv/indel(FtIncludedInSV)
-    puts "\t...Annotations with pathogenic snv/indel"
+    if {$g_AnnotSV(organism) eq "Human"} {
+	puts "\t...Annotations with pathogenic snv/indel"
+    }
+    
+    #######  Annotations with benign genes or genomic regions (SVincludedInFt)
+    if {$g_AnnotSV(organism) eq "Human"} {
+	puts "\t...Annotations with benign genes or genomic regions"
+	puts "\t\t...gnomAD annotation"
+	puts "\t\t...ClinVar annotation"
+	puts "\t\t...ClinGen annotation"
+	puts "\t\t...DGV annotation"
+	puts "\t\t...DDD annotation"
+	puts "\t\t...1000g annotation"
+	puts "\t\t...Ira M. Hall's lab annotation"
+    }
+    
+    ####### "SVincludedInFt"
+    set L_SVincludedInFt [glob -nocomplain $usersDir/SVincludedInFt/*.formatted.sorted.bed]
+    if {$L_SVincludedInFt ne ""} {
+	puts "\t...Annotations with features overlapping the SV ($g_AnnotSV(overlap) %)"
+	foreach formattedUserBEDfile $L_SVincludedInFt {
+	    puts "\t\t...[file tail $formattedUserBEDfile]"
+	    regsub -nocase ".formatted.sorted.bed$" $formattedUserBEDfile ".header.tsv" userHeaderFile
+	    set L1header [split [FirstLineFromFile $userHeaderFile] "\t"]
+	    set L_headerColName [lrange $L1header 3 end]
+	    # Number of columns of annotation in the user bedfile (without the 3 columns "chrom start end")
+	    set nColHeader [llength $L_headerColName]
+	    puts "\t\t($nColHeader annotations columns: [join $L_headerColName ", "])"
+	}
+    }
+
     ####### "FtIncludedInSV"
-    puts "\t...Annotations with features overlapped with the SV ($g_AnnotSV(overlap) %)"
-    if {$g_AnnotSV(tadAnn)} {puts "\t\t...TAD annotation"}
-    foreach formattedUserBEDfile [glob -nocomplain $usersDir/FtIncludedInSV/*.formatted.sorted.bed] {
-	puts "\t\t...[file tail $formattedUserBEDfile]"
-	regsub -nocase ".formatted.sorted.bed$" $formattedUserBEDfile ".header.tsv" userHeaderFile
-	set L1header   [split [FirstLineFromFile $userHeaderFile] "\t"]
-	set L_headerColName [lrange $L1header 3 end]
-	append FtIncludedInSVHeader "\t[join $L_headerColName "\t"]"
-	# Number of columns of annotation in the user bedfile (without the 3 columns "chrom start end")
-	set nColHeader [llength $L_headerColName]
-	puts "\t\t($nColHeader annotations columns: [join $L_headerColName ", "])"
+    if {$g_AnnotSV(organism) eq "Human"} {
+	puts "\t...Annotations with features overlapped with the SV ($g_AnnotSV(overlap) %)"
+	if {$g_AnnotSV(tadAnn)} {puts "\t\t...TAD annotation"}
+	foreach formattedUserBEDfile [glob -nocomplain $usersDir/FtIncludedInSV/*.formatted.sorted.bed] {
+	    puts "\t\t...[file tail $formattedUserBEDfile]"
+	    regsub -nocase ".formatted.sorted.bed$" $formattedUserBEDfile ".header.tsv" userHeaderFile
+	    set L1header   [split [FirstLineFromFile $userHeaderFile] "\t"]
+	    set L_headerColName [lrange $L1header 3 end]
+	    append FtIncludedInSVHeader "\t[join $L_headerColName "\t"]"
+	    # Number of columns of annotation in the user bedfile (without the 3 columns "chrom start end")
+	    set nColHeader [llength $L_headerColName]
+	    puts "\t\t($nColHeader annotations columns: [join $L_headerColName ", "])"
+	}
     }
     ####### "Breakpoints annotations"
     puts "\t...Breakpoints annotations"
@@ -316,8 +345,8 @@ proc OrganizeAnnotation {} {
     if {$g_AnnotSV(ENCODEblacklistAnn)} {puts "\t\t...ENCODE blacklist annotation"}
 
     ####### "Gene-based annotations"
-    puts "\t...Gene-based annotations"
     if {$g_AnnotSV(geneBasedAnn)} {
+	puts "\t...Gene-based annotations"
 	puts "[join $g_ExtAnnotation(display) "\n"]"
     }
     ####### "Exomiser annotation"
@@ -344,6 +373,7 @@ proc OrganizeAnnotation {} {
     set g_AnnotSV(fullAndSplitBedFile) "$g_AnnotSV(outputDir)/[file tail $g_AnnotSV(bedFile)].users.bed"
     file delete -force $g_AnnotSV(fullAndSplitBedFile)
     set L_UsersText {}
+
     set f [open "$FullAndSplitBedFile"]
     while {! [eof $f]} {
         set L [gets $f]
@@ -399,6 +429,7 @@ proc OrganizeAnnotation {} {
     ########################################################################
 
     set f [open "$FullAndSplitBedFile"]
+    
     while {! [eof $f]} {
         set L [gets $f]
 	if {$L eq ""} {continue}
@@ -488,22 +519,6 @@ proc OrganizeAnnotation {} {
 	    set nbExons    ""
 	    set frameshift ""
 	}	    
-
-	# To select only the SV "split" annotations overlapping a gene from the "candidateGenesFile"
-	if {$g_AnnotSV(candidateGenesFiltering) eq "yes"} {
-	    set test 0
-	    if {$geneName eq ""} {
-		set test 1
-	    } else {
-		foreach g [split $geneName ";"] {
-		    if {[lsearch -exact $L_Candidates $g] eq -1} {
-			set test 1
-		    }
-		}	
-	    }
-	    if {$test} {continue}
-	}
-
 
 	# Definition of "locationStart" and "locationEnd" variables
 	# Definition of "distNearestSS" and "nearestSStype" variables
@@ -732,6 +747,20 @@ proc OrganizeAnnotation {} {
 	    } 
 	} 
 	
+	# Annotations with pathogenic genes or genomic regions (FtIncludedInSV)
+	if {$AnnotationMode eq "split"} {
+	    set pathogenicText "[pathogenicSVannotation $SVchrom $intersectStart $intersectEnd]"
+	} else {
+	    set pathogenicText "[pathogenicSVannotation $SVchrom $SVleft $SVright]"
+	} 
+
+	# Annotations with pathogenic snv/indel (FtIncludedInSV)
+	if {$AnnotationMode eq "split"} {
+	    set pathoSNVindelText "[pathoSNVindelAnnotation $SVchrom $intersectStart $intersectEnd]"
+	} else {
+	    set pathoSNVindelText "[pathoSNVindelAnnotation $SVchrom $SVleft $SVright]"
+	} 
+
 	# Annotations with benign genes or genomic regions (SVincludedInFt)
 	if {$AnnotationMode eq "split"} {
 	    set benignText "[benignSVannotation $SVchrom $intersectStart $intersectEnd]"
@@ -749,20 +778,6 @@ proc OrganizeAnnotation {} {
 	    } 
 	}
 	set SVincludedInFTtext [join $L_SVincludedInFtText "\t"]
-
-	# Annotations with pathogenic genes or genomic regions (FtIncludedInSV)
-	if {$AnnotationMode eq "split"} {
-	    set pathogenicText "[pathogenicSVannotation $SVchrom $intersectStart $intersectEnd]"
-	} else {
-	    set pathogenicText "[pathogenicSVannotation $SVchrom $SVleft $SVright]"
-	} 
-
-	# Annotations with pathogenic snv/indel (FtIncludedInSV)
-	if {$AnnotationMode eq "split"} {
-	    set pathoSNVindelText "[pathoSNVindelAnnotation $SVchrom $intersectStart $intersectEnd]"
-	} else {
-	    set pathoSNVindelText "[pathoSNVindelAnnotation $SVchrom $SVleft $SVright]"
-	} 
 
 	# User FtIncludedInSV BED annotations. 
 	set L_FtIncludedInSVtext {}
@@ -962,7 +977,7 @@ proc OrganizeAnnotation {} {
 	# "bestAnn" annotation order: 
 	# chrom txStart txEnd name2 name cdsStart cdsEnd exonStarts exonEnds
 	#
-	# headerOutput "\tAnnotation_mode\tGene_name\tGene_count\tTx\tTx_start\tTx_end\tOverlapped_tx_length\tOverlapped_CDS_length\tOverlapped_CDS_percent\tFrameshift\tExon_count\tLocation\tLocation2\tDist_Nearest_SS\tNearest_SS_type\tIntersect_Start\tIntersect_End\tRE_gene"
+	# headerOutput "\tAnnotation_mode\tGene_name\tGene_count\tTx\tTx_start\tTx_end\tOverlapped_tx_length\tOverlapped_CDS_length\tOverlapped_CDS_percent\tFrameshift\tExon_count\tLocation\tLocation2\tDist_nearest_SS\tNearest_SS_type\tIntersect_start\tIntersect_end\tRE_gene"
 
 	# Insertion of the SV length in the fourth column:
 	set SVchrom [lindex $Ls 0]
@@ -1033,6 +1048,12 @@ proc OrganizeAnnotation {} {
 	####### "Regulatory elements annotations"
 	append TextToWrite "\t$reText"
 	
+	#######  "Annotations with pathogenic genes or genomic regions (FtIncludedInSV)"
+	append TextToWrite "\t$pathogenicText"
+	
+	#######  "Annotations with pathogenic snv/indel (FtIncludedInSV)"
+	append TextToWrite "\t$pathoSNVindelText"
+	
 	#######  "Annotations with benign genes or genomic regions (SVincludedInFt)"
 	append TextToWrite "\t$benignText"
 	
@@ -1040,12 +1061,6 @@ proc OrganizeAnnotation {} {
 	if {[glob -nocomplain $usersDir/SVincludedInFt/*.formatted.sorted.bed] ne ""} { ; # Don't put {$SVincludedInFTtext ne ""}: the user BED could have only 1 annotation column, and so $UserText can be equel to "" (without "\t")
 	    append TextToWrite "\t$SVincludedInFTtext"
 	}
-	
-	#######  "Annotations with pathogenic genes or genomic regions (FtIncludedInSV)"
-	append TextToWrite "\t$pathogenicText"
-	
-	#######  "Annotations with pathogenic snv/indel (FtIncludedInSV)"
-	append TextToWrite "\t$pathoSNVindelText"
 	
 	####### "FtIncludedInSV"
 	if {$g_AnnotSV(tadAnn)} {
@@ -1160,11 +1175,14 @@ proc OrganizeAnnotation {} {
     }
 
     set i_Annotation_mode [lsearch -exact [split $headerOutput "\t"] "Annotation_mode"]
+    set i_genename        [lsearch -exact [split $headerOutput "\t"] "Gene_name"]
     set i 0
     foreach AnnotSV_ID $L_AnnotSV_ID {
 	set AnnotSV_ID [lindex $AnnotSV_ID 0]
+
 	foreach fullOrSplitLine $L_TextToWrite($AnnotSV_ID) {
 	    set AnnMo [lindex [split $fullOrSplitLine "\t"] $i_Annotation_mode]
+	    set geneName [lindex [split $fullOrSplitLine "\t"] $i_genename]
 	    set lineCompleted ""
 
 	    if {$AnnMo eq "full"} {
@@ -1217,6 +1235,22 @@ proc OrganizeAnnotation {} {
 		    }
 		}
 	    }
+	    
+	    # To select only the SV annotations overlapping a gene from the "candidateGenesFile"
+	    if {$g_AnnotSV(candidateGenesFiltering) eq "yes"} {
+		set test 0
+		if {$geneName eq ""} {
+		    set test 1
+		} else {
+		    foreach g [split $geneName ";"] {
+			if {[lsearch -exact $L_Candidates $g] eq -1} {
+			    set test 1
+			}
+		    }	
+		}
+		if {$test} {continue}
+	    }
+	    
 	    lappend L_lineCompleted "$lineCompleted"
 
 	    # To avoid a segmentation fault
@@ -1254,7 +1288,7 @@ proc OrganizeAnnotation {} {
     ################### Display ####################
     ################################################
     puts "\n...output columns annotation ([clock format [clock seconds] -format "%B %d %Y - %H:%M"]):"
-    regsub -all "\t" $headerOutput "; " t
+    regsub -all "\t" $headerOutput ";" t
     puts "\t$t\n"
 
 }

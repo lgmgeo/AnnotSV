@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.5.2                                                                                            #
+# AnnotSV 3.0                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -110,11 +110,13 @@ proc userBEDannotation {formattedSortedUserBEDfile SVchrom SVstart SVend} {
 	set tmpFile "$g_AnnotSV(outputDir)/[file tail $tmpFile]"
 	file delete -force $tmpFile	
 	if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(fullAndSplitBedFile) -b $formattedSortedUserBEDfile -wa -wb > $tmpFile} Message]} {
-	    puts "-- userBEDannotation --"
-	    puts "$g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(fullAndSplitBedFile) -b $formattedSortedUserBEDfile -wa -wb > $tmpFile"
-	    puts "$Message"
-	    puts "Exit with error"
-	    exit 2
+	    if {[catch {exec $g_AnnotSV(bedtools) intersect -a $g_AnnotSV(fullAndSplitBedFile) -b $formattedSortedUserBEDfile -wa -wb > $tmpFile} Message]} {
+		puts "-- userBEDannotation --"
+		puts "$g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(fullAndSplitBedFile) -b $formattedSortedUserBEDfile -wa -wb > $tmpFile"
+		puts "$Message"
+		puts "Exit with error"
+		exit 2
+	    }
 	}
 
 	# Parse

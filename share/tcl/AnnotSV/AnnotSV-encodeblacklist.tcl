@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.5.2                                                                                            #
+# AnnotSV 3.0                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -193,11 +193,13 @@ proc ENCODEblacklistAnnotation {BreakpointChrom BreakpointPos} {
 	set tmpENCODEblacklistFile "$g_AnnotSV(outputDir)/[file tail $tmpENCODEblacklistFile]"
 	file delete -force $tmpENCODEblacklistFile
 	if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $tmpBreakpointsFile -b $encodeblacklistFileFormatted -wa -wb > $tmpENCODEblacklistFile} Message]} {
-	    puts "-- ENCODEblacklistAnnotation, intersect --"
-	    puts "$g_AnnotSV(bedtools) intersect -sorted -a $tmpBreakpointsFile -b $encodeblacklistFileFormatted -wa -wb > $tmpENCODEblacklistFile"
-	    puts "$Message"
-	    puts "Exit with error"
-	    exit 2
+	    if {[catch {exec $g_AnnotSV(bedtools) intersect -a $tmpBreakpointsFile -b $encodeblacklistFileFormatted -wa -wb > $tmpENCODEblacklistFile} Message]} {
+		puts "-- ENCODEblacklistAnnotation, intersect --"
+		puts "$g_AnnotSV(bedtools) intersect -sorted -a $tmpBreakpointsFile -b $encodeblacklistFileFormatted -wa -wb > $tmpENCODEblacklistFile"
+		puts "$Message"
+		puts "Exit with error"
+		exit 2
+	    }
 	}
 
 	# Loading g_ENCODEblacklist for each SV breakpoint

@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.5.2                                                                                            #
+# AnnotSV 3.0                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -67,10 +67,10 @@ proc checkTADfiles {} {
 	##   - 'date'_boundariesTAD.sorted.bed   ; # Header: chr boundaryStart boundaryEnd ENCODEexperiments correspondingTADs
 	set boundariesTADfileFormatted "$extannDir/FtIncludedInSV/TAD/$g_AnnotSV(genomeBuild)/[clock format [clock seconds] -format "%Y%m%d"]_boundariesTAD.sorted.bed"
 
-	puts "...TAD configuration"
+	puts "\t...TAD configuration"
 
-	puts "\t...creation of $boundariesTADfileFormatted"
-	puts "\t   (done only once during the first boundaries TAD annotation)\n"
+	puts "\t\t...creation of $boundariesTADfileFormatted"
+	puts "\t\t   (done only once during the first boundaries TAD annotation)"
 
 	foreach TADfile [glob -nocomplain "$extannDir/FtIncludedInSV/TAD/$g_AnnotSV(genomeBuild)/ENC*.bed"] {
 	    regsub -nocase ".bed$" $TADfile "" ENCODEexperiment
@@ -150,11 +150,13 @@ proc TADannotation {SVchrom SVstart SVend L_i} {
 	set tmpFile "$g_AnnotSV(outputDir)/[file tail $tmpFile]"
 	file delete -force $tmpFile	
 	if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(bedFile) -b $boundariesTADfileFormatted -wa -wb > $tmpFile} Message]} {
-	    puts "-- TADannotation --"
-	    puts "$g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(bedFile) -b $boundariesTADfileFormatted -wa -wb > $tmpFile"
-	    puts "$Message"
-	    puts "Exit with error"
-	    exit 2
+	    if {[catch {exec $g_AnnotSV(bedtools) intersect -a $g_AnnotSV(bedFile) -b $boundariesTADfileFormatted -wa -wb > $tmpFile} Message]} {
+		puts "-- TADannotation --"
+		puts "$g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(bedFile) -b $boundariesTADfileFormatted -wa -wb > $tmpFile"
+		puts "$Message"
+		puts "Exit with error"
+		exit 2
+	    }
 	}
 	# Parse
 	set f [open $tmpFile]

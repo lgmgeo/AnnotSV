@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.5.2                                                                                            #
+# AnnotSV 3.0                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -37,7 +37,7 @@ TCLVERSION           := tcl$(shell echo 'puts $${tcl_version};exit 0' | tclsh)
 TCLDIRDISTRIBUTED    := share/tcl
 TCLDIR               := $(SHAREDIR)/$(TCLVERSION)
 ANNOTSV              := AnnotSV
-VERSION              := 2.5.2
+VERSION              := 3.0
 RM                   := /bin/rm
 RMDIR                := /bin/rmdir
 MKDIR                := install -d
@@ -141,15 +141,15 @@ install-human-annotation: Annotations_Human_$(VERSION).tar.gz install-exomiser
 	@echo ""
 	@echo "--> Human annotation installed"
 
-install-exomiser-1: 2003_phenotype.zip
+install-exomiser-1: 2007_phenotype.zip
 	@echo ""
 	@echo "Installation of Exomiser data:"
 	@echo ""
-	$(MKDIR) -p $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/2003
-	tar -xf 2003_hg19.tar.gz -C $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/2003/
-	unzip 2003_phenotype.zip -d $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/2003/
-	$(RM) -rf 2003_phenotype.zip
-	$(RM) -rf 2003_hg19.tar.gz
+	$(MKDIR) -p $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/2007
+	tar -xf 2007_hg19.tar.gz -C $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/2007/
+	unzip 2007_phenotype.zip -d $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/2007/
+	$(RM) -rf 2007_phenotype.zip
+	$(RM) -rf 2007_hg19.tar.gz
 
 install-exomiser-2:
 	install -p -m 0755 $(PROPERTIES) $(DESTDIR)$(ETCDIR)/$(ANNOTSV)
@@ -179,7 +179,7 @@ Annotations_%.tar.gz:
 	@echo ""
 	@echo "Download Exomiser supporting data files:"
 	@echo ""
-	curl -C - -LO https://www.lbgi.fr/~geoffroy/Annotations/2003_hg19.tar.gz
+	curl -C - -LO https://www.lbgi.fr/~geoffroy/Annotations/2007_hg19.tar.gz
 	curl -C - -LO https://data.monarchinitiative.org/exomiser/data/$@
 
 

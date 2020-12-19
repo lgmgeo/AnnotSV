@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.5.2                                                                                            #
+# AnnotSV 3.0                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -61,10 +61,10 @@ proc checkGeneIntoleranceFile {} {
 	## Create : 'date'_GeneIntolerance-Zscore.annotations.tsv.gz   ; # Header: chr start end syn_z mis_z 
 	set GeneIntoleranceFileFormatted "$extannDir/ExAC/[clock format [clock seconds] -format "%Y%m%d"]_GeneIntolerance-Zscore.annotations.tsv"
 
-	puts "...GeneIntolerance configuration for Z scores annotation from ExAC ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+	puts "\t...GeneIntolerance configuration for Z scores annotation from ExAC ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 
-	puts "\t...creation of $GeneIntoleranceFileFormatted.gz"
-	puts "\t   (done only once during the first GeneIntolerance annotation)\n"
+	puts "\t\t...creation of $GeneIntoleranceFileFormatted.gz"
+	puts "\t\t   (done only once during the first GeneIntolerance annotation)"
 
 	set TexteToWrite {genes\tsynZ_ExAC\tmisZ_ExAC}
 	foreach L [LinesFromFile $GeneIntoleranceFileDownloaded] {
@@ -155,10 +155,10 @@ proc checkCNVintoleranceFile {} {
 
 	set CNVintoleranceFileFormatted "$extannDir/ExAC/[clock format [clock seconds] -format "%Y%m%d"]_ExAC.CNV-Zscore.annotations.tsv"
 
-	puts "...ExAC CNV Intolerant Genes configuration ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+	puts "\t...ExAC CNV Intolerant Genes configuration ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 
-	puts "\t...creation of $CNVintoleranceFileFormatted.gz"
-	puts "\t   (done only once during the first CNV Intolerant Genes  annotation)\n"
+	puts "\t\t...creation of $CNVintoleranceFileFormatted.gz"
+	puts "\t\t   (done only once during the first CNV Intolerant Genes  annotation)"
 
 	set TexteToWrite {genes\tdelZ_ExAC\tdupZ_ExAC\tcnvZ_ExAC}
 	foreach L [LinesFromFile $CNVintoleranceFileDownloaded] {

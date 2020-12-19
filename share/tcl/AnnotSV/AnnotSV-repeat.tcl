@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.5.2                                                                                            #
+# AnnotSV 3.0                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -185,11 +185,13 @@ proc RepeatAnnotation {BreakpointChrom BreakpointPos} {
 	set tmpRepeatFile "$g_AnnotSV(outputDir)/[file tail $tmpRepeatFile]"
 	file delete -force $tmpRepeatFile
 	if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $tmpBreakpointsFile -b $repeatFileFormatted -wa -wb > $tmpRepeatFile} Message]} {
-	    puts "-- RepeatAnnotation, intersect --"
-	    puts "$g_AnnotSV(bedtools) intersect -sorted -a $tmpBreakpointsFile -b $repeatFileFormatted -wa -wb > $tmpRepeatFile"
-	    puts "$Message"
-	    puts "Exit with error"
-	    exit 2
+	    if {[catch {exec $g_AnnotSV(bedtools) intersect -a $tmpBreakpointsFile -b $repeatFileFormatted -wa -wb > $tmpRepeatFile} Message]} {
+		puts "-- RepeatAnnotation, intersect --"
+		puts "$g_AnnotSV(bedtools) intersect -sorted -a $tmpBreakpointsFile -b $repeatFileFormatted -wa -wb > $tmpRepeatFile"
+		puts "$Message"
+		puts "Exit with error"
+		exit 2
+	    }
 	}
 
 	# Loading g_Repeat for each SV breakpoint

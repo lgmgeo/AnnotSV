@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.5.2                                                                                            #
+# AnnotSV 3.0                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -204,7 +204,7 @@ proc checkEAfiles {} {
 
     puts "\t\t...creation of [file tail $EARefSeqFileFormattedGRCh37] and [file tail $EAENSEMBLfileFormattedGRCh37]"
     puts "\t\t   (done only once)"
-    puts "\t\t   For GRCh38 use, please lift over this GRCh37 file to GRCh38\n"
+    puts "\t\t   For GRCh38 use, please lift over this GRCh37 file to GRCh38"
 
     file delete -force $EARefSeqFileFormattedGRCh37
     file delete -force $EAENSEMBLfileFormattedGRCh37
@@ -361,7 +361,7 @@ proc checkGHfiles {} {
     set GHENSEMBLfileFormatted38 "$regElementsDir/GRCh38/GH_ENSEMBL_GRCh38.sorted.bed"
 
     puts "\t\t...creation of the 4 GH_*_GRCh3*.sorted.bed files"
-    puts "\t\t   (done only once)\n"
+    puts "\t\t   (done only once)"
 
     file delete -force $GHRefSeqFileFormatted37
     file delete -force $GHRefSeqFileFormatted38
@@ -517,11 +517,13 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
     foreach reFile $L_REfiles {
 	if {![file exists $reFile]} {continue}
 	if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(bedFile) -b $reFile -wa -wb >> $SV_RE_intersectBEDfile} Message]} {
-	    puts "-- regulatoryElementsAnnotation --"
-	    puts "$g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(bedFile) -b $reFile -wa -wb >> $SV_RE_intersectBEDfile"
-	    puts "$Message"
-	    puts "Exit with error"
-	    exit 2
+	    if {[catch {exec $g_AnnotSV(bedtools) intersect -a $g_AnnotSV(bedFile) -b $reFile -wa -wb >> $SV_RE_intersectBEDfile} Message]} {
+		puts "-- regulatoryElementsAnnotation --"
+		puts "$g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(bedFile) -b $reFile -wa -wb >> $SV_RE_intersectBEDfile"
+		puts "$Message"
+		puts "Exit with error"
+		exit 2
+	    }
 	}
     }
 

@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 2.5.2                                                                                            #
+# AnnotSV 3.0                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -149,7 +149,7 @@ proc checkClinVar_benignFile {genomeBuild} {
 	    puts $g_AnnotSV(benignText)
 	    unset g_AnnotSV(benignText)
 	}
-	puts "\t   >>> ClinVar parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+	puts "\t   >>> $genomeBuild ClinVar parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 		
 	set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
 	set benignGainFile_Tmp "$benignDir/benign_Gain_SV_$genomeBuild.tmp.bed"
@@ -241,7 +241,7 @@ proc checkClinGenHITS_benignFile {genomeBuild} {
 	    puts $g_AnnotSV(benignText)
 	    unset g_AnnotSV(benignText)
 	}
-	puts "\t   >>> ClinGen parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+	puts "\t   >>> $genomeBuild ClinGen parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
     } else {return}
 
     set L_files "$ClinGenFileDownloaded1"
@@ -328,7 +328,7 @@ proc checkDGV_benignFile {genomeBuild} {
 	    puts $g_AnnotSV(benignText)
 	    unset g_AnnotSV(benignText)
 	}
-	puts "\t   >>> DGV parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+	puts "\t   >>> $genomeBuild DGV parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 	
 	set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
 	set benignGainFile_Tmp "$benignDir/benign_Gain_SV_$genomeBuild.tmp.bed"
@@ -424,7 +424,7 @@ proc checkGnomAD_benignFile {genomeBuild} {
 	    puts $g_AnnotSV(benignText)
 	    unset g_AnnotSV(benignText)
 	}
-	puts "\t   >>> GnomAD parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+	puts "\t   >>> $genomeBuild GnomAD parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 	
 	set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
 	set benignGainFile_Tmp "$benignDir/benign_Gain_SV_$genomeBuild.tmp.bed"
@@ -531,7 +531,7 @@ proc checkDDD_benignFile {genomeBuild} {
 	    puts $g_AnnotSV(benignText)
 	    unset g_AnnotSV(benignText)
 	}
-	puts "\t   >>> DDD parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+	puts "\t   >>> $genomeBuild DDD parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 
 	set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
 	set benignGainFile_Tmp "$benignDir/benign_Gain_SV_$genomeBuild.tmp.bed"
@@ -616,7 +616,7 @@ proc check1000g_benignFile {genomeBuild} {
 	    puts $g_AnnotSV(benignText)
 	    unset g_AnnotSV(benignText)
 	}
-	puts "\t   >>> 1000g parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+	puts "\t   >>> $genomeBuild 1000g parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 
 	set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
 	set benignGainFile_Tmp "$benignDir/benign_Gain_SV_$genomeBuild.tmp.bed"
@@ -758,7 +758,7 @@ proc checkIMH_benignFile {genomeBuild} {
 	    puts $g_AnnotSV(benignText)
 	    unset g_AnnotSV(benignText)
 	}
-	puts "\t   >>> IMH parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+	puts "\t   >>> $genomeBuild $genomeBuild IMH parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 
 	set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
 	set benignGainFile_Tmp "$benignDir/benign_Gain_SV_$genomeBuild.tmp.bed"
@@ -884,11 +884,13 @@ proc benignSVannotation {SVchrom SVstart SVend} {
 	    file delete -force $tmpFile
 	    # -f 1.0 : the feature in B overlaps at least 100% of the A feature.
 	    if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(fullAndSplitBedFile) -b $benignBEDfile -f 1.0 -wa -wb > $tmpFile} Message]} {
-		puts "-- benignSVAnnotation, $svtype --"
-		puts "$g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(fullAndSplitBedFile) -b $benignBEDfile -f 1.0 -wa -wb > $tmpFile"
-		puts "$Message"
-		puts "Exit with error"
-		exit 2
+		if {[catch {exec $g_AnnotSV(bedtools) intersect -a $g_AnnotSV(fullAndSplitBedFile) -b $benignBEDfile -f 1.0 -wa -wb > $tmpFile} Message]} {
+		    puts "-- benignSVAnnotation, $svtype --"
+		    puts "$g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(fullAndSplitBedFile) -b $benignBEDfile -f 1.0 -wa -wb > $tmpFile"
+		    puts "$Message"
+		    puts "Exit with error"
+		    exit 2
+		}
 	    }
 	    # Parse
 	    set f [open $tmpFile]
