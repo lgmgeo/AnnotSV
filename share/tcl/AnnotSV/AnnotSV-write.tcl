@@ -1196,7 +1196,7 @@ proc OrganizeAnnotation {} {
 		    }
 		    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "ACMG_class"] ne -1} {
 			if {$g_rankingScore($AnnotSV_ID) eq ""} {
-			    set class ""
+			    set class "NA"
 			} elseif {$g_rankingScore($AnnotSV_ID) >= "0.99"} {
 			    set class 5
 			} elseif {$g_rankingScore($AnnotSV_ID) >= "0.9"} {

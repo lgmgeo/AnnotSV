@@ -10,6 +10,9 @@
 
 For more details, please see the README file.
 
+
+	- Set the ACMG_class to "NA" if not defined
+	
 December 18, 2020, AnnotSV version 3.0
 	- Major code rewrite and annotations sources reorganization
 		- Significant modification of the annotations column names
