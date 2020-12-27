@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.0                                                                                              #
+# AnnotSV 3.0.1                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -163,10 +163,10 @@ proc SVrankingLoss {L_annotations} {
 	## Section 5: Evaluation of inheritance pattern/family history for patient being studied			
 	####################################################################################################################
 	if {$REgene ne ""} {
-	    set L_infos [split $REgene ";"]
+	    set L_infos [split $REgene "\\\);"]
 	    set bestEx "0"
 	    foreach infos $L_infos {
-		if {[regexp "(.+?) \\\(.*?EX=(.+)\\\)$" $infos match g ex]} {
+		if {[regexp "(.+?) \\\(.*?EX=(.+)$" $infos match g ex]} {
 		    regsub "," $ex "." ex
 		    if {$ex > $bestEx} {
 			set bestEx $ex
@@ -192,9 +192,11 @@ proc SVrankingLoss {L_annotations} {
 	## Section 2: Overlap with established/predicted haploinsufficiency (HI) or established benign genes/genomic regions
 	##            (Skip to section 3 if your copy-number loss DOES NOT overlap these types of genes/regions)
 	#####################################################################################################################
-	set HI [lindex $Ls $g_i(HI)]
+	set HI     [lindex $Ls $g_i(HI)]
 	set morbid [lindex $Ls $g_i(morbid)]
-	set gene       [lindex $Ls $g_i(gene)]
+	set gene   [lindex $Ls $g_i(gene)]
+	set exomiser    [lindex $Ls $g_i(exomiser)]
+	regsub "," $exomiser "." exomiser
 
 	if {$HI eq "3" || $morbid eq "yes"} {
 	    set location   [lindex $Ls $g_i(location)]
@@ -294,8 +296,6 @@ proc SVrankingLoss {L_annotations} {
 
 	## Section 5: Evaluation of inheritance pattern/family history for patient being studied			
 	####################################################################################################################
-	set exomiser   [lindex $Ls $g_i(exomiser)]
-	regsub "," $exomiser "." exomiser
 	if {$exomiser >= 0.7} {
 	    # 5H. Inheritance information is unavailable or uninformative. The patient phenotype is highly specific and consistent with what has been described in similar cases (+ 0.30)
 	    lappend g_rankingExplanations($AnnotSV_ID,5H) "$gene"
@@ -507,10 +507,10 @@ proc SVrankingGain {L_annotations} {
 	## Section 5: Evaluation of inheritance pattern/family history for patient being studied			
 	####################################################################################################################
 	if {$REgene ne ""} {
-	    set L_infos [split $REgene ";"]
+	    set L_infos [split $REgene "\\\);"]
 	    set bestEx "0"
 	    foreach infos $L_infos {
-		if {[regexp "(.+?) \\\(.*?EX=(.+)\\\)$" $infos match g ex]} {
+		if {[regexp "(.+?) \\\(.*?EX=(.+)$" $infos match g ex]} {
 		    regsub "," $ex "." ex
 		    if {$ex > $bestEx} {
 			set bestEx $ex
@@ -526,7 +526,7 @@ proc SVrankingGain {L_annotations} {
 		lappend g_rankingExplanations($AnnotSV_ID,5G) "RE:$bestG"
 	    }
 	}
-	    
+	
     } else {
 	# Split lines
 	

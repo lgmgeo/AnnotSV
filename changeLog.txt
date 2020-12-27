@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.0                                                                                              #
+# AnnotSV 3.0.1                                                                                            #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
@@ -11,7 +11,8 @@
 For more details, please see the README file.
 
 
-	- Set the ACMG_class to "NA" if not defined
+	- feat: Add bugfix in section 5 of the SV ranking
+	- feat: Set the ACMG_class to "NA" if not defined
 	
 December 18, 2020, AnnotSV version 3.0
 	- Major code rewrite and annotations sources reorganization

@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.0                                                                                              #
+# AnnotSV 3.0.1                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -238,13 +238,13 @@ proc OrganizeAnnotation {} {
 	if {$g_AnnotSV(geneBasedAnn_i) eq ""} {set g_AnnotSV(geneBasedAnn) 0}
     }
  
-    # Preparation for the ranking (from benign to pathogenic)
-    SVprepareRanking $headerOutput    ; # svtTSVcol (for VCF input file) is defined there
-
     ####### "Exomiser header"
     if {$g_AnnotSV(hpo) ne ""} {
 	append headerOutput "\tExomiser_gene_pheno_score\tHuman_pheno_evidence\tMouse_pheno_evidence\tFish_pheno_evidence"
     }
+
+    # Preparation for the ranking (from benign to pathogenic)
+    SVprepareRanking $headerOutput    ; # svtTSVcol (for VCF input file) is defined there
     
     ####### "Ranking header"
     if {$g_AnnotSV(svtTSVcol) eq -1 && $g_AnnotSV(organism) eq "Human"} { ; # SV_type is required for the ranking of human SV
@@ -1190,6 +1190,9 @@ proc OrganizeAnnotation {} {
 		set notSelected 0  ; # To select the SV of a user-defined specific class (from 1 to 5)
 		append lineCompleted "$fullOrSplitLine"
 		if {$g_AnnotSV(ranking)} {
+		    if {$g_rankingScore($AnnotSV_ID) ne ""} {
+			set g_rankingScore($AnnotSV_ID) [expr {double(round(100*$g_rankingScore($AnnotSV_ID)))/100}] ;# e.g.: expr 1+0+0.9+0.3 = 2.1999999999999997 => becomes 2.2 with this line
+		    }
 		    append lineCompleted "\t$g_rankingScore($AnnotSV_ID)" ;#rankingScore
 		    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "AnnotSV_ranking_criteria"] ne -1} {
 			append lineCompleted "\t$g_rankingExplanations($AnnotSV_ID)" ;#rankingExplanations
@@ -1218,14 +1221,14 @@ proc OrganizeAnnotation {} {
 			if {$g_AnnotSV(rankFiltering) ne {1 2 3 4 5} && [lsearch -exact $g_AnnotSV(rankFiltering) $class] eq -1} {
 			    set notSelected 1
 			    continue
-			}
+			} 
 		    }
 		}
 	    } else {
 		if {$notSelected} {continue} ;# To select the SV of a user-defined specific class (from 1 to 5)
 		# Ranking not available for the split lines
 		append lineCompleted "$fullOrSplitLine"
-		if {$g_AnnotSV(ranking)} {
+		if {$g_AnnotSV(ranking)} {		    
 		    append lineCompleted "\t"  ;#rankingScore
 		    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "AnnotSV_ranking_criteria"] ne -1} {
 			append lineCompleted "\t" ;#rankingExplanations
