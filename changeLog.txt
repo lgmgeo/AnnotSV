@@ -1,16 +1,16 @@
 ############################################################################################################
-# AnnotSV 3.0.1                                                                                            #
+# AnnotSV 3.0.2                                                                                            #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
-# Copyright (C) 2017-2020 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
+# Copyright (C) 2017-2021 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
 #                                                                                                          #
 ############################################################################################################
 
 
 For more details, please see the README file.
 
-
+	- feat: Definition of the characters used to separate the annotations
 	- feat: Add bugfix in section 5 of the SV ranking
 	- feat: Set the ACMG_class to "NA" if not defined
 	

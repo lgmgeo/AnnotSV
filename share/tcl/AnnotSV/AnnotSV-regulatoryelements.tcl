@@ -1,9 +1,9 @@
 ############################################################################################################
-# AnnotSV 3.0.1                                                                                            #
+# AnnotSV 3.0.2                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
-# Copyright (C) 2017-2020 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
+# Copyright (C) 2017-2021 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
 #                                                                                                          #
 # This is part of AnnotSV source code.                                                                     #
 #                                                                                                          #
@@ -581,7 +581,7 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
 		set HI [lindex $Ls 1]; if {$HI ne "Not yet evaluated"} {lappend L_ann "HI=$HI"}
 		set TS [lindex $Ls 2]; if {$TS ne "Not yet evaluated"} {lappend L_ann "TS=$TS"}
 		if {$L_ann ne ""} {
-		    set g_HITS($gene) "[join $L_ann ";"]"
+		    set g_HITS($gene) "[join $L_ann "/"]" ;# used as sub-annotation (between parentheses) => slashes separated
 		}
 	    }
 	}

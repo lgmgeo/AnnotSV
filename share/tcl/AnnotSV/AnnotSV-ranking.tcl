@@ -1,9 +1,9 @@
 ############################################################################################################
-# AnnotSV 3.0.1                                                                                            #
+# AnnotSV 3.0.2                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
-# Copyright (C) 2017-2020 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
+# Copyright (C) 2017-2021 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
 #                                                                                                          #
 # This is part of AnnotSV source code.                                                                     #
 #                                                                                                          #
@@ -334,48 +334,48 @@ proc achieveSVrankingLoss {AnnotSV_ID} {
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2C-1)]} {
 	# 2C-1
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.90}]
-	append g_rankingExplanations($AnnotSV_ID) "2C-1 ([join $g_rankingExplanations($AnnotSV_ID,2C-1) ";"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2C-1 ([join $g_rankingExplanations($AnnotSV_ID,2C-1) "/"]);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2D-2)]} {
 	# 2D-2
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.90}]
-	append g_rankingExplanations($AnnotSV_ID) "2D-2 ([join $g_rankingExplanations($AnnotSV_ID,2D-2) ";"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2D-2 ([join $g_rankingExplanations($AnnotSV_ID,2D-2) "/"]);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2D-4)]} {
 	# 2D-4
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.90}]
-	append g_rankingExplanations($AnnotSV_ID) "2D-4 ([join $g_rankingExplanations($AnnotSV_ID,2D-4) ";"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2D-4 ([join $g_rankingExplanations($AnnotSV_ID,2D-4) "/"]);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2E-1)]} {
 	# 2E-1
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.90}]
-	append g_rankingExplanations($AnnotSV_ID) "2E-1 ([join $g_rankingExplanations($AnnotSV_ID,2E-1) ";"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2E-1 ([join $g_rankingExplanations($AnnotSV_ID,2E-1) "/"]);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2E-2)]} {
 	# 2E-2
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.45}]
-	append g_rankingExplanations($AnnotSV_ID) "2E-2 ([join $g_rankingExplanations($AnnotSV_ID,2E-2) ";"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2E-2 ([join $g_rankingExplanations($AnnotSV_ID,2E-2) "/"]);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2D-3)]} {
 	# 2D-3
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.45}]
-	append g_rankingExplanations($AnnotSV_ID) "2D-3 ([join $g_rankingExplanations($AnnotSV_ID,2D-3) ";"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2D-3 ([join $g_rankingExplanations($AnnotSV_ID,2D-3) "/"]);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2E-3)]} {
 	# 2E-3
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.30}]
-	append g_rankingExplanations($AnnotSV_ID) "2E-3 ([join $g_rankingExplanations($AnnotSV_ID,2E-3) ";"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2E-3 ([join $g_rankingExplanations($AnnotSV_ID,2E-3) "/"]);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2E-4)]} {
 	# 2E-4
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.20}]
-	append g_rankingExplanations($AnnotSV_ID) "2E-4 ([join $g_rankingExplanations($AnnotSV_ID,2E-4) ";"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2E-4 ([join $g_rankingExplanations($AnnotSV_ID,2E-4) "/"]);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2H)]} {
 	# 2H
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.15}]
 	#set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+$g_rankingScore($AnnotSV_ID,maxLoeuf)}]
-	append g_rankingExplanations($AnnotSV_ID) "2H ([join $g_rankingExplanations($AnnotSV_ID,2H) ";"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2H ([join $g_rankingExplanations($AnnotSV_ID,2H) "/"]);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2C-2)]} {
 	# 2C-2
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.00}]
-	append g_rankingExplanations($AnnotSV_ID) "2C-2 ([join $g_rankingExplanations($AnnotSV_ID,2C-2) ";"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2C-2 ([join $g_rankingExplanations($AnnotSV_ID,2C-2) "/"]);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2D-1)]} {
 	# 2D-1
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.00}]
-	append g_rankingExplanations($AnnotSV_ID) "2D-1 ([join $g_rankingExplanations($AnnotSV_ID,2D-1) ";"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2D-1 ([join $g_rankingExplanations($AnnotSV_ID,2D-1) "/"]);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2G)]} {
 	# 2G
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.00}]
@@ -420,11 +420,11 @@ proc achieveSVrankingLoss {AnnotSV_ID} {
     if {[info exists g_rankingExplanations($AnnotSV_ID,5H)]} {
 	# 5H
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.30}]
-	append g_rankingExplanations($AnnotSV_ID) "5H ([join $g_rankingExplanations($AnnotSV_ID,5H) ";"])"
+	append g_rankingExplanations($AnnotSV_ID) "5H ([join $g_rankingExplanations($AnnotSV_ID,5H) "/"])"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,5G)]} {
 	# 5G
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.10}]
-	append g_rankingExplanations($AnnotSV_ID) "5G ([join $g_rankingExplanations($AnnotSV_ID,5G) ";"])"
+	append g_rankingExplanations($AnnotSV_ID) "5G ([join $g_rankingExplanations($AnnotSV_ID,5G) "/"])"
     } else {
 	# 5F
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.00}]
@@ -626,19 +626,19 @@ proc achieveSVrankingGain {AnnotSV_ID} {
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2I-1)]} {
 	# 2I-1
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.45}]
-	append g_rankingExplanations($AnnotSV_ID) "2I-1 ([join $g_rankingExplanations($AnnotSV_ID,2I-1) ";"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2I-1 ([join $g_rankingExplanations($AnnotSV_ID,2I-1) "/"]);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2I-2)]} {
 	# 2I-2
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.45}]
-	append g_rankingExplanations($AnnotSV_ID) "2I-2 ([join $g_rankingExplanations($AnnotSV_ID,2I-2) ";"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2I-2 ([join $g_rankingExplanations($AnnotSV_ID,2I-2) "/"]);"
      } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2K)]} {
 	# 2K
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.45}]
-	append g_rankingExplanations($AnnotSV_ID) "2K ([join $g_rankingExplanations($AnnotSV_ID,2K) ";"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2K ([join $g_rankingExplanations($AnnotSV_ID,2K) "/"]);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2H-1)]} {
 	# 2H-1
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.45}]
-	append g_rankingExplanations($AnnotSV_ID) "2H-1 ([join $g_rankingExplanations($AnnotSV_ID,2H-1) ";"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2H-1 ([join $g_rankingExplanations($AnnotSV_ID,2H-1) "/"]);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2E)]} {
 	# 2E
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.00}]
@@ -646,19 +646,19 @@ proc achieveSVrankingGain {AnnotSV_ID} {
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2H-2)]} {
 	# 2H-2
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.00}]
-	append g_rankingExplanations($AnnotSV_ID) "2H-2 ([join $g_rankingExplanations($AnnotSV_ID,2H-2) ";"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2H-2 ([join $g_rankingExplanations($AnnotSV_ID,2H-2) "/"]);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2I-3)]} {
 	# 2I-3
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.00}]
-	append g_rankingExplanations($AnnotSV_ID) "2I-3 ([join $g_rankingExplanations($AnnotSV_ID,2I-3) ";"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2I-3 ([join $g_rankingExplanations($AnnotSV_ID,2I-3) "/"]);"
      } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2J)]} {
 	# 2J
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.00}]
-	append g_rankingExplanations($AnnotSV_ID) "2J ([join $g_rankingExplanations($AnnotSV_ID,2J) ";"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2J ([join $g_rankingExplanations($AnnotSV_ID,2J) "/"]);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2L)]} {
 	# 2L
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.00}]
-	append g_rankingExplanations($AnnotSV_ID) "2L ([join $g_rankingExplanations($AnnotSV_ID,2L) ";"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2L ([join $g_rankingExplanations($AnnotSV_ID,2L) "/"]);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2D)]} {
 	# 2D
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)-1.00}]
@@ -698,11 +698,11 @@ proc achieveSVrankingGain {AnnotSV_ID} {
 	if {[info exists g_rankingExplanations($AnnotSV_ID,5H)]} {
 	    # 5H
 	    set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.15}]
-	    append g_rankingExplanations($AnnotSV_ID) "5H ([join $g_rankingExplanations($AnnotSV_ID,5H) ";"])"
+	    append g_rankingExplanations($AnnotSV_ID) "5H ([join $g_rankingExplanations($AnnotSV_ID,5H) "/"])"
 	} elseif {[info exists g_rankingExplanations($AnnotSV_ID,5G)]} {
 	    # 5G
 	    set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.10}]
-	    append g_rankingExplanations($AnnotSV_ID) "5G ([join $g_rankingExplanations($AnnotSV_ID,5G) ";"])"
+	    append g_rankingExplanations($AnnotSV_ID) "5G ([join $g_rankingExplanations($AnnotSV_ID,5G) "/"])"
 	} else {
 	    # 5F
 	    set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.00}]

@@ -1,9 +1,9 @@
 ############################################################################################################
-# AnnotSV 3.0.1                                                                                            #
+# AnnotSV 3.0.2                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
-# Copyright (C) 2017-2020 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
+# Copyright (C) 2017-2021 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
 #                                                                                                          #
 # This is part of AnnotSV source code.                                                                     #
 #                                                                                                          #
@@ -735,10 +735,10 @@ proc OrganizeAnnotation {} {
 
 		    set lAnn {}
 		    if {$HITS ne ""} {lappend lAnn $HITS}
-		    if {$exomiserScore ne ""} {lappend lAnn $exomiserScore}
+		    if {$exomiserScore ne "" && $exomiserScore ne "EX=0.0000" && $exomiserScore ne "EX=-1.0"} {lappend lAnn $exomiserScore}
 		    if {[isMorbid $gName] eq "yes"} {lappend lAnn "morbid"} 
 		    if {$lAnn ne ""} {
-			lappend reText "$gName ([join $lAnn ";"])"
+			lappend reText "$gName ([join $lAnn "/"])"
 		    } else {
 			lappend reText "$gName"
 		    }

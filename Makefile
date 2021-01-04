@@ -1,9 +1,9 @@
 ############################################################################################################
-# AnnotSV 3.0.1                                                                                            #
+# AnnotSV 3.0.2                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
-# Copyright (C) 2017-2020 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
+# Copyright (C) 2017-2021 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
 #                                                                                                          #
 # This is part of AnnotSV source code.                                                                     #
 #                                                                                                          #
@@ -37,7 +37,7 @@ TCLVERSION           := tcl$(shell echo 'puts $${tcl_version};exit 0' | tclsh)
 TCLDIRDISTRIBUTED    := share/tcl
 TCLDIR               := $(SHAREDIR)/$(TCLVERSION)
 ANNOTSV              := AnnotSV
-VERSION              := 3.0.1
+VERSION              := 3.0.2
 RM                   := /bin/rm
 RMDIR                := /bin/rmdir
 MKDIR                := install -d
