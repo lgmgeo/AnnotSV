@@ -93,20 +93,28 @@ proc OrganizeAnnotation {} {
 		    }
 		    if {$g_AnnotSV(samplesidBEDcol) ne -1} {
 			set headerFromTheUser [lreplace $headerFromTheUser $g_AnnotSV(samplesidBEDcol) $g_AnnotSV(samplesidBEDcol) "Samples_ID"]
-		    } 
-		    append headerOutput "\t[join [lrange $headerFromTheUser 3 end] "\t"]"		
+		    }
+		    set k 1
+		    foreach colName [lrange $headerFromTheUser 3 end] {
+			if {$colName ne ""} {
+			    append headerOutput "\t$colName"
+			} else {
+			    append headerOutput "\tuser#$k"; incr k
+			}
+		    }
 		}	
 	    } else {
 		# No header given by the user
 		set i 5 ; # headerOutput = "AnnotSV_ID   SV_chrom    SV_start	   SV_end	SV_length"
 		set j [expr {$theBEDlength+2}]
+		set k 1
 		while {$i < $j} {
 		    if {$i eq $g_AnnotSV(svtTSVcol)} {
 			append headerOutput "\tSV_type"
 		    } elseif {$i eq $g_AnnotSV(samplesidTSVcol)} {
 			append headerOutput "\tSamples_ID"
 		    } else {
-			append headerOutput "\t"
+			append headerOutput "\tuser#$k"; incr k
 		    }
 		    incr i
 		}
@@ -253,16 +261,9 @@ proc OrganizeAnnotation {} {
 	puts "=> No SV ranking"
 	set g_AnnotSV(ranking) 0
     }
-    if {$g_AnnotSV(ranking)} {
-	append headerOutput "\tAnnotSV_ranking_score"
-	if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "AnnotSV_ranking_criteria"] ne -1} {
-	    append headerOutput "\tAnnotSV_ranking_criteria"
-	}
-	if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "ACMG_class"] ne -1} {
-	    append headerOutput "\tACMG_class"
-	}
-    }
-    
+    append headerOutput "\tAnnotSV_ranking_score"
+    append headerOutput "\tAnnotSV_ranking_criteria"
+    append headerOutput "\tACMG_class"    
     
     ReplaceTextInFile $headerOutput $outputFile
 
@@ -1135,7 +1136,7 @@ proc OrganizeAnnotation {} {
 	lappend L_TextToWrite($AnnotSV_ID) "$TextToWrite"
     }
     close $f
-        
+
     
     ## Finalize the ranking
     #######################
@@ -1189,54 +1190,43 @@ proc OrganizeAnnotation {} {
 		# Ranking available only for the full lines
 		set notSelected 0  ; # To select the SV of a user-defined specific class (from 1 to 5)
 		append lineCompleted "$fullOrSplitLine"
-		if {$g_AnnotSV(ranking)} {
-		    if {$g_rankingScore($AnnotSV_ID) ne ""} {
-			set g_rankingScore($AnnotSV_ID) [expr {double(round(100*$g_rankingScore($AnnotSV_ID)))/100}] ;# e.g.: expr 1+0+0.9+0.3 = 2.1999999999999997 => becomes 2.2 with this line
-		    }
-		    append lineCompleted "\t$g_rankingScore($AnnotSV_ID)" ;#rankingScore
-		    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "AnnotSV_ranking_criteria"] ne -1} {
-			append lineCompleted "\t$g_rankingExplanations($AnnotSV_ID)" ;#rankingExplanations
-		    }
-		    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "ACMG_class"] ne -1} {
-			if {$g_rankingScore($AnnotSV_ID) eq ""} {
-			    set class "NA"
-			} elseif {$g_rankingScore($AnnotSV_ID) >= "0.99"} {
-			    set class 5
-			} elseif {$g_rankingScore($AnnotSV_ID) >= "0.9"} {
-			    set class 4
-			} elseif {$g_rankingScore($AnnotSV_ID) >= "-0.9"} {
-			    set class 3
-			} elseif {$g_rankingScore($AnnotSV_ID) >= "-0.99"} {
-			    set class 2
-			} else {
-			    set class 1
-			}
-			append lineCompleted "\t$class"	;#ACMGclass
-			if {$class ne ""} {
-			    set g_ACMGclass($AnnotSV_ID,full) "full=$class"
-			} else {
-			    set g_ACMGclass($AnnotSV_ID,full) ""
-			}
-			# To select the SV of a user-defined specific class (from 1 to 5)
-			if {$g_AnnotSV(rankFiltering) ne {1 2 3 4 5} && [lsearch -exact $g_AnnotSV(rankFiltering) $class] eq -1} {
-			    set notSelected 1
-			    continue
-			} 
-		    }
+
+		if {![info exists g_rankingScore($AnnotSV_ID)]} {set g_rankingScore($AnnotSV_ID) ""}
+		if {$g_rankingScore($AnnotSV_ID) ne ""} {
+		    set g_rankingScore($AnnotSV_ID) [expr {double(round(100*$g_rankingScore($AnnotSV_ID)))/100}] ;# e.g.: expr 1+0+0.9+0.3 = 2.1999999999999997 => becomes 2.2 with this line
 		}
+		append lineCompleted "\t$g_rankingScore($AnnotSV_ID)" ;#rankingScore
+		if {![info exists g_rankingExplanations($AnnotSV_ID)]} {set g_rankingExplanations($AnnotSV_ID) ""}
+		append lineCompleted "\t$g_rankingExplanations($AnnotSV_ID)" ;#rankingExplanations
+		if {$g_rankingScore($AnnotSV_ID) eq ""} {
+		    set class "NA"
+		} elseif {$g_rankingScore($AnnotSV_ID) >= "0.99"} {
+		    set class 5
+		} elseif {$g_rankingScore($AnnotSV_ID) >= "0.9"} {
+		    set class 4
+		} elseif {$g_rankingScore($AnnotSV_ID) >= "-0.9"} {
+		    set class 3
+		} elseif {$g_rankingScore($AnnotSV_ID) >= "-0.99"} {
+		    set class 2
+		} else {
+		    set class 1
+		}
+		append lineCompleted "\t$class"	;#ACMGclass
+		set g_ACMGclass($AnnotSV_ID,full) "full=$class"
+	
+		# To select the SV of a user-defined specific class (from 1 to 5)
+		if {$g_AnnotSV(rankFiltering) ne {1 2 3 4 5} && [lsearch -exact $g_AnnotSV(rankFiltering) $class] eq -1} {
+		    set notSelected 1
+		    continue
+		} 
 	    } else {
 		if {$notSelected} {continue} ;# To select the SV of a user-defined specific class (from 1 to 5)
 		# Ranking not available for the split lines
 		append lineCompleted "$fullOrSplitLine"
-		if {$g_AnnotSV(ranking)} {		    
-		    append lineCompleted "\t"  ;#rankingScore
-		    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "AnnotSV_ranking_criteria"] ne -1} {
-			append lineCompleted "\t" ;#rankingExplanations
-		    }
-		    if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "ACMG_class"] ne -1} {
-			append lineCompleted "\t$g_ACMGclass($AnnotSV_ID,full)";#ACMGclass 
-		    }
-		}
+		
+		append lineCompleted "\t"  ;#rankingScore
+		append lineCompleted "\t" ;#rankingExplanations
+		append lineCompleted "\t$g_ACMGclass($AnnotSV_ID,full)";#ACMGclass 
 	    }
 	    
 	    # To select only the SV annotations overlapping a gene from the "candidateGenesFile"

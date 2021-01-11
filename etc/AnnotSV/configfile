@@ -155,7 +155,7 @@ Mouse_pheno_evidence
 Fish_pheno_evidence
 
 # Ranking:
-AnnotSV_ranking_score
-AnnotSV_ranking_criteria
-ACMG_class
+AnnotSV_ranking_score           *
+AnnotSV_ranking_criteria        *
+ACMG_class                      *
 
