@@ -534,13 +534,16 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
 	## Delete temporary file
 	file delete -force $SV_RE_intersectBEDfile
     } else {
-	foreach L [LinesFromFile $SV_RE_intersectBEDfile] {
+	set f [open "$SV_RE_intersectBEDfile"]
+	while {! [eof $f]} {
+	    set L [gets $f]
 	    set Ls [split $L "\t"]
 	    # SVfromBED ("chrom, start, end")
 	    set SVfromBED "[join [lrange $Ls 0 2] "\t"]"
 	    lappend g_re($SVfromBED) {*}[split [lindex $Ls end] ";"] ;# regulated genes
 	    lappend L_allRegulatedGenes {*}[split [lindex $Ls end] ";"]
 	}
+	close $f
 	foreach sv [array names g_re] {
 	    set g_re($sv) [lsort -unique $g_re($sv)]
 	}
@@ -563,7 +566,6 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
     if {$g_AnnotSV(hpo) ne "" && $L_allGenes ne ""} {
 	runExomiser "$L_allGenes" "$g_AnnotSV(hpo)" 
     }
-
     ## HI/TS information for these regulated genes
     set clingenDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/ClinGen"
     set ClinGenFileFormattedGzip [lindex [glob -nocomplain "$clingenDir/*_ClinGenAnnotations.tsv.gz"] end]

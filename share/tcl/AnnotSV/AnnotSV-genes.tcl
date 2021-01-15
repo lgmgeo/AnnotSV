@@ -215,7 +215,7 @@ proc genesAnnotation {} {
     set splitBedFile "$FullAndSplitBedFile.tmp"
     file delete -force $FullAndSplitBedFile
     file delete -force $splitBedFile
-
+    
 
     # Intersect of the input SV bedfile with the genes annotations
     # + create the "FullAndSplitBedFile"
@@ -312,7 +312,7 @@ proc genesAnnotation {} {
     #   - the one selected by the user with the "-txFile" option
     #   - the one with the most of "bp" of overlapped CDS (=overlappedCDSlength)
     #   - if x transcript with same "bp of overlapped CDS", the one with the most of "bp" of overlapped transcript (=overlapped "UTR, exon, intron" = overlappedTxLength)
-    set f [open $splitBedFile]
+    set f [open $splitBedFile]    
     while {![eof $f]} {
 	set L [gets $f]
 	if {$L eq ""} {continue}
@@ -467,7 +467,7 @@ proc genesAnnotation {} {
 
     }
     close $f
-    
+
     # Treatment for the last SV of the file
     ########################################
     
