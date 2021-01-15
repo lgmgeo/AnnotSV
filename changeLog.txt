@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.0.2                                                                                            #
+# AnnotSV 3.0.3                                                                                            #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
@@ -10,6 +10,8 @@
 
 For more details, please see the README file.
 
+	- feat: Add bugfix to avoid a segmentation fault error with the RE_gene calculation
+	- feat: Update of the user header (user column names could not be empty anymore)
 	- feat: Definition of the characters used to separate the annotations
 	- feat: Add bugfix in section 5 of the SV ranking
 	- feat: Set the ACMG_class to "NA" if not defined
