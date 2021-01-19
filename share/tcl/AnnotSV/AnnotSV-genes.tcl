@@ -170,6 +170,12 @@ proc genesAnnotation {} {
     while {![eof $f]} {
 	set L [gets $f]
 	if {$L eq ""} {continue}
+	
+	# To avoid a bug with "bedtools intersect", the last value of a line could NOT be empty.
+	# Exemple of bedtools error message:
+	# "Error: line number 716 of file input.formatted.sorted.bed has 6 fields, but 4 were expected."
+	regsub "\t$" $L "\t." L
+	
 	if {[regsub "chr" [lindex $L 0] "" chrom] ne 0} {
 	    lappend L_Text($chrom) "[string range $L 3 end]"
 	} else {
@@ -178,14 +184,22 @@ proc genesAnnotation {} {
     }
     close $f
     ## Writing the bedfile (not sorted)
+    set emptyBed 1
     regsub -nocase ".bed$" $g_AnnotSV(bedFile) ".formatted.sorted.bed" newBed
     set newBed "$g_AnnotSV(outputDir)/[file tail $newBed]"
     file delete -force $newBed
     foreach chrom {1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y M MT} {
 	if {![info exists L_Text($chrom)]} {continue}
+	set emptyBed 0
 	WriteTextInFile [join $L_Text($chrom) "\n"] $newBed.tmp
 	unset L_Text($chrom)
     }
+    if {$emptyBed} {
+	puts "The SV input file is empty or badly formatted."
+	puts "Exit with error\n"
+	exit 2
+    }
+    
     # Sorting of the bedfile:
     # Intersection with very large files can cause trouble with excessive memory usage.
     # A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm.
@@ -199,7 +213,7 @@ proc genesAnnotation {} {
 	puts "-- genesAnnotation --"
 	puts "sort -k1,1 -k2,2n $newBed.tmp >> $newBed"
 	puts "$Message"
-	puts "Exit with error"
+	puts "Exit with error\n"
 	exit 2
     }
     file delete -force $sortTmpFile 
