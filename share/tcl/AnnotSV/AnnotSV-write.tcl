@@ -452,11 +452,6 @@ proc OrganizeAnnotation {} {
 	    set Samplesid ""
 	}
 
-	# For the use of the -annotationMode option: keep only the corresponding lines (full or split or both)
-	if {$g_AnnotSV(annotationMode) eq "full" && $AnnotationMode eq "split"} {continue}
-	if {$g_AnnotSV(annotationMode) eq "split" && $AnnotationMode eq "full"} {continue}
-
-
 	if {$AnnotationMode eq "split"} {
 	    # split
 	    set txStart    [lindex $Ls end-12]
@@ -1180,15 +1175,13 @@ proc OrganizeAnnotation {} {
     set i 0
     foreach AnnotSV_ID $L_AnnotSV_ID {
 	set AnnotSV_ID [lindex $AnnotSV_ID 0]
-
 	foreach fullOrSplitLine $L_TextToWrite($AnnotSV_ID) {
 	    set AnnMo [lindex [split $fullOrSplitLine "\t"] $i_Annotation_mode]
 	    set geneName [lindex [split $fullOrSplitLine "\t"] $i_genename]
 	    set lineCompleted ""
 
 	    if {$AnnMo eq "full"} {
-		# Ranking available only for the full lines
-		set notSelected 0  ; # To select the SV of a user-defined specific class (from 1 to 5)
+		# Note: the ranking is available only for the full lines
 		append lineCompleted "$fullOrSplitLine"
 
 		if {![info exists g_rankingScore($AnnotSV_ID)]} {set g_rankingScore($AnnotSV_ID) ""}
@@ -1213,17 +1206,31 @@ proc OrganizeAnnotation {} {
 		}
 		append lineCompleted "\t$class"	;#ACMGclass
 		set g_ACMGclass($AnnotSV_ID,full) "full=$class"
-	
+
 		# To select the SV of a user-defined specific class (from 1 to 5)
+		# default : $g_AnnotSV(rankFiltering) == {1 2 3 4 5}
+		# Warning: no filtering needed by default => keep class == "NA"
 		if {$g_AnnotSV(rankFiltering) ne {1 2 3 4 5} && [lsearch -exact $g_AnnotSV(rankFiltering) $class] eq -1} {
-		    set notSelected 1
+		    continue
+		}
+
+		# For the use of the -annotationMode option: keep only the corresponding lines (full or split or both)
+		if {$g_AnnotSV(annotationMode) eq "full" && $AnnMo eq "split"} {continue}
+		if {$g_AnnotSV(annotationMode) eq "split" && $AnnMo eq "full"} {continue}
+		
+	    } else {
+		# To select the SV of a user-defined specific class (from 1 to 5)
+		regsub "full=" $g_ACMGclass($AnnotSV_ID,full) "" class
+		if {$g_AnnotSV(rankFiltering) ne {1 2 3 4 5} && [lsearch -exact $g_AnnotSV(rankFiltering) $class] eq -1} {
 		    continue
 		} 
-	    } else {
-		if {$notSelected} {continue} ;# To select the SV of a user-defined specific class (from 1 to 5)
-		# Ranking not available for the split lines
-		append lineCompleted "$fullOrSplitLine"
 		
+		# For the use of the -annotationMode option: keep only the corresponding lines (full or split or both)
+		if {$g_AnnotSV(annotationMode) eq "full" && $AnnMo eq "split"} {continue}
+		if {$g_AnnotSV(annotationMode) eq "split" && $AnnMo eq "full"} {continue}
+		
+		# Ranking not available for the split lines
+		append lineCompleted "$fullOrSplitLine"		
 		append lineCompleted "\t"  ;#rankingScore
 		append lineCompleted "\t" ;#rankingExplanations
 		append lineCompleted "\t$g_ACMGclass($AnnotSV_ID,full)";#ACMGclass 

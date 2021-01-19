@@ -10,6 +10,7 @@
 
 For more details, please see the README file.
 
+	- feat: Add bugfix concerning the use of the "split" annotationMode
 	- feat: Last column of the SV input BED file could not have empty values. Replaced with "."
 	- feat: Add bugfix to avoid a segmentation fault error with the RE_gene calculation
 	- feat: Update of the user header (user column names could not be empty anymore)
