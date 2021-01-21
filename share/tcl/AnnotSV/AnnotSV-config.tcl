@@ -60,7 +60,7 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(overlap)                  "100"
     set g_AnnotSV(overwrite)                "yes"
     set g_AnnotSV(promoterSize)             "500"
-    set g_AnnotSV(rankFiltering)            "1-5"
+    set g_AnnotSV(rankFiltering)            "1-5,NA"
     set g_AnnotSV(ranking)                  "1"   ;# not given in parameter
     set g_AnnotSV(reciprocal)               "no"
     set g_AnnotSV(REreport)                 "no"
@@ -224,7 +224,7 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(hpo) [join $L_correctHPO ","]
 
     # g_AnnotSV(rankFiltering)
-    ## It must be a list between 1 and 5 
+    ## It must be a list between 1 and 5 and NA
     ## e.g.: "3,4,5" or "3-5" 
     set liste {}
     while {[regexp "(\[1-5\])-(\[1-5\])" $g_AnnotSV(rankFiltering) match i j]} {
@@ -235,7 +235,7 @@ proc configureAnnotSV {argv} {
 	regsub "\[1-5\]-\[1-5\]" $g_AnnotSV(rankFiltering) "" g_AnnotSV(rankFiltering)
     }
     foreach i [split $g_AnnotSV(rankFiltering) ","] {
-	if {[lsearch -exact {1 2 3 4 5} $i] ne -1} {lappend liste $i}	    
+	if {[lsearch -exact {1 2 3 4 5 NA} $i] ne -1} {lappend liste $i}	    
     }
     set liste [lsort -unique $liste]
     set g_AnnotSV(rankFiltering) $liste

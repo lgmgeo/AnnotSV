@@ -24,7 +24,7 @@
 
 -promoterSize:              500
 
--rankFiltering:             "1-5"
+-rankFiltering:             "1-5,NA"
 
 -reciprocal:                "no"
 
