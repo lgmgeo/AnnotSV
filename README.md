@@ -34,3 +34,24 @@ cd /path/to/install/AnnotSV/share/doc/AnnotSV/Example/
 $ANNOTSV/bin/AnnotSV -SVinputFile test.bed -outputFile ./test.annotated.tsv -svtBEDcol 4
 ```
 2. Examine the output
+
+Happy exploring!
+
+
+## COLLABORATIVE WORK
+
+Anyone interested in implementing new annotations/features in AnnotSV?
+
+Thanks to the [AnnotSV user community](https://lbgi.fr/AnnotSV/acknowledgments):
+
+    - Bugs could be tackled efficiently
+
+    - New ideas could be investigated faster
+
+
+I look forward to the opportunity to work together,
+
+feel free to fork the page if you want to help :-)
+
+Véronique
+

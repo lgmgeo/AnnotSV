@@ -90,7 +90,6 @@ proc startTheRESTservice {applicationPropertiesTmpFile port exomiserStartService
 
 
 ## - Check if the exomiser installation is ok
-## - Check and create if necessary the 'date'_OMIMannotations.tsv file.
 proc checkExomiserInstallation {} {
 
     global g_AnnotSV
@@ -140,9 +139,10 @@ proc searchforGeneID {geneName} {
 
 	set NCBIgeneDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/NCBIgeneID" 
 	# Header:
-	# "Approved symbol" "NCBI gene ID"    "Previous symbol" "Alias symbol"
-	# A1BG    1 
-	# A1BG-AS1        503538  NCRNA00181      FLJ23569
+	#Approved symbol Alias symbol    Previous symbol    	NCBI gene ID
+	#A1BG                    			    	1
+	#A1BG-AS1        FLJ23569        NCRNA00181         	503538
+	#A1BG-AS1        FLJ23569        A1BGAS  		503538
 	foreach L [LinesFromFile "$NCBIgeneDir/results.txt"] {
 	    set Ls [split $L "\t"]
 	    if {[regexp "Approved symbol" $L]} {
@@ -177,12 +177,12 @@ proc searchforGeneID {geneName} {
 
 # Creation of the g_Exomiser variable:
 # g_Exomiser($geneName) = EXOMISER_GENE_PHENO_SCORE\tHUMAN_PHENO_EVIDENCE\tMOUSE_PHENO_EVIDENCE\tFISH_PHENO_EVIDENCE
-#\t-1.0\t\t\t"
+# default = "\t-1.0\t\t\t"
 # INPUTS:
 # L_genes: e.g. "FGFR2"
 # L_HPO:   e.g. "HP:0001156,HP:0001363,HP:0011304,HP:0010055"
 #
-# INFO: This proc is run from "AnnotSV-genes.tcl"
+# INFO: This proc is run from "AnnotSV-regulatoryelements.tcl"
 proc runExomiser {L_Genes L_HPO} {
     
     global g_AnnotSV
