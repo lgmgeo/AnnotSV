@@ -1243,17 +1243,17 @@ proc OrganizeAnnotation {} {
 	    
 	    # To select only the SV annotations overlapping a gene from the "candidateGenesFile"
 	    if {$g_AnnotSV(candidateGenesFiltering) eq "yes"} {
-		set test 0
 		if {$geneName eq ""} {
-		    set test 1
-		} else {
-		    foreach g [split $geneName ";"] {
-			if {[lsearch -exact $L_Candidates $g] eq -1} {
-			    set test 1
-			}
-		    }	
+		    # No gene overlapped
+		    continue
 		}
-		if {$test} {continue}
+		set doNotDisplay 1
+		foreach g [split $geneName ";"] {
+		    if {[lsearch -exact $L_Candidates $g] ne -1} {
+			set doNotDisplay 0
+		    }
+		}	
+		if {$doNotDisplay} {continue}
 	    }
 	    
 	    lappend L_lineCompleted "$lineCompleted"
