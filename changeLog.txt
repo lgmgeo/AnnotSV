@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.0.4                                                                                            #
+# AnnotSV 3.0.5                                                                                            #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
@@ -10,6 +10,7 @@
 
 For more details, please see the README file.
 
+	- feat: Add bugfix concerning the use of the "candidateGenesFiltering" option
 	- feat: Include "NA" in the rankFiltering default option (default = "1-5,NA")
 	- feat: Add bugfix concerning the use of the "split" annotationMode
 	- feat: Last column of the SV input BED file could not have empty values. Replaced with "."
