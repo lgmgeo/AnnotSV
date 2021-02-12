@@ -17,7 +17,7 @@ OPTIONS
 
 -candidateGenesFile:            Path of a file containing the candidate genes of the user (gene names can be space-separated, tabulation-separated, or line-break-separated) (optional)
 
--candidateGenesFiltering:       To select only the SV "split" annotations overlapping a gene from the "candidateGenesFile"
+-candidateGenesFiltering:       To select only the SV "split" annotations overlapping a gene from the "candidateGenesFile". The corresponding "full" annotations are also reported.
                                 Values: no (default) or yes
 
 -candidateSnvIndelFiles:        Path of the filtered VCF input file(s) with SNV/indel coordinates for compound heterozygotes report (optional)
