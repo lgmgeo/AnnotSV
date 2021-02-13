@@ -20,6 +20,13 @@ class AnnotationMode(BaseEnum, IntFlag):
     both = full | split
 
 
+class ConfigTypes(str, Enum):
+    legacy = "legacy"
+    yaml = "yaml"
+    json = "json"
+    toml = "toml"
+
+
 class GenomeBuild(str, BaseEnum):
     GRCh37 = "GRCh37"
     GRCh38 = "GRCh38"

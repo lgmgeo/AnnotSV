@@ -10,6 +10,8 @@ import typer
 from . import constants
 from .enums import AnnotationMode, GenomeBuild, MetricFormat, TranscriptSource, YesNo
 
+### validation / helper funcs
+
 
 def to_bool(val: str) -> bool:
     try:
@@ -22,15 +24,16 @@ def to_bool(val: str) -> bool:
 def validate_hpo(hpo_str: Optional[str]) -> List[str]:
     if hpo_str is None or hpo_str == "":
         return []
-    hpo_pattern = re.compile("^HP:\d+$")
-    hpo_terms = re.split("[ ,;]")
+    hpo_pattern = re.compile(r"^HP:\d+$")
+    hpo_terms = re.split("[ ,;]", hpo_str)
     bad_terms = [x for x in hpo_terms if hpo_pattern.search(x)]
     if bad_terms:
         raise typer.BadParameter(f"Invalid HPO terms: {','.join(bad_terms)}")
     return hpo_terms
 
 
-###
+### CLI processing
+
 typer_cli = typer.Typer(name="pyAnnotSV")
 
 
@@ -127,14 +130,14 @@ def annotsv(
         case_sensitive=False,
         help="Changing numerical values from frequencies to us or fr metrics (e.g. 0.2 or 0,2)",
     ),
-    minTotalNumber: int = typer.Option(
+    min_total_number: int = typer.Option(
         500,
         "--minTotalNumber",
         min=100,
         max=1000,
         help="Minimum number of individuals tested to consider a benign SV for the ranking",
     ),
-    outputDir: Path = typer.Option(
+    output_dir: Path = typer.Option(
         ...,
         "--outputDir",
         dir_okay=True,
@@ -143,7 +146,7 @@ def annotsv(
         resolve_path=True,
         help="Output path name",
     ),
-    outputFile: Path = typer.Option(
+    output_file: Path = typer.Option(
         ...,
         "--outputFile",
         dir_okay=False,
@@ -226,7 +229,7 @@ def annotsv(
         "--svtBEDcol",
         min=4,
         help="Number of the column describing the SV type (DEL, DUP) if the input SV file is a BED. Range values: [4-[",
-        # NOTE: use optional/None instead of -1?
+        # NOTE: use Optional/None instead of -1?
     ),
     tx: TranscriptSource = typer.Option(
         TranscriptSource.RefSeq,

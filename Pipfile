@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 typer = "*"
+pydantic = "*"
 
 [dev-packages]
 black = "*"
