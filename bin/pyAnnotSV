@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 HERE="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
-PYTHONPATH="$(dirname "$HERE")/share/python3:$PYTHONPATH"
+PYTHONPATH="$PYTHONPATH:$(dirname "$HERE")/share/python3"
 
-# exec python -m pdb -m AnnotSV.cli "$@"
-exec python -m AnnotSV.cli "$@"
+# exec python -m pdb -m annotsv.cli "$@"
+exec python -m annotsv.cli "$@"

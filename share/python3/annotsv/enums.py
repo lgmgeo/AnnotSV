@@ -10,14 +10,18 @@ class BaseEnum(Enum):
     def __str__(self) -> str:
         return self.name
 
+    @classmethod
+    def first(cls):
+        return list(cls.__members__.values())[0]
+
 
 ###
 
 
-class AnnotationMode(BaseEnum, IntFlag):
-    full = auto()
-    split = auto()
-    both = full | split
+class AnnotationMode(str, BaseEnum):
+    full = "full"
+    split = "split"
+    both = "both"
 
 
 class ConfigTypes(str, Enum):
@@ -42,8 +46,3 @@ class MetricFormat(str, BaseEnum):
 class TranscriptSource(str, BaseEnum):
     RefSeq = "RefSeq"
     ENSEMBL = "ENSEMBL"
-
-
-class YesNo(BaseEnum):
-    yes = True
-    no = False
