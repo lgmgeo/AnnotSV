@@ -3,3 +3,6 @@
 __pycache__/
 *.pyc
 .vscode/
+
+# ignore validation datasets
+validation/
