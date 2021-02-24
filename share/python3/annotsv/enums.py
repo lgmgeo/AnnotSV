@@ -1,7 +1,7 @@
 from enum import Enum, IntFlag, auto
 
 
-class BaseEnum(Enum):
+class BaseEnum(str, Enum):
     @classmethod
     def metavar(cls):
         """ generates nice metavar strings for typer help """
@@ -18,31 +18,31 @@ class BaseEnum(Enum):
 ###
 
 
-class AnnotationMode(str, BaseEnum):
+class AnnotationMode(BaseEnum):
     full = "full"
     split = "split"
     both = "both"
 
 
-class ConfigTypes(str, Enum):
+class ConfigTypes(BaseEnum):
     legacy = "legacy"
     yaml = "yaml"
     json = "json"
     toml = "toml"
 
 
-class GenomeBuild(str, BaseEnum):
+class GenomeBuild(BaseEnum):
     GRCh37 = "GRCh37"
     GRCh38 = "GRCh38"
     mm9 = "mm9"
     mm10 = "mm10"
 
 
-class MetricFormat(str, BaseEnum):
+class MetricFormat(BaseEnum):
     us = "us"
     fr = "fr"
 
 
-class TranscriptSource(str, BaseEnum):
+class TranscriptSource(BaseEnum):
     RefSeq = "RefSeq"
     ENSEMBL = "ENSEMBL"

@@ -6,3 +6,7 @@ __pycache__/
 
 # ignore validation datasets
 validation/
+
+# ignore annotation datasets
+share/AnnotSV/*
+
