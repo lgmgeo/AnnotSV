@@ -13,15 +13,21 @@ from .enums import AnnotationMode, GenomeBuild, MetricFormat, TranscriptSource
 
 ### validation / helper funcs
 
-
-def to_bool(val: str) -> bool:
+# Only official support 1/0 as CLI param, but check for yes/no
+def to_bool(ctx: typer.Context, param: typer.CallbackParam, val: str) -> bool:
+    stripped_val = val.strip().replace('"', "")
     try:
         # just use Decimal instead of checking int, float, etc.
-        return bool(Decimal(val))
+        return bool(Decimal(stripped_val))
     except InvalidOperation:
-        if isinstance(val, str) and val.lower() == "no":
+        # warn on
+        typer.echo(
+            f"WARNING: non 1/0 options are not supported, --{param.name} may not function as expected",
+            err=True,
+        )
+        if stripped_val.lower() == "no":
             return False
-        return bool(val)
+        return bool(stripped_val)
 
 
 ### CLI processing
@@ -77,7 +83,7 @@ def annotsv(
         "--candidateGenesFiltering",
         is_flag=False,
         callback=to_bool,
-        metavar="0|1",
+        metavar="[0|1]",
         help="To select only the SV annotations ('split' and 'full') overlapping a gene from the 'candidateGenesFile'",
     ),
     candidate_snv_indel_files: Optional[str] = typer.Option(
@@ -111,6 +117,7 @@ def annotsv(
         "--includeCI",
         is_flag=False,
         callback=to_bool,
+        metavar="[0|1]",
         help="To expand the 'start' and 'end' SV positions with the VCF confidence intervals (CIPOS, CIEND) around the breakpoints",
     ),
     metrics: MetricFormat = typer.Option(
@@ -156,6 +163,7 @@ def annotsv(
         "--overwrite",
         is_flag=False,
         callback=to_bool,
+        metavar="[0|1]",
         help="To overwrite existing output results",
     ),
     promoter_size: int = typer.Option(
@@ -174,6 +182,7 @@ def annotsv(
         "--reciprocal",
         is_flag=False,
         callback=to_bool,
+        metavar="[0|1]",
         help="Use of a reciprocal overlap between SV and user features (only for annotations with features overlapping the SV)",
     ),
     re_report: bool = typer.Option(
@@ -181,13 +190,14 @@ def annotsv(
         "--REreport",
         is_flag=False,
         callback=to_bool,
+        metavar="[0|1]",
         help="Create a report to link the annotated SV and the overlapped regulatory elements (coordinates and sources)",
     ),
     samplesid_bed_col: int = typer.Option(
         -1,
         "--samplesidBEDcol",
         min=4,
-        help="Number of the column reporting the samples ID for which the SV was called (if the input SV file is a BED). Range values: [4-[, default = -1 (value not given) $ (Samples ID should be comma or space separated)",
+        help="Number of the column reporting the samples ID for which the SV was called (if the input SV file is a BED). Range values: [4-[,  (Samples ID should be comma or space separated)",
     ),
     snv_indel_files: str = typer.Option(
         ...,
@@ -198,6 +208,7 @@ def annotsv(
         False,
         "--snvIndelPASS",
         callback=to_bool,
+        metavar="[0|1]",
         help="Boolean. To only use variants from VCF input files that passed all filters during the calling (FILTER column value equal to PASS) $ Values: 0 (default) or 1",
         # NOTE: change to  true/false flag instead of requiring param value?
     ),
@@ -210,6 +221,7 @@ def annotsv(
         True,
         "--SVinputInfo",
         callback=to_bool,
+        metavar="[0|1]",
         help="To extract the additional SV input fields and insert the data in the output file $ Values: 1 (default) or 0",
     ),
     sv_min_size: int = typer.Option(50, "--SVminSize", min=1, help="SV minimum size (in bp)"),

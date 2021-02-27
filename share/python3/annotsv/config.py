@@ -151,7 +151,7 @@ def _load_legacy_config(config_file: Path) -> Dict[str, Any]:
                 option_name, option_value = match.group(1, 2)
                 if option_name == "rankFiltering":
                     pass
-                # invalid options will be caught by Config
+                # invalid options will be caught when creating Config object
                 option_config[option_name] = option_value.replace('"', "")
             else:
                 raise ValueError(f"unexpected line format: {line}")
