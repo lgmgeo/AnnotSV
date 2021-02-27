@@ -45,24 +45,35 @@ def annotsv(
     sv_input_file: Path = typer.Option(
         ...,
         "--SVinputFile",
+        dir_okay=False,
+        file_okay=True,
         help="Path of your VCF or BED input file with SV coordinates",
+        metavar="FILE",
+        readable=True,
+        resolve_path=True,
     ),
     annotations_dir: Optional[Path] = typer.Option(
         str(constants.annotation_dir),
         "--annotationsDir",
+        dir_okay=True,
+        file_okay=False,
         help="Path of the annotations directory",
+        metavar="FILE",
+        readable=True,
+        resolve_path=True,
     ),
     annotation_mode: AnnotationMode = typer.Option(
         config.annotation_mode,
         case_sensitive=False,
-        metavar=AnnotationMode.metavar(),
         help="Selection of the type of annotation lines produced by AnnotSV",
     ),
+    # TODO: verify dir vs. binary
     bcftools: Optional[Path] = typer.Option(
         config.bcftools,
         "--bcftools",
         help="Path of the bcftools local installation",
     ),
+    # TODO: verify dir vs. binary
     bedtools: Optional[Path] = typer.Option(
         config.bedtools,
         "--bedtools",
@@ -107,16 +118,16 @@ def annotsv(
         case_sensitive=False,
         help="Genome build used",
     ),
-    hpo: List[str] = typer.Option(
-        [],
+    hpo: Optional[List[str]] = typer.Option(
+        None,
         "--hpo",
         help="HPO terms list describing the phenotype of the individual being investigated. Values: use comma, semicolon or space separated class values (e.g.: 'HP:0001156,HP:0001363,HP:0011304')",
     ),
     include_ci: bool = typer.Option(
         config.include_ci,
         "--includeCI",
-        is_flag=False,
         callback=to_bool,
+        is_flag=False,
         metavar="[0|1]",
         help="To expand the 'start' and 'end' SV positions with the VCF confidence intervals (CIPOS, CIEND) around the breakpoints",
     ),
@@ -131,6 +142,7 @@ def annotsv(
         "--minTotalNumber",
         min=100,
         max=1000,
+        metavar="[100, 1000]",
         help="Minimum number of individuals tested to consider a benign SV for the ranking",
     ),
     output_dir: Path = typer.Option(
@@ -138,8 +150,8 @@ def annotsv(
         "--outputDir",
         dir_okay=True,
         file_okay=False,
-        writable=True,
         resolve_path=True,
+        writable=True,
         help="Output path name",
     ),
     output_file: Path = typer.Option(
@@ -147,8 +159,8 @@ def annotsv(
         "--outputFile",
         dir_okay=False,
         file_okay=True,
-        writable=True,
         resolve_path=True,
+        writable=True,
         help="Output path and file name",
     ),
     overlap: int = typer.Option(
@@ -156,13 +168,14 @@ def annotsv(
         "--overlap",
         min=0,
         max=100,
-        help="Minimum overlap (%) between the user features and the annotated SV to be reported. Range values: [0-100]",
+        metavar="[0, 100]",
+        help="Minimum overlap (%) between the user features and the annotated SV to be reported",
     ),
     overwrite: bool = typer.Option(
         config.overwrite,
         "--overwrite",
-        is_flag=False,
         callback=to_bool,
+        is_flag=False,
         metavar="[0|1]",
         help="To overwrite existing output results",
     ),
@@ -170,6 +183,7 @@ def annotsv(
         500,
         "--promoterSize",
         min=1,
+        metavar="[1, inf)",
         help="Number of bases upstream from the transcription start site",
     ),
     rank_filtering: str = typer.Option(
@@ -180,24 +194,25 @@ def annotsv(
     reciprocal: bool = typer.Option(
         config.reciprocal,
         "--reciprocal",
-        is_flag=False,
         callback=to_bool,
+        is_flag=False,
         metavar="[0|1]",
         help="Use of a reciprocal overlap between SV and user features (only for annotations with features overlapping the SV)",
     ),
     re_report: bool = typer.Option(
         config.re_report,
         "--REreport",
-        is_flag=False,
         callback=to_bool,
+        is_flag=False,
         metavar="[0|1]",
         help="Create a report to link the annotated SV and the overlapped regulatory elements (coordinates and sources)",
     ),
-    samplesid_bed_col: int = typer.Option(
-        -1,
+    samplesid_bed_col: Optional[int] = typer.Option(
+        None,
         "--samplesidBEDcol",
         min=4,
-        help="Number of the column reporting the samples ID for which the SV was called (if the input SV file is a BED). Range values: [4-[,  (Samples ID should be comma or space separated)",
+        metavar="[4, inf)",
+        help="Number of the column reporting the samples ID for which the SV was called (if the input SV file is a BED). (Samples ID should be comma or space separated)",
     ),
     snv_indel_files: str = typer.Option(
         ...,
@@ -209,11 +224,10 @@ def annotsv(
         "--snvIndelPASS",
         callback=to_bool,
         metavar="[0|1]",
-        help="Boolean. To only use variants from VCF input files that passed all filters during the calling (FILTER column value equal to PASS) $ Values: 0 (default) or 1",
-        # NOTE: change to  true/false flag instead of requiring param value?
+        help="Only use variants from VCF input files that passed all filters during the calling (FILTER column value equal to PASS)",
     ),
     snv_indel_samples: Optional[str] = typer.Option(
-        ...,
+        None,
         "--snvIndelSamples",
         help="To specifiy the sample names from the VCF files defined from the -vcfFiles option. Default: use all samples from the VCF files",
     ),
@@ -222,15 +236,21 @@ def annotsv(
         "--SVinputInfo",
         callback=to_bool,
         metavar="[0|1]",
-        help="To extract the additional SV input fields and insert the data in the output file $ Values: 1 (default) or 0",
+        help="Extract additional SV input fields and insert the data into the output file",
     ),
-    sv_min_size: int = typer.Option(50, "--SVminSize", min=1, help="SV minimum size (in bp)"),
-    svt_bed_col: int = typer.Option(
-        -1,
+    sv_min_size: int = typer.Option(
+        50,
+        "--SVminSize",
+        min=1,
+        metavar="[1, inf)",
+        help="SV minimum size (in bp)",
+    ),
+    svt_bed_col: Optional[int] = typer.Option(
+        None,
         "--svtBEDcol",
         min=4,
-        help="Number of the column describing the SV type (DEL, DUP) if the input SV file is a BED. Range values: [4-[",
-        # NOTE: use Optional/None instead of -1?
+        metavar="[4, inf)",
+        help="Number of the column describing the SV type (DEL, DUP) if the input SV file is a BED",
     ),
     tx: TranscriptSource = typer.Option(
         TranscriptSource.RefSeq,
