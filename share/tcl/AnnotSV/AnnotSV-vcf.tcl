@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.0.5                                                                                            #
+# AnnotSV 3.0.6                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -81,17 +81,30 @@ proc VCFannotation {SVchrom SVstart SVend SVtype} {
 		foreach line [split $Message "\n"] {
 		    if {[regexp -nocase "error|fail" $line]} {puts "\t   $line"}
 		}
-		puts "\t   No multiallelic treatment done."
+		puts "\t   => No multiallelic treatment done."
 		if {[regexp ".gz$" $vcfF]} {
 		    file copy -force $vcfF $tmpVCFgz1 
 		} else {
 		    catch {eval exec cat $vcfF | gzip > $tmpVCFgz1} Message 
 		}
+	    } elseif {[regexp -nocase "error|fail" $Message]} {
+		# we continue AnnotSV without splitting the multiallelic sites !
+		puts "\t   -- VCFannotation --"
+		puts "\t   $g_AnnotSV(bcftools) norm -m -both $vcfF > $tmpVCF1"
+		foreach line [split $Message "\n"] {
+		    if {[regexp -nocase "error|fail" $line]} {puts "\t   $line"}
+		}
+		puts "\t   => No multiallelic treatment done."
+		if {[regexp ".gz$" $vcfF]} {
+		    file copy -force $vcfF $tmpVCFgz1 
+		} else {
+		    catch {eval exec cat $vcfF | gzip > $tmpVCFgz1} Message 
+		}		
 	    } else {
-		    catch {eval exec gzip $tmpVCF1} Message
+		catch {eval exec gzip $tmpVCF1} Message
 	    }
 	    file delete -force $tmpVCF1
-
+	    
 	    # Parsing of $vcfF
 	    puts "\t...parsing of $vcfF ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
 	    set iIntersect 0

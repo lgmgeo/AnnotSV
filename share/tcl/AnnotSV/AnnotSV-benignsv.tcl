@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.0.5                                                                                            #
+# AnnotSV 3.0.6                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -631,12 +631,14 @@ proc check1000g_benignFile {genomeBuild} {
 	##############################################
 	regsub ".vcf.gz" $1000gFileDownloaded ".tmp.vcf" 1000gFileTmp 	
 	catch {eval exec $g_AnnotSV(bcftools) norm -m -both $1000gFileDownloaded > $1000gFileTmp} Message
-	if {[file size $1000gFileTmp] eq 0} {
+	if {[regexp -nocase "error|fail" $Message]} {
 	    # we continue AnnotSV without splitting the multiallelic sites !
 	    puts "\t   -- check1000g --"
 	    puts "\t   $g_AnnotSV(bcftools) norm -m -both $1000gFileDownloaded > $1000gFileTmp"
-	    puts "\t   $1000gFileTmp: file empty."
-	    puts "\t   No multiallelic treatment done."
+	    foreach line [split $Message "\n"] {
+		if {[regexp -nocase "error|fail" $line]} {puts "\t   $line"}
+	    }
+	    puts "\t   => No multiallelic treatment done."
 	    file delete -force $1000gFileTmp	   
 	} 
 	

@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.0.5                                                                                            #
+# AnnotSV 3.0.6                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -506,7 +506,7 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
     # Intersect of the input SV bedfile with the regulatory elements files
     ######################################################################
     ## Sorted SV bed file: $g_AnnotSV(bedFile)
-    regsub ".annotated.tsv$" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) ".SV_RE_intersect.tmp" SV_RE_intersectBEDfile
+    regsub "(.annotated)?.tsv$" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) ".SV_RE_intersect.tmp" SV_RE_intersectBEDfile
     file delete -force $SV_RE_intersectBEDfile
 
     set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)"
@@ -547,9 +547,13 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
 	foreach sv [array names g_re] {
 	    set g_re($sv) [lsort -unique $g_re($sv)]
 	}
+	
 	## Delete temporary file
 	if {$g_AnnotSV(REreport) eq "no"} {
 	    file delete -force $SV_RE_intersectBEDfile
+	} else {
+	    regsub "(.annotated)?.tsv$" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) ".SV_RE_intersect" permanentSV_RE_intersectBEDfile
+	    file rename $SV_RE_intersectBEDfile $permanentSV_RE_intersectBEDfile
 	}
     }
 
