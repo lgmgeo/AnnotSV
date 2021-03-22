@@ -112,45 +112,45 @@ proc SVrankingLoss {L_annotations} {
 	## Section 1: Initial assessment of genomic content
 	####################################################################################################################
 	if {$REgene eq "" && $NbGenes eq "0"} {
-	    # 1B. Does NOT contain protein-coding or any known functionally important elements (- 0.60)
+	    # 1B. Does NOT contain protein-coding or any known functionally important elements (-0.60)
 	    set g_rankingScore($AnnotSV_ID) "-0.60"
-	    set g_rankingExplanations($AnnotSV_ID) "1B;"
+	    set g_rankingExplanations($AnnotSV_ID) "1B (-0.60);"
 	} else {
-	    # 1A. Contains protein-coding or other known functionally important elements (+ 0)
+	    # 1A. Contains protein-coding or other known functionally important elements (+0.00)
 	    set g_rankingScore($AnnotSV_ID) "0"
-	    set g_rankingExplanations($AnnotSV_ID) "1A;"
+	    set g_rankingExplanations($AnnotSV_ID) "1A (+0.00);"
 	}
 	
 	## Section 2: Overlap with established/predicted haploinsufficiency (HI) or established benign genes/genomic regions
 	##            (Skip to section 3 if your copy-number loss DOES NOT overlap these types of genes/regions)
 	#####################################################################################################################
 	if {$Ploss ne ""} {
-	    # 2A. Complete overlap of an established HI gene/genomic region (+ 1)
-	    set g_rankingExplanations($AnnotSV_ID,2A) "2A (cf P_loss_source);"
+	    # 2A. Complete overlap of an established HI gene/genomic region (+1.00)
+	    set g_rankingExplanations($AnnotSV_ID,2A) "2A (cf P_loss_source, +1.00);"
 	} elseif {$Bloss ne ""} {
-	    # 2F. Completely contained within an established benign CNV region (- 1)
-	    set g_rankingExplanations($AnnotSV_ID,2F) "2F (cf B_loss_source);"
+	    # 2F. Completely contained within an established benign CNV region (-1.00)
+	    set g_rankingExplanations($AnnotSV_ID,2F) "2F (cf B_loss_source, -1.00);"
 	} elseif {0} {		
-	    # 2G. Overlaps an established benign CNV, but includes additional genomic material (+ 0)
+	    # 2G. Overlaps an established benign CNV, but includes additional genomic material (+0.00)
 	    # Vero to improve
-	    set g_rankingExplanations($AnnotSV_ID,2G) ""
+	    set g_rankingExplanations($AnnotSV_ID,2G) "2G (+0.00);"
 	}
 	
 	## Section 3: Evaluation of gene number
 	####################################################################################################################
 	if {$NbGenes <= 24} {
-	    # 3A. 0-24 genes (+ 0)
+	    # 3A. 0-24 genes (+0.00)
 	    if {$NbGenes < 2} {
-		set g_rankingExplanations($AnnotSV_ID,3A) "3A ($NbGenes gene);"
+		set g_rankingExplanations($AnnotSV_ID,3A) "3A ($NbGenes gene, +0.00);"
 	    } else {
-		set g_rankingExplanations($AnnotSV_ID,3A) "3A ($NbGenes genes);"
+		set g_rankingExplanations($AnnotSV_ID,3A) "3A ($NbGenes genes, +0.00);"
 	    }
 	} elseif {$NbGenes <= 35} {
-	    # 3B. 25-34 genes (+ 0.45)
-	    set g_rankingExplanations($AnnotSV_ID,3B) "3B ($NbGenes genes);"
+	    # 3B. 25-34 genes (+0.45)
+	    set g_rankingExplanations($AnnotSV_ID,3B) "3B ($NbGenes genes, +0.45);"
 	} else {
-	    # 3C. 35+ genes (+ 0.90)
-	    set g_rankingExplanations($AnnotSV_ID,3C) "3C ($NbGenes genes);"
+	    # 3C. 35+ genes (+0.90)
+	    set g_rankingExplanations($AnnotSV_ID,3C) "3C ($NbGenes genes, +0.90);"
 	} 
 	
 	## Section 4: Detailed evaluation of genomic content using cases from published literature, public databases, and/or internal lab data
@@ -175,10 +175,10 @@ proc SVrankingLoss {L_annotations} {
 		}
 	    }
 	    if {$bestEx >= 0.7} {
-		# 5H. Inheritance information is unavailable or uninformative. The patient phenotype is highly specific and consistent with what has been described in similar cases (+ 0.30)
+		# 5H. Inheritance information is unavailable or uninformative. The patient phenotype is highly specific and consistent with what has been described in similar cases (+0.30)
 		lappend g_rankingExplanations($AnnotSV_ID,5H) "RE:$bestG"
 	    } elseif {$bestEx >= 0.5} {
-		# 5G. Inheritance information is unavailable or uninformative. The patient phenotype is nonspecific, but is consistent with what has been described in similar cases (+ 0.10)
+		# 5G. Inheritance information is unavailable or uninformative. The patient phenotype is nonspecific, but is consistent with what has been described in similar cases (+0.10)
 		lappend g_rankingExplanations($AnnotSV_ID,5G) "RE:$bestG"
 	    }
 	}
@@ -210,27 +210,27 @@ proc SVrankingLoss {L_annotations} {
 	    if {[regexp "^5'UTR" $location2] && ![regexp "3'UTR$" $location2]} {
 		# 2C. Partial overlap with the 5’ end of an established HI gene (3’ end of the gene not involved)…
 		if {$CDSlength ne "0"} {
-		    # 2C-1. …and coding sequence is involved (+ 0.90)
+		    # 2C-1. …and coding sequence is involved (+0.90)
 		    lappend g_rankingExplanations($AnnotSV_ID,2C-1) "$gene"
 		} else {
-		    # 2C-2. …and only the 5’ UTR is involved (+ 0)
+		    # 2C-2. …and only the 5’ UTR is involved (+0.00)
 		    lappend g_rankingExplanations($AnnotSV_ID,2C-2) "$gene"		    
 		}
 	    } elseif {[regexp "3'UTR$" $location2] && ![regexp "^5'UTR" $location2]} {
 		# 2D. Partial overlap with the 3’ end of an established HI gene (5’ end of the gene not involved)…
 		if {$CDSlength eq "0"} {
-		    # 2D-1. …and only the 3’ untranslated region is involved (+ 0)
+		    # 2D-1. …and only the 3’ untranslated region is involved (+0.00)
 		    lappend g_rankingExplanations($AnnotSV_ID,2D-1) "$gene"		    
 		} elseif {$location eq "exon${NbExons}-txEnd" && $Psnvindel ne ""} {
-		    # 2D-2. …and only the last exon is involved. Other established pathogenic snv/indel have been reported in the SV (+ 0.90)
+		    # 2D-2. …and only the last exon is involved. Other established pathogenic snv/indel have been reported in the SV (+0.90)
 		    # Vero to improve: Other established pathogenic snv/indel have been reported in this exon
 		    lappend g_rankingExplanations($AnnotSV_ID,2D-2) "$gene"
 		} elseif {$location eq "exon${NbExons}-txEnd"} {
-		    # 2D-3. …and only the last exon is involved. No other established pathogenic snv/indel have been reported in the SV (+ 0.30)
+		    # 2D-3. …and only the last exon is involved. No other established pathogenic snv/indel have been reported in the SV (+0.30)
 		    # Vero to improve: No other established pathogenic snv/indel have been reported in this exon
 		    lappend g_rankingExplanations($AnnotSV_ID,2D-3) "$gene"
 		} elseif {$location ne "exon${NbExons}-txEnd" && $location ne "intron[expr {${NbExons}-1}]-txEnd"} {	    
-		    # 2D-4. …and it includes other exons in addition to the last exon. Nonsense-mediated decay is expected to occur (+ 0.90)
+		    # 2D-4. …and it includes other exons in addition to the last exon. Nonsense-mediated decay is expected to occur (+0.90)
 		    lappend g_rankingExplanations($AnnotSV_ID,2D-4) "$gene"		    
 		}
 	    } elseif {![regexp "txStart|txEnd" $location]} {
@@ -246,16 +246,16 @@ proc SVrankingLoss {L_annotations} {
 		    }
 		}
 		if {$frameshift eq "yes"} {
-		    # 2E-1. ...frameshift (+ 0.90)
+		    # 2E-1. ...frameshift (+0.90)
 		    lappend g_rankingExplanations($AnnotSV_ID,2E-1) "$gene"
 		} elseif {$exonOverlapped && $Psnvindel ne "" && $CDSpercent >= 10} {
-		    # 2E-2. ...exon(s) overlapped AND pathogenic snv/indel overlapped AND SV removes > 10% of protein (+ 0.45)
+		    # 2E-2. ...exon(s) overlapped AND pathogenic snv/indel overlapped AND SV removes > 10% of protein (+0.45)
 		    lappend g_rankingExplanations($AnnotSV_ID,2E-2) "$gene"		    
 		} elseif {$exonOverlapped && $Psnvindel ne "" && $CDSpercent < 10} {
-		    # 2E-3. ...exon(s) overlapped AND pathogenic snv/indel overlapped AND SV removes < 10% of protein (+ 0.30)
+		    # 2E-3. ...exon(s) overlapped AND pathogenic snv/indel overlapped AND SV removes < 10% of protein (+0.30)
 		    lappend g_rankingExplanations($AnnotSV_ID,2E-3) "$gene"		    
 		} elseif {$exonOverlapped && $Psnvindel eq "" && $CDSpercent > 10} {
-		    # 2E-4. ...>=1 exon deleted AND no established pathogenic snv/indel have been reported in the observed CNV AND variant removes > 10% of protein (0.2)
+		    # 2E-4. ...>=1 exon deleted AND no established pathogenic snv/indel have been reported in the observed CNV AND variant removes > 10% of protein (+0.20)
 		    lappend g_rankingExplanations($AnnotSV_ID,2E-4) "$gene"
 		}
 	    }
@@ -268,12 +268,12 @@ proc SVrankingLoss {L_annotations} {
 	    if {$pLI >= 0.9} {incr i}
 	    if {$HIpercent <= 10} {incr i}
 	    if {$i >= 2} {
-		# 2H. Two or more HI predictors suggest that AT LEAST ONE gene in the interval is HI (+ 0.15)
+		# 2H. Two or more HI predictors suggest that AT LEAST ONE gene in the interval is HI (+0.15)
 		lappend g_rankingExplanations($AnnotSV_ID,2H) "$gene"
 	    }
 #	    if {$loeuf != ""} {incr i} 
 #	    if {$i >= 2} {
-#		# 2H. Two or more HI predictors suggest that AT LEAST ONE gene in the interval is HI (+ 0.15)
+#		# 2H. Two or more HI predictors suggest that AT LEAST ONE gene in the interval is HI (+0.15)
 #		lappend g_rankingExplanations($AnnotSV_ID,2H) "$gene"
 #		set scoreLoeuf(0) "0.075"
 #		set scoreLoeuf(1) "0.0675"
@@ -297,10 +297,10 @@ proc SVrankingLoss {L_annotations} {
 	## Section 5: Evaluation of inheritance pattern/family history for patient being studied			
 	####################################################################################################################
 	if {$exomiser >= 0.7} {
-	    # 5H. Inheritance information is unavailable or uninformative. The patient phenotype is highly specific and consistent with what has been described in similar cases (+ 0.30)
+	    # 5H. Inheritance information is unavailable or uninformative. The patient phenotype is highly specific and consistent with what has been described in similar cases (+0.30)
 	    lappend g_rankingExplanations($AnnotSV_ID,5H) "$gene"
 	} elseif {$exomiser >= 0.5} {
-	    # 5G. Inheritance information is unavailable or uninformative. The patient phenotype is nonspecific, but is consistent with what has been described in similar cases (+ 0.10)
+	    # 5G. Inheritance information is unavailable or uninformative. The patient phenotype is nonspecific, but is consistent with what has been described in similar cases (+0.10)
 	    lappend g_rankingExplanations($AnnotSV_ID,5G) "$gene"
 	}
     }
@@ -334,52 +334,52 @@ proc achieveSVrankingLoss {AnnotSV_ID} {
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2C-1)]} {
 	# 2C-1
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.90}]
-	append g_rankingExplanations($AnnotSV_ID) "2C-1 ([join $g_rankingExplanations($AnnotSV_ID,2C-1) "/"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2C-1 ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,2C-1)] "/"], +0.90);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2D-2)]} {
 	# 2D-2
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.90}]
-	append g_rankingExplanations($AnnotSV_ID) "2D-2 ([join $g_rankingExplanations($AnnotSV_ID,2D-2) "/"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2D-2 ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,2D-2)] "/"], +0.90);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2D-4)]} {
 	# 2D-4
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.90}]
-	append g_rankingExplanations($AnnotSV_ID) "2D-4 ([join $g_rankingExplanations($AnnotSV_ID,2D-4) "/"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2D-4 ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,2D-4)] "/"], +0.90);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2E-1)]} {
 	# 2E-1
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.90}]
-	append g_rankingExplanations($AnnotSV_ID) "2E-1 ([join $g_rankingExplanations($AnnotSV_ID,2E-1) "/"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2E-1 ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,2E-1)] "/"], +0.90);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2E-2)]} {
 	# 2E-2
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.45}]
-	append g_rankingExplanations($AnnotSV_ID) "2E-2 ([join $g_rankingExplanations($AnnotSV_ID,2E-2) "/"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2E-2 ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,2E-2)] "/"], +0.45);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2D-3)]} {
 	# 2D-3
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.45}]
-	append g_rankingExplanations($AnnotSV_ID) "2D-3 ([join $g_rankingExplanations($AnnotSV_ID,2D-3) "/"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2D-3 ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,2D-3)] "/"], +0.45);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2E-3)]} {
 	# 2E-3
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.30}]
-	append g_rankingExplanations($AnnotSV_ID) "2E-3 ([join $g_rankingExplanations($AnnotSV_ID,2E-3) "/"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2E-3 ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,2E-3)] "/"], +0.30);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2E-4)]} {
 	# 2E-4
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.20}]
-	append g_rankingExplanations($AnnotSV_ID) "2E-4 ([join $g_rankingExplanations($AnnotSV_ID,2E-4) "/"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2E-4 ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,2E-4)] "/"]), +0.20;"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2H)]} {
 	# 2H
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.15}]
 	#set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+$g_rankingScore($AnnotSV_ID,maxLoeuf)}]
-	append g_rankingExplanations($AnnotSV_ID) "2H ([join $g_rankingExplanations($AnnotSV_ID,2H) "/"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2H ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,2H)] "/"], +0.15);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2C-2)]} {
 	# 2C-2
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.00}]
-	append g_rankingExplanations($AnnotSV_ID) "2C-2 ([join $g_rankingExplanations($AnnotSV_ID,2C-2) "/"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2C-2 ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,2C-2)] "/"],+0.00);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2D-1)]} {
 	# 2D-1
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.00}]
-	append g_rankingExplanations($AnnotSV_ID) "2D-1 ([join $g_rankingExplanations($AnnotSV_ID,2D-1) "/"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2D-1 ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,2D-1)] "/"],+0.00);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2G)]} {
 	# 2G
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.00}]
-	append g_rankingExplanations($AnnotSV_ID) "2G;"
+	append g_rankingExplanations($AnnotSV_ID) "$g_rankingExplanations($AnnotSV_ID,2G)"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2F)]} {
 	# 2F
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)-1.00}]
@@ -420,15 +420,15 @@ proc achieveSVrankingLoss {AnnotSV_ID} {
     if {[info exists g_rankingExplanations($AnnotSV_ID,5H)]} {
 	# 5H
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.30}]
-	append g_rankingExplanations($AnnotSV_ID) "5H ([join $g_rankingExplanations($AnnotSV_ID,5H) "/"])"
+	append g_rankingExplanations($AnnotSV_ID) "5H ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,5H)] "/"], +0.30)"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,5G)]} {
 	# 5G
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.10}]
-	append g_rankingExplanations($AnnotSV_ID) "5G ([join $g_rankingExplanations($AnnotSV_ID,5G) "/"])"
+	append g_rankingExplanations($AnnotSV_ID) "5G ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,5G)] "/"], +0.10)"
     } else {
 	# 5F
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.00}]
-	append g_rankingExplanations($AnnotSV_ID) "5F"
+	append g_rankingExplanations($AnnotSV_ID) "5F (+0.00)"
     }
 
     return
@@ -462,21 +462,21 @@ proc SVrankingGain {L_annotations} {
 	## Section 1: Initial assessment of genomic content
 	####################################################################################################################
 	if {$REgene eq "" && $NbGenes eq "0"} {
-	    # 1B. Does NOT contain protein-coding or any known functionally important elements (- 0.60)
+	    # 1B. Does NOT contain protein-coding or any known functionally important elements (-0.60)
 	    set g_rankingScore($AnnotSV_ID) "-0.60"
-	    set g_rankingExplanations($AnnotSV_ID) "1B;"
+	    set g_rankingExplanations($AnnotSV_ID) "1B (-0.60);"
 	} else {
-	    # 1A. Contains protein-coding or other known functionally important elements (+ 0)
+	    # 1A. Contains protein-coding or other known functionally important elements (+0.00)
 	    set g_rankingScore($AnnotSV_ID) "0"
-	    set g_rankingExplanations($AnnotSV_ID) "1A;"
+	    set g_rankingExplanations($AnnotSV_ID) "1A (+0.00);"
 	}
 	
 	## Section 2: Overlap with established triplosensitive (TS), haploinsufficient (HI), or benign genes or genomic regions
 	##            (Skip to section 3 if the copy-number gain DOES NOT overlap these types of genes/regions)			
 	#####################################################################################################################
 	if {$Pgain ne ""} {
-	    # 2A. Complete overlap; the TS gene or minimal critical region is fully contained within the observed copy-number gain (+ 1)
-	    set g_rankingExplanations($AnnotSV_ID,2A) "2A (cf P_gain_source);"
+	    # 2A. Complete overlap; the TS gene or minimal critical region is fully contained within the observed copy-number gain (+1.00)
+	    set g_rankingExplanations($AnnotSV_ID,2A) "2A (cf P_gain_source, +1.00);"
 	} elseif {$Bgain ne ""} {
 	    # 2DE. Smaller than established benign copy-number gain
 	    set g_rankingExplanations($AnnotSV_ID,2DE) ""
@@ -485,18 +485,18 @@ proc SVrankingGain {L_annotations} {
 	## Section 3: Evaluation of gene number
 	####################################################################################################################
 	if {$NbGenes <= 34} {
-	    # 3A. 0-34 genes (+ 0)
+	    # 3A. 0-34 genes (+0.00)
 	    if {$NbGenes < 2} {
-		set g_rankingExplanations($AnnotSV_ID,3A) "3A ($NbGenes gene);"
+		set g_rankingExplanations($AnnotSV_ID,3A) "3A ($NbGenes gene, +0.00);"
 	    } else {
-		set g_rankingExplanations($AnnotSV_ID,3A) "3A ($NbGenes genes);"
+		set g_rankingExplanations($AnnotSV_ID,3A) "3A ($NbGenes genes, +0.00);"
 	    }
 	} elseif {$NbGenes <= 49} {
-	    # 3B. 35-49 genes (+ 0.45)
-	    set g_rankingExplanations($AnnotSV_ID,3B) "3B ($NbGenes genes);"
+	    # 3B. 35-49 genes (+0.45)
+	    set g_rankingExplanations($AnnotSV_ID,3B) "3B ($NbGenes genes, +0.45);"
 	} else {
-	    # 3C. 50 or more genes (+ 0.90)
-	    set g_rankingExplanations($AnnotSV_ID,3C) "3C ($NbGenes genes);"
+	    # 3C. 50 or more genes (+0.90)
+	    set g_rankingExplanations($AnnotSV_ID,3C) "3C ($NbGenes genes, +0.90);"
 	} 
 	
 	##  Section 4: Detailed evaluation of genomic content using cases from published literature, public databases, and/or internal lab data
@@ -519,10 +519,10 @@ proc SVrankingGain {L_annotations} {
 		}
 	    }
 	    if {$bestEx >= 0.7} {
-		# 5H. Inheritance information is unavailable or uninformative. The patient phenotype is highly specific and consistent with what has been described in similar cases (+ 0.15)
+		# 5H. Inheritance information is unavailable or uninformative. The patient phenotype is highly specific and consistent with what has been described in similar cases (+0.15)
 		lappend g_rankingExplanations($AnnotSV_ID,5H) "RE:$bestG"
 	    } elseif {$bestEx >= 0.5} {
-		# 5G. Inheritance information is unavailable or uninformative. The patient phenotype is nonspecific, but is consistent with what has been described in similar cases (+ 0.10)
+		# 5G. Inheritance information is unavailable or uninformative. The patient phenotype is nonspecific, but is consistent with what has been described in similar cases (+0.10)
 		lappend g_rankingExplanations($AnnotSV_ID,5G) "RE:$bestG"
 	    }
 	}
@@ -542,11 +542,11 @@ proc SVrankingGain {L_annotations} {
 
         if {[info exists g_rankingExplanations($AnnotSV_ID,2DE)]} {
 	    if {![regexp "exon|intron" $location]} {
-		# 2D. Smaller than established benign copy-number gain, breakpoint(s) does not interrupt protein-coding genes (- 1)
-		set g_rankingExplanations($AnnotSV_ID,2D) "2D (cf B_gain_source);"
+		# 2D. Smaller than established benign copy-number gain, breakpoint(s) does not interrupt protein-coding genes (-1.00)
+		set g_rankingExplanations($AnnotSV_ID,2D) "2D (cf B_gain_source, -1.00);"
 	    } else {
 		# 2E. Smaller than established benign copy-number gain, breakpoint(s) potentially interrupts protein-coding gene (+0.00)
-		set g_rankingExplanations($AnnotSV_ID,2E) "2E (cf B_gain_source);"
+		set g_rankingExplanations($AnnotSV_ID,2E) "2E (cf B_gain_source, +0.00);"
 	    }
 	} 
 	
@@ -556,20 +556,20 @@ proc SVrankingGain {L_annotations} {
 	    if {![regexp "^txStart" $location] && ![regexp "txEnd$" $location]} {
 		# Both breakpoints are within the same HI gene / morbid gene (gene-level sequence variant, possibly resulting in loss of function [LOF]) AND...
 		if {$frameshift eq "yes"} {
-		    # 2I-1. ...disrupts the reading frame (+ 0.45)
+		    # 2I-1. ...disrupts the reading frame (+0.45)
 		    lappend g_rankingExplanations($AnnotSV_ID,2I-1) "$gene"
 		} elseif {$exomiser >= 0.7} {
-		    # 2I-2. ...patient phenotype is highly specific and consistent with what has been described for this HI gene / morbid gene (Exomiser_gene_pheno_score >= 0.7) (+ 0.45)
+		    # 2I-2. ...patient phenotype is highly specific and consistent with what has been described for this HI gene / morbid gene (Exomiser_gene_pheno_score >= 0.7) (+0.45)
 		    lappend g_rankingExplanations($AnnotSV_ID,2I-2) "$gene"
 		} else {
-		    # 2I-3. ...patient phenotype is either inconsistent with what has been described for this HI gene / morbid gene (Exomiser_gene_pheno_score < 0.7) OR unknown (+ 0.00)
+		    # 2I-3. ...patient phenotype is either inconsistent with what has been described for this HI gene / morbid gene (Exomiser_gene_pheno_score < 0.7) OR unknown (+0.00)
 		    lappend g_rankingExplanations($AnnotSV_ID,2I-3) "$gene"
 		}
 	    } elseif {![regexp "^txStart" $location] || ![regexp "txEnd$" $location]} {
 		# One breakpoint is within an established HI gene
 		if {$exomiser >= 0.7} {
 		    # 2K. One breakpoint is within an established HI gene / morbid gene, patient’s phenotype is highly specific and consistent with what is expected
-		    #     for LOF of that gene (Exomiser_gene_pheno_score >= 0.7) (+ 0.45)
+		    #     for LOF of that gene (Exomiser_gene_pheno_score >= 0.7) (+0.45)
 		    lappend g_rankingExplanations($AnnotSV_ID,2K) "$gene"
 		} else {
 		    # 2J. One breakpoint is within an established HI gene / morbid gene, patient’s phenotype is either inconsistent with what is expected for LOF of that gene OR unknown (+0.00) 
@@ -593,10 +593,10 @@ proc SVrankingGain {L_annotations} {
 	## Section 5: Evaluation of inheritance pattern/family history for patient being studied			
 	####################################################################################################################
 	if {$exomiser >= 0.7} {
-	    # 5H. Inheritance information is unavailable or uninformative. The patient phenotype is highly specific and consistent with what has been described in similar cases (+ 0.15)
+	    # 5H. Inheritance information is unavailable or uninformative. The patient phenotype is highly specific and consistent with what has been described in similar cases (+0.15)
 	    lappend g_rankingExplanations($AnnotSV_ID,5H) "$gene"
 	} elseif {$exomiser >= 0.5} {
-	    # 5G. Inheritance information is unavailable or uninformative. The patient phenotype is nonspecific, but is consistent with what has been described in similar cases (+ 0.10)
+	    # 5G. Inheritance information is unavailable or uninformative. The patient phenotype is nonspecific, but is consistent with what has been described in similar cases (+0.10)
 	    lappend g_rankingExplanations($AnnotSV_ID,5G) "$gene"
 	}
     }
@@ -626,19 +626,19 @@ proc achieveSVrankingGain {AnnotSV_ID} {
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2I-1)]} {
 	# 2I-1
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.45}]
-	append g_rankingExplanations($AnnotSV_ID) "2I-1 ([join $g_rankingExplanations($AnnotSV_ID,2I-1) "/"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2I-1 ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,2I-1)] "/"], +0.45);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2I-2)]} {
 	# 2I-2
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.45}]
-	append g_rankingExplanations($AnnotSV_ID) "2I-2 ([join $g_rankingExplanations($AnnotSV_ID,2I-2) "/"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2I-2 ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,2I-2)] "/"], +0.45);"
      } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2K)]} {
 	# 2K
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.45}]
-	append g_rankingExplanations($AnnotSV_ID) "2K ([join $g_rankingExplanations($AnnotSV_ID,2K) "/"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2K ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,2K)] "/"], +0.45);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2H-1)]} {
 	# 2H-1
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.45}]
-	append g_rankingExplanations($AnnotSV_ID) "2H-1 ([join $g_rankingExplanations($AnnotSV_ID,2H-1) "/"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2H-1 ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,2H-1)] "/"], +0.45);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2E)]} {
 	# 2E
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.00}]
@@ -646,19 +646,19 @@ proc achieveSVrankingGain {AnnotSV_ID} {
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2H-2)]} {
 	# 2H-2
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.00}]
-	append g_rankingExplanations($AnnotSV_ID) "2H-2 ([join $g_rankingExplanations($AnnotSV_ID,2H-2) "/"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2H-2 ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,2H-2)] "/"], +0.00);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2I-3)]} {
 	# 2I-3
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.00}]
-	append g_rankingExplanations($AnnotSV_ID) "2I-3 ([join $g_rankingExplanations($AnnotSV_ID,2I-3) "/"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2I-3 ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,2I-3)] "/"], +0.00);"
      } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2J)]} {
 	# 2J
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.00}]
-	append g_rankingExplanations($AnnotSV_ID) "2J ([join $g_rankingExplanations($AnnotSV_ID,2J) "/"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2J ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,2J)] "/"], +0.00);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2L)]} {
 	# 2L
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.00}]
-	append g_rankingExplanations($AnnotSV_ID) "2L ([join $g_rankingExplanations($AnnotSV_ID,2L) "/"]);"
+	append g_rankingExplanations($AnnotSV_ID) "2L ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,2L)] "/"], +0.00);"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2D)]} {
 	# 2D
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)-1.00}]
@@ -698,15 +698,15 @@ proc achieveSVrankingGain {AnnotSV_ID} {
 	if {[info exists g_rankingExplanations($AnnotSV_ID,5H)]} {
 	    # 5H
 	    set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.15}]
-	    append g_rankingExplanations($AnnotSV_ID) "5H ([join $g_rankingExplanations($AnnotSV_ID,5H) "/"])"
+	    append g_rankingExplanations($AnnotSV_ID) "5H ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,5H)] "/"], +0.15)"
 	} elseif {[info exists g_rankingExplanations($AnnotSV_ID,5G)]} {
 	    # 5G
 	    set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.10}]
-	    append g_rankingExplanations($AnnotSV_ID) "5G ([join $g_rankingExplanations($AnnotSV_ID,5G) "/"])"
+	    append g_rankingExplanations($AnnotSV_ID) "5G ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,5G)] "/"], +0.10)"
 	} else {
 	    # 5F
 	    set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.00}]
-	    append g_rankingExplanations($AnnotSV_ID) "5F"
+	    append g_rankingExplanations($AnnotSV_ID) "5F (+0.00)"
 	}
     }
     
