@@ -10,6 +10,7 @@
 
 For more details, please see the README file.
 
+	- feat: (i) Add the scoring points and (ii) remove gene names redundancy in the "AnnotSV_ranking_criteria" output column
 	- feat: Add bugfix concerning the use of the "candidateGenesFiltering" option
 	- feat: Include "NA" in the rankFiltering default option (default = "1-5,NA")
 	- feat: Add bugfix concerning the use of the "split" annotationMode
