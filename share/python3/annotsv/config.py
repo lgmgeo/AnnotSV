@@ -1,12 +1,14 @@
+import os
 import re
+import shutil
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, conint, constr, PositiveInt, Extra, validator
+from pydantic import BaseModel, Extra, PositiveInt, ValidationError, conint, validator
 
 from . import constants
 from .enums import *
-from .util import to_camel, from_camel
+from .util import from_camel, to_camel
 
 # NOTE: defaults coming from CLI, AnnotSV-config.tcl, default configfile. What should be priority? CLI > configfile > class defaults
 # should class defaults be eliminated and moved into config? then lose programmatic access to default values though
@@ -69,9 +71,9 @@ class Config(BaseModel):
     sv_min_size: PositiveInt
 
     # optional
-    annotations_dir: Optional[Path]
-    bcftools: Optional[Path]
-    bedtools: Optional[Path]
+    annotations_dir: Path
+    bcftools: Path
+    bedtools: Path
     candidate_genes_file: Optional[Path]
     candidate_snv_indel_files: Optional[str]
     candidate_snv_indel_samples: Optional[List[str]]
@@ -101,6 +103,21 @@ class Config(BaseModel):
         hpo_pattern = re.compile(r"^HP:\d+$")
         assert all([hpo_pattern.search(c) for c in v.split(",")]), f"Invalid HPO patterns in {v}"
         return v
+
+    @validator("bcftools", "bedtools")
+    def validate_executable(cls, path_str: str):
+        bin_path = Path(path_str)
+        if bin_path.exists():
+            assert os.access(
+                bin_path, os.F_OK | os.X_OK
+            ), f"{bin_path} exists, but is not a file or not executable"
+        elif bin_path.name == path_str:
+            which_path = shutil.which(path_str)
+            assert which_path is not None, f"{path_str} not found"
+            bin_path = Path(which_path)
+        else:
+            assert False, ""
+        return bin_path.resolve()
 
     class Config:
         # allows loading/dumping with camelCase, while still keeping snake_case
