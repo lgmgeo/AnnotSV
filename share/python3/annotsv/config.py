@@ -60,8 +60,8 @@ class Config(BaseModel):
     hpo: Optional[str]
     include_ci: bool
     metrics: MetricFormat
-    min_total_number: conint(ge=100, le=1000)
-    overlap: conint(ge=0, le=100)
+    min_total_number: conint(ge=100, le=1000)  # type: ignore
+    overlap: conint(ge=0, le=100)  # type: ignore
     overwrite: bool
     promoter_size: PositiveInt
     rank_filtering: str
