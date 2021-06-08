@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.0.7                                                                                            #
+# AnnotSV 3.0.8                                                                                            #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
@@ -10,6 +10,7 @@
 
 For more details, please see the README file.
 
+	- feat: External BED annotation files can now also be used to report any feature overlapped with the SV (even with 1bp overlap)
 	- feat: (i) Add the scoring points and (ii) remove gene names redundancy in the "AnnotSV_ranking_criteria" output column
 	- feat: Add bugfix concerning the use of the "candidateGenesFiltering" option
 	- feat: Include "NA" in the rankFiltering default option (default = "1-5,NA")

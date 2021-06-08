@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.0.7                                                                                            #
+# AnnotSV 3.0.8                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -171,8 +171,11 @@ proc userBEDannotation {formattedSortedUserBEDfile SVchrom SVstart SVend} {
 		if {$g_AnnotSV(reciprocal) eq "yes"} {			
 		    if {[expr {$overlap_length*100.0/$userBED_length}] < $g_AnnotSV(overlap)} {continue}
 		}
+	    } elseif {[regexp "AnyOverlap" $formattedSortedUserBEDfile]} {
+		## AnyOverlap
+		## <=> Keeping all user regions
 	    }
-	   	    
+	    
 	    # Each SV to annotate can be overlapped with several users regions => use of "$i" to merge the annotations column by column
 	    set i "$g_numberOfAnnotationCol($formattedSortedUserBEDfile)"
 	    while {$i > 0} {
@@ -207,7 +210,7 @@ proc userBEDannotation {formattedSortedUserBEDfile SVchrom SVstart SVend} {
 	## Annotation done
 	set userBEDtext($formattedSortedUserBEDfile,DONE) 1	
 	set g_AnnotSV(userBEDAnn) 1
-	file delete -force $tmpFile		
+	file delete -force $tmpFile
     }
 
     if {[info exist userBEDtext($formattedSortedUserBEDfile,$SVchrom,$SVstart,$SVend)]} {

@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.0.7                                                                                            #
+# AnnotSV 3.0.8                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -195,7 +195,7 @@ proc OrganizeAnnotation {} {
 	}
     }
 
-    ####### "FtIncludedInSV header"
+    #######  usersDir: "FtIncludedInSV header"
     if {[glob -nocomplain $usersDir/FtIncludedInSV/*.formatted.sorted.bed] ne ""} {
 	foreach formattedUserBEDfile [glob -nocomplain $usersDir/FtIncludedInSV/*.formatted.sorted.bed] {
 	    regsub -nocase ".formatted.sorted.bed$" $formattedUserBEDfile ".header.tsv" userHeaderFile
@@ -204,6 +204,17 @@ proc OrganizeAnnotation {} {
 	    lappend FtIncludedInSVHeader "[join $L_headerColName "\t"]"
 	}
 	append headerOutput "\t[join $FtIncludedInSVHeader "\t"]"
+    }
+
+    #######  usersDir: "AnyOverlap header"
+    if {[glob -nocomplain $usersDir/AnyOverlap/*.formatted.sorted.bed] ne ""} {
+	foreach formattedUserBEDfile [glob -nocomplain $usersDir/AnyOverlap/*.formatted.sorted.bed] {
+	    regsub -nocase ".formatted.sorted.bed$" $formattedUserBEDfile ".header.tsv" userHeaderFile
+	    set L1header   [split [FirstLineFromFile $userHeaderFile] "\t"]
+	    set L_headerColName [lrange $L1header 3 end]
+	    lappend AnyOverlapHeader "[join $L_headerColName "\t"]"
+	}
+	append headerOutput "\t[join $AnyOverlapHeader "\t"]"
     }
 
     ####### "Breakpoints header"
@@ -337,12 +348,26 @@ proc OrganizeAnnotation {} {
 	    regsub -nocase ".formatted.sorted.bed$" $formattedUserBEDfile ".header.tsv" userHeaderFile
 	    set L1header   [split [FirstLineFromFile $userHeaderFile] "\t"]
 	    set L_headerColName [lrange $L1header 3 end]
-	    append FtIncludedInSVHeader "\t[join $L_headerColName "\t"]"
 	    # Number of columns of annotation in the user bedfile (without the 3 columns "chrom start end")
 	    set nColHeader [llength $L_headerColName]
 	    puts "\t\t($nColHeader annotations columns: [join $L_headerColName ", "])"
 	}
     }
+
+    ####### "AnyOverlap"
+    if {$g_AnnotSV(organism) eq "Human"} {
+	puts "\t...Annotations with features sharing any overlap with the SV"
+	foreach formattedUserBEDfile [glob -nocomplain $usersDir/AnyOverlap/*.formatted.sorted.bed] {
+	    puts "\t\t...[file tail $formattedUserBEDfile]"
+	    regsub -nocase ".formatted.sorted.bed$" $formattedUserBEDfile ".header.tsv" userHeaderFile
+	    set L1header   [split [FirstLineFromFile $userHeaderFile] "\t"]
+	    set L_headerColName [lrange $L1header 3 end]
+	    # Number of columns of annotation in the user bedfile (without the 3 columns "chrom start end")
+	    set nColHeader [llength $L_headerColName]
+	    puts "\t\t($nColHeader annotations columns: [join $L_headerColName ", "])"
+	}
+    }
+
     ####### "Breakpoints annotations"
     puts "\t...Breakpoints annotations"
     if {$g_AnnotSV(gcContentAnn)} {puts "\t\t...GC content annotation"}
@@ -792,6 +817,25 @@ proc OrganizeAnnotation {} {
 	}
 	set FtIncludedInSVtext [join $L_FtIncludedInSVtext "\t"]
 
+	# User AnyOverlap BED annotations. 
+	set L_AnyOverlapText {}
+   	foreach formattedUserBEDfile [glob -nocomplain $usersDir/AnyOverlap/*.formatted.sorted.bed] {
+	    if {$AnnotationMode eq "split"} {
+		lappend L_AnyOverlapText "[userBEDannotation $formattedUserBEDfile $SVchrom $intersectStart $intersectEnd]"
+	    } else {
+		lappend L_AnyOverlapText "[userBEDannotation $formattedUserBEDfile $SVchrom $SVleft $SVright]"
+	    } 
+	}
+	set AnyOverlapText [join $L_AnyOverlapText "\t"]
+	
+	if {$formattedUserBEDfile eq "$usersDir/AnyOverlap/cytoBand_$g_AnnotSV(genomeBuild).formatted.sorted.bed"} {
+	    set L_AnyOverlapText [split $AnyOverlapText ";"]
+	    set AnyOverlapText [lindex $L_AnyOverlapText end]
+	    if {[llength $L_AnyOverlapText] > 1} {
+		append AnyOverlapText "-[lindex $L_AnyOverlapText 0]"
+	    }
+	}
+	
 	# Gene-based annotations.
 	if {$g_AnnotSV(geneBasedAnn)} {
 	    #   -> Number of columns from each Gene-based file
@@ -1077,6 +1121,11 @@ proc OrganizeAnnotation {} {
 	if {[glob -nocomplain $usersDir/FtIncludedInSV/*.formatted.sorted.bed] ne ""} { ; # Don't put {$FtIncludedInSVtext ne ""}: the user BED could have only 1 annotation column, and so $UserText can be equel to "" (without "\t")
 	    append TextToWrite "\t$FtIncludedInSVtext"
 	}
+	
+	#######  "Users: AnyOverlap"
+	if {[glob -nocomplain $usersDir/AnyOverlap/*.formatted.sorted.bed] ne ""} { ; # Don't put {$AnyOverlaptext ne ""}: the user BED could have only 1 annotation column, and so $UserText can be equel to "" (without "\t")
+	    append TextToWrite "\t$AnyOverlapText"
+	}	
 	
 	####### "Breakpoints annotations"
 	if {$g_AnnotSV(gcContentAnn)} {
