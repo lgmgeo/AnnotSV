@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.0.8                                                                                            #
+# AnnotSV 3.0.9                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -820,21 +820,30 @@ proc OrganizeAnnotation {} {
 	# User AnyOverlap BED annotations. 
 	set L_AnyOverlapText {}
    	foreach formattedUserBEDfile [glob -nocomplain $usersDir/AnyOverlap/*.formatted.sorted.bed] {
-	    if {$AnnotationMode eq "split"} {
-		lappend L_AnyOverlapText "[userBEDannotation $formattedUserBEDfile $SVchrom $intersectStart $intersectEnd]"
+	    # Temporary annotation code for the cytoband (To remove later, once the cytoband annotation will be integrated in the distribution)
+	    if {$formattedUserBEDfile eq "$usersDir/AnyOverlap/cytoBand_$g_AnnotSV(genomeBuild).formatted.sorted.bed"} {
+		if {$AnnotationMode eq "split"} {
+		    set L_cytobandText "[userBEDannotation $formattedUserBEDfile $SVchrom $intersectStart $intersectEnd]"
+		} else {
+		    set L_cytobandText "[userBEDannotation $formattedUserBEDfile $SVchrom $SVleft $SVright]"
+		}
+		set L_cytobandText [split $L_cytobandText ";"]
+		set cytobandText [lindex $L_cytobandText end]
+		if {[llength $L_cytobandText] > 1} {
+		    append cytobandText "-[lindex $L_cytobandText 0]"
+		}
+		lappend L_AnyOverlapText $cytobandText 
 	    } else {
-		lappend L_AnyOverlapText "[userBEDannotation $formattedUserBEDfile $SVchrom $SVleft $SVright]"
-	    } 
+		# Permanent code
+		if {$AnnotationMode eq "split"} {
+		    lappend L_AnyOverlapText "[userBEDannotation $formattedUserBEDfile $SVchrom $intersectStart $intersectEnd]"
+		} else {
+		    lappend L_AnyOverlapText "[userBEDannotation $formattedUserBEDfile $SVchrom $SVleft $SVright]"
+		}
+	    }
 	}
 	set AnyOverlapText [join $L_AnyOverlapText "\t"]
 	
-	if {$formattedUserBEDfile eq "$usersDir/AnyOverlap/cytoBand_$g_AnnotSV(genomeBuild).formatted.sorted.bed"} {
-	    set L_AnyOverlapText [split $AnyOverlapText ";"]
-	    set AnyOverlapText [lindex $L_AnyOverlapText end]
-	    if {[llength $L_AnyOverlapText] > 1} {
-		append AnyOverlapText "-[lindex $L_AnyOverlapText 0]"
-	    }
-	}
 	
 	# Gene-based annotations.
 	if {$g_AnnotSV(geneBasedAnn)} {
