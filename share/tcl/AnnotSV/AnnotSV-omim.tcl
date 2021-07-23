@@ -77,10 +77,10 @@ proc checkOMIMfile {} {
 	    set Ls [split $L "\t"]
 	    
 	    if {[regexp "^# Chromosome\tGenomic" $L]} {
-		set i_gene1    [lsearch -exact $Ls "Gene Symbols"];    if {$i_gene1 == -1} {puts "Bad header line syntax. Gene Symbols column not found - Exit with error"; exit 2}
-		set i_gene2    [lsearch -exact $Ls "Approved Symbol"]; if {$i_gene2 == -1} {puts "Bad header line syntax. Approved Symbol column not found - Exit with error"; exit 2}
-		set i_mim      [lsearch -exact $Ls "MIM Number"];      if {$i_mim == -1} {puts "Bad header line syntax. Mim Number column not found - Exit with error"; exit 2}
-		set i_pheno    [lsearch -exact $Ls "Phenotypes"];      if {$i_pheno == -1} {puts "Bad header line syntax. Phenotypes column not found - Exit with error"; exit 2}
+		set i_gene1    [lsearch -exact $Ls "Gene Symbols"];         if {$i_gene1 == -1} {puts "Bad header line syntax. Gene Symbols column not found - Exit with error"; exit 2}
+		set i_gene2    [lsearch -exact $Ls "Approved Gene Symbol"]; if {$i_gene2 == -1} {puts "Bad header line syntax. Approved Symbol column not found - Exit with error"; exit 2}
+		set i_mim      [lsearch -exact $Ls "MIM Number"];           if {$i_mim == -1} {puts "Bad header line syntax. Mim Number column not found - Exit with error"; exit 2}
+		set i_pheno    [lsearch -exact $Ls "Phenotypes"];           if {$i_pheno == -1} {puts "Bad header line syntax. Phenotypes column not found - Exit with error"; exit 2}
 		continue
 	    }
 	    if {[regexp "^#" $L]} {continue}
