@@ -77,6 +77,7 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(tx)                       "RefSeq"
     set g_AnnotSV(txFile)                   ""
 
+    
     ###########################
     ## Load config file options
     ###########################

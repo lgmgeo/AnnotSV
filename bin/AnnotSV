@@ -110,6 +110,9 @@ if {![info exists g_AnnotSV(Version)]} {
 }
 
 puts "AnnotSV $g_AnnotSV(Version)"
+if {[regexp "\-version|\-Version" $argv]} {
+    exit
+}
 puts ""
 puts "Copyright (C) 2017-2021 GEOFFROY Veronique"
 puts ""
