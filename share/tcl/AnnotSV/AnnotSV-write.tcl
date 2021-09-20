@@ -130,7 +130,7 @@ proc OrganizeAnnotation {} {
 	    }
 	}
     }
-    append headerOutput "\tAnnotation_mode\tGene_name\tGene_count\tTx\tTx_start\tTx_end\tOverlapped_tx_length\tOverlapped_CDS_length\tOverlapped_CDS_percent\tFrameshift\tExon_count\tLocation\tLocation2\tDist_nearest_SS\tNearest_SS_type\tIntersect_start\tIntersect_end\tRE_gene"
+    append headerOutput "\tAnnotation_mode\tCytoBand\tGene_name\tGene_count\tTx\tTx_start\tTx_end\tOverlapped_tx_length\tOverlapped_CDS_length\tOverlapped_CDS_percent\tFrameshift\tExon_count\tLocation\tLocation2\tDist_nearest_SS\tNearest_SS_type\tIntersect_start\tIntersect_end\tRE_gene"
     	      
 
     ### Search for "ref" and "alt" information (to define the AnnotSV_ID)
@@ -295,6 +295,7 @@ proc OrganizeAnnotation {} {
     ################### Display of the annotations to be realize #####################
     ##################################################################################
     puts "...listing of the annotations to be realized ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
+    puts "\t...CytoBand annotation" 
     puts "\t...Genes annotation" 
     puts "\t\t...$g_AnnotSV(tx) annotation"
     
@@ -800,6 +801,23 @@ proc OrganizeAnnotation {} {
 	    set benignText "[benignSVannotation $SVchrom $SVleft $SVright]"
 	} 
 
+	# Annotations with cytoband (AnyOverlap) 
+	set cytobandText ""
+	set cytobandDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/AnyOverlap/CytoBand/$g_AnnotSV(genomeBuild)/"
+   	set cytobandBEDfile [glob -nocomplain $cytobandDir/cytoBand_$g_AnnotSV(genomeBuild).formatted.sorted.bed] 
+	if {[file exists $cytobandBEDfile]} {
+	    if {$AnnotationMode eq "split"} {
+		set L_cytobandText "[userBEDannotation $cytobandBEDfile $SVchrom $intersectStart $intersectEnd]"
+	    } else {
+		set L_cytobandText "[userBEDannotation $cytobandBEDfile $SVchrom $SVleft $SVright]"
+	    }
+	    set L_cytobandText [split $L_cytobandText ";"]
+	    set cytobandText [lindex $L_cytobandText end]
+	    if {[llength $L_cytobandText] > 1} {
+		append cytobandText "-[lindex $L_cytobandText 0]"
+	    }
+	}
+
 	# User SVincludedInFt BED annotations. 
 	set L_SVincludedInFtText {}
    	foreach formattedUserBEDfile [glob -nocomplain $usersDir/SVincludedInFt/*.formatted.sorted.bed] {
@@ -825,30 +843,13 @@ proc OrganizeAnnotation {} {
 	# User AnyOverlap BED annotations. 
 	set L_AnyOverlapText {}
    	foreach formattedUserBEDfile [glob -nocomplain $usersDir/AnyOverlap/*.formatted.sorted.bed] {
-	    # Temporary annotation code for the cytoband (To remove later, once the cytoband annotation will be integrated in the distribution)
-	    if {$formattedUserBEDfile eq "$usersDir/AnyOverlap/cytoBand_$g_AnnotSV(genomeBuild).formatted.sorted.bed"} {
-		if {$AnnotationMode eq "split"} {
-		    set L_cytobandText "[userBEDannotation $formattedUserBEDfile $SVchrom $intersectStart $intersectEnd]"
-		} else {
-		    set L_cytobandText "[userBEDannotation $formattedUserBEDfile $SVchrom $SVleft $SVright]"
-		}
-		set L_cytobandText [split $L_cytobandText ";"]
-		set cytobandText [lindex $L_cytobandText end]
-		if {[llength $L_cytobandText] > 1} {
-		    append cytobandText "-[lindex $L_cytobandText 0]"
-		}
-		lappend L_AnyOverlapText $cytobandText 
+	    if {$AnnotationMode eq "split"} {
+		lappend L_AnyOverlapText "[userBEDannotation $formattedUserBEDfile $SVchrom $intersectStart $intersectEnd]"
 	    } else {
-		# Permanent code
-		if {$AnnotationMode eq "split"} {
-		    lappend L_AnyOverlapText "[userBEDannotation $formattedUserBEDfile $SVchrom $intersectStart $intersectEnd]"
-		} else {
-		    lappend L_AnyOverlapText "[userBEDannotation $formattedUserBEDfile $SVchrom $SVleft $SVright]"
-		}
+		lappend L_AnyOverlapText "[userBEDannotation $formattedUserBEDfile $SVchrom $SVleft $SVright]"
 	    }
 	}
-	set AnyOverlapText [join $L_AnyOverlapText "\t"]
-	
+	set AnyOverlapText [join $L_AnyOverlapText "\t"]	
 	
 	# Gene-based annotations.
 	if {$g_AnnotSV(geneBasedAnn)} {
@@ -1102,6 +1103,9 @@ proc OrganizeAnnotation {} {
 	}
 	append TextToWrite "\t$AnnotationMode"
 
+	####### "Cytoband annotations"
+	append TextToWrite "\t$cytobandText"
+	
 	####### "Basic gene annotations"
 	append TextToWrite "\t$geneName\t$NbGenes\t$transcript\t$txStart\t$txEnd\t$txL\t$CDSl\t$CDSpercent\t$frameshift\t$nbExons\t$location\t$location2\t$distNearestSS\t$nearestSStype\t$intersect"
 

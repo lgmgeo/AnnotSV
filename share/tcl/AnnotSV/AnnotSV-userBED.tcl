@@ -94,6 +94,11 @@ proc userBEDannotation {formattedSortedUserBEDfile SVchrom SVstart SVend} {
     global userBEDtext
 
     if {![info exists userBEDtext($formattedSortedUserBEDfile,DONE)]} {
+	# The cytoBand file is not present in the User directory. But this proc is used for its parsing.
+	if {[regexp "cytoBand_GRCh3..formatted.sorted.bed" $formattedSortedUserBEDfile]} {
+	    set g_numberOfAnnotationCol($formattedSortedUserBEDfile) 1
+	}
+				    
 	set userBEDtext($formattedSortedUserBEDfile,Empty) ""
 	
 	regsub -nocase ".formatted.sorted.bed$" $formattedSortedUserBEDfile ".header.tsv" userHeaderFile
