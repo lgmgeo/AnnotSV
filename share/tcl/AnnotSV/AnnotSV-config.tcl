@@ -425,7 +425,7 @@ proc configureAnnotSV {argv} {
     ## It must be existing files
     if {$g_AnnotSV(candidateSnvIndelFiles) ne ""} {
 	# Warning: A file that doesn't exist (or badly defined with a regexp) will not return an error message but will return an empty list:
-	set g_AnnotSV(candidateSnvIndelFiles) [eval glob -nocomplain $g_AnnotSV(candidateSnvIndelFiles)] 
+	set g_AnnotSV(candidateSnvIndelFiles) [eval glob -nocomplain $g_AnnotSV(candidateSnvIndelFiles)]
     }
     ## After that, if "candidateSnvIndelFiles" contains at least 1 existing file:
     if {$g_AnnotSV(candidateSnvIndelFiles) ne ""} {
@@ -468,10 +468,15 @@ proc configureAnnotSV {argv} {
 		set g_AnnotSV(candidateSnvIndelSamples) $L_allSamplesFromVCF
 	    }
 	}
+	
+	# Check if the "candidateSnvIndelFiles" contains the GT field
+	# (else the g_AnnotSV(candidateSnvIndelSamples) is set to "")
+	filteredVCFannotation "FULL" "" "" "" ""
+	
     } else {
 	set g_AnnotSV(candidateSnvIndelSamples) ""
     }
-
+    
     ## It must be "GRCh37" or "GRCh38" or "mm9" or "mm10" for the genomeBuild option.
     if {![regexp -nocase "^(GRCh37)|(GRCh38)|(mm9)|(mm10)$" $g_AnnotSV(genomeBuild)]} {
 	puts "############################################################################"

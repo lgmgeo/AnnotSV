@@ -269,7 +269,7 @@ proc OrganizeAnnotation {} {
     if {$g_AnnotSV(svtTSVcol) eq -1 && $g_AnnotSV(organism) eq "Human"} { ; # SV_type is required for the ranking of human SV
 	puts "\nWARNING: AnnotSV requires the SV type (duplication, deletion...) to classify the SV"
 	puts "         Not provided (svtBEDcol = -1)"
-	puts "         => No SV ranking (ACMG_class feature will be set to \"NA\")"
+	puts "         => No SV ranking (ACMG_class feature will be set to \"NA\")\n"
 	set g_AnnotSV(ranking) 0
 
 	if {![regexp "NA" $g_AnnotSV(rankFiltering)]} {
@@ -277,6 +277,11 @@ proc OrganizeAnnotation {} {
 	    puts "         => SV with \"ACMG_class = NA\" will be filtered out"
 	    puts "         => All the SV will be filtered out\n"
 	}
+    } else {
+	if {![regexp "NA" $g_AnnotSV(rankFiltering)]} {
+	    puts "\nWARNING: -rankFiltering = $g_AnnotSV(rankFiltering)"
+	    puts "         => SV with \"ACMG_class = NA\" will be filtered out\n"
+	}	
     }
     append headerOutput "\tAnnotSV_ranking_score"
     append headerOutput "\tAnnotSV_ranking_criteria"

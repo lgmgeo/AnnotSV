@@ -351,6 +351,10 @@ proc VCFsToBED {SV_VCFfiles} {
 	
 	set i 0
 	set VCFheaderNotPresent 1
+	
+	# Check if the GT feature is present for at least 1 variant
+	set GTabsent 1
+	
 	while {![eof $f]} {
 	    
 	    if {$i eq "500000"} {
@@ -509,6 +513,7 @@ proc VCFsToBED {SV_VCFfiles} {
 		# If the GT is not given, AnnotSV considers that the SV is present in all the samples
 		set L_samplesid "$L_allSamples"
 	    } else {
+		set GTabsent 0
 		set L_samplesid {}
 		set isample 0
 		foreach sampleValue [lrange $Ls 9 end] {
@@ -542,6 +547,14 @@ proc VCFsToBED {SV_VCFfiles} {
 	if {![regexp ".gz$" $VCFfile]} {close $f}
 	
 	WriteTextInFile [join $L_TextToWrite "\n"] $SV_BEDfile
+
+	if {$g_AnnotSV(candidateSnvIndelFiles) ne "" && $GTabsent} {
+	    puts "...parsing of $SV_VCFfiles"
+	    puts "\t...WARNING: The SV genotype is not indicated in the FORMAT column under the “GT” field"
+	    puts "\t            => Compound heterozygosity analysis won't be processed!\n"
+	    set g_AnnotSV(candidateSnvIndelFiles)   ""
+	    set g_AnnotSV(candidateSnvIndelSamples) ""
+	}
 
 	if {$VCFheader eq ""} { ; # No header in the VCF input file
 	    #CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  HG00096

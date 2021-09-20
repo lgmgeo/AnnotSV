@@ -36,15 +36,27 @@ proc filteredVCFannotation {GENEchrom GENEstart GENEend Line headerOutput} {
     global L_htzPos
     global L_samplesFromTheHeader
 
+    if {[regexp ".bed(.gz)?" $g_AnnotSV(SVinputFile)]} { ;# <=> SVinputFile is a BED
+	puts "\t...WARNING: The compound heterozygosity analysis is not available from a BED SV input file"
+	puts "\t            => That analysis won't be processed!\n"
+	set g_AnnotSV(candidateSnvIndelFiles)   ""
+	set g_AnnotSV(candidateSnvIndelSamples) ""
+	set g_AnnotSV(filteredVCFparsing) "useless"
+	return 
+    }
+    
     ## VCFs parsing is done only 1 time (After, g_AnnotSV(filteredVCFparsing) is set to "done")
     if {![info exists g_AnnotSV(filteredVCFparsing)]} {
 	set g_AnnotSV(filteredVCFparsing) "done"
 	# parsing of $g_AnnotSV(candidateSnvIndelFiles): creation of L_htzPos($chrom,$sample)
-	puts "\n\n...parsing of candidateSnvIndelFiles for \"$g_AnnotSV(candidateSnvIndelSamples)\" ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
+	puts "...parsing of candidateSnvIndelFiles for \"$g_AnnotSV(candidateSnvIndelSamples)\" ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
 	
 	# No htz compound for the full lines
 	set L_htzPos(FULL) [lrepeat [llength $g_AnnotSV(candidateSnvIndelSamples)] ""]
 	
+	# Check if the GT feature is present for at least 1 variant
+	set GTabsent 1
+
 	# "eval glob" accept regular expression ("*.vcf) as well as a list of files ("sample1.vcf sample2.vcf.gz"):
 	foreach vcfF [eval glob -nocomplain $g_AnnotSV(candidateSnvIndelFiles)] {
 	    puts "\t...parse all positions from $vcfF ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
@@ -86,12 +98,13 @@ proc filteredVCFannotation {GENEchrom GENEstart GENEend Line headerOutput} {
 
 		# keep only variant with FILTER == PASS
 		if {$g_AnnotSV(snvIndelPASS) && $filter ne "PASS"} {continue}
-		
+
 		foreach sample $L_samplesOkFROMvcfF {
 		    set sampleData [lindex $Ls $i_sample($sample)]
 		    # set the GT
 		    set j_GT [lsearch -exact [split $formatData ":"] "GT"]
 		    if {$j_GT eq -1} {continue}
+		    set GTabsent 0
 		    set GT ""
 		    set GTsample [lindex [split $sampleData ":"] $j_GT]
 		    set GTsample [split $GTsample "/|\\|"]
@@ -102,6 +115,13 @@ proc filteredVCFannotation {GENEchrom GENEstart GENEend Line headerOutput} {
 	    }
 	    close $f
 	}
+	if {$GTabsent} {
+	    puts "\t...WARNING: The SNV/indel genotype is not indicated in the FORMAT column under the “GT” field"
+	    puts "\t            => Compound heterozygosity analysis won't be processed!"
+	    set g_AnnotSV(candidateSnvIndelFiles)   ""
+	    set g_AnnotSV(candidateSnvIndelSamples) ""
+	}
+	puts ""
     }
 
     set textToReturn {}
@@ -115,23 +135,30 @@ proc filteredVCFannotation {GENEchrom GENEstart GENEend Line headerOutput} {
 	############################
 	
 	if {![info exists L_samplesFromTheHeader]} {
+	    # Done only one time
 	    # Listing of all the samples in the VCF input files
 	    regsub ".*FORMAT\t" $headerOutput "" samples
 	    regsub "\tAnnotation_mode.*" $samples "" samples
 	    set L_samplesFromTheHeader [split $samples "\t"]
 	}
-	
+
+	# SVinputFile is a VCF
 	# Is the SV detected in each sample from $g_AnnotSV(candidateSnvIndelSamples)?
-	# Answer given in the GT of the VCF input file (but not from a bedfile)
+	# Answer given in the GT of the SV VCF input file (but not from a bedfile)
 	if {[info exists g_AnnotSV(formatColNumber)]} { ;# <=> SVinputFile is a VCF
 	    set formatData [lindex $Line $g_AnnotSV(formatColNumber)]
 	    set i_gt [lsearch [split $formatData ":"] "GT"]
 	    foreach sample $L_samplesFromTheHeader valueSample [lrange $Line [expr {$g_AnnotSV(formatColNumber)+1}] end-13] {
 		set gt [lindex [split $valueSample ":"] $i_gt]
 		if {[regexp "\[1-9\]" $gt]} {
-		set SV($sample) detected
+		    set SV($sample) detected
 		}
 	    }
+	} else {
+	    # SVinputFile is a BED
+	    # => no GT information
+	    # => SV($sample) has never been defined
+	    # => No "Compound heterozygosity analysis" (even if asked with the -candidateSnvIndelFiles option)
 	}
 	
 	foreach sample $g_AnnotSV(candidateSnvIndelSamples) {
