@@ -6,13 +6,13 @@
 # AnnotSV Options :
 #------------------
 
--candidateGenesFiltering:   no
+-candidateGenesFiltering:   0
 
--genomeBuild:               GRCh37
+-genomeBuild:               GRCh38
 
 -hpo:                       ""
 
--includeCI:                 "yes"
+-includeCI:                 1
 
 -metrics:                   "us"
 
@@ -20,15 +20,15 @@
 
 -overlap:                   100
 
--overwrite:                 "yes"
+-overwrite:                 1
 
 -promoterSize:              500
 
 -rankFiltering:             "1-5,NA"
 
--reciprocal:                "no"
+-reciprocal:                0
 
--snvindelPASS:              "0"
+-snvindelPASS:              0
 
 -SVinputInfo:               1
 

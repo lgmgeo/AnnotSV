@@ -49,7 +49,7 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(candidateSnvIndelSamples) ""
     set g_AnnotSV(extann)                   ""    ;# list of the “.../Annotations_$g_AnnotSV(organism)/*/*.tsv(.gz) files” <=> External gene annotation files
     set g_AnnotSV(externalGeneFiles)        ""
-    set g_AnnotSV(genomeBuild)              "GRCh37"
+    set g_AnnotSV(genomeBuild)              "GRCh38"
     set g_AnnotSV(hpo)                      ""    ;# "HP:0030684,HP:0085622"
     set g_AnnotSV(includeCI)                "1"
     set g_AnnotSV(metrics)                  "us"
@@ -195,8 +195,8 @@ proc configureAnnotSV {argv} {
 	set g_AnnotSV(metrics) "us"
     }
 
-    ## It must be: 1 or 0
-    foreach val {candidateGenesFiltering includeCI overwrite reciprocal REreport REselect1 REselect2} {
+    ## It must be a boolean: 1 or 0
+    foreach val {candidateGenesFiltering includeCI overwrite reciprocal REreport REselect1 REselect2 SVinputInfo snvIndelPASS} {
 	if {$g_AnnotSV($val) ne "1" && $g_AnnotSV($val) ne "0"} {
 	    puts "############################################################################"
 	    puts "Bad option value: -$val = $g_AnnotSV($val)"
@@ -205,7 +205,7 @@ proc configureAnnotSV {argv} {
 	    exit 2
 	}
     }
-
+   
     # g_AnnotSV(hpo)
     # It must be a comma, semicolon or space separated class values, default = ""
     # (e.g.: "HP:0001156,HP:0001363,HP:0011304")
@@ -242,17 +242,6 @@ proc configureAnnotSV {argv} {
     }
     set liste [lsort -unique $liste]
     set g_AnnotSV(rankFiltering) $liste
-
-    ## It must be a boolean (0 or 1) for the SVinputInfo and snvIndelPASS options.
-    foreach val {SVinputInfo snvIndelPASS} {
-	if {$g_AnnotSV($val) ne 0 && $g_AnnotSV($val) ne 1} {
-	    puts "############################################################################"
-	    puts "Bad option value: -$val = $g_AnnotSV($val)"
-	    puts "Should be \"0\" or \"1\""
-	    puts "############################################################################"
-	    exit 2
-	}
-    }
 
     ## g_AnnotSV(outputDir) must be an existing directory. Else, we create it.
     ## g_AnnotSV(outputFile) must be defined and should not already exists.
