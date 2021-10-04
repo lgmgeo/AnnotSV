@@ -257,6 +257,14 @@ proc checkBed {bedFile {bedDir ""} {mergeOverlap 0}} {
     while {![eof $f]} {
         set L [gets $f]
         if {$L eq ""} {continue}
+	# For each tab separated value, any leading or trailing white space is removed
+	set Ls [split $L "\t"]
+	set newLs ""
+	foreach val $Ls {
+	    lappend newLs [string trim $val]
+	}
+	set L [join $newLs "\t"]
+	
         if {[regexp "^#" $L]} {set header $L; continue}
         if {[regsub "chr" [lindex $L 0] "" chrom] ne 0} {
             lappend L_Text($chrom) "[string range $L 3 end]"

@@ -176,6 +176,15 @@ proc genesAnnotation {} {
 	# "Error: line number 716 of file input.formatted.sorted.bed has 6 fields, but 4 were expected."
 	regsub "\t$" $L "\t." L
 	
+	# To avoid a bug, the SV type value should be trimmed (should not be equal to "DEL ")
+	# For each tab separated value, any leading or trailing white space is removed
+	set Ls [split $L "\t"]
+	set newLs ""
+	foreach val $Ls {
+	    lappend newLs [string trim $val]
+	}
+	set L [join $newLs "\t"]
+
 	if {[regsub "chr" [lindex $L 0] "" chrom] ne 0} {
 	    lappend L_Text($chrom) "[string range $L 3 end]"
 	} else {
@@ -305,7 +314,8 @@ proc genesAnnotation {} {
     set SVfromBED "[join $Ls_fromBED "\t"]"
 	
     # Particular case: only 1 SV is associated with split lines AND it is not the first SV of the BED.
-    while {$SVfromBED ne $oldSplitSV} {	
+    while {$SVfromBED ne $oldSplitSV} {
+puts "...$SVfromBED! ne ...$oldSplitSV!"
 	# Writing of the "full" SV line (not present in the $splitBedFile file, if not covering a gene)
 	lappend L_linesToWrite "[lindex $L_Bed $n]\tfull"
 	incr i_toWrite
