@@ -1274,7 +1274,7 @@ proc OrganizeAnnotation {} {
 	    }
 	    
 	    # To select only the SV annotations overlapping a gene from the "candidateGenesFile"
-	    if {$g_AnnotSV(candidateGenesFiltering) eq "yes"} {
+	    if {$g_AnnotSV(candidateGenesFiltering)} {
 		if {$geneName eq ""} {
 		    # No gene overlapped
 		    continue

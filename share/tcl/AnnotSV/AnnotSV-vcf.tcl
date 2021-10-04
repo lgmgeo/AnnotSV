@@ -477,7 +477,7 @@ proc VCFsToBED {SV_VCFfiles} {
 	    if {$end < $pos} {set tutu $end; set end $pos; set pos $tutu}
 	    if {$end eq $pos} {set end [expr {$pos+1}]}
 
-	    if {$g_AnnotSV(includeCI) eq "yes"} {
+	    if {$g_AnnotSV(includeCI)} {
 		# Correction of the "start" / "end" SV positions by using the confidence interval around the boundaries:
 		##INFO=<ID=CIPOS,Number=2,Type=Integer,Description="Confidence interval around POS for imprecise variants">
 		##INFO=<ID=CIEND,Number=2,Type=Integer,Description="Confidence interval around END for imprecise variants">

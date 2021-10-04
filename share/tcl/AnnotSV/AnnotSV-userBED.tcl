@@ -173,7 +173,7 @@ proc userBEDannotation {formattedSortedUserBEDfile SVchrom SVstart SVend} {
 		## SVincludedInFt:
 		## <=> Keeping user regions respecting the overlaps (reciprocal or not reciprocal)
 		if {[expr {$overlap_length*100.0/$SVtoAnn_length}] < $g_AnnotSV(overlap)} {continue}
-		if {$g_AnnotSV(reciprocal) eq "yes"} {			
+		if {$g_AnnotSV(reciprocal)} {			
 		    if {[expr {$overlap_length*100.0/$userBED_length}] < $g_AnnotSV(overlap)} {continue}
 		}
 	    } elseif {[regexp "AnyOverlap" $formattedSortedUserBEDfile]} {

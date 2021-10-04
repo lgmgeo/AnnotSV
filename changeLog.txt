@@ -10,6 +10,7 @@
 
 For more details, please see the README file.
 
+	- refactor: Use boolean values (instead of "yes"/"no") for the following values: -candidateGenesFiltering, -includeCI, -overwrite, -reciprocal, -REreport, -REselect1 and -REselect2
 	- feat: Complete the regulatory element annotation:
 		- Add miRNA annotation (from miRTargetLink)
 		- Complete the RE_gene column output (the regulated gene name is detailed with the candidate gene annotation and the data sources (RefSeq, ENSEMBL, EnhancerAtlas, GeneHancer and/or miRTargetLink)

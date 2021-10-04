@@ -44,26 +44,26 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(bcftools)                 "bcftools"
     set g_AnnotSV(bedtools)                 "bedtools"
     set g_AnnotSV(candidateGenesFile)       ""
-    set g_AnnotSV(candidateGenesFiltering)  "no"
+    set g_AnnotSV(candidateGenesFiltering)  "0"
     set g_AnnotSV(candidateSnvIndelFiles)   ""
     set g_AnnotSV(candidateSnvIndelSamples) ""
     set g_AnnotSV(extann)                   ""    ;# list of the “.../Annotations_$g_AnnotSV(organism)/*/*.tsv(.gz) files” <=> External gene annotation files
     set g_AnnotSV(externalGeneFiles)        ""
     set g_AnnotSV(genomeBuild)              "GRCh37"
     set g_AnnotSV(hpo)                      ""    ;# "HP:0030684,HP:0085622"
-    set g_AnnotSV(includeCI)                "yes"
+    set g_AnnotSV(includeCI)                "1"
     set g_AnnotSV(metrics)                  "us"
     set g_AnnotSV(minTotalNumber)           "500"
     set g_AnnotSV(outputColHeader)          ""    ;# not given in parameter
     set g_AnnotSV(outputDir)                ""
     set g_AnnotSV(outputFile)               ""
     set g_AnnotSV(overlap)                  "100"
-    set g_AnnotSV(overwrite)                "yes"
+    set g_AnnotSV(overwrite)                "1"
     set g_AnnotSV(promoterSize)             "500"
     set g_AnnotSV(rankFiltering)            "1-5,NA"
     set g_AnnotSV(ranking)                  "1"   ;# not given in parameter
-    set g_AnnotSV(reciprocal)               "no"
-    set g_AnnotSV(REreport)                 "no"
+    set g_AnnotSV(reciprocal)               "0"
+    set g_AnnotSV(REreport)                 "0"
     set g_AnnotSV(REselect1)                "1"
     set g_AnnotSV(REselect2)                "1"
     set g_AnnotSV(samplesidBEDcol)          "-1"
@@ -195,18 +195,8 @@ proc configureAnnotSV {argv} {
 	set g_AnnotSV(metrics) "us"
     }
 
-    ## It must be: yes or no
-    foreach val {candidateGenesFiltering includeCI REreport} {
-	if {$g_AnnotSV($val) ne "yes" && $g_AnnotSV($val) ne "no"} {
-	    puts "############################################################################"
-	    puts "Bad option value: -$val = $g_AnnotSV($val)"
-	    puts "Should be \"no\" or \"yes\""
-	    puts "############################################################################"
-	    exit 2
-	}
-    }
     ## It must be: 1 or 0
-    foreach val {REselect1 REselect2} {
+    foreach val {candidateGenesFiltering includeCI overwrite reciprocal REreport REselect1 REselect2} {
 	if {$g_AnnotSV($val) ne "1" && $g_AnnotSV($val) ne "0"} {
 	    puts "############################################################################"
 	    puts "Bad option value: -$val = $g_AnnotSV($val)"
@@ -288,7 +278,7 @@ proc configureAnnotSV {argv} {
     } else {
 	regsub -nocase "(\\.bed|\\.vcf(\\.gz)?)$" [file tail $g_AnnotSV(SVinputFile)] ".annotated.tsv" g_AnnotSV(outputFile)
     }
-    if {$g_AnnotSV(overwrite) eq "no" && [file exists $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile)]} {
+    if {!$g_AnnotSV(overwrite) && [file exists $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile)]} {
 	puts "############################################################################"
 	puts "Bad value for the -outputFile option, file already exists ($g_AnnotSV(outputDir)/$g_AnnotSV(outputFile)) - Exit with error."
 	puts "############################################################################"
@@ -348,17 +338,6 @@ proc configureAnnotSV {argv} {
 	puts "Bad value for the $val option ($g_AnnotSV($val)), should be an integer comprised between 100 and 1000 - Exit with error."
 	puts "############################################################################"
 	exit 2
-    }
-
-    ## It must be "no" or "yes" for the reciprocal/overwrite option.
-    foreach val {reciprocal overwrite} {
-	if {![regexp -nocase "^(no)|(yes)$" $g_AnnotSV($val)]} {
-	    puts "############################################################################"
-	    puts "Bad option value: -$val = $g_AnnotSV($val)"
-	    puts "Should be \"no\" or \"yes\""
-	    puts "############################################################################"
-	    exit 2
-	}
     }
 
     ## It must be an integer > 0

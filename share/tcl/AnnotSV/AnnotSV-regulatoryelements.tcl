@@ -539,7 +539,8 @@ proc checkMiRTargetLinkFiles {} {
     ## Check if miRTargetLink file has been downloaded
     ##################################################
     # Checks if the miRTargetLink file exist:
-    set miRNAfiles [glob -nocomplain "$regElementsDir/*_miRNA-gene_pairs_hsa_miRBase_*_GRCh38_location_augmented.tsv"];# Validated + Predicted miRNA files
+    # (we only keep the validated miRNA file. But the code is OK to also keep the predicted miRNA file if wanted)
+    set miRNAfiles [glob -nocomplain "$regElementsDir/*_miRNA-gene_pairs_hsa_miRBase_*_GRCh38_location_augmented.tsv"];# Validated (+ Predicted) miRNA files
     if {$miRNAfiles eq ""} {
 	return
     }
@@ -619,7 +620,7 @@ proc checkMiRTargetLinkFiles {} {
 	WriteTextInFile "sort -k1,1 -k2,2n [set $miRNAfile].tmp >> [set $miRNAfile]" $sortTmpFile
 	file attributes $sortTmpFile -permissions 0755
 	if {[catch {eval exec bash $sortTmpFile} Message]} {
-	    puts "-- checkmiRNAfiles --"
+	    puts "-- checkMiRTargetLinkFiles --"
 	    puts "sort -k1,1 -k2,2n [set $miRNAfile].tmp >> [set $miRNAfile]"
 	    puts "$Message"
 	    puts "Exit with error"
@@ -630,8 +631,10 @@ proc checkMiRTargetLinkFiles {} {
     }
 
     # Delete the downloaded files
-    file delete -force $miRNAfile
-        
+    foreach miRNAfile $miRNAfiles {
+	file delete -force $miRNAfile
+    }
+    
     set g_AnnotSV(miRNAann) 1
 }
 
@@ -706,12 +709,12 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
 	}
 	
 	## Delete temporary file
-	if {$g_AnnotSV(REreport) eq "no"} {
-	    file delete -force $SV_RE_intersectBEDfile
-	} else {
+	if {$g_AnnotSV(REreport)} {
 	    regsub "(.annotated)?.tsv$" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) ".SV_RE_intersect.report" permanentSV_RE_intersectBEDfile
 	    file delete -force $permanentSV_RE_intersectBEDfile
 	    file rename $SV_RE_intersectBEDfile $permanentSV_RE_intersectBEDfile
+	} else {
+	    file delete -force $SV_RE_intersectBEDfile
 	}
     }
 
