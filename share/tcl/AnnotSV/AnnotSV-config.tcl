@@ -64,6 +64,8 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(ranking)                  "1"   ;# not given in parameter
     set g_AnnotSV(reciprocal)               "no"
     set g_AnnotSV(REreport)                 "no"
+    set g_AnnotSV(REselect1)                "1"
+    set g_AnnotSV(REselect2)                "1"
     set g_AnnotSV(samplesidBEDcol)          "-1"
     set g_AnnotSV(samplesidTSVcol)          "-1"  ;# not given in parameter
     set g_AnnotSV(snvIndelFiles)            ""
@@ -81,7 +83,7 @@ proc configureAnnotSV {argv} {
     ###########################
     ## Load config file options
     ###########################
-    set lOptionsOk "annotationsDir annotationMode bcftools bedtools candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo includeCI metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering reciprocal REreport samplesidBEDcol snvIndelFiles snvIndelPASS snvIndelSamples SVinputFile SVinputInfo SVminSize svtBEDcol tx txFile"
+    set lOptionsOk "annotationsDir annotationMode bcftools bedtools candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo includeCI metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering reciprocal REreport REselect1 REselect2 samplesidBEDcol snvIndelFiles snvIndelPASS snvIndelSamples SVinputFile SVinputInfo SVminSize svtBEDcol tx txFile"
     set configFile "$g_AnnotSV(etcDir)/configfile"
     if {[file exists "[file dirname $g_AnnotSV(SVinputFile)]/configfile"]} {
 	set configFile "[file dirname $g_AnnotSV(SVinputFile)]/configfile"
@@ -199,6 +201,16 @@ proc configureAnnotSV {argv} {
 	    puts "############################################################################"
 	    puts "Bad option value: -$val = $g_AnnotSV($val)"
 	    puts "Should be \"no\" or \"yes\""
+	    puts "############################################################################"
+	    exit 2
+	}
+    }
+    ## It must be: 1 or 0
+    foreach val {REselect1 REselect2} {
+	if {$g_AnnotSV($val) ne "1" && $g_AnnotSV($val) ne "0"} {
+	    puts "############################################################################"
+	    puts "Bad option value: -$val = $g_AnnotSV($val)"
+	    puts "Should be \"1\" or \"0\""
 	    puts "############################################################################"
 	    exit 2
 	}

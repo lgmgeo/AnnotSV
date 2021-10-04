@@ -386,7 +386,10 @@ proc checkGHfiles {} {
 	set GHstart [lindex $Ls $i_GHstart]
 	set GHend [lindex $Ls $i_GHend]
 	set coordGRCh38($GHid) "$chrom\t$GHstart\t$GHend"
-	set type($GHid) "GH_[lindex $Ls $i_GHtype]"
+	regsub -all "/" [lindex $Ls $i_GHtype] "_" type($GHid)
+	regsub "promoter_enhancer" $type($GHid) "enhancer" type($GHid) ;# to simplify the annotation in the AnnotSV output \
+	    # (we don't want: "RE=GH_enhancer+GH_promoter+GH_promoter_enhancer" in the RE_gene output column)
+	set type($GHid) "GH_[string tolower $type($GHid)]"
 	set L_GHgene(RefSeq,$GHid) "" ;# initialisation before the next foreach
 	set L_GHgene(ENSEMBL,$GHid) "" ;# initialisation before the next foreach
 	
@@ -495,14 +498,157 @@ proc checkGHfiles {} {
 
 
 
+## - Check if the following miRTargetLink files has been downloaded:
+##   - Validated_miRNA-gene_pairs_hsa_miRBase_v22.1_GRCh38_location_augmented.tsv
+##   - Predicted_miRNA-gene_pairs_hsa_miRBase_v22.1_GRCh38_location_augmented.tsv
+##  
+## - Check and create if necessary:
+##   - miRTargetLink_RefSeq_GRCh38.sorted.bed
+##   - miRTargetLink_ENSEMBL_GRCh38.sorted.bed
+##
+## - GRCh37 miRTargetLink are not provided (only GRCh38)
+##   - miRTargetLink_ENSEMBL_GRCh37.sorted.bed => created with a UCSC liftover
+##   - miRTargetLink_RefSeq_GRCh37.sorted.bed  => created with a UCSC liftover
+proc checkMiRTargetLinkFiles {} {
+
+    global g_AnnotSV
+
+    set g_AnnotSV(miRNAann) 0
+
+    ## Check if miRTargetLink files has been formatted
+    ##################################################
+    set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)"
+    set regElementsDir "$extannDir/FtIncludedInSV/RegulatoryElements"
+    set miRNARefSeqFileFormatted  "$regElementsDir/$g_AnnotSV(genomeBuild)/miRTargetLink_RefSeq_$g_AnnotSV(genomeBuild).sorted.bed"
+    set miRNAENSEMBLfileFormatted "$regElementsDir/$g_AnnotSV(genomeBuild)/miRTargetLink_ENSEMBL_$g_AnnotSV(genomeBuild).sorted.bed"
+    if {[file exists $miRNARefSeqFileFormatted] && [file exists $miRNAENSEMBLfileFormatted]} {
+	set g_AnnotSV(miRNAann) 1
+	return
+    }
+
+    ##########################################################
+    ## No formatted miRTargetLink files available at this step
+    ##########################################################
+
+    ## miRTargetLink is only available in GRCh38
+    ############################################
+    if {$g_AnnotSV(genomeBuild) ne "GRCh38"} {
+	return
+    }
+    
+    ## Check if miRTargetLink file has been downloaded
+    ##################################################
+    # Checks if the miRTargetLink file exist:
+    set miRNAfiles [glob -nocomplain "$regElementsDir/*_miRNA-gene_pairs_hsa_miRBase_*_GRCh38_location_augmented.tsv"];# Validated + Predicted miRNA files
+    if {$miRNAfiles eq ""} {
+	return
+    }
+  
+    ## Downloaded miRTargetLink file is available
+    #############################################
+    puts "\t...miRTargetLink configuration ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+    
+    ## Creation of the 2 miRNA formatted files (RefSeq and ENSEMBL in GRCh38)
+    ##   - # Header: chr miRNAstart miRNAend miRNAtype miRNAgene
+    set miRNARefSeqFileFormatted38  "$regElementsDir/GRCh38/miRTargetLink_RefSeq_GRCh38.sorted.bed"
+    set miRNAENSEMBLfileFormatted38 "$regElementsDir/GRCh38/miRTargetLink_ENSEMBL_GRCh38.sorted.bed"
+
+    puts "\t\t...creation of the 2 miRNA_*_GRCh38.sorted.bed files"
+    puts "\t\t   (done only once)"
+
+    file delete -force $miRNARefSeqFileFormatted38
+    file delete -force $miRNAENSEMBLfileFormatted38
+    
+    # Validated_miRNA-gene_pairs_hsa_miRBase_v22.1_GRCh38_location_augmented.tsv:
+    #    seqnames  start          end             strand  ID              Alias           Name             species   target_gene     confidence
+    #    chr11     122146523      122146544       -       MIMAT0010195    MIMAT0010195    hsa-let-7a-2-3p  hsa       CADM1           Functional MTI (Weak)
+    #    chr11     122146523      122146544       -       MIMAT0010195    MIMAT0010195    hsa-let-7a-2-3p  hsa       ARID1A          Functional MTI (Weak)
+    foreach miRNAfile $miRNAfiles {
+	foreach L [LinesFromFile $miRNAfile] {
+	    set Ls [split $L "\t"]
+	    if {[regexp "^seqnames" $L]} {
+		set i_miRNAchrom [lsearch -exact $Ls "seqnames"]
+		set i_miRNAstart [lsearch -exact $Ls "start"]
+		set i_miRNAend   [lsearch -exact $Ls "end"]
+		set i_miRNAgene  [lsearch -exact $Ls "target_gene"]
+		continue
+	    }
+	    regsub "chr" [lindex $Ls $i_miRNAchrom] "" chrom
+	    set miRNAstart [lindex $Ls $i_miRNAstart]
+	    set miRNAend [lindex $Ls $i_miRNAend]
+	    set coordGRCh38 "$chrom\t$miRNAstart\t$miRNAend"
+	    lappend L_Genes($coordGRCh38) [lindex $Ls $i_miRNAgene]
+	    lappend L_coord($chrom) "$coordGRCh38"
+	}
+    }
+    # Writings:
+    file delete -force $miRNARefSeqFileFormatted38.tmp
+    file delete -force $miRNAENSEMBLfileFormatted38.tmp
+    foreach chrom {1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y M MT} {
+	if {![info exists L_coord($chrom)]} {continue}
+	set L_linesToWriteRefSeqGRCh38 {}
+	set L_linesToWriteENSEMBLGRCh38 {}
+	foreach coordGRCh38 [lsort -unique $L_coord($chrom)] {
+	    set allRefSeqGenes ""
+	    set allEnsemblGenes ""
+	    foreach gene $L_Genes($coordGRCh38) {
+		if {[isARefSeqGeneName $gene]} {
+		    lappend allRefSeqGenes $gene
+		}
+		if {[isAnENSEMBLgeneName $gene]} {
+		    lappend allEnsemblGenes $gene
+		}
+	    }
+	    if {$allRefSeqGenes ne ""} {lappend L_linesToWriteRefSeqGRCh38 "$coordGRCh38\tmTL_miRNA\t[join [lsort -unique $allRefSeqGenes] ";"]"}
+	    if {$allEnsemblGenes ne ""} {lappend L_linesToWriteENSEMBLGRCh38 "$coordGRCh38\tmTL_miRNA\t[join [lsort -unique $allEnsemblGenes] ";"]"}	    
+	}
+	set L_linesToWriteRefSeqGRCh38 [lsort -command AscendingSortOnElement1 [lsort -command AscendingSortOnElement2 $L_linesToWriteRefSeqGRCh38]]
+	set L_linesToWriteENSEMBLGRCh38 [lsort -command AscendingSortOnElement1 [lsort -command AscendingSortOnElement2 $L_linesToWriteENSEMBLGRCh38]]
+	WriteTextInFile "[join $L_linesToWriteRefSeqGRCh38 "\n"]" $miRNARefSeqFileFormatted38.tmp
+	WriteTextInFile "[join $L_linesToWriteENSEMBLGRCh38 "\n"]" $miRNAENSEMBLfileFormatted38.tmp
+    }
+    
+    # Sorting of the bedfile:
+    # Intersection with very large files can cause trouble with excessive memory usage.
+    # A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm. 
+    foreach miRNAfile {miRNARefSeqFileFormatted38 miRNAENSEMBLfileFormatted38} {
+	set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.tmp.bash"
+	ReplaceTextInFile "#!/bin/bash" $sortTmpFile
+	WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $sortTmpFile
+	WriteTextInFile "export LC_ALL=C" $sortTmpFile
+	WriteTextInFile "sort -k1,1 -k2,2n [set $miRNAfile].tmp >> [set $miRNAfile]" $sortTmpFile
+	file attributes $sortTmpFile -permissions 0755
+	if {[catch {eval exec bash $sortTmpFile} Message]} {
+	    puts "-- checkmiRNAfiles --"
+	    puts "sort -k1,1 -k2,2n [set $miRNAfile].tmp >> [set $miRNAfile]"
+	    puts "$Message"
+	    puts "Exit with error"
+	    exit 2
+	}
+	file delete -force $sortTmpFile 
+	file delete -force [set $miRNAfile].tmp
+    }
+
+    # Delete the downloaded files
+    file delete -force $miRNAfile
+        
+    set g_AnnotSV(miRNAann) 1
+}
+
+
+
+
 ## Annotate the SV bedFile with the regulatory elements files
 ## Creation of the g_re global variable
 proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
 
     global g_AnnotSV
     global g_re
-    global g_HITS
-    
+    global g_genesReg
+    global g_HI
+    global g_TS
+    global g_reDB
+
     # Intersect of the input SV bedfile with the regulatory elements files
     ######################################################################
     ## Sorted SV bed file: $g_AnnotSV(bedFile)
@@ -510,10 +656,12 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
     file delete -force $SV_RE_intersectBEDfile
 
     set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)"
+    set regElementsDir "$extannDir/FtIncludedInSV/RegulatoryElements/$g_AnnotSV(genomeBuild)"
     set L_REfiles {}
-    lappend L_REfiles "$extannDir/FtIncludedInSV/RegulatoryElements/$g_AnnotSV(genomeBuild)/EA_${g_AnnotSV(tx)}_$g_AnnotSV(genomeBuild).sorted.bed"     ;#EnhancerAtlas
-    lappend L_REfiles "$extannDir/FtIncludedInSV/RegulatoryElements/$g_AnnotSV(genomeBuild)/GH_${g_AnnotSV(tx)}_$g_AnnotSV(genomeBuild).sorted.bed"     ;#GeneHancer
-    lappend L_REfiles "$extannDir/FtIncludedInSV/RegulatoryElements/$g_AnnotSV(genomeBuild)/promoter_${g_AnnotSV(promoterSize)}bp_${g_AnnotSV(tx)}_$g_AnnotSV(genomeBuild).sorted.bed" ;# promoter
+    lappend L_REfiles "$regElementsDir/EA_${g_AnnotSV(tx)}_$g_AnnotSV(genomeBuild).sorted.bed"     ;#EnhancerAtlas
+    lappend L_REfiles "$regElementsDir/GH_${g_AnnotSV(tx)}_$g_AnnotSV(genomeBuild).sorted.bed"     ;#GeneHancer
+    lappend L_REfiles "$regElementsDir/promoter_${g_AnnotSV(promoterSize)}bp_${g_AnnotSV(tx)}_$g_AnnotSV(genomeBuild).sorted.bed" ;# promoter
+    lappend L_REfiles "$regElementsDir/miRTargetLink_${g_AnnotSV(tx)}_$g_AnnotSV(genomeBuild).sorted.bed"     ;#miRTargetLink
     foreach reFile $L_REfiles {
 	if {![file exists $reFile]} {continue}
 	if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(bedFile) -b $reFile -wa -wb >> $SV_RE_intersectBEDfile} Message]} {
@@ -527,7 +675,8 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
 	}
     }
 
-    # Definition of the g_re($SVfromBED) variable (list all the regulated genes impacted by 1 SV)
+    # Definition of the g_genesReg($SVfromBED) variable (list all the regulated genes impacted by 1 SV)
+    ###################################################################################################
     set L_allRegulatedGenes {} ;# used for exomiser
     if {![file exists $SV_RE_intersectBEDfile ] || [file size $SV_RE_intersectBEDfile] eq 0} {
 	# No intersection between SV and regulatory elements
@@ -540,101 +689,126 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
 	    set Ls [split $L "\t"]
 	    # SVfromBED ("chrom, start, end")
 	    set SVfromBED "[join [lrange $Ls 0 2] "\t"]"
-	    lappend g_re($SVfromBED) {*}[split [lindex $Ls end] ";"] ;# regulated genes
-	    lappend L_allRegulatedGenes {*}[split [lindex $Ls end] ";"]
+	    set L_genesFromTheLine [split [lindex $Ls end] ";"]
+	    lappend g_genesReg($SVfromBED) {*}$L_genesFromTheLine ;# regulated genes
+	    lappend L_allRegulatedGenes {*}$L_genesFromTheLine
+	    set db [lindex $Ls end-1]
+	    foreach g $L_genesFromTheLine {
+		lappend g_reDB($SVfromBED,$g) $db
+	    }
 	}
 	close $f
-	foreach sv [array names g_re] {
-	    set g_re($sv) [lsort -unique $g_re($sv)]
+	foreach SV [array names g_genesReg] {
+	    set g_genesReg($SV) [lsort -unique $g_genesReg($SV)]
+	}
+	foreach key [array names g_reDB] {
+	    set g_reDB($key) [lsort -unique $g_reDB($key)]
 	}
 	
 	## Delete temporary file
 	if {$g_AnnotSV(REreport) eq "no"} {
 	    file delete -force $SV_RE_intersectBEDfile
 	} else {
-	    regsub "(.annotated)?.tsv$" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) ".SV_RE_intersect" permanentSV_RE_intersectBEDfile
+	    regsub "(.annotated)?.tsv$" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) ".SV_RE_intersect.report" permanentSV_RE_intersectBEDfile
+	    file delete -force $permanentSV_RE_intersectBEDfile
 	    file rename $SV_RE_intersectBEDfile $permanentSV_RE_intersectBEDfile
 	}
     }
 
     ## Display
+    ##########
     puts "...searching for SV overlaps with a gene or a regulatory elements"
     puts "\t...[llength $L_allGenesOverlapped] genes overlapped with an SV"
     set L_allRegulatedGenes [lsort -unique $L_allRegulatedGenes]
     puts "\t...[llength $L_allRegulatedGenes] genes regulated by a regulatory element which is overlapped with an SV\n"
     
     ## Preparation of the phenotype-driven analysis (Exomiser)
+    ## (to be able to access to the exomiser score of a gene with [ExomiserAnnotation $gName "score"])
+    ##################################################################################################
     set L_allGenes $L_allGenesOverlapped
     lappend L_allGenes {*}$L_allRegulatedGenes
     set L_allGenes [lsort -unique $L_allGenes]
     if {$g_AnnotSV(hpo) ne "" && $L_allGenes ne ""} {
 	runExomiser "$L_allGenes" "$g_AnnotSV(hpo)" 
     }
+    
     ## HI/TS information for these regulated genes
+    ## -> definition of g_HI($gene) and g_TS($gene)
+    ###############################################
     set clingenDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/ClinGen"
-    set ClinGenFileFormattedGzip [lindex [glob -nocomplain "$clingenDir/*_ClinGenAnnotations.tsv.gz"] end]
+    set ClinGenFileFormatted [lindex [glob -nocomplain "$clingenDir/*_ClinGenAnnotations.tsv*"] end]
     foreach g $L_allRegulatedGenes {
 	set t($g) 1
     }
-    if {$ClinGenFileFormattedGzip ne ""} {
-	set f [open "| gzip -cd $ClinGenFileFormattedGzip"]
+    if {$ClinGenFileFormatted ne ""} {
+	if {[regexp ".gz$" $ClinGenFileFormatted]} {
+	    set f [open "| gzip -cd $ClinGenFileFormatted"]	 
+	} else {		
+	    set f [open "$ClinGenFileFormatted"]
+	}	 
 	while {! [eof $f]} {
 	    set L [gets $f]
 	    set Ls [split $L "\t"]
 	    set gene [lindex $Ls 0]
 	    if {[info exists t($gene)]} {
-		set L_ann ""
-		set HI [lindex $Ls 1]; if {$HI ne "Not yet evaluated"} {lappend L_ann "HI=$HI"}
-		set TS [lindex $Ls 2]; if {$TS ne "Not yet evaluated"} {lappend L_ann "TS=$TS"}
-		if {$L_ann ne ""} {
-		    set g_HITS($gene) "[join $L_ann "/"]" ;# used as sub-annotation (between parentheses) => slashes separated
-		}
+		set HI [lindex $Ls 1]; if {$HI ne "Not yet evaluated"} {set g_HI($gene) "$HI"}
+		set TS [lindex $Ls 2]; if {$TS ne "Not yet evaluated"} {set g_TS($gene) "$TS"}
 	    }
 	}
     }
-    
-    return
-	
-    
-##     
-##    # Complete the "fullAndSplitBedFile" ($g_AnnotSV(outputDir)/$g_AnnotSV(outputFile).tmp)
-##    #######################################################################################
-##    # Used for the insertion of the "full/split" information
-##    set L_Bed [LinesFromFile $g_AnnotSV(bedFile)]
-##    set L "[FirstLineFromFile $SV_RE_intersectBEDfile]"
-##    set Ls [split $L "\t"]
-##
-##    set previousSV ""
-##    set L_LinesToWrite {}
-##    foreach L [LinesFromFile $fullAndSplitBedFile] {
-##	set Ls [split $L "\t"]
-##
-##	# Annotation_mode (full or split)
-##	set AnnotationMode [lindex $Ls end]
-##	
-##	# To write
-##	if {$AnnotationMode eq "full"} {
-##	    if {$g_AnnotSV(svtBEDcol) ne "-1"} {
-##		set SVtype "\t[lindex $Ls "$g_AnnotSV(svtBEDcol)"]"
-##	    } else {
-##		set SVtype ""
-##	    }
-##	    set currentSV "[join [lrange $Ls 0 2] "\t"]$SVtype"
-##
-##	    if {[info exists g_re($previousSV)]} {
-##		foreach l $g_re($previousSV) {
-##		    lappend L_LinesToWrite "$previousFullLine\t[join $l "\t"]\tsplit-re"
-##		}
-##	    }
-##	    set previousSV $currentSV
-##	    set previousFullLine $L
-##	}
-##	lappend L_LinesToWrite $L
-##    }
-##
-##    ReplaceTextInFile "[join $L_LinesToWrite "\n"]" $fullAndSplitBedFile
-##    ## Delete temporary file
-##    file delete -force $SV_RE_intersectBEDfile
-##
 
+    ## Resume RE information for each SV
+    ## -> definition of g_re($SVfromBED)
+    ####################################
+    foreach SV [array names g_genesReg] {
+	set g_re($SV) ""
+	foreach gName "$g_genesReg($SV)" {
+	    if {$g_AnnotSV(REselect2)} {
+		# AnnotSV restrict the report of the regulated genes to the ones not present in "Gene_name".
+		if {[lsearch -exact $L_allGenesOverlapped $gName] ne "-1"} {continue}
+	    }
+	    set HI ""
+	    catch {set HI "$g_HI($gName)"}
+	    set TS ""
+	    catch {set TS "$g_TS($gName)"}
+	    if {$g_AnnotSV(hpo) ne ""} {
+		set exomiserScore "[ExomiserAnnotation $gName "score"]"
+	    } else {set exomiserScore ""}
+	    
+	    set lAnn {}
+	    if {$g_AnnotSV(REselect1)} {
+		# By default, only the genes entering in one of the following categories are reported:
+		#  - OMIM morbid genes
+		#  - HI genes (ClinGen HI = 3)
+		#  - TS genes (ClinGen TS = 3)
+		#  - Phenotype matched genes (Exomiser gene score > 0.7)
+		#  - User candidate genes 
+		if {$HI eq "3"} {lappend lAnn "HI=$HI"}
+		if {$TS eq "3"} {lappend lAnn "TS=$TS"}
+		if {$exomiserScore ne "" && $exomiserScore > 0.7} {lappend lAnn "EX=$exomiserScore"}
+		if {[isMorbid $gName]} {lappend lAnn "morbid"}
+		if {[isCandidate $gName]} {lappend lAnn "candidate"}
+		if {$lAnn eq ""} {
+		    continue
+		} else {
+		    lappend lAnn "RE=[join $g_reDB($SV,$gName) "+"]"
+		}
+	    } else {
+		if {$HI ne ""} {lappend lAnn "HI=$HI"}
+		if {$TS ne ""} {lappend lAnn "TS=$TS"}
+		if {$exomiserScore ne "" && $exomiserScore ne "0.0000" && $exomiserScore ne "-1.0"} {lappend lAnn "EX=$exomiserScore"}
+		if {[isMorbid $gName]} {lappend lAnn "morbid"}
+		if {[isCandidate $gName]} {lappend lAnn "candidate"}
+		lappend lAnn "RE=[join $g_reDB($SV,$gName) "+"]"
+	    }
+	    if {$lAnn ne ""} {
+		lappend g_re($SV) "$gName ([join $lAnn "/"])"
+	    } else {
+		lappend g_re($SV) "$gName"
+	    }
+	}
+	set g_re($SV) [join $g_re($SV) ";"]
+    }
+
+    return
 }

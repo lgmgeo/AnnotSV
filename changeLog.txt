@@ -10,6 +10,10 @@
 
 For more details, please see the README file.
 
+	- feat: Complete the regulatory element annotation:
+		- Add miRNA annotation (from miRTargetLink)
+		- Complete the RE_gene column output (the regulated gene name is detailed with the candidate gene annotation and the data sources (RefSeq, ENSEMBL, EnhancerAtlas, GeneHancer and/or miRTargetLink)
+		- Add the "-REselect1" and "-REselect2" options to filter the RE_gene output
 	- feat: Add CytoBand annotation
 	- feat: Display some warnings if the compound heterozygosity analysis is not processed
 	- feat: Add the "-version" option

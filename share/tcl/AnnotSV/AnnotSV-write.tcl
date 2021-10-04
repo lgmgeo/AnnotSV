@@ -30,7 +30,6 @@ proc OrganizeAnnotation {} {
     global VCFheader
     global g_numberOfAnnotationCol
     global headerFileToRemove 
-    global L_Candidates
     global g_SVLEN
     global g_ExtAnnotation
     global g_rankingScore
@@ -42,19 +41,6 @@ proc OrganizeAnnotation {} {
     ###############
     set FullAndSplitBedFile "$g_AnnotSV(outputDir)/$g_AnnotSV(outputFile).tmp" ;# created in AnnotSV-genes.tcl
     set outputFile "$g_AnnotSV(outputDir)/$g_AnnotSV(outputFile)" 
-
-
-    # List of the candidate genes (given by the user)
-    #################################################
-    set L_Candidates {}
-    if {$g_AnnotSV(candidateGenesFile) ne ""} {
-	set f [open $g_AnnotSV(candidateGenesFile)]
-	while {![eof $f]} {
-	    set L [gets $f]
-	    lappend L_Candidates {*}[split $L " |\n|\t"]
-	}
-	close $f
-    }
 
     
     #########################################################################################
@@ -753,30 +739,9 @@ proc OrganizeAnnotation {} {
 
 	# Regulatory elements annotation (only for the full lines)
 	set reText ""
-	set L_genes [split $geneName ";"]
 	if {$AnnotationMode eq "full"} {
-	    if {[info exists g_re($SVchrom\t$SVleft\t$SVright)]} {
-		set L_regulatedGenes $g_re($SVchrom\t$SVleft\t$SVright)
-		foreach gName "$L_regulatedGenes" {
-		    # Because overlapping so many regulated genes is a problem, AnnotSV restrict the report of the regulated genes to the ones not present in "Gene_name".
-		    # if {[lsearch -exact $L_genes $gName] ne "-1"} {continue}
-		    set HITS ""
-		    catch {set HITS "$g_HITS($gName)"}
-		    if {$g_AnnotSV(hpo) ne ""} {
-			set exomiserScore "EX=[ExomiserAnnotation $gName "score"]"
-		    } else {set exomiserScore ""}
-
-		    set lAnn {}
-		    if {$HITS ne ""} {lappend lAnn $HITS}
-		    if {$exomiserScore ne "" && $exomiserScore ne "EX=0.0000" && $exomiserScore ne "EX=-1.0"} {lappend lAnn $exomiserScore}
-		    if {[isMorbid $gName] eq "yes"} {lappend lAnn "morbid"} 
-		    if {$lAnn ne ""} {
-			lappend reText "$gName ([join $lAnn "/"])"
-		    } else {
-			lappend reText "$gName"
-		    }
-		}
-		set reText [join $reText ";"]
+	    if {[info exists g_re($SVchrom\t$SVleft\t$SVright)]} {		
+		set reText $g_re($SVchrom\t$SVleft\t$SVright)
 	    } 
 	} 
 	
@@ -1316,10 +1281,10 @@ proc OrganizeAnnotation {} {
 		}
 		set doNotDisplay 1
 		foreach g [split $geneName ";"] {
-		    if {[lsearch -exact $L_Candidates $g] ne -1} {
+		    if {[isCandidate $g]} {
 			set doNotDisplay 0
 		    }
-		}	
+		}
 		if {$doNotDisplay} {continue}
 	    }
 	    

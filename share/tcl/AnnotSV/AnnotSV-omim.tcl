@@ -363,8 +363,8 @@ proc isMorbid {gene} {
     }
     
     if {[info exists g_morbid($gene)]} {
-	return "yes"
+	return 1
     } else {
-	return "no"
+	return 0
     } 
 }
