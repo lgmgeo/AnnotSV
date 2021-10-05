@@ -6,6 +6,8 @@
 # AnnotSV Options :
 #------------------
 
+-benignAF:                  0.01
+
 -candidateGenesFiltering:   0
 
 -genomeBuild:               GRCh38
@@ -75,12 +77,16 @@ RE_gene                         *
 # Annotations with benign genes or genomic regions:
 B_gain_source                   *
 B_gain_coord                    *
+B_gain_AFmax                    *
 B_loss_source                   *
 B_loss_coord                    *
+B_loss_AFmax                    *
 B_ins_source                    
 B_ins_coord                     
+B_ins_AFmax                     
 B_inv_source                    
 B_inv_coord
+B_inv_AFmax
 
 # Annotations with pathogenic genes or genomic regions:
 P_gain_phen 

@@ -10,6 +10,9 @@
 
 For more details, please see the README file.
 
+	- feat: Update the benign SV annotation method:
+		- Add the "-benignAF" option to change the allele frequency threshold used to select the benign SV in the data sources
+		- Add 4 annotation columns: B_gain_AFmax, B_loss_AFmax, B_ins_AFmax and B_inv_AFmax (maximum allele frequency of the reported benign genomic regions)
 	- feat: Add bugfix in case of leading or trailing white space in SV type values from the SV input BED file
 	- feat: Change the -genomeBuild default value to "GRCh38" (instead of GRCh37)
 	- refactor: Use boolean values (instead of "yes"/"no") for the following values: -candidateGenesFiltering, -includeCI, -overwrite, -reciprocal, -REreport, -REselect1 and -REselect2

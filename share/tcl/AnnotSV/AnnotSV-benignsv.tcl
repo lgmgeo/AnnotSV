@@ -187,13 +187,13 @@ proc checkClinVar_benignFile {genomeBuild} {
 	    set coord "${chrom}:${start}-$end"
 	    
 	    if {$CLNVC eq "Deletion"} {
-		lappend L_toWriteLoss "$chrom\t$start\t$end\tCLN:$ALLELEID\t$coord"
+		lappend L_toWriteLoss "$chrom\t$start\t$end\tCLN:$ALLELEID\t$coord\tCLN"
 	    } elseif {$CLNVC eq "Duplication"} {
-		lappend L_toWriteGain "$chrom\t$start\t$end\tCLN:$ALLELEID\t$coord"
+		lappend L_toWriteGain "$chrom\t$start\t$end\tCLN:$ALLELEID\t$coord\tCLN"
 	    } elseif {$CLNVC eq "Insertion"} {
-		lappend L_toWriteIns "$chrom\t$start\t$end\tCLN:$ALLELEID\t$coord"
+		lappend L_toWriteIns "$chrom\t$start\t$end\tCLN:$ALLELEID\t$coord\tCLN"
 	    } elseif {$CLNVC eq "Inversion"} {
-		lappend L_toWriteInv "$chrom\t$start\t$end\tCLN:$ALLELEID\t$coord"
+		lappend L_toWriteInv "$chrom\t$start\t$end\tCLN:$ALLELEID\t$coord\tCLN"
 	    }
 	    
 	}
@@ -282,10 +282,10 @@ proc checkClinGenHITS_benignFile {genomeBuild} {
 		set hi [lindex $Ls $i_hi]
 		set ts [lindex $Ls $i_ts]
 		if {$hi eq "40"} {
-		    lappend L_toWriteLoss "$chrom\t$start\t$end\tHI40:$ID\t$coord"
+		    lappend L_toWriteLoss "$chrom\t$start\t$end\tHI40:$ID\t$coord\tHI"
 		}
 		if {$ts eq "40"} {
-		    lappend L_toWriteGain "$chrom\t$start\t$end\tTS40:$ID\t$coord"
+		    lappend L_toWriteGain "$chrom\t$start\t$end\tTS40:$ID\t$coord\tTS"
 		} 
 	    }
 	    close $f
@@ -363,7 +363,7 @@ proc checkDGV_benignFile {genomeBuild} {
 	    # ≥ 500 individuals tested 
 	    set samplesize [lindex $Ls $i_samplesize]
 	    if {$samplesize <= $g_AnnotSV(minTotalNumber)} {continue}
-	    # allele frequency > 1%
+	    # allele frequency > 0.1%
 	    set obsgains [lindex $Ls $i_obsgains]
 	    set obsloss [lindex $Ls $i_obsloss]
 	    set freqgain [expr {$obsgains*100/(2*$samplesize)}]
@@ -373,11 +373,12 @@ proc checkDGV_benignFile {genomeBuild} {
 	    set start [lindex $Ls $i_start]
 	    set end [lindex $Ls $i_end]
 	    set coord "${chr}:${start}-$end"
-	    set infos "$chr\t$start\t$end\t$id\t$coord"
-	    if {$freqgain > 1} {
+	    if {$freqgain > 0.1} {
+		set infos "$chr\t$start\t$end\t$id\t$coord\t[format "%.4f" [expr {$freqgain*1.0/100}]]"
 		lappend L_toWriteGain "$infos"
 	    }
-	    if {$freqloss > 1} {
+	    if {$freqloss > 0.1} {
+		set infos "$chr\t$start\t$end\t$id\t$coord\t[format "%.4f" [expr {$freqloss*1.0/100}]]"
 		lappend L_toWriteLoss "$infos"
 	    }
 	}
@@ -416,8 +417,8 @@ proc checkGnomAD_benignFile {genomeBuild} {
     ## Check if GnomAD file has been downloaded 
     ###########################################
     set benignDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/SVincludedInFt/BenignSV/$genomeBuild"
-    set GnomADfileDownloaded [glob -nocomplain "$benignDir/gnomad_v2.1_sv.sites.bed.gz"] ;# GRCh37 (not yet available in GRCh38)
-
+    set GnomADfileDownloaded [glob -nocomplain "$benignDir/gnomad_v2.1_sv.sites.bed.gz"] ;# GRCh37 (not yet available in GRCh38, 2021/10/05)
+                                                           
     if {$GnomADfileDownloaded ne ""} {
 	# We have some GnomAD annotations to add in $benign*File
 	if {[info exists g_AnnotSV(benignText)]} {
@@ -466,17 +467,17 @@ proc checkGnomAD_benignFile {genomeBuild} {
 	    # => These SV are not selected.
 	    if {[lsearch -exact {DEL DUP INS INV} "$SVTYPE"] eq -1} {continue}
 	    
-	    # At least one population allele frequency > 1% OR at least 5 homozygous individuals
+	    # At least one population allele frequency > 0.1% OR at least 5 homozygous individuals
 	    set nhomalt    [lindex $Ls $i_nhomalt]
 	    set popmaxaf   [lindex $Ls $i_popmaxaf]
-	    if {$popmaxaf < 0.01 && $nhomalt < 5} {continue}
+	    if {$popmaxaf < 0.001 && $nhomalt < 5} {continue}
 
 	    set chrom      [lindex $Ls $i_chrom]
 	    set start      [lindex $Ls $i_start]
 	    set end        [lindex $Ls $i_end]
 	    set svid       [lindex $Ls $i_svid]
 	    set coord "$chrom:${start}-$end"
-	    set infos "$chrom\t$start\t$end\t$svid\t$coord"
+	    set infos "$chrom\t$start\t$end\t$svid\t$coord\t[format "%.4f" $popmaxaf]"
 	    
 	    if {$SVTYPE eq "DEL"} {
 		lappend L_toWriteLoss "$infos"
@@ -523,7 +524,7 @@ proc checkDDD_benignFile {genomeBuild} {
     ## Check if DDD file has been downloaded 
     ########################################
     set benignDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/SVincludedInFt/BenignSV/$genomeBuild"
-    set DDDfileDownloaded [glob -nocomplain "$benignDir/population_cnv.txt.gz"]
+    set DDDfileDownloaded [glob -nocomplain "$benignDir/population_cnv_[string tolower $genomeBuild].txt.gz"]
 
     if {$DDDfileDownloaded ne ""} {
 	# We have some DDD annotations to add in $benign*File
@@ -565,7 +566,7 @@ proc checkDDD_benignFile {genomeBuild} {
 	    set sample_size [lindex $Ls $i_sample_size]
 	    # ≥ 500 individuals tested 
 	    if {$sample_size < $g_AnnotSV(minTotalNumber)} {continue}
-	    # allele frequency > 1%
+	    # allele frequency > 0.1%
 	    set id "DDD:[lindex $Ls $i_id]"
 	    set chr [lindex $Ls $i_chr]
 	    set start [lindex $Ls $i_start]
@@ -573,11 +574,12 @@ proc checkDDD_benignFile {genomeBuild} {
 	    set delfreq [lindex $Ls $i_delfreq]
 	    set dupfreq [lindex $Ls $i_dupfreq]
 	    set coord "$chr:${start}-$end"
-	    set infos "$chr\t$start\t$end\t$id\t$coord"
-	    if {$delfreq > 0.01} {
+	    if {$delfreq > 0.001} {
+		set infos "$chr\t$start\t$end\t$id\t$coord\t[format "%.4f" $delfreq]"
 		lappend L_toWriteLoss "$infos"
 	    }
-	    if {$dupfreq > 0.01} {
+	    if {$dupfreq > 0.001} {
+		set infos "$chr\t$start\t$end\t$id\t$coord\t[format "%.4f" $dupfreq]"
 		lappend L_toWriteGain "$infos"
 	    }
 	}
@@ -683,8 +685,8 @@ proc check1000g_benignFile {genomeBuild} {
 		    if {[set $val]>$max} {set max [set $val]}
 		}
 	    }
-	    # allele frequency > 1%
-	    if {$max < 0.01} {continue}
+	    # allele frequency > 0.1%
+	    if {$max < 0.001} {continue}
 	    
 	    if {![info exists END]} {
 		# INS:ME (LINE1, ALU or SVA)
@@ -702,7 +704,7 @@ proc check1000g_benignFile {genomeBuild} {
 		set SVTYPE "$alt"
 	    }
 	    set coord "$chrom:${pos}-$END"
-	    set infos "$chrom\t$pos\t$END\t1000g\t$coord"
+	    set infos "$chrom\t$pos\t$END\t1000g\t$coord\t[format "%.4f" $max]"
 	    
 	    if {[regexp "<CN0>|DEL" $SVTYPE]} {
 		lappend L_toWriteLoss "$infos"
@@ -796,12 +798,12 @@ proc checkIMH_benignFile {genomeBuild} {
 	    if {$chromA ne $chromB} {continue}	    
 	    set Annotations [lindex $Ls $i_annotations]
 	    if {![regexp ";AF=(.+?);" $Annotations match AF]} {continue}
-	    if {$AF < 0.01} {continue}
+	    if {$AF < 0.001} {continue}
 	    set start  [lindex $Ls $i_start]
 	    set end    [lindex $Ls $i_end]
 	    set SVTYPE [normalizeSVtype [lindex $Ls $i_svtype]]
 	    set coord "$chromA:${start}-$end"
-	    set infos "$chromA\t$start\t$end\tIMH\t$coord"
+	    set infos "$chromA\t$start\t$end\tIMH\t$coord\t[format "%.4f" $AF]"
 	    
 	    if {$SVTYPE eq "DEL"} {
 		lappend L_toWriteLoss "$infos"
@@ -844,13 +846,6 @@ proc checkIMH_benignFile {genomeBuild} {
     return
 }
 
-# 2020-11-27
-############
-# benign_Gain_SV_GRCh37.sorted.bed:  23 148 SV (  310 161 514 bp)
-# benign_Loss_SV_GRCh37.sorted.bed:  60 442 SV (  433 579 309 bp)
-# benign_Ins_SV_GRCh37.sorted.bed:   21 254 SV (    1 638 472 bp)
-# benign_Inv_SV_GRCh37.sorted.bed:    1 693 SV (5 381 728 519 bp)
-
 
 
 
@@ -863,14 +858,14 @@ proc benignSVannotation {SVchrom SVstart SVend} {
     set benignDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/SVincludedInFt/BenignSV/$g_AnnotSV(genomeBuild)"
     
     if {![info exists benignText(DONE)]} {
-	# headerOutput "B_gain_source B_gain_coord B_loss_source B_loss_coord"
-	# + (if user selected) "B_ins_source B_ins_coord B_inv_source B_inv_coord" 
+	# headerOutput "B_gain_source B_gain_coord B_gain_AFmax B_loss_source B_loss_coord B_loss_AFmax"
+	# + (if user selected) "B_ins_source B_ins_coord B_ins_AFmax B_inv_source B_inv_coord B_inv_AFmax" 
 
 	set L_benignText(Empty) {}
 	foreach svtype {"gain" "loss" "ins" "inv"} {
 	    # Keep only the user requested columns (defined in the configfile)
 	    if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^B_${svtype}_"] eq -1} { continue }
-	    lappend L_benignText(Empty) {*}{"" ""}
+	    lappend L_benignText(Empty) {*}{"" "" ""}
 	}
 	set benignText(Empty) "[join $L_benignText(Empty) "\t"]"
 	
@@ -905,13 +900,28 @@ proc benignSVannotation {SVchrom SVstart SVend} {
 		set SVtoAnn_start [lindex $Ls 1]
 		set SVtoAnn_end   [lindex $Ls 2]
 
-		set benign_coord [lindex $Ls end]
-		set benign_source [lindex $Ls end-1]
-		
+		set benign_AF [lindex $Ls end]
+		# An SV is considered benign if its allele frequency > $g_AnnotSV(benignAF)
+		# (default 0.01)
+		if {[string is double $benign_AF] && $benign_AF < $g_AnnotSV(benignAF)} {continue}
+		set benign_coord [lindex $Ls end-1]
+		set benign_source [lindex $Ls end-2]
+
 		set SVtoAnn "$SVtoAnn_chrom,$SVtoAnn_start,$SVtoAnn_end"
 		lappend L_allSVtoAnn $SVtoAnn
 		lappend L_benign_coord($SVtoAnn,$svtype) $benign_coord
 		lappend L_benign_source($SVtoAnn,$svtype) $benign_source
+		if {![info exists L_benign_AF($SVtoAnn,$svtype)]} {
+		    if {[string is double $benign_AF]} {
+			set L_benign_AF($SVtoAnn,$svtype) "$benign_AF"
+		    } else {
+			set L_benign_AF($SVtoAnn,$svtype) ""
+		    }
+		} else {
+		    if {[string is double $benign_AF] && $benign_AF > $L_benign_AF($SVtoAnn,$svtype)} {
+			set L_benign_AF($SVtoAnn,$svtype) "$benign_AF"
+		    }
+		}
 	    }
 	    file delete -force $tmpFile
 	}
@@ -928,7 +938,9 @@ proc benignSVannotation {SVchrom SVstart SVend} {
 		    if {[info exists L_benign_coord($SVtoAnn,$svtype)]} {
 			lappend L_benignText($SVtoAnn) "[join [lsort -unique $L_benign_source($SVtoAnn,$svtype)] ";"]"
 			lappend L_benignText($SVtoAnn) "[join $L_benign_coord($SVtoAnn,$svtype) ";"]"
+			lappend L_benignText($SVtoAnn) "$L_benign_AF($SVtoAnn,$svtype)"
 		    } else {
+			lappend L_benignText($SVtoAnn) ""
 			lappend L_benignText($SVtoAnn) ""
 			lappend L_benignText($SVtoAnn) ""
 		    }

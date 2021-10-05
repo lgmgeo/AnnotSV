@@ -43,6 +43,7 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(annotationMode)           "both"
     set g_AnnotSV(bcftools)                 "bcftools"
     set g_AnnotSV(bedtools)                 "bedtools"
+    set g_AnnotSV(benignAF)                 "0.01"
     set g_AnnotSV(candidateGenesFile)       ""
     set g_AnnotSV(candidateGenesFiltering)  "0"
     set g_AnnotSV(candidateSnvIndelFiles)   ""
@@ -83,7 +84,7 @@ proc configureAnnotSV {argv} {
     ###########################
     ## Load config file options
     ###########################
-    set lOptionsOk "annotationsDir annotationMode bcftools bedtools candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo includeCI metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering reciprocal REreport REselect1 REselect2 samplesidBEDcol snvIndelFiles snvIndelPASS snvIndelSamples SVinputFile SVinputInfo SVminSize svtBEDcol tx txFile"
+    set lOptionsOk "annotationsDir annotationMode bcftools bedtools benignAF candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo includeCI metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering reciprocal REreport REselect1 REselect2 samplesidBEDcol snvIndelFiles snvIndelPASS snvIndelSamples SVinputFile SVinputInfo SVminSize svtBEDcol tx txFile"
     set configFile "$g_AnnotSV(etcDir)/configfile"
     if {[file exists "[file dirname $g_AnnotSV(SVinputFile)]/configfile"]} {
 	set configFile "[file dirname $g_AnnotSV(SVinputFile)]/configfile"
@@ -184,6 +185,15 @@ proc configureAnnotSV {argv} {
 	puts "SVinputFile ($g_AnnotSV(SVinputFile) is empty, no SV to annotate - Exit without error."
 	puts "############################################################################"
 	exit 0
+    }
+
+    ## benignAF: [0.001-0.1], default = 0.01
+    if {![string is double $g_AnnotSV(benignAF)] || $g_AnnotSV(benignAF) < 0.001 || $g_AnnotSV(benignAF) > 0.1} {
+	puts "############################################################################"
+	puts "Bad option value: -benignAF = $g_AnnotSV(benignAF)"
+	puts "Should be in the \[0.001-0.1\] range values, default = 0.01"
+	puts "############################################################################"
+	exit 2
     }
 
     ## metrics: us or fr

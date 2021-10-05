@@ -139,7 +139,7 @@ proc OrganizeAnnotation {} {
     ####### "Benign SV header"
     foreach svtype "gain loss ins inv" {
 	if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^B_[string tolower ${svtype}]_"] eq -1} { continue }
-	append headerOutput "\tB_${svtype}_source\tB_${svtype}_coord"
+	append headerOutput "\tB_${svtype}_source\tB_${svtype}_coord\tB_${svtype}_AFmax"
     }
 
     set usersDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Users/$g_AnnotSV(genomeBuild)"
