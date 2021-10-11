@@ -136,6 +136,10 @@ ENCODE_blacklist_characteristics_right
 ACMG
 HI                              *
 TS                              *
+GenCC_disease   
+GenCC_moi       
+GenCC_classification    
+GenCC_pmid
 DDD_status
 DDD_mode
 DDD_consequence

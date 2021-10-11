@@ -10,6 +10,7 @@
 
 For more details, please see the README file.
 
+	- feat: Add 4 annotation columns from the GenCC database (GenCC_disease, GenCC_moi, GenCC_classification and GenCC_pmid)
 	- feat: Update the benign SV annotation method:
 		- Add the "-benignAF" option to change the allele frequency threshold used to select the benign SV in the data sources
 		- Add 4 annotation columns: B_gain_AFmax, B_loss_AFmax, B_ins_AFmax and B_inv_AFmax (maximum allele frequency of the reported benign genomic regions)

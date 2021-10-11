@@ -315,7 +315,6 @@ proc genesAnnotation {} {
 	
     # Particular case: only 1 SV is associated with split lines AND it is not the first SV of the BED.
     while {$SVfromBED ne $oldSplitSV} {
-puts "...$SVfromBED! ne ...$oldSplitSV!"
 	# Writing of the "full" SV line (not present in the $splitBedFile file, if not covering a gene)
 	lappend L_linesToWrite "[lindex $L_Bed $n]\tfull"
 	incr i_toWrite

@@ -78,6 +78,7 @@ source $g_AnnotSV(tclDir)/AnnotSV-extann.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-filteredVCF.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-gap.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-gccontent.tcl
+source $g_AnnotSV(tclDir)/AnnotSV-gencc.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-general.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-genes.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-haploinsufficiency.tcl
@@ -171,9 +172,13 @@ if {$g_AnnotSV(tx) eq "RefSeq"} {
 } else {
     checkGenesENSEMBLfile
 }
+# Annotation with GenCC?
+checkGenCCgeneFile
 # Annotation with OMIM?
 checkOMIMfile
 checkMorbidfile
+# Annotation with DDD?
+checkDDDgeneFile
 # Annotation with HI (Haploinsufficiency)?
 checkHIfile
 # Annotation with ClinGen?
@@ -182,8 +187,6 @@ checkClinGenFile
 checkExomiserInstallation
 # Annotation with LOEUF
 checkLOEUFfile
-# Annotation with DDD?
-checkDDDgeneFile
 
 ## SVincludedInFt:
 ##################
