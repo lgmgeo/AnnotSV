@@ -61,6 +61,7 @@ proc checkGapFile {} {
     if {$gapFileFormatted eq ""} {
 	# The downloaded file exist but not the formatted.
 	set gapFileFormatted "$extannDir/Gap/$g_AnnotSV(genomeBuild)/[clock format [clock seconds] -format "%Y%m%d"]_Gap.sorted.bed"
+	puts "\t...creation of the \"[file tail $gapFileFormatted]\" file ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])\n\t   (done only once)"
 	ReplaceTextInFile "#Chrom\tStart\tEnd\tGap" $gapFileFormatted.tmp
 
 	set f [open $gapFileDownloaded]

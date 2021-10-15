@@ -314,6 +314,7 @@ proc OrganizeAnnotation {} {
 	puts "\t\t...DDD annotation"
 	puts "\t\t...1000g annotation"
 	puts "\t\t...Ira M. Hall's lab annotation"
+	puts "\t\t...Children’s Mercy Research Institute"
     }
     
     ####### "SVincludedInFt"

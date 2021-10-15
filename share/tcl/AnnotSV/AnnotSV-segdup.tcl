@@ -61,6 +61,7 @@ proc checkSegDupFile {} {
     if {$segdupFileFormatted eq ""} {
 	# The downloaded file exist but not the formatted.
 	set segdupFileFormatted "$extannDir/SegDup/$g_AnnotSV(genomeBuild)/[clock format [clock seconds] -format "%Y%m%d"]_SegDup.sorted.bed"
+	puts "\t...creation of the \"[file tail $segdupFileFormatted]\" file ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])\n\t   (done only once)"
 	ReplaceTextInFile "#Chrom\tStart\tEnd\tSegDup" $segdupFileFormatted.tmp
 
 	set f [open $segdupFileDownloaded]

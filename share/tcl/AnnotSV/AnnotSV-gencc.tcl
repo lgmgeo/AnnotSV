@@ -44,7 +44,7 @@ proc checkGenCCgeneFile {} {
     #################################################################
     set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based"
     set GenCCfileDownloaded [glob -nocomplain "$extannDir/GenCC/submissions-export-tsv"]
-    set GenCCfileFormattedGzip [glob -nocomplain "$extannDir/GenCC/*_GenCC.tsv*"]
+    set GenCCfileFormattedGzip [glob -nocomplain "$extannDir/GenCC/*_GenCC.tsv" "$extannDir/GenCC/*_GenCC.tsv.gz"]
 
     if {$GenCCfileDownloaded eq "" && $GenCCfileFormattedGzip eq ""} {
 	# No "GenCC gene" annotation (with extAnn procedure)
@@ -151,9 +151,13 @@ proc updateGenCCgeneFile {} {
 	} else {
 	    set moi ""
 	}
+	
 	if {$moi ne ""} {
 	    lappend L_moi($gene) "$moi"
 	    #lappend all_moi $moi ;# To use during the annotation update (and see if new moi is used by GenCC)
+	    if {[regexp -nocase "incomplete penetrance|Reduced penetrance" $L]} {
+		lappend L_moi($gene) "IPVE"
+	    }
 	}
 	if {$classif ne ""} {
 	    lappend L_classif($gene) "$classif"

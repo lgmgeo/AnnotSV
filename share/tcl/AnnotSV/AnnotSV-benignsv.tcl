@@ -59,6 +59,7 @@ proc checkBenignFiles {} {
 	checkClinGenHITS_benignFile $genomeBuild
 	checkClinVar_benignFile $genomeBuild
 	checkIMH_benignFile $genomeBuild
+	checkCMRI_benignFile $genomeBuild
 	catch {unset g_AnnotSV(benignText)}
 
 	# Creation of *.tmp.formatted.bed
@@ -762,7 +763,7 @@ proc checkIMH_benignFile {genomeBuild} {
 	    puts $g_AnnotSV(benignText)
 	    unset g_AnnotSV(benignText)
 	}
-	puts "\t   >>> $genomeBuild $genomeBuild IMH parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+	puts "\t   >>> $genomeBuild IMH parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 
 	set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
 	set benignGainFile_Tmp "$benignDir/benign_Gain_SV_$genomeBuild.tmp.bed"
@@ -848,6 +849,98 @@ proc checkIMH_benignFile {genomeBuild} {
 
 
 
+proc checkCMRI_benignFile {genomeBuild} {
+    
+    global g_AnnotSV
+ 
+    ## Check if CMRI file has been downloaded 
+    ############################################
+    set benignDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/SVincludedInFt/BenignSV/$genomeBuild"
+    set CMRIfileDownloaded [lindex [glob -nocomplain "$benignDir/pb_joint_merged.sv.vcf"] end]
+
+    if {$CMRIfileDownloaded ne ""} {
+	# We have some CMRI annotations to add in $benign*File
+	if {[info exists g_AnnotSV(benignText)]} {
+	    puts $g_AnnotSV(benignText)
+	    unset g_AnnotSV(benignText)
+	}
+	puts "\t   >>> $genomeBuild CMRI parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+		
+	set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
+	set benignGainFile_Tmp "$benignDir/benign_Gain_SV_$genomeBuild.tmp.bed"
+	set benignInsFile_Tmp "$benignDir/benign_Ins_SV_$genomeBuild.tmp.bed"
+	set benignInvFile_Tmp "$benignDir/benign_Inv_SV_$genomeBuild.tmp.bed"
+	set L_toWriteLoss {}
+	set L_toWriteGain {}
+	set L_toWriteIns {}
+	set L_toWriteInv {}
+	set f [open "$CMRIfileDownloaded"]
+	while {! [eof $f]} {
+	    set L [gets $f]
+	    set Ls [split $L "\t"]
+	    if {[regexp "^#" $L]} {continue}
+	    set infos [lindex $Ls 7]
+	    
+	    # Selection of the benign variants to keep:
+  	    ###########################################
+	    # Criteria:
+	    # - ≥ 500 individuals tested 
+	    # - ≥ $g_AnnotSV(SVminSize) bp in size (default 50)	    
+	    # - Allele frequency [0.001-0.1]
+	    # - "DUP”, “DEL”, “INS” or “INV” SV type 
+	    if {![regexp "END=(\[^;\]+)?;.*SVTYPE=(\[^;\]+)?;.*SVLEN=(\[^;\]+)?;.*SVN=(\[^;\]+)?;.*SVF=(\[^;\]+)?" $infos match end svtype svlen totalcount freq]} {continue}
+	    if {$totalcount < 500} {continue}
+	    if {[expr abs($svlen)] < $g_AnnotSV(SVminSize)} {continue}
+	    if {$freq < 0.001} {continue}
+	    set chrom [lindex $Ls 0]
+	    set start [lindex $Ls 1]
+	    set id    [lindex $Ls 2]
+	    set ref   [lindex $Ls 3]
+	    set alt   [lindex $Ls 4]
+	    set coord "${chrom}:${start}-$end"
+	    if {$end eq $start} {set end [expr {$start+1}]}
+	    if {$end < $start} {set i $start; set start $end; set end $i}
+	    
+	    if {$svtype eq "DEL"} {
+		lappend L_toWriteLoss "$chrom\t$start\t$end\tCMRI:$id\t$coord\t[format "%.4f" $freq]"
+	    } elseif {$svtype eq "DUP"} {
+		lappend L_toWriteGain "$chrom\t$start\t$end\tCMRI:$id\t$coord\t[format "%.4f" $freq]"
+	    } elseif {$svtype eq "INS"} {
+		lappend L_toWriteIns "$chrom\t$start\t$end\tCMRI:$id\t$coord\t[format "%.4f" $freq]"
+	    } elseif {$svtype eq "INV"} {
+		lappend L_toWriteInv "$chrom\t$start\t$end\tCMRI:$id\t$coord\t[format "%.4f" $freq]"
+	    }	    
+	}
+	close $f
+	
+	# Writing:
+	##########
+	puts "\t       ([llength $L_toWriteLoss] SV Loss + [llength $L_toWriteGain] SV Gain)"
+ 	if {$L_toWriteLoss ne {}} {
+	    WriteTextInFile [join $L_toWriteLoss "\n"] $benignLossFile_Tmp
+	}
+	if {$L_toWriteGain ne {}} {
+	    WriteTextInFile [join $L_toWriteGain "\n"] $benignGainFile_Tmp
+	}
+	puts "\t       ([llength $L_toWriteIns] INS + [llength $L_toWriteInv] INV)"
+	if {$L_toWriteIns ne {}} {
+	    WriteTextInFile [join $L_toWriteIns "\n"]  $benignInsFile_Tmp
+	}
+	if {$L_toWriteInv ne {}} {
+	    WriteTextInFile [join $L_toWriteInv "\n"]  $benignInvFile_Tmp
+	}
+	
+	# Clean:
+	########
+	file delete -force $CMRIfileDownloaded
+    }
+
+    return
+}
+
+
+
+
 
 # Return the overlapped SV annotation 
 proc benignSVannotation {SVchrom SVstart SVend} {
@@ -889,6 +982,7 @@ proc benignSVannotation {SVchrom SVstart SVend} {
 		    exit 2
 		}
 	    }
+
 	    # Parse
 	    set f [open $tmpFile]
 	    while {![eof $f]} {
@@ -925,7 +1019,7 @@ proc benignSVannotation {SVchrom SVstart SVend} {
 	    }
 	    file delete -force $tmpFile
 	}
-	    
+	  
 	# Loading benign final annotation for each SV
 	if {[info exists L_allSVtoAnn]} {
 	    foreach SVtoAnn [lsort -unique $L_allSVtoAnn] {
@@ -957,3 +1051,5 @@ proc benignSVannotation {SVchrom SVstart SVend} {
 	return $benignText(Empty)
     }
 }
+
+

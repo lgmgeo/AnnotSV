@@ -73,6 +73,9 @@ proc checkClinGenFile {} {
 	    set HI [lindex $Ls $i_HI]
 	    set TS [lindex $Ls $i_TS]
 
+	    if {$HI eq "Not yet evaluated"} {set HI ""}
+	    if {$TS eq "Not yet evaluated"} {set TS ""}
+
 	    lappend L_Texte "$gene\t$HI\t$TS"
 	}
 
