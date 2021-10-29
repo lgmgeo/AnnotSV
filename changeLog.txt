@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.0.9                                                                                            #
+# AnnotSV 3.1                                                                                              #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
@@ -10,35 +10,35 @@
 
 For more details, please see the README file.
 
-	- feat: Add the Children’s Mercy Research Institute Benign SV annotations
-	- feat: Add 4 annotation columns from the GenCC database (GenCC_disease, GenCC_moi, GenCC_classification and GenCC_pmid)
-	- feat: Update the benign SV annotation method:
+
+October 26, 2021, AnnotSV version 3.1
+	- Change the -genomeBuild default value to "GRCh38" (instead of GRCh37)
+	- Use boolean values (instead of "yes"/"no") for the following option values: -candidateGenesFiltering, -includeCI, -overwrite, -reciprocal, -REreport, -REselect1 and -REselect2
+	- Add the Children’s Mercy Research Institute Benign SV annotations (n=502 WGS)
+	- Add the GenCC database for Gene-Disease relationship annotations
+	- Add CytoBand annotation
+	- Add novel regulatory element annotation:
+		- Add miRNA annotation (from miRTargetLink)
+		- Complete the RE_gene column output (the regulated gene name is detailed with more information: candidate gene annotation 
+		and data sources (RefSeq, ENSEMBL, EnhancerAtlas, GeneHancer and/or miRTargetLink))
+		- Add the "-REselect1" and "-REselect2" options to filter the RE_gene output
+	- Update the benign SV annotation method:
 		- Add the "-benignAF" option to change the allele frequency threshold used to select the benign SV in the data sources
 		- Add 4 annotation columns: B_gain_AFmax, B_loss_AFmax, B_ins_AFmax and B_inv_AFmax (maximum allele frequency of the reported benign genomic regions)
-	- feat: Add bugfix in case of leading or trailing white space in SV type values from the SV input BED file
-	- feat: Change the -genomeBuild default value to "GRCh38" (instead of GRCh37)
-	- refactor: Use boolean values (instead of "yes"/"no") for the following values: -candidateGenesFiltering, -includeCI, -overwrite, -reciprocal, -REreport, -REselect1 and -REselect2
-	- feat: Complete the regulatory element annotation:
-		- Add miRNA annotation (from miRTargetLink)
-		- Complete the RE_gene column output (the regulated gene name is detailed with the candidate gene annotation and the data sources (RefSeq, ENSEMBL, EnhancerAtlas, GeneHancer and/or miRTargetLink)
-		- Add the "-REselect1" and "-REselect2" options to filter the RE_gene output
-	- feat: Add CytoBand annotation
-	- feat: Display some warnings if the compound heterozygosity analysis is not processed
-	- feat: Add the "-version" option
-	- feat: Take into account of a new format in the downloaded OMIM data (Approuved Gene symbol) 
-	- feat: Add bugfix in case of no external BED annotation files used
-	- feat: External BED annotation files can now also be used to report any feature overlapped with the SV (even with 1bp overlap)
-	- feat: (i) Add the scoring points and (ii) remove gene names redundancy in the "AnnotSV_ranking_criteria" output column
-	- feat: Add bugfix concerning the use of the "candidateGenesFiltering" option
-	- feat: Include "NA" in the rankFiltering default option (default = "1-5,NA")
-	- feat: Add bugfix concerning the use of the "split" annotationMode
-	- feat: Last column of the SV input BED file could not have empty values. Replaced with "."
-	- feat: Add bugfix to avoid a segmentation fault error with the RE_gene calculation
-	- feat: Update of the user header (user column names could not be empty anymore)
-	- feat: Definition of the characters used to separate the annotations
-	- feat: Add bugfix in section 5 of the SV ranking
-	- feat: Set the ACMG_class to "NA" if not defined
-	
+	- Add new details in the"AnnotSV_ranking_criteria" output column: (i) detailed scoring points and (ii) remove gene names redundancy
+	- Add new warnings if the compound heterozygosity analysis is not processed
+	- Add the "-version" option
+	- Take into account of a new format in the downloaded OMIM data (approved gene symbol)
+	- Add bugfix in case of leading or trailing white space in SV type values from the SV input BED file
+	- Add bugfix in case of no external BED annotation files used
+	- External BED annotation files can now also be used to report any feature overlapped with the SV (even with 1bp overlap)
+	- Add bugfix concerning the use of the "-candidateGenesFiltering" option
+	- Include "NA" in the "-rankFiltering" default option (default = "1-5,NA")
+	- Add bugfix concerning the use of the "split" annotationMode
+	- Add bugfix in the SV input BED file, last column could not have empty values. Replaced with "." if empty
+	- Add bugfix in section 5 of the SV ranking
+	- Set the ACMG_class to "NA" if not defined 
+
 December 18, 2020, AnnotSV version 3.0
 	- Major code rewrite and annotations sources reorganization
 		- Significant modification of the annotations column names
@@ -68,12 +68,12 @@ December 18, 2020, AnnotSV version 3.0
 	- By default, AnnotSV now expands the "start" and "end" SV positions with the VCF confidence intervals (CIPOS, CIEND) around the breakpoints (see the "includeCI" option)
 
 November 06, 2020, AnnotSV version 2.5.2
-	- feat: Add the pLI annotation from gnomAD (pLI_gnomAD), update the pLI annotation from ExAC (pLI_ExAC)
-	- feat: Add the "LOEUF_bin" annotation (gnomAD)
-	- feat: Add the "tx start", "tx end" and "Number of exons" annotations 
+	- Add the pLI annotation from gnomAD (pLI_gnomAD), update the pLI annotation from ExAC (pLI_ExAC)
+	- Add the "LOEUF_bin" annotation (gnomAD)
+	- Add the "tx start", "tx end" and "Number of exons" annotations 
 		The "tx length" column has been renamed "overlapped tx length"
 	  	The "CDS length" column has been renamed "overlapped CDS length" 
-	- feat: If not provided, the EXOMISER_GENE_PHENO_SCORE is set to "-1.0"
+	- If not provided, the EXOMISER_GENE_PHENO_SCORE is set to "-1.0"
 	- Update README.md
 
 October 13, 2020: AnnotSV version 2.5.1

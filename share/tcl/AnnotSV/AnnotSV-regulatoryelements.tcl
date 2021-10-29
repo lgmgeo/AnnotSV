@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.0.9                                                                                            #
+# AnnotSV 3.1                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -690,7 +690,7 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
 	while {! [eof $f]} {
 	    set L [gets $f]
 	    set Ls [split $L "\t"]
-	    # SVfromBED ("chrom, start, end")
+	    # SVfromBED ("chrom\tstart\tend")
 	    set SVfromBED "[join [lrange $Ls 0 2] "\t"]"
 	    set L_genesFromTheLine [split [lindex $Ls end] ";"]
 	    lappend g_genesReg($SVfromBED) {*}$L_genesFromTheLine ;# regulated genes

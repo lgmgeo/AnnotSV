@@ -16,7 +16,7 @@ OPTIONS
 -bedtools:                      Path of the bedtools local installation
 
 -benignAF:                      Allele frequency threshold to select the benign SV in the data sources
-                                Range values: [0.001-0.1], default = 0.01	
+                                Range values: [0.001-0.1], default = 0.01 (i.e. 1%)	
 
 -candidateGenesFile:            Path of a file containing the candidate genes of the user (gene names can be space-separated, tabulation-separated, or line-break-separated)
 
@@ -67,7 +67,7 @@ OPTIONS
 -reciprocal:                    Use of a reciprocal overlap between SV and user features (only for annotations with features overlapping the SV)
                                 Values: 0 (default) or 1
 
-- REreport:                     Create a report to link the annotated SV and the overlapped regulatory elements (coordinates and sources)
+-REreport:                     Create a report to link the annotated SV and the overlapped regulatory elements (coordinates and sources)
                                 Values: 0 (default) or 1
 
 -REselect1:                     To report only the morbid, HI, TS, candidate and phenotype matched genes 

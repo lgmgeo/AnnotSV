@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.0.9                                                                                            #
+# AnnotSV 3.1                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -98,7 +98,6 @@ proc filteredVCFannotation {GENEchrom GENEstart GENEend Line headerOutput} {
 
 		# keep only variant with FILTER == PASS
 		if {$g_AnnotSV(snvIndelPASS) && $filter ne "PASS"} {continue}
-
 		foreach sample $L_samplesOkFROMvcfF {
 		    set sampleData [lindex $Ls $i_sample($sample)]
 		    # set the GT
@@ -106,9 +105,8 @@ proc filteredVCFannotation {GENEchrom GENEstart GENEend Line headerOutput} {
 		    if {$j_GT eq -1} {continue}
 		    set GTabsent 0
 		    set GT ""
-		    set GTsample [lindex [split $sampleData ":"] $j_GT]
-		    set GTsample [split $GTsample "/|\\|"]
-		    if {[lindex $GTsample 0] ne [lindex $GTsample 1] && [lindex $GTsample 0] ne ""} {
+		    set GTsample [lindex [split $sampleData ":"] $j_GT];# GTsample = 0/2 or 0|1 or "" or ./.
+		    if {[lindex [split $GTsample "\[/|\]"] 0] ne [lindex [split $GTsample "\[/|\]"] 1] && $GTsample ne ""} {
 			lappend L_htzPos($chrom,$sample) "$pos"
 		    }
 		}

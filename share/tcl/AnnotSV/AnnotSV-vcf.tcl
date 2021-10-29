@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.0.9                                                                                            #
+# AnnotSV 3.1                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -45,10 +45,12 @@ proc DichotomySearch {number OrderedNumberList} {
 
 
 ##################################################################
-# Prepare 3 new annotation columns:
-# - Number of homozygous SNV/indel detected in the sample and located in the SV
-# - Number of heterozygous SNV/indel detected in the sample and  located in the SV
-# - Total number of calls detected in all samples and located in the SV
+# Prepare 5 new annotation columns:
+# - Number of homozygous SNV/indel detected in the sample and located in the SV --- $countHom($sample)
+# - Number of heterozygous SNV/indel detected in the sample and  located in the SV --- $countHtz($sample)
+# - Ratio of htz / Hom ---  $HtzHomRatio
+# - Ratio of htz / Total --- $HtzTotRatio
+# - Total number of calls detected in all samples and located in the SV --- $totalCount
 ##################################################################
 proc VCFannotation {SVchrom SVstart SVend SVtype} {
 
@@ -64,7 +66,7 @@ proc VCFannotation {SVchrom SVstart SVend SVtype} {
 	# parsing of $g_AnnotSV(snvIndelFiles): creation of lPos($SVchrom,htz,sample), lPos($SVchrom,hom,sample) and lPos($SVchrom,tot,cohort)
 	puts "\n\n...parsing of snvIndelFiles for \"$g_AnnotSV(snvIndelSamples)\" ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
 
-	# "eval glob" accept regular expression ("*.vcf) as well as a list of files ("sample1.vcf sample2.vcf.gz"):
+	# "eval glob" accept regular expression ("*.vcf") as well as a list of files ("sample1.vcf sample2.vcf.gz"):
 	set L_allSamples {}
 	foreach vcfF [eval glob -nocomplain $g_AnnotSV(snvIndelFiles)] {
 	    
@@ -74,7 +76,7 @@ proc VCFannotation {SVchrom SVstart SVend SVtype} {
             set tmpVCFgz1 "$g_AnnotSV(outputDir)/[file tail $vcfF].[clock seconds].separate.vcf.gz"
 	    catch {eval exec $g_AnnotSV(bcftools) norm -m -both $vcfF > $tmpVCF1} Message
 	    if {[file size $tmpVCF1] eq 0} {
-		# we continue AnnotSV without splitting the multiallelic sites !
+		# we continue AnnotSV without splitting the multiallelic sites!
 		puts "\t   -- VCFannotation --"
 		puts "\t   $g_AnnotSV(bcftools) norm -m -both $vcfF > $tmpVCF1"
 		puts "\t   $tmpVCF1: file empty."
@@ -122,7 +124,7 @@ proc VCFannotation {SVchrom SVstart SVend SVtype} {
 		set tmpVCFgz2 "$tmpVCFgz1"
 	    }
 
-	    # Header for the intersection with the bedfile
+	    # Header for the intersection with the SV bedfile
 	    regsub ".vcf.gz$" $tmpVCFgz2 ".intersect.vcf.gz" tmpVCFgz3
 	    regsub ".gz$" $tmpVCFgz3 "" tmpVCF3
 	    set f [open "| gzip -cd $tmpVCFgz2"]	 
@@ -229,7 +231,7 @@ proc VCFannotation {SVchrom SVstart SVend SVtype} {
 		    set GTsampleB [lindex $GTsample 1]
 		    if {$GTsampleA eq "" || $GTsampleB eq ""} {continue}
 		    if {$GTsampleA eq "0" && $GTsampleB eq "0"} {continue}
-		    if {[lindex $GTsample 0] ne [lindex $GTsample 1]} {set GT "htz"} else {set GT "hom"} 
+		    if {[lindex $GTsample 0] ne [lindex $GTsample 1]} {set GT "htz"} else {set GT "hom"}
 		    # set the lPos($chrom,$GT,$sample)
 		    lappend lPos($chrom,$GT,$sample) $pos
 		}
@@ -240,19 +242,19 @@ proc VCFannotation {SVchrom SVstart SVend SVtype} {
 	    close $f
 	    file delete -force $tmpVCFgz3
 	    if {$iIntersect} {
-		puts "\t\t-> $iIntersect variants located in the SV"
+		puts "\t\t-> $iIntersect SNV/indel located in all the SV (potentially with redundancy depending on SV overlap)"
 	    }
 	    if {$iLoaded} {
-		puts "\t\t-> $iLoaded variants loaded"
+		puts "\t\t-> $iLoaded SNV/indel loaded"
 	    }
 	    if {$iSV} {
 		puts "\t\t-> $iSV SV excluded (considering only SNV/indel from the VCF)"
 	    }
 	    if {$iNotPASS} {
-		puts "\t\t-> $iNotPASS variants excluded beacause of the FILTER value not equal to \"PASS\""
+		puts "\t\t-> $iNotPASS SNV/indel excluded beacause of the FILTER value not equal to \"PASS\""
 	    }
 	    if {$iNotGT} {
-		puts "\t\t-> $iNotGT variants excluded because of the absence of GT information"
+		puts "\t\t-> $iNotGT SNV/indel excluded because of the absence of GT information"
 	    }
 	}
     }
@@ -421,16 +423,32 @@ proc VCFsToBED {SV_VCFfiles} {
 		} 
 		if {[regexp "<TRA>" $alt]} {
 		    # Example of a strange VCF format line (translocation):
-		    # chr1    63705386   N    .     <TRA>   51      PASS    "PRECISE;CT=5to5;CIPOS=-10,10;CIEND=-10,10;SOMATIC;SVTYPE=TRA;CHR2=chrX;END=478444;SVLEN=0"        GT      ./.   
+		    # chr1   63705386   N    .     <TRA>   51      PASS    "PRECISE;CT=5to5;CIPOS=-10,10;CIEND=-10,10;SOMATIC;SVTYPE=TRA;CHR2=chrX;END=478444;SVLEN=0"        GT      ./.   
 		    # POS = 63705386 --> sur chrom1
 		    # END = 478444   --> sur chromX
 		    ## => annotation only of the first breakpoint
 		    set end [expr {$pos+1}]
 		}
+		# First, we choose the SVTYPE in the INFO column.
+		# Second, we choose the SVtype in the ALT column.
+		if {$svtype eq ""} {
+		    regexp "^<(.+)>$" $alt match svtype
+		}
 	    } elseif {[regexp "(\\\[|\\\])(\[^:\]+):(\[0-9\]+)" $alt]} {
 		# Type3 	
-		# Only one breakend is annotated with this kind of line
-		set end [expr {$pos+1}]		
+		# Mainly, that are the breakends which are annotated with this kind of line.
+		# But it can also be a DUP, DEL...:
+		# 12  46665455  .  N  ]12:46677091]N  .  PASS   END=46677091;CHR2=12;SVTYPE=DUP;SVLEN=11636
+		if {$svtype ne ""} {
+		    set svtypeNormed [normalizeSVtype $svtype]
+		    # SVtypeNormed in which category: DUP? DEL? INV? INS? None?
+		    if {$svtypeNormed eq "None" || $end eq ""} {
+			set end [expr {$pos+1}]
+		    }
+		} else {
+		    # BND
+		    set end [expr {$pos+1}]
+		}
 	    } elseif {[regexp -nocase "^\[ACGTN.*\]+$" $ref$alt]} {
 		# Type1
 		regsub -all "\[*.\]" $ref "" refbis ;# cf GRIDSS comment, just below

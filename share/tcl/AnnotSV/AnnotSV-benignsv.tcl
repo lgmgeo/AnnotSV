@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.0.9                                                                                            #
+# AnnotSV 3.1                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -1032,6 +1032,11 @@ proc benignSVannotation {SVchrom SVstart SVend} {
 		    if {[info exists L_benign_coord($SVtoAnn,$svtype)]} {
 			lappend L_benignText($SVtoAnn) "[join [lsort -unique $L_benign_source($SVtoAnn,$svtype)] ";"]"
 			lappend L_benignText($SVtoAnn) "[join $L_benign_coord($SVtoAnn,$svtype) ";"]"
+			if {[set g_AnnotSV(metrics)] eq "fr"} {
+			    # Change metrics from "." to ","
+			    # We remove the exponential nomenclature: [expr {9.9443e-01}] = 0.99443
+			    catch {regsub -all {\.} [expr {$L_benign_AF($SVtoAnn,$svtype)}] "," L_benign_AF($SVtoAnn,$svtype)} 
+			} 
 			lappend L_benignText($SVtoAnn) "$L_benign_AF($SVtoAnn,$svtype)"
 		    } else {
 			lappend L_benignText($SVtoAnn) ""

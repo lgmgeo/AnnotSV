@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.0.9                                                                                            #
+# AnnotSV 3.1                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -43,7 +43,7 @@ proc SVprepareRanking {L_header} {
     # "SV_type" is compulsory for the ranking
     if {$g_AnnotSV(svtTSVcol) eq -1} {return}
 
-    # Check if we have all the needed information for ranking
+    # Check if we have all the needed infoloeufrmation for ranking
     # unset g_i <=> no SV ranking  
     set g_i(gene)     [lsearch -regexp $Ls "Gene_name"];      if {$g_i(gene) == -1} {unset g_i; return}  
     set g_i(NbGenes)  [lsearch -regexp $Ls "Gene_count"]; if {$g_i(NbGenes) == -1} {unset g_i; return}  
@@ -261,9 +261,11 @@ proc SVrankingLoss {L_annotations} {
 	    }
 	} else {
 	    set pLI        [lindex $Ls $g_i(pLI)]
+	    regsub -all "," $pLI "." pLI
 	    set loeuf      [lindex $Ls $g_i(loeuf)]
+	    regsub -all "," $loeuf "." loeuf
 	    set HIpercent  [lindex $Ls $g_i(HIpercent)]
-
+	    regsub -all "," $HIpercent "." HIpercent
 	    set i 0
 	    if {$pLI >= 0.9} {incr i}
 	    if {$HIpercent <= 10} {incr i}
