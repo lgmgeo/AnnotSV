@@ -27,16 +27,16 @@ class BaseEnum(str, AutoValueMixin, Enum):
 
 
 class AnnotationMode(BaseEnum):
-    full = auto()
-    split = auto()
-    both = auto()
+    FULL = auto()
+    SPLIT = auto()
+    BOTH = auto()
 
 
 class ConfigTypes(BaseEnum):
-    legacy = auto()
-    yaml = auto()
-    json = auto()
-    toml = auto()
+    LEGACY = auto()
+    YAML = auto()
+    JSON = auto()
+    TOML = auto()
 
 
 class GenomeBuild(BaseEnum):
@@ -47,8 +47,8 @@ class GenomeBuild(BaseEnum):
 
 
 class MetricFormat(BaseEnum):
-    us = auto()
-    fr = auto()
+    US = auto()
+    FR = auto()
 
 
 class TranscriptSource(BaseEnum):

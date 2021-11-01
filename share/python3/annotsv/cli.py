@@ -155,7 +155,7 @@ def annotsv(
         help="To expand the 'start' and 'end' SV positions with the VCF confidence intervals (CIPOS, CIEND) around the breakpoints",
     ),
     metrics: MetricFormat = typer.Option(
-        MetricFormat.us,
+        MetricFormat.US,
         "--metrics",
         case_sensitive=False,
         help="Changing numerical values from frequencies to us or fr metrics (e.g. 0.2 or 0,2)",
