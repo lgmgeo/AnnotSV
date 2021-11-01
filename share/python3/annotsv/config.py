@@ -6,14 +6,14 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Extra, PositiveInt, ValidationError, conint, validator
 
-from . import constants
-from .enums import *
-from .util import from_camel, to_camel
+from annotsv.constants import install_dir
+from annotsv.enums import *
+from annotsv.util import from_camel, to_camel
 
-# NOTE: defaults coming from CLI, AnnotSV-config.tcl, default configfile. What should be priority? CLI > configfile > class defaults
-# should class defaults be eliminated and moved into config? then lose programmatic access to default values though
+# NOTE:
+#   config priority: CLI > configfile > class defaults
 
-default_config_file = constants.install_dir / "etc" / "AnnotSV" / "configfile"
+default_config_file = install_dir / "etc" / "AnnotSV" / "configfile"
 required_output_cols = (
     "AnnotSV_ID",
     "SV_chrom",
@@ -129,9 +129,9 @@ class Config(BaseModel):
 
 
 def load_config(
-    config_file: Path = default_config_file, config_type: ConfigTypes = ConfigTypes.legacy
+    config_file: Path = default_config_file, config_type: ConfigTypes = ConfigTypes.LEGACY
 ) -> Config:
-    if config_type == ConfigTypes.legacy:
+    if config_type == ConfigTypes.LEGACY:
         config_dict = _load_legacy_config(config_file)
     else:
         raise NotImplemented

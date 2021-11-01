@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import re
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import List, Optional
@@ -272,8 +271,3 @@ def annotsv(
     typer.echo(f"in annotsv")
     breakpoint()
     pass
-
-
-if __name__ == "__main__":
-    # print license info
-    typer_cli()

@@ -1,7 +1,9 @@
-#!/bin/bash -e
+#!/bin/bash -ex
+set -o pipefail
 
 HERE="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
-PYTHONPATH="$PYTHONPATH:$(dirname "$HERE")/share/python3"
+PYTHONPATH="$(dirname "$HERE")/share/python3:$PYTHONPATH"
+export PYTHONPATH
 
 # exec python -m pdb -m annotsv.cli "$@"
-exec python -m annotsv.cli "$@"
+python3 -m annotsv "$@"
