@@ -1,0 +1,1 @@
+from constants import annotsv_version as __version__
