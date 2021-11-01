@@ -1,7 +1,15 @@
-from enum import Enum, IntFlag, auto
+from enum import Enum, auto
 
 
-class BaseEnum(str, Enum):
+class AutoValueMixin:
+    """ Makes auto() set the member value to its name """
+
+    @staticmethod
+    def _generate_next_value_(name: str, start, count, last_values):
+        return name
+
+
+class BaseEnum(str, AutoValueMixin, Enum):
     @classmethod
     def metavar(cls):
         """ generates nice metavar strings for typer help """
@@ -19,30 +27,30 @@ class BaseEnum(str, Enum):
 
 
 class AnnotationMode(BaseEnum):
-    full = "full"
-    split = "split"
-    both = "both"
+    full = auto()
+    split = auto()
+    both = auto()
 
 
 class ConfigTypes(BaseEnum):
-    legacy = "legacy"
-    yaml = "yaml"
-    json = "json"
-    toml = "toml"
+    legacy = auto()
+    yaml = auto()
+    json = auto()
+    toml = auto()
 
 
 class GenomeBuild(BaseEnum):
-    GRCh37 = "GRCh37"
-    GRCh38 = "GRCh38"
-    mm9 = "mm9"
-    mm10 = "mm10"
+    GRCh37 = auto()
+    GRCh38 = auto()
+    mm9 = auto()
+    mm10 = auto()
 
 
 class MetricFormat(BaseEnum):
-    us = "us"
-    fr = "fr"
+    us = auto()
+    fr = auto()
 
 
 class TranscriptSource(BaseEnum):
-    RefSeq = "RefSeq"
-    ENSEMBL = "ENSEMBL"
+    RefSeq = auto()
+    ENSEMBL = auto()
