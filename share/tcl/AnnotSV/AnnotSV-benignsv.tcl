@@ -892,7 +892,7 @@ proc checkCMRI_benignFile {genomeBuild} {
 	    if {$totalcount < 500} {continue}
 	    if {[expr abs($svlen)] < $g_AnnotSV(SVminSize)} {continue}
 	    if {$freq < 0.001} {continue}
-	    set chrom [lindex $Ls 0]
+	    regsub "chr" [lindex $Ls 0] "" chrom
 	    set start [lindex $Ls 1]
 	    set id    [lindex $Ls 2]
 	    set ref   [lindex $Ls 3]

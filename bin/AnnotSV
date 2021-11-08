@@ -70,6 +70,7 @@ source $g_AnnotSV(tclDir)/AnnotSV-candidategenes.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-clingen.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-config.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-cosmic.tcl
+source $g_AnnotSV(tclDir)/AnnotSV-cytoband.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-ddd.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-encodeblacklist.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-exac.tcl
@@ -209,6 +210,8 @@ checkSegDupFile
 checkGapFile
 # Annotation with ENCODE blacklist?
 checkENCODEblacklistFile
+# Cytoband
+checkCytoband
 
 ## FtIncludedInSV annotations:
 ##############################

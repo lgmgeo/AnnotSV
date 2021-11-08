@@ -39,6 +39,8 @@ October 26, 2021, AnnotSV version 3.1
 	- Add bugfix in section 5 of the SV ranking
 	- Set the ACMG_class to "NA" if not defined 
 
+	- Update/Add Mouse annotations (CytoBand, miRNA from miRTargetLink)
+
 December 18, 2020, AnnotSV version 3.0
 	- Major code rewrite and annotations sources reorganization
 		- Significant modification of the annotations column names

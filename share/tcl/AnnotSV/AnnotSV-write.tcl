@@ -117,7 +117,7 @@ proc OrganizeAnnotation {} {
 	}
     }
     append headerOutput "\tAnnotation_mode"
-    if {$g_AnnotSV(organism) eq "Human"} {
+    if {$g_AnnotSV(cytoband)} {
 	append headerOutput "\tCytoBand"
     }
     append headerOutput "\tGene_name\tGene_count\tTx\tTx_start\tTx_end\tOverlapped_tx_length\tOverlapped_CDS_length\tOverlapped_CDS_percent\tFrameshift\tExon_count\tLocation\tLocation2\tDist_nearest_SS\tNearest_SS_type\tIntersect_start\tIntersect_end\tRE_gene"
@@ -261,26 +261,28 @@ proc OrganizeAnnotation {} {
     SVprepareRanking $headerOutput    ; # svtTSVcol (for VCF input file) is defined there
     
     ####### "Ranking header"
-    if {$g_AnnotSV(svtTSVcol) eq -1 && $g_AnnotSV(organism) eq "Human"} { ; # SV_type is required for the ranking of human SV
-	puts "\nWARNING: AnnotSV requires the SV type (duplication, deletion...) to classify the SV"
-	puts "         Not provided (svtBEDcol = -1)"
-	puts "         => No SV ranking (ACMG_class feature will be set to \"NA\")\n"
-	set g_AnnotSV(ranking) 0
-
-	if {![regexp "NA" $g_AnnotSV(rankFiltering)]} {
-	    puts "\nWARNING: -rankFiltering = $g_AnnotSV(rankFiltering)"
-	    puts "         => SV with \"ACMG_class = NA\" will be filtered out"
-	    puts "         => All the SV will be filtered out\n"
+    if {$g_AnnotSV(organism) eq "Human"} {
+	if {$g_AnnotSV(svtTSVcol) eq -1} { ; # SV_type is required for the ranking of human SV
+	    puts "\nWARNING: AnnotSV requires the SV type (duplication, deletion...) to classify the SV"
+	    puts "         Not provided (svtBEDcol = -1)"
+	    puts "         => No SV ranking (ACMG_class feature will be set to \"NA\")\n"
+	    set g_AnnotSV(ranking) 0
+	    
+	    if {![regexp "NA" $g_AnnotSV(rankFiltering)]} {
+		puts "\nWARNING: -rankFiltering = $g_AnnotSV(rankFiltering)"
+		puts "         => SV with \"ACMG_class = NA\" will be filtered out"
+		puts "         => All the SV will be filtered out\n"
+	    }
+	} else {
+	    if {![regexp "NA" $g_AnnotSV(rankFiltering)]} {
+		puts "\nWARNING: -rankFiltering = $g_AnnotSV(rankFiltering)"
+		puts "         => SV with \"ACMG_class = NA\" will be filtered out\n"
+	    }	
 	}
-    } else {
-	if {![regexp "NA" $g_AnnotSV(rankFiltering)]} {
-	    puts "\nWARNING: -rankFiltering = $g_AnnotSV(rankFiltering)"
-	    puts "         => SV with \"ACMG_class = NA\" will be filtered out\n"
-	}	
+	append headerOutput "\tAnnotSV_ranking_score"
+	append headerOutput "\tAnnotSV_ranking_criteria"
+	append headerOutput "\tACMG_class"    
     }
-    append headerOutput "\tAnnotSV_ranking_score"
-    append headerOutput "\tAnnotSV_ranking_criteria"
-    append headerOutput "\tACMG_class"    
     
     ReplaceTextInFile $headerOutput $outputFile
 
@@ -290,7 +292,7 @@ proc OrganizeAnnotation {} {
     ################### Display of the annotations to be realize #####################
     ##################################################################################
     puts "...listing of the annotations to be realized ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
-    if {$g_AnnotSV(organism) eq "Human"} {
+    if {$g_AnnotSV(cytoband)} {
 	puts "\t...CytoBand annotation"
     }
     puts "\t...Genes annotation" 
@@ -774,8 +776,8 @@ proc OrganizeAnnotation {} {
 	    set benignText "[benignSVannotation $SVchrom $SVleft $SVright]"
 	} 
 
-	# Annotations with cytoband (AnyOverlap) 
-	if {$g_AnnotSV(organism) eq "Human"} {
+	# Annotations with cytoband (AnyOverlap)
+	if {$g_AnnotSV(cytoband)} {	    
 	    set cytobandText ""
 	    set cytobandDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/AnyOverlap/CytoBand/$g_AnnotSV(genomeBuild)/"
 	    set cytobandBEDfile [glob -nocomplain $cytobandDir/cytoBand_$g_AnnotSV(genomeBuild).formatted.sorted.bed] 
@@ -783,7 +785,7 @@ proc OrganizeAnnotation {} {
 		if {$AnnotationMode eq "split"} {
 		    set L_cytobandText "[userBEDannotation $cytobandBEDfile $SVchrom $intersectStart $intersectEnd]"
 		} else {
-		    set L_cytobandText "[userBEDannotation $cytobandBEDfile $SVchrom $SVleft $SVright]"
+		set L_cytobandText "[userBEDannotation $cytobandBEDfile $SVchrom $SVleft $SVright]"
 		}
 		set L_cytobandText [split $L_cytobandText ";"]
 		set cytobandText [lindex $L_cytobandText end]
@@ -792,7 +794,7 @@ proc OrganizeAnnotation {} {
 		}
 	    }
 	}
-
+	
 	# User SVincludedInFt BED annotations. 
 	set L_SVincludedInFtText {}
    	foreach formattedUserBEDfile [glob -nocomplain $usersDir/SVincludedInFt/*.formatted.sorted.bed] {
@@ -1086,7 +1088,7 @@ proc OrganizeAnnotation {} {
 	append TextToWrite "\t$AnnotationMode"
 
 	####### "Cytoband annotations"
-	if {$g_AnnotSV(organism) eq "Human"} {
+	if {$g_AnnotSV(cytoband)} {
 	    append TextToWrite "\t$cytobandText"
 	}
 	
@@ -1247,61 +1249,67 @@ proc OrganizeAnnotation {} {
 		# Note: the ranking is available only for the full lines
 		append lineCompleted "$fullOrSplitLine"
 
-		if {![info exists g_rankingScore($AnnotSV_ID)]} {set g_rankingScore($AnnotSV_ID) ""}
-		if {$g_rankingScore($AnnotSV_ID) ne ""} {
-		    set g_rankingScore($AnnotSV_ID) [expr {double(round(100*$g_rankingScore($AnnotSV_ID)))/100}] ;# e.g.: expr 1+0+0.9+0.3 = 2.1999999999999997 => becomes 2.2 with this line
+		if {$g_AnnotSV(organism) eq "Human"} {
+		    if {![info exists g_rankingScore($AnnotSV_ID)]} {set g_rankingScore($AnnotSV_ID) ""}
+		    if {$g_rankingScore($AnnotSV_ID) ne ""} {
+			set g_rankingScore($AnnotSV_ID) [expr {double(round(100*$g_rankingScore($AnnotSV_ID)))/100}] ;# e.g.: expr 1+0+0.9+0.3 = 2.1999999999999997 => becomes 2.2 with this line
+		    }
+		    # Change metrics from "." to ","
+		    if {[set g_AnnotSV(metrics)] eq "fr"} {
+			regsub -all {\.} $g_rankingScore($AnnotSV_ID) "," rankScoreFr
+			append lineCompleted "\t$rankScoreFr" ;#rankingScore
+		    } else {
+			append lineCompleted "\t$g_rankingScore($AnnotSV_ID)" ;#rankingScore
+		    }
+		    if {![info exists g_rankingExplanations($AnnotSV_ID)]} {set g_rankingExplanations($AnnotSV_ID) ""}
+		    append lineCompleted "\t$g_rankingExplanations($AnnotSV_ID)" ;#rankingExplanations
+		    if {$g_rankingScore($AnnotSV_ID) eq ""} {
+			set class "NA"
+		    } elseif {$g_rankingScore($AnnotSV_ID) >= "0.99"} {
+			set class 5
+		    } elseif {$g_rankingScore($AnnotSV_ID) >= "0.9"} {
+			set class 4
+		    } elseif {$g_rankingScore($AnnotSV_ID) >= "-0.9"} {
+			set class 3
+		    } elseif {$g_rankingScore($AnnotSV_ID) >= "-0.99"} {
+			set class 2
+		    } else {
+			set class 1
+		    }
+		    append lineCompleted "\t$class"	;#ACMGclass
+		    set g_ACMGclass($AnnotSV_ID,full) "full=$class"
+		    
+		    # To select the SV of a user-defined specific class (from 1 to 5)
+		    # default : $g_AnnotSV(rankFiltering) == {1 2 3 4 5 NA}
+		    if {[lsearch -exact $g_AnnotSV(rankFiltering) $class] eq -1} {
+			continue
+		    }
 		}
-		# Change metrics from "." to ","
-		if {[set g_AnnotSV(metrics)] eq "fr"} {
-		    regsub -all {\.} $g_rankingScore($AnnotSV_ID) "," rankScoreFr
-		    append lineCompleted "\t$rankScoreFr" ;#rankingScore
-		} else {
-		    append lineCompleted "\t$g_rankingScore($AnnotSV_ID)" ;#rankingScore
-		}
-		if {![info exists g_rankingExplanations($AnnotSV_ID)]} {set g_rankingExplanations($AnnotSV_ID) ""}
-		append lineCompleted "\t$g_rankingExplanations($AnnotSV_ID)" ;#rankingExplanations
-		if {$g_rankingScore($AnnotSV_ID) eq ""} {
-		    set class "NA"
-		} elseif {$g_rankingScore($AnnotSV_ID) >= "0.99"} {
-		    set class 5
-		} elseif {$g_rankingScore($AnnotSV_ID) >= "0.9"} {
-		    set class 4
-		} elseif {$g_rankingScore($AnnotSV_ID) >= "-0.9"} {
-		    set class 3
-		} elseif {$g_rankingScore($AnnotSV_ID) >= "-0.99"} {
-		    set class 2
-		} else {
-		    set class 1
-		}
-		append lineCompleted "\t$class"	;#ACMGclass
-		set g_ACMGclass($AnnotSV_ID,full) "full=$class"
-
-		# To select the SV of a user-defined specific class (from 1 to 5)
-		# default : $g_AnnotSV(rankFiltering) == {1 2 3 4 5 NA}
-		if {[lsearch -exact $g_AnnotSV(rankFiltering) $class] eq -1} {
-		    continue
-		}
-
+		
 		# For the use of the -annotationMode option: keep only the corresponding lines (full or split or both)
 		if {$g_AnnotSV(annotationMode) eq "full" && $AnnMo eq "split"} {continue}
 		if {$g_AnnotSV(annotationMode) eq "split" && $AnnMo eq "full"} {continue}
-		
+	    
 	    } else {
-		# To select the SV of a user-defined specific class (from 1 to 5)
-		regsub "full=" $g_ACMGclass($AnnotSV_ID,full) "" class
-		if {[lsearch -exact $g_AnnotSV(rankFiltering) $class] eq -1} {
-		    continue
-		} 
+		if {$g_AnnotSV(organism) eq "Human"} {
+		    # To select the SV of a user-defined specific class (from 1 to 5)
+		    regsub "full=" $g_ACMGclass($AnnotSV_ID,full) "" class
+		    if {[lsearch -exact $g_AnnotSV(rankFiltering) $class] eq -1} {
+			continue
+		    }
+		}
 		
 		# For the use of the -annotationMode option: keep only the corresponding lines (full or split or both)
 		if {$g_AnnotSV(annotationMode) eq "full" && $AnnMo eq "split"} {continue}
 		if {$g_AnnotSV(annotationMode) eq "split" && $AnnMo eq "full"} {continue}
 		
 		# Ranking not available for the split lines
-		append lineCompleted "$fullOrSplitLine"		
-		append lineCompleted "\t"  ;#rankingScore
-		append lineCompleted "\t" ;#rankingExplanations
-		append lineCompleted "\t$g_ACMGclass($AnnotSV_ID,full)";#ACMGclass 
+		append lineCompleted "$fullOrSplitLine"
+		if {$g_AnnotSV(organism) eq "Human"} {
+		    append lineCompleted "\t"  ;#rankingScore
+		    append lineCompleted "\t" ;#rankingExplanations
+		    append lineCompleted "\t$g_ACMGclass($AnnotSV_ID,full)";#ACMGclass 
+		}
 	    }
 	    
 	    # To select only the SV annotations overlapping a gene from the "candidateGenesFile"

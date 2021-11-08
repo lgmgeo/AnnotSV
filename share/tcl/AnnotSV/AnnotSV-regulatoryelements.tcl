@@ -52,9 +52,12 @@ proc isAnENSEMBLgeneName {geneName} {
 	set g_exist(ENSEMBL) "1"
 
 	set genesDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes/$g_AnnotSV(genomeBuild)"
-	foreach L [LinesFromFile "$genesDir/genes.ENSEMBL.sorted.bed"] {
-	    set Ls [split $L "\t"]
-	    set g_exist(ENSEMBL,[lindex $Ls 4]) 1
+	set ENSEMBLfile "$genesDir/genes.ENSEMBL.sorted.bed"
+	if {[file exists $ENSEMBLfile]} {
+	    foreach L [LinesFromFile $ENSEMBLfile] {
+		set Ls [split $L "\t"]
+		set g_exist(ENSEMBL,[lindex $Ls 4]) 1
+	    }
 	}
     }
     
@@ -497,10 +500,10 @@ proc checkGHfiles {} {
 
 
 
-
+## Human:
+#########
 ## - Check if the following miRTargetLink files has been downloaded:
 ##   - Validated_miRNA-gene_pairs_hsa_miRBase_v22.1_GRCh38_location_augmented.tsv
-##   - Predicted_miRNA-gene_pairs_hsa_miRBase_v22.1_GRCh38_location_augmented.tsv
 ##  
 ## - Check and create if necessary:
 ##   - miRTargetLink_RefSeq_GRCh38.sorted.bed
@@ -509,6 +512,17 @@ proc checkGHfiles {} {
 ## - GRCh37 miRTargetLink are not provided (only GRCh38)
 ##   - miRTargetLink_ENSEMBL_GRCh37.sorted.bed => created with a UCSC liftover
 ##   - miRTargetLink_RefSeq_GRCh37.sorted.bed  => created with a UCSC liftover
+#
+## Mouse:
+#########
+## - Check if the following miRTargetLink files has been downloaded:
+##   - Validated_miRNA-gene_pairs_mmu_miRBase_v22.1_GRCm38_location_augmented.tsv
+##  
+## - Check and create if necessary:
+##   - miRTargetLink_RefSeq_mm10.sorted.bed
+##
+## - mm9 miRTargetLink is not provided (only mm10)
+##   - miRTargetLink_RefSeq_mm9.sorted.bed  => created with a UCSC liftover
 proc checkMiRTargetLinkFiles {} {
 
     global g_AnnotSV
@@ -521,18 +535,25 @@ proc checkMiRTargetLinkFiles {} {
     set regElementsDir "$extannDir/FtIncludedInSV/RegulatoryElements"
     set miRNARefSeqFileFormatted  "$regElementsDir/$g_AnnotSV(genomeBuild)/miRTargetLink_RefSeq_$g_AnnotSV(genomeBuild).sorted.bed"
     set miRNAENSEMBLfileFormatted "$regElementsDir/$g_AnnotSV(genomeBuild)/miRTargetLink_ENSEMBL_$g_AnnotSV(genomeBuild).sorted.bed"
-    if {[file exists $miRNARefSeqFileFormatted] && [file exists $miRNAENSEMBLfileFormatted]} {
-	set g_AnnotSV(miRNAann) 1
-	return
+    if {$g_AnnotSV(organism) eq "Human"} {
+	if {[file exists $miRNARefSeqFileFormatted] && [file exists $miRNAENSEMBLfileFormatted]} {
+	    set g_AnnotSV(miRNAann) 1
+	    return
+	}
+    } elseif {$g_AnnotSV(organism) eq "Mouse"} {
+	if {[file exists $miRNARefSeqFileFormatted]} {
+	    set g_AnnotSV(miRNAann) 1
+	    return
+	}
     }
 
     ##########################################################
     ## No formatted miRTargetLink files available at this step
     ##########################################################
 
-    ## miRTargetLink is only available in GRCh38
-    ############################################
-    if {$g_AnnotSV(genomeBuild) ne "GRCh38"} {
+    ## miRTargetLink is only available in GRCh38 and mm10
+    #####################################################
+    if {$g_AnnotSV(genomeBuild) ne "GRCh38" && $g_AnnotSV(genomeBuild) ne "mm10"} {
 	return
     }
     
@@ -540,31 +561,39 @@ proc checkMiRTargetLinkFiles {} {
     ##################################################
     # Checks if the miRTargetLink file exist:
     # (we only keep the validated miRNA file. But the code is OK to also keep the predicted miRNA file if wanted)
-    set miRNAfiles [glob -nocomplain "$regElementsDir/*_miRNA-gene_pairs_hsa_miRBase_*_GRCh38_location_augmented.tsv"];# Validated (+ Predicted) miRNA files
-    if {$miRNAfiles eq ""} {
+    if {$g_AnnotSV(genomeBuild) eq "GRCh38"} {
+	set miRNAfilesDownloaded [glob -nocomplain "$regElementsDir/*_miRNA-gene_pairs_hsa_miRBase_*_GRCh38_location_augmented.tsv"];# Validated (+ Predicted) miRNA files
+    } elseif {$g_AnnotSV(genomeBuild) eq "mm10"} {
+	set miRNAfilesDownloaded [glob -nocomplain "$regElementsDir/*_miRNA-gene_pairs_mmu_miRBase_*_GRCm38_location_augmented.tsv"];# Validated (+ Predicted) miRNA files
+    }
+    if {$miRNAfilesDownloaded eq ""} {
 	return
     }
-  
+
     ## Downloaded miRTargetLink file is available
     #############################################
     puts "\t...miRTargetLink configuration ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
     
-    ## Creation of the 2 miRNA formatted files (RefSeq and ENSEMBL in GRCh38)
+    ## Creation of the 2 miRNA formatted files: RefSeq (GRCh38 + mm10)and ENSEMBL (GRCh38)
     ##   - # Header: chr miRNAstart miRNAend miRNAtype miRNAgene
-    set miRNARefSeqFileFormatted38  "$regElementsDir/GRCh38/miRTargetLink_RefSeq_GRCh38.sorted.bed"
-    set miRNAENSEMBLfileFormatted38 "$regElementsDir/GRCh38/miRTargetLink_ENSEMBL_GRCh38.sorted.bed"
+    set miRNARefSeqFileFormatted38or10  "$regElementsDir/$g_AnnotSV(genomeBuild)/miRTargetLink_RefSeq_$g_AnnotSV(genomeBuild).sorted.bed"
+    set miRNAENSEMBLfileFormatted38     "$regElementsDir/$g_AnnotSV(genomeBuild)/miRTargetLink_ENSEMBL_$g_AnnotSV(genomeBuild).sorted.bed"
 
-    puts "\t\t...creation of the 2 miRNA_*_GRCh38.sorted.bed files"
+    puts "\t\t...creation of the miRNA_*_$g_AnnotSV(genomeBuild).sorted.bed files"
     puts "\t\t   (done only once)"
 
-    file delete -force $miRNARefSeqFileFormatted38
+    file delete -force $miRNARefSeqFileFormatted38or10
     file delete -force $miRNAENSEMBLfileFormatted38
     
     # Validated_miRNA-gene_pairs_hsa_miRBase_v22.1_GRCh38_location_augmented.tsv:
     #    seqnames  start          end             strand  ID              Alias           Name             species   target_gene     confidence
     #    chr11     122146523      122146544       -       MIMAT0010195    MIMAT0010195    hsa-let-7a-2-3p  hsa       CADM1           Functional MTI (Weak)
     #    chr11     122146523      122146544       -       MIMAT0010195    MIMAT0010195    hsa-let-7a-2-3p  hsa       ARID1A          Functional MTI (Weak)
-    foreach miRNAfile $miRNAfiles {
+    # Validated_miRNA-gene_pairs_mmu_miRBase_v22.1_GRCm38_location_augmented.tsv
+    #    seqnames  start          end             strand  ID              Alias           Name            species    target_gene     confidence
+    #    chr13     48538239       48538260        -       MIMAT0000521    MIMAT0000521    mmu-let-7a-5p   mmu        Hoxa9           Functional MTI
+    #    chr13     48538239       48538260        -       MIMAT0000521    MIMAT0000521    mmu-let-7a-5p   mmu        Hmga2           Functional MTI
+    foreach miRNAfile $miRNAfilesDownloaded {   ;# Validated and predicted
 	foreach L [LinesFromFile $miRNAfile] {
 	    set Ls [split $L "\t"]
 	    if {[regexp "^seqnames" $L]} {
@@ -577,22 +606,22 @@ proc checkMiRTargetLinkFiles {} {
 	    regsub "chr" [lindex $Ls $i_miRNAchrom] "" chrom
 	    set miRNAstart [lindex $Ls $i_miRNAstart]
 	    set miRNAend [lindex $Ls $i_miRNAend]
-	    set coordGRCh38 "$chrom\t$miRNAstart\t$miRNAend"
-	    lappend L_Genes($coordGRCh38) [lindex $Ls $i_miRNAgene]
-	    lappend L_coord($chrom) "$coordGRCh38"
+	    set coord "$chrom\t$miRNAstart\t$miRNAend"
+	    lappend L_Genes($coord) [lindex $Ls $i_miRNAgene]
+	    lappend L_coord($chrom) "$coord"
 	}
     }
     # Writings:
-    file delete -force $miRNARefSeqFileFormatted38.tmp
+    file delete -force $miRNARefSeqFileFormatted38or10.tmp
     file delete -force $miRNAENSEMBLfileFormatted38.tmp
     foreach chrom {1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y M MT} {
 	if {![info exists L_coord($chrom)]} {continue}
-	set L_linesToWriteRefSeqGRCh38 {}
+	set L_linesToWriteRefSeqGRCh38or10 {}
 	set L_linesToWriteENSEMBLGRCh38 {}
-	foreach coordGRCh38 [lsort -unique $L_coord($chrom)] {
+	foreach coord [lsort -unique $L_coord($chrom)] {
 	    set allRefSeqGenes ""
 	    set allEnsemblGenes ""
-	    foreach gene $L_Genes($coordGRCh38) {
+	    foreach gene $L_Genes($coord) {
 		if {[isARefSeqGeneName $gene]} {
 		    lappend allRefSeqGenes $gene
 		}
@@ -600,19 +629,22 @@ proc checkMiRTargetLinkFiles {} {
 		    lappend allEnsemblGenes $gene
 		}
 	    }
-	    if {$allRefSeqGenes ne ""} {lappend L_linesToWriteRefSeqGRCh38 "$coordGRCh38\tmTL_miRNA\t[join [lsort -unique $allRefSeqGenes] ";"]"}
-	    if {$allEnsemblGenes ne ""} {lappend L_linesToWriteENSEMBLGRCh38 "$coordGRCh38\tmTL_miRNA\t[join [lsort -unique $allEnsemblGenes] ";"]"}	    
+	    if {$allRefSeqGenes ne ""} {lappend L_linesToWriteRefSeqGRCh38or10 "$coord\tmTL_miRNA\t[join [lsort -unique $allRefSeqGenes] ";"]"}
+	    if {$allEnsemblGenes ne ""} {lappend L_linesToWriteENSEMBLGRCh38 "$coord\tmTL_miRNA\t[join [lsort -unique $allEnsemblGenes] ";"]"}	    
 	}
-	set L_linesToWriteRefSeqGRCh38 [lsort -command AscendingSortOnElement1 [lsort -command AscendingSortOnElement2 $L_linesToWriteRefSeqGRCh38]]
+	set L_linesToWriteRefSeqGRCh38or10 [lsort -command AscendingSortOnElement1 [lsort -command AscendingSortOnElement2 $L_linesToWriteRefSeqGRCh38or10]]
 	set L_linesToWriteENSEMBLGRCh38 [lsort -command AscendingSortOnElement1 [lsort -command AscendingSortOnElement2 $L_linesToWriteENSEMBLGRCh38]]
-	WriteTextInFile "[join $L_linesToWriteRefSeqGRCh38 "\n"]" $miRNARefSeqFileFormatted38.tmp
-	WriteTextInFile "[join $L_linesToWriteENSEMBLGRCh38 "\n"]" $miRNAENSEMBLfileFormatted38.tmp
+	WriteTextInFile "[join $L_linesToWriteRefSeqGRCh38or10 "\n"]" $miRNARefSeqFileFormatted38or10.tmp
+	if {$g_AnnotSV(genomeBuild) eq "GRCh38"} {
+	    WriteTextInFile "[join $L_linesToWriteENSEMBLGRCh38 "\n"]" $miRNAENSEMBLfileFormatted38.tmp
+	}
     }
     
     # Sorting of the bedfile:
     # Intersection with very large files can cause trouble with excessive memory usage.
     # A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm. 
-    foreach miRNAfile {miRNARefSeqFileFormatted38 miRNAENSEMBLfileFormatted38} {
+    foreach miRNAfile {miRNARefSeqFileFormatted38or10 miRNAENSEMBLfileFormatted38} {
+	if {![file exists [set $miRNAfile].tmp]} {continue} ;# use for Mouse annotation, ENSEMBL annotation doesn't exist
 	set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.tmp.bash"
 	ReplaceTextInFile "#!/bin/bash" $sortTmpFile
 	WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $sortTmpFile
@@ -631,7 +663,7 @@ proc checkMiRTargetLinkFiles {} {
     }
 
     # Delete the downloaded files
-    foreach miRNAfile $miRNAfiles {
+    foreach miRNAfile $miRNAfilesDownloaded {
 	file delete -force $miRNAfile
     }
     
