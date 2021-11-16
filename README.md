@@ -5,7 +5,7 @@
 1. The sources can be cloned to any directory:
 ```
 cd /path/to/install/
-git clone git@github.com:lgmgeo/AnnotSV.git
+git clone https://github.com/lgmgeo/AnnotSV.git
 ```
 2. Then, the user can easily install the package using make:
 ```

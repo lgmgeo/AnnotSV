@@ -361,6 +361,7 @@ proc configureAnnotSV {argv} {
 
     ## The following step could be improved: too long
     #################################################
+    set g_AnnotSV(snvIndelSamples) [split $g_AnnotSV(snvIndelSamples)  ";|,"]
     ## If "snvIndelFiles" option is defined:
     ## It must be existing files
     if {$g_AnnotSV(snvIndelFiles) ne ""} {
@@ -411,6 +412,7 @@ proc configureAnnotSV {argv} {
     }
     
 
+    set g_AnnotSV(candidateSnvIndelSamples) [split $g_AnnotSV(candidateSnvIndelSamples)  ";|,"]
     ## If "candidateSnvIndelFiles" option is defined:
     ## It must be existing files
     if {$g_AnnotSV(candidateSnvIndelFiles) ne ""} {

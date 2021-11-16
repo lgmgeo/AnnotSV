@@ -30,7 +30,7 @@ OPTIONS
                                 Default: use all samples from the filtered VCF files
 
 -genomeBuild:                   Genome build used
-                                Values: GRCh37 (default) or GRCh38 or mm9 or mm10
+                                Values: GRCh38 (default) or GRCh37 or mm9 or mm10
 
 -help:                          More information on the arguments
 
