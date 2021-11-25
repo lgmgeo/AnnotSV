@@ -19,7 +19,7 @@ make PREFIX=. install-mouse-annotation
 
 In csh:
 ```
-setenv ANNOTSV /path/to/install/AnnotSV/
+setenv ANNOTSV /path/to/install/AnnotSV
 ```
 In bash:
 ```

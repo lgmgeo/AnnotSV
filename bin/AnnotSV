@@ -1,7 +1,7 @@
 #!/usr/bin/env tclsh
 
 ############################################################################################################
-# AnnotSV 3.1                                                                                              #
+# AnnotSV 3.1.1                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -38,6 +38,8 @@ proc getScriptDirectory {} {
 ## Checking for environment variables needed (if all are defined).
 if {![info exists env(ANNOTSV)]} {
     puts "\"ANNOTSV\" environment variable not specified. Please defined it before running AnnotSV. Exit with error"; exit 2
+} else {
+    regsub "/$" $env(ANNOTSV) "" env(ANNOTSV)
 }
 
 ## Checking if the application name is the same that the path of the ANNOTSV environment variable

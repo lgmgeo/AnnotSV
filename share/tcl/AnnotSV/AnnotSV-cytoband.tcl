@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.1                                                                                              #
+# AnnotSV 3.1.1                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -64,7 +64,7 @@ proc checkCytoband {} {
 	}
 	file delete -force $sortTmpFile 
 	file delete -force $formattedFile
-	#file delete -force $cytobandBEDfile
+	file delete -force $cytobandBEDfile
     }
 
     # Number of annotation columns (without the 3 columns "chrom start end")

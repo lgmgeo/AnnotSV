@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.1                                                                                              #
+# AnnotSV 3.1.1                                                                                            #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
@@ -9,6 +9,11 @@
 
 
 For more details, please see the README file.
+
+
+November 25, 2021, AnnotSV version 3.1.1
+	- Add bugfix when setting the ANNOTSV global environmental variable with a final "/"
+	- Update the documentation, add of the AnnotSV logo
 
 
 November 08, 2021, AnnotSV version 3.1
