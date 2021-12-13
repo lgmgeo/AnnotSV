@@ -1,10 +1,9 @@
-import os
 import re
 import shutil
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 
-from pydantic import BaseModel, Extra, PositiveInt, ValidationError, conint, validator
+from pydantic import BaseModel, Extra, PositiveInt, Field, validator
 
 from annotsv.constants import install_dir
 from annotsv.enums import *
@@ -51,6 +50,9 @@ required_output_cols = (
     "ACMG_class",
 )
 
+RANK_PATTERN = r"(?:[1-5](?:-[1-5])?)|NA"
+HPO_PATTERN = r"HP:\d+$"
+
 
 class Config(BaseModel):
     # has defaults in config file
@@ -60,64 +62,63 @@ class Config(BaseModel):
     hpo: Optional[str]
     include_ci: bool
     metrics: MetricFormat
-    min_total_number: conint(ge=100, le=1000)  # type: ignore
-    overlap: conint(ge=0, le=100)  # type: ignore
+    min_total_number: int = Field(..., min=100, max=1000)
+    overlap: int = Field(..., min=0, max=100)
     overwrite: bool
     promoter_size: PositiveInt
-    rank_filtering: str
+    rank_filtering: str = Field(..., regex=f"^{RANK_PATTERN}(?:,{RANK_PATTERN})*$")
     reciprocal: bool
     snv_indel_pass: bool
     sv_input_info: bool
     sv_min_size: PositiveInt
 
     # optional
-    annotations_dir: Path
-    bcftools: Path
-    bedtools: Path
-    candidate_genes_file: Optional[Path]
-    candidate_snv_indel_files: Optional[str]
-    candidate_snv_indel_samples: Optional[List[str]]
-    external_gene_files: Optional[List[Path]]
-    outputDir: Optional[Path]
-    outputFile: Optional[Path]
-    re_report: Optional[bool]
-    samplesid_bed_col: Optional[int]
-    snv_indel_files: Optional[List[Path]]
-    snv_indel_samples: Optional[List[str]]
+    annotations_dir: Path = Path(__file__).parents[1] / "AnnotSV"
+    bcftools: Path = Path(shutil.which("bcftools") or "bcftools")
+    bedtools: Path = Path(shutil.which("bedtools") or "bedtools")
+    candidate_genes_file: Optional[Path] = None
+    candidate_snv_indel_files: Optional[str] = None
+    candidate_snv_indel_samples: Optional[List[str]] = None
+    external_gene_files: Optional[List[Path]] = None
+    outputDir: Optional[Path] = None
+    outputFile: Optional[Path] = None
+    re_report: Optional[bool] = None
+    samplesid_bed_col: Optional[int] = None
+    snv_indel_files: Optional[List[Path]] = None
+    snv_indel_samples: Optional[List[str]] = None
     svt_bed_col: int
     tx: TranscriptSource
-    tx_file: Optional[Path]
+    tx_file: Optional[Path] = None
 
     output_columns: List[str]
 
-    @validator("rank_filtering")
-    def validate_rank(cls, v: str) -> str:
-        rank_pattern = re.compile(r"^([1-5](-[1-5])?)|NA$")
-        assert all([rank_pattern.search(r) for r in v.split(",")]), f"Invalid ranks in {v}"
-        return v
+    # @validator("rank_filtering")
+    # def validate_rank(cls, v: str) -> str:
+    #     rank_pattern = re.compile(r"^([1-5](-[1-5])?)|NA$")
+    #     assert all([rank_pattern.search(r) for r in v.split(",")]), f"Invalid ranks in {v}"
+    #     return v
 
     @validator("hpo")
-    def validate_hpo(cls, v: Optional[str]) -> Optional[str]:
+    def validate_hpo(cls, v: Optional[str]):
         if v is None or v == "":
             return None
-        hpo_pattern = re.compile(r"^HP:\d+$")
-        assert all([hpo_pattern.search(c) for c in v.split(",")]), f"Invalid HPO patterns in {v}"
+        assert re.search(f"^{HPO_PATTERN}(?:,{HPO_PATTERN})*$", v), f"Invalid HPO patterns in {v}"
         return v
 
-    @validator("bcftools", "bedtools")
-    def validate_executable(cls, path_str: str):
-        bin_path = Path(path_str)
-        if bin_path.exists():
-            assert os.access(
-                bin_path, os.F_OK | os.X_OK
-            ), f"{bin_path} exists, but is not a file or not executable"
-        elif bin_path.name == path_str:
-            which_path = shutil.which(path_str)
-            assert which_path is not None, f"{path_str} not found"
-            bin_path = Path(which_path)
-        else:
-            assert False, ""
-        return bin_path.resolve()
+    # @validator("bcftools", "bedtools")
+    # def validate_executable(cls, path_str: str):
+    #     bin_path = Path(path_str)
+    #     if bin_path.exists():
+    #         assert os.access(
+    #             bin_path, os.F_OK | os.X_OK
+    #         ), f"{bin_path} exists, but is not a file or not executable"
+    #     elif bin_path.name == path_str:
+    #         which_path = shutil.which(path_str)
+    #         assert which_path is not None, f"{path_str} not found"
+    #         bin_path = Path(which_path)
+    #     else:
+    #         assert False, ""
+    #     return bin_path.resolve()
 
     class Config:
         # allows loading/dumping with camelCase, while still keeping snake_case
@@ -129,17 +130,18 @@ class Config(BaseModel):
 
 
 def load_config(
-    config_file: Path = default_config_file, config_type: ConfigTypes = ConfigTypes.LEGACY
-) -> Config:
+    config_file: Path = default_config_file,
+    config_type: ConfigTypes = ConfigTypes.LEGACY,
+):
     if config_type == ConfigTypes.LEGACY:
         config_dict = _load_legacy_config(config_file)
     else:
-        raise NotImplemented
-    config = Config(**config_dict)
+        raise NotImplementedError
+    config = Config.parse_obj(config_dict)
     return config
 
 
-def _load_legacy_config(config_file: Path) -> Dict[str, Any]:
+def _load_legacy_config(config_file: Path):
     opt_val_pattern = re.compile(r"^-([a-zA-Z]+):\s+(\S+?)\s*$")
     column_pattern = re.compile(r"[ \t\*:]+$")
     with config_file.open("rt") as input:
@@ -168,6 +170,9 @@ def _load_legacy_config(config_file: Path) -> Dict[str, Any]:
                 option_name, option_value = match.group(1, 2)
                 if option_name == "rankFiltering":
                     pass
+                elif "$ref" in Config.schema()["properties"][option_name]:
+                    # force case-insensitivity in config for enum keys
+                    option_value = option_value.upper()
                 # invalid options will be caught when creating Config object
                 option_config[option_name] = option_value.replace('"', "")
             else:

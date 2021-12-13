@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from decimal import Decimal, InvalidOperation
+from distutils.util import strtobool
 from pathlib import Path
 from typing import List, Optional
 
@@ -12,21 +12,9 @@ from .enums import AnnotationMode, GenomeBuild, MetricFormat, TranscriptSource
 
 ### validation / helper funcs
 
-# Only official support 1/0 as CLI param, but check for yes/no
-def to_bool(ctx: typer.Context, param: typer.CallbackParam, val: str) -> bool:
-    stripped_val = val.strip().replace('"', "")
-    try:
-        # just use Decimal instead of checking int, float, etc.
-        return bool(Decimal(stripped_val))
-    except InvalidOperation:
-        # warn on
-        typer.echo(
-            f"WARNING: non 1/0 options are not supported, --{param.name} may not function as expected",
-            err=True,
-        )
-        if stripped_val.lower() == "no":
-            return False
-        return bool(stripped_val)
+# Only official support 1/0 as CLI param, but check for more just in case
+def to_bool(ctx: typer.Context, param: typer.CallbackParam, val: str):
+    return strtobool(val.strip().replace('"', ""))
 
 
 ### CLI processing
@@ -47,14 +35,14 @@ def annotsv(
         dir_okay=False,
         file_okay=True,
         help="Path of your VCF or BED input file with SV coordinates",
-        metavar="FILE",
+        metavar="INPUT_FILE",
         readable=True,
         resolve_path=True,
     ),
     snv_indel_files: str = typer.Option(
         ...,
         "--snvIndelFiles",
-        help="Path of the VCF input file(s) with SNV/indel coordinates used for false positive discovery. Use counts of the homozygous and heterozygous variants. Gzipped VCF files are supported as well as regular expression",
+        help="Path of the VCF input file(s) with SNV/indel coordinates used for false positive discovery. Use counts of the homozygous and heterozygous variants. Gzipped VCF files are supported as well as regular expressions",
     ),
     output_dir: Path = typer.Option(
         ...,
@@ -75,7 +63,7 @@ def annotsv(
         help="Output path and file name",
     ),
     annotations_dir: Optional[Path] = typer.Option(
-        str(constants.annotation_dir),
+        constants.annotation_dir,
         "--annotationsDir",
         dir_okay=True,
         file_okay=False,
@@ -135,7 +123,7 @@ def annotsv(
         help="Path of tab separated values file(s) to integrate external gene annotations into the output file. The first line should be a header including a column entitled 'genes'. Gzipped files are supported",
     ),
     genome_build: GenomeBuild = typer.Option(
-        GenomeBuild.GRCh37,
+        GenomeBuild.GRCH37,
         "--genomeBuild",
         case_sensitive=False,
         help="Genome build used",
@@ -252,7 +240,7 @@ def annotsv(
         help="Number of the column describing the SV type (DEL, DUP) if the input SV file is a BED",
     ),
     tx: TranscriptSource = typer.Option(
-        TranscriptSource.RefSeq,
+        TranscriptSource.REFSEQ,
         "--tx",
         case_sensitive=False,
         help="Origin of the transcripts",
@@ -269,5 +257,5 @@ def annotsv(
     ),
 ):
     typer.echo(f"in annotsv")
-    breakpoint()
+    # breakpoint()
     pass

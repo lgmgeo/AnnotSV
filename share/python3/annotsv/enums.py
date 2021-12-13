@@ -1,19 +1,15 @@
 from enum import Enum, auto
 
 
-class AutoValueMixin:
-    """ Makes auto() set the member value to its name """
+class BaseEnum(str, Enum):
+    @classmethod
+    def metavar(cls):
+        """generates nice metavar strings for typer help"""
+        return f"[{'|'.join(cls.__members__)}]"
 
     @staticmethod
     def _generate_next_value_(name: str, start, count, last_values):
         return name
-
-
-class BaseEnum(str, AutoValueMixin, Enum):
-    @classmethod
-    def metavar(cls):
-        """ generates nice metavar strings for typer help """
-        return f"[{'|'.join(cls.__members__)}]"
 
     def __str__(self) -> str:
         return self.name
@@ -40,10 +36,10 @@ class ConfigTypes(BaseEnum):
 
 
 class GenomeBuild(BaseEnum):
-    GRCh37 = auto()
-    GRCh38 = auto()
-    mm9 = auto()
-    mm10 = auto()
+    GRCH37 = auto()
+    GRCH38 = auto()
+    MM9 = auto()
+    MM10 = auto()
 
 
 class MetricFormat(BaseEnum):
@@ -52,5 +48,5 @@ class MetricFormat(BaseEnum):
 
 
 class TranscriptSource(BaseEnum):
-    RefSeq = auto()
+    REFSEQ = auto()
     ENSEMBL = auto()

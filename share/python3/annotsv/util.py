@@ -1,5 +1,5 @@
-def to_camel(val: str) -> str:
-    """  converts snake_case to camelCase """
+def to_camel(val: str):
+    """converts snake_case to camelCase"""
     always_upper = ("sv", "pass", "bed", "re", "ci")
     # ensure all lowercase, split on _
     parts = val.lower().split("_")
@@ -22,8 +22,8 @@ def to_camel(val: str) -> str:
     return "".join(camel_parts)
 
 
-def from_camel(val: str) -> str:
-    """ converts camelCase to snake_case """
+def from_camel(val: str):
+    """converts camelCase to snake_case"""
 
     # word boundaries at shift from lower to upper case e.g., camel^Case
     # or upper to lower if several uppercase characters in a row e.g., UPPER^lower

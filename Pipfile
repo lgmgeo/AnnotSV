@@ -6,14 +6,16 @@ name = "pypi"
 [packages]
 typer = "*"
 pydantic = "*"
+typing-extensions = "*"
 
 [dev-packages]
 black = "*"
 typer-cli = "*"
 pdbpp = "*"
+ipython = "*"
 
 [pipenv]
 allow_prereleases = true
 
 [scripts]
-annotsv = "python3 -m annotsv"
+annotsv = "./bin/pyAnnotSV"
