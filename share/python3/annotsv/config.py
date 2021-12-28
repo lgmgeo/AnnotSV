@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import gzip
 import os
 import re
@@ -6,16 +8,16 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, Extra, PositiveInt, Field, validator
+from pydantic import BaseModel, Extra, Field, PositiveInt, validator
 
 from annotsv.constants import install_dir
 from annotsv.enums import (
-    GenomeBuild,
-    Organisms,
     AnnotationMode,
-    TranscriptSource,
-    MetricFormat,
     ConfigTypes,
+    GenomeBuild,
+    MetricFormat,
+    Organisms,
+    TranscriptSource,
 )
 from annotsv.util import from_camel, to_camel
 
@@ -98,8 +100,8 @@ class AnnotSVConfig(BaseModel):
 
     # optional
     annotations_dir: Path = Path(__file__).parents[1] / "AnnotSV"
-    bcftools: Path = Path(shutil.which("bcftools") or "bcftools")
-    bedtools: Path = Path(shutil.which("bedtools") or "bedtools")
+    bcftools: Path = Path("bcftools")
+    bedtools: Path = Path("bedtools")
     candidate_genes_file: Optional[Path] = None
     candidate_snv_indel_files: Optional[str] = None
     candidate_snv_indel_samples: Optional[List[str]] = None

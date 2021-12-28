@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 def to_camel(val: str):
     """converts snake_case to camelCase"""
     always_upper = ("sv", "pass", "bed", "re", "ci", "af")
