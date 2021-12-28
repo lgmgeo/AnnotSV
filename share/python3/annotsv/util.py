@@ -1,6 +1,6 @@
 def to_camel(val: str):
     """converts snake_case to camelCase"""
-    always_upper = ("sv", "pass", "bed", "re", "ci")
+    always_upper = ("sv", "pass", "bed", "re", "ci", "af")
     # ensure all lowercase, split on _
     parts = val.lower().split("_")
     if len(parts) == 1:

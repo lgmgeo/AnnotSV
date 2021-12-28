@@ -1,8 +1,12 @@
 #!/bin/bash -e
 set -o pipefail
 
-HERE=$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/..")
-PYTHONPATH=$(dirname "$HERE")/share/python3:$PYTHONPATH
+if [[ -z $ANNOTSV ]]; then
+    echo '"ANNOTSV" environment variable not specified. Please define it before running AnnotSV' >&2
+    exit 2
+fi
+
+PYTHONPATH=$ANNOTSV/share/python3:$PYTHONPATH
 export PYTHONPATH
 
 python3 -m annotsv "$@"

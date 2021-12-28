@@ -1,7 +1,9 @@
+import gzip
 import re
 import shutil
+from glob import glob
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from pydantic import BaseModel, Extra, PositiveInt, Field, validator
 
@@ -52,14 +54,28 @@ required_output_cols = (
 
 RANK_PATTERN = r"(?:[1-5](?:-[1-5])?)|NA"
 HPO_PATTERN = r"HP:\d+$"
+ORGANISM_MAP = {
+    GenomeBuild.GRCH37: Organisms.Human,
+    GenomeBuild.GRCH38: Organisms.Human,
+    GenomeBuild.MM9: Organisms.Mouse,
+    GenomeBuild.MM10: Organisms.Mouse,
+}
 
 
-class Config(BaseModel):
+class AnnotSVConfig(BaseModel):
+    # from command line
+    output_file: Path
+    output_dir: Path
+    sv_input_file: Path
+    snv_indel_files: List[Path]
+    snv_indel_samples: List[str]
+
     # has defaults in config file
     annotation_mode: AnnotationMode
+    benign_af: float = Field(..., min=0.001, max=0.1)
     candidate_genes_filtering: bool
     genome_build: GenomeBuild
-    hpo: Optional[str]
+    hpo: Optional[str] = None
     include_ci: bool
     metrics: MetricFormat
     min_total_number: int = Field(..., min=100, max=1000)
@@ -68,7 +84,7 @@ class Config(BaseModel):
     promoter_size: PositiveInt
     rank_filtering: str = Field(..., regex=f"^{RANK_PATTERN}(?:,{RANK_PATTERN})*$")
     reciprocal: bool
-    snv_indel_pass: bool
+    snvindel_pass: bool
     sv_input_info: bool
     sv_min_size: PositiveInt
 
@@ -80,29 +96,69 @@ class Config(BaseModel):
     candidate_snv_indel_files: Optional[str] = None
     candidate_snv_indel_samples: Optional[List[str]] = None
     external_gene_files: Optional[List[Path]] = None
-    outputDir: Optional[Path] = None
-    outputFile: Optional[Path] = None
-    re_report: Optional[bool] = None
+    re_report: bool
     samplesid_bed_col: Optional[int] = None
-    snv_indel_files: Optional[List[Path]] = None
-    snv_indel_samples: Optional[List[str]] = None
     svt_bed_col: int
     tx: TranscriptSource
     tx_file: Optional[Path] = None
 
     output_columns: List[str]
 
-    # @validator("rank_filtering")
-    # def validate_rank(cls, v: str) -> str:
-    #     rank_pattern = re.compile(r"^([1-5](-[1-5])?)|NA$")
-    #     assert all([rank_pattern.search(r) for r in v.split(",")]), f"Invalid ranks in {v}"
-    #     return v
+    @property
+    def organism(self):
+        return ORGANISM_MAP[self.genome_build]
 
     @validator("hpo")
     def validate_hpo(cls, v: Optional[str]):
         if v is None or v == "":
             return None
-        assert re.search(f"^{HPO_PATTERN}(?:,{HPO_PATTERN})*$", v), f"Invalid HPO patterns in {v}"
+        if not re.search(f"^{HPO_PATTERN}(?:,{HPO_PATTERN})*$", v):
+            raise ValueError(f"Invalid HPO patterns in {v}")
+        return v
+
+    @validator("snv_indel_samples", "candidate_snv_indel_samples")
+    def validate_samples(cls, v, values, field, **kwargs):
+        v_list: List[str] = []
+        if v:
+            v_list = re.split(r"[;,|]", v)
+
+        files_field = field.name.replace("samples", "files")
+        if values.get(files_field):
+            # All samples should be present in one of the VCF files
+            # If the no samples are defined, include all samples found in the VCFs
+            all_samples = set()
+            for fpath in values[files_field]:
+                if fpath.suffix == ".gz":
+                    open_func = gzip.open
+                else:
+                    open_func = open
+
+                with open_func(fpath, "rt") as fh:
+                    for line in fh:
+                        if line.startswith("#CHROM"):
+                            all_samples.update(line.rstrip().split("\t")[9:])
+                            break
+
+            if len(v_list) == 0:
+                v_list = list(all_samples)
+            else:
+                v_list = list(set(v_list) & all_samples)
+
+        return v_list
+
+    @validator("output_dir")
+    def validate_output_path(cls, v, values, **kwargs):
+        if v:
+            if (
+                values["output_file"]
+                and values["output_file"].is_absolute()
+                and not values["output_file"].resolve().startswith(str(v.resolve()))
+            ):
+                raise ValueError(
+                    f"Output dir {v} does not match output file {values['output_file']}"
+                )
+        else:
+            v = values["output_file"].resolve().parent
         return v
 
     # @validator("bcftools", "bedtools")
@@ -130,15 +186,18 @@ class Config(BaseModel):
 
 
 def load_config(
+    params: Dict[str, Any],
+    *,
     config_file: Path = default_config_file,
     config_type: ConfigTypes = ConfigTypes.LEGACY,
 ):
     if config_type == ConfigTypes.LEGACY:
-        config_dict = _load_legacy_config(config_file)
+        config_defaults = _load_legacy_config(config_file)
     else:
         raise NotImplementedError
-    config = Config.parse_obj(config_dict)
-    return config
+
+    # keys present in params will overwrite values from config file
+    return AnnotSVConfig.parse_obj({**config_defaults, **params})
 
 
 def _load_legacy_config(config_file: Path):
@@ -170,7 +229,7 @@ def _load_legacy_config(config_file: Path):
                 option_name, option_value = match.group(1, 2)
                 if option_name == "rankFiltering":
                     pass
-                elif "$ref" in Config.schema()["properties"][option_name]:
+                elif issubclass(AnnotSVConfig.__fields__[from_camel(option_name)].type_, Enum):
                     # force case-insensitivity in config for enum keys
                     option_value = option_value.upper()
                 # invalid options will be caught when creating Config object

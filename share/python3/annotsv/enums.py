@@ -47,6 +47,11 @@ class MetricFormat(BaseEnum):
     FR = auto()
 
 
+class Organisms(BaseEnum):
+    Human = auto()
+    Mouse = auto()
+
+
 class TranscriptSource(BaseEnum):
     REFSEQ = auto()
     ENSEMBL = auto()
