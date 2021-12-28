@@ -68,3 +68,14 @@ def from_camel(val: str):
             parts.append(current_part)
 
     return "_".join([x.lower() for x in parts])
+
+
+def strtobool(val: str):
+    """pulled from distutils.util, since distutils is deprecated"""
+    val = val.lower()
+    if val in ("y", "yes", "t", "true", "on", "1"):
+        return True
+    elif val in ("n", "no", "f", "false", "off", "0"):
+        return False
+    else:
+        raise ValueError(f"invalid truth value {val!r}")

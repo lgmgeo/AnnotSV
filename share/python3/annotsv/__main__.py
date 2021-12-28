@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import os
-from distutils.util import strtobool
+import re
 from glob import glob
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -12,7 +12,7 @@ import typer
 from annotsv import constants
 from annotsv.config import load_config
 from annotsv.enums import AnnotationMode, GenomeBuild, MetricFormat, TranscriptSource
-from annotsv.util import to_camel
+from annotsv.util import strtobool, to_camel
 
 ### validation / helper funcs
 
@@ -54,15 +54,15 @@ def annotsv(
         file_okay=False,
         resolve_path=True,
         writable=True,
-        help="Output path name",
+        help="Output directory path, required unless --outputFile is also used",
     ),
-    output_file: Path = typer.Option(
-        ...,
+    output_file: Optional[Path] = typer.Option(
+        None,
         "--outputFile",
         dir_okay=False,
         file_okay=True,
         writable=True,
-        help="Output path and file name",
+        help="Output file path, required unless --outputDir is also used",
     ),
     annotations_dir: Optional[Path] = typer.Option(
         constants.annotation_dir,
@@ -74,18 +74,16 @@ def annotsv(
         readable=True,
         resolve_path=True,
     ),
-    annotation_mode: AnnotationMode = typer.Option(
+    annotation_mode: Optional[AnnotationMode] = typer.Option(
         None,
         case_sensitive=False,
         help="Selection of the type of annotation lines produced by AnnotSV",
     ),
-    # TODO: verify dir vs. binary
     bcftools: Optional[Path] = typer.Option(
         None,
         "--bcftools",
         help="Path of the bcftools local installation",
     ),
-    # TODO: verify dir vs. binary
     bedtools: Optional[Path] = typer.Option(
         None,
         "--bedtools",
@@ -95,7 +93,7 @@ def annotsv(
         None,
         "--candidateGenesFile",
         dir_okay=False,
-        exists=False,
+        exists=True,
         file_okay=True,
         readable=True,
         resolve_path=True,
@@ -260,7 +258,24 @@ def annotsv(
 ):
     params: Dict[str, Any] = {to_camel(k): v for k, v in ctx.params.items() if v is not None}
 
-    # massage some params for the config load
+    # massage some params for the config
+    if output_file is None and output_dir is None:
+        raise ValueError(f"You must specify at least one of: --outputFile, --outputDir")
+    elif output_file and output_dir is None:
+        output_dir = output_file.parent
+    elif output_dir and output_file is None:
+        output_file = output_dir / re.sub(
+            r"\.(?:bed|vcf(?:\.gz)?)$",
+            ".annotated.tsv",
+            sv_input_file.name,
+        )
+    assert output_file and output_dir
+
+    if output_file.exists() and not overwrite:
+        raise ValueError(f"Output file {output_file} already exists, but overwrite not specified")
+    params["outputFile"] = output_file
+    params["outputDir"] = output_dir
+
     sif_list = []
     if snv_indel_files:
         if snv_indel_files.startswith("/"):

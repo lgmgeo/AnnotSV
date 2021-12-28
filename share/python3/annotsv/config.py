@@ -156,6 +156,12 @@ class AnnotSVConfig(BaseModel):
 
         return v_list
 
+    @validator("output_file")
+    def validate_output_file(cls, v: Path, values, **kwargs):
+        if v.suffix != ".tsv":
+            v = Path(f"{v}.tsv")
+        return v
+
     @validator("output_dir")
     def validate_output_path(cls, v, values, **kwargs):
         if v:
@@ -169,6 +175,7 @@ class AnnotSVConfig(BaseModel):
                 )
         else:
             v = values["output_file"].resolve().parent
+        v.mkdir(parents=True, exist_ok=True)
         return v
 
     @validator("bcftools", "bedtools")
