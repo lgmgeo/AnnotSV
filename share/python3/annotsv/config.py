@@ -1,14 +1,22 @@
 import gzip
+import os
 import re
 import shutil
-from glob import glob
+from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Extra, PositiveInt, Field, validator
 
 from annotsv.constants import install_dir
-from annotsv.enums import *
+from annotsv.enums import (
+    GenomeBuild,
+    Organisms,
+    AnnotationMode,
+    TranscriptSource,
+    MetricFormat,
+    ConfigTypes,
+)
 from annotsv.util import from_camel, to_camel
 
 # NOTE:
@@ -161,20 +169,17 @@ class AnnotSVConfig(BaseModel):
             v = values["output_file"].resolve().parent
         return v
 
-    # @validator("bcftools", "bedtools")
-    # def validate_executable(cls, path_str: str):
-    #     bin_path = Path(path_str)
-    #     if bin_path.exists():
-    #         assert os.access(
-    #             bin_path, os.F_OK | os.X_OK
-    #         ), f"{bin_path} exists, but is not a file or not executable"
-    #     elif bin_path.name == path_str:
-    #         which_path = shutil.which(path_str)
-    #         assert which_path is not None, f"{path_str} not found"
-    #         bin_path = Path(which_path)
-    #     else:
-    #         assert False, ""
-    #     return bin_path.resolve()
+    @validator("bcftools", "bedtools")
+    def validate_executable(cls, v: Path, field, **kwargs):
+        if v.exists():
+            if not os.access(v, os.F_OK | os.X_OK):
+                raise ValueError(f"{v} exists, but is not a file or not executable")
+        else:
+            which_path = shutil.which(field.name)
+            if which_path is None:
+                raise ValueError(f"{field.name} not found")
+            v = Path(which_path)
+        return v.resolve()
 
     class Config:
         # allows loading/dumping with camelCase, while still keeping snake_case
