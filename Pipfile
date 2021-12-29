@@ -7,15 +7,13 @@ name = "pypi"
 typer = "*"
 pydantic = "*"
 typing-extensions = "*"
+cyvcf2 = "*"
 
 [dev-packages]
-black = "*"
+black = "21.10b0"
 typer-cli = "*"
 pdbpp = "*"
 ipython = "*"
-
-[pipenv]
-allow_prereleases = true
 
 [scripts]
 annotsv = "./bin/pyAnnotSV"

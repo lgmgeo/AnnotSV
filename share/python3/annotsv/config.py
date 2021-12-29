@@ -163,12 +163,12 @@ class AnnotSVConfig(BaseModel):
         return v
 
     @validator("output_dir")
-    def validate_output_path(cls, v, values, **kwargs):
+    def validate_output_dir(cls, v, values, **kwargs):
         if v:
             if (
                 values["output_file"]
                 and values["output_file"].is_absolute()
-                and not values["output_file"].resolve().startswith(str(v.resolve()))
+                and not str(values["output_file"].resolve()).startswith(str(v.resolve()))
             ):
                 raise ValueError(
                     f"Output dir {v} does not match output file {values['output_file']}"

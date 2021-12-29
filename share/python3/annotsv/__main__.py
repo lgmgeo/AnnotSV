@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import logging
 import os
-import re
 from glob import glob
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -11,8 +11,10 @@ import typer
 
 from annotsv import constants
 from annotsv.config import load_config
+from annotsv.context import Context
 from annotsv.enums import AnnotationMode, GenomeBuild, MetricFormat, TranscriptSource
 from annotsv.util import strtobool, to_camel
+from annotsv.vcf import vcf2bed
 
 ### validation / helper funcs
 
@@ -22,6 +24,11 @@ def to_bool(ctx: typer.Context, param: typer.CallbackParam, val):
         return val
     return strtobool(val.strip().replace('"', ""))
 
+
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger("annotsv")
 
 ### CLI processing
 
@@ -264,10 +271,9 @@ def annotsv(
     elif output_file and output_dir is None:
         output_dir = output_file.parent
     elif output_dir and output_file is None:
-        output_file = output_dir / re.sub(
-            r"\.(?:bed|vcf(?:\.gz)?)$",
-            ".annotated.tsv",
-            sv_input_file.name,
+        # with_suffix only removes the final suffix, so manually remove .vcf for .vcf.gz files
+        output_file = output_dir / sv_input_file.with_suffix(".annotated.tsv").name.replace(
+            ".vcf", ""
         )
     assert output_file and output_dir
 
@@ -288,7 +294,14 @@ def annotsv(
         params["snvIndelSamples"] = []
 
     config = load_config(params)
-    breakpoint()
+    app = Context(config)
+
+    if ".vcf" in app.config.sv_input_file.suffixes:
+        sv_input_bed = vcf2bed(app)
+    else:
+        ...
+
+    # breakpoint()
     pass
 
 

@@ -57,3 +57,11 @@ class Organisms(BaseEnum):
 class TranscriptSource(BaseEnum):
     REFSEQ = auto()
     ENSEMBL = auto()
+
+
+class SVTypes(BaseEnum):
+    DEL = auto()
+    DUP = auto()
+    INV = auto()
+    INS = auto()
+    NONE = auto()

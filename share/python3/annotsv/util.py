@@ -1,5 +1,12 @@
 from __future__ import annotations
 
+import gzip
+import re
+from pathlib import Path
+from typing import List, Union
+
+from annotsv.enums import SVTypes
+
 
 def to_camel(val: str):
     """converts snake_case to camelCase"""
@@ -79,3 +86,39 @@ def strtobool(val: str):
         return False
     else:
         raise ValueError(f"invalid truth value {val!r}")
+
+
+def normalize_sv_type(sv_str: str):
+    if re.search(r"del|loss|<CN[01]>", sv_str, re.I):
+        return SVTypes.DEL
+    elif re.search(r"dup|gain|MCNV", sv_str, re.I) or re.match(r"<CN\d+>", sv_str, re.I):
+        return SVTypes.DUP
+    elif re.search(r"inv", sv_str, re.I):
+        return SVTypes.INV
+    elif re.search(r"ins|MEI|alu|line|sva", sv_str):
+        return SVTypes.INS
+    else:
+        return SVTypes.NONE
+
+
+def append_file(file: Path, text: str):
+    with file.open("at") as fh:
+        fh.write(text + "\n")
+
+
+def is_empty_file(file: Path):
+    if not file.exists():
+        raise FileNotFoundError(str(file))
+    if file.stat().st_size == 0:
+        return True
+
+    if file.suffix == ".gz":
+        open_func = gzip.open
+    else:
+        open_func = open
+
+    with open_func(file, "rt") as fh:
+        for line in fh:
+            if line.strip() and not line.startswith("#"):
+                return False
+    return True
