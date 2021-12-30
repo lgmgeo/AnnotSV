@@ -18,6 +18,7 @@ class Context:
     segdup_ann: bool
     gap_ann: bool
     blacklist_ann: bool
+    cytoband_ann: bool = False  # modified in annotsv.cytoband if relevant
     vcf_header: Optional[List[str]] = None
     bed_header: Optional[Path] = None
     genes_file: Optional[Path] = None

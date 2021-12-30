@@ -13,6 +13,7 @@ from annotsv import (
     benignsv,
     clingen,
     constants,
+    cytoband,
     ddd,
     encode_blacklist,
     exac,
@@ -366,6 +367,7 @@ def check_annotation_files(app: Context):
     segdup.check_segdup_file(app)
     gap.check_gap_file(app)
     encode_blacklist.check_blacklist_file(app)
+    cytoband.check_cytoband_file(app)
 
     app.log.info("Finished checking all annotation files")
 

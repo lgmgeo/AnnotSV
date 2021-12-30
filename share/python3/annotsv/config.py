@@ -143,6 +143,10 @@ class AnnotSVConfig(BaseModel):
         return self.extann_dir / "ClinGen"
 
     @property
+    def cytoband_dir(self):
+        return self.annotation_dir / f"AnyOverlap/CytoBand/{self.genome_build}"
+
+    @property
     def exac_dir(self):
         return self.extann_dir / "ExAC"
 
