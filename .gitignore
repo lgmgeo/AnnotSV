@@ -10,3 +10,9 @@ validation/
 # ignore annotation datasets
 share/AnnotSV/*
 
+# ignore misc test stuff
+test/*.gz
+test/*.vcf
+test/*.tbi
+test/output*
+
