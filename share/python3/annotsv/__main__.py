@@ -9,11 +9,11 @@ from typing import Any, Dict, List, Optional
 
 import typer
 
-from annotsv import constants, genes, gencc
+from annotsv import constants, genes, gencc, omim
 from annotsv.config import load_config
 from annotsv.context import Context
 from annotsv.enums import AnnotationMode, GenomeBuild, MetricFormat, TranscriptSource
-from annotsv.util import append_file, strtobool, to_camel
+from annotsv.util import strtobool, to_camel
 from annotsv.vcf import vcf2bed
 
 ### validation / helper funcs
@@ -328,6 +328,10 @@ def check_annotation_files(app: Context):
         app.abort(f"Invalid transcript source: {app.config.tx}")
 
     gencc.check_gencc_gene_file(app)
+    omim.check_omim_file(app)
+    omim.check_morbid_file(app)
+
+    app.log.info("Finished checking all annotation files")
 
 
 ###

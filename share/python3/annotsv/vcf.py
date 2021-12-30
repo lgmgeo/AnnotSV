@@ -1,11 +1,8 @@
 from __future__ import annotations
 
-import datetime
 import gzip
-import logging
 import re
 from pathlib import Path
-from typing import List
 
 from cyvcf2 import VCF
 
@@ -13,7 +10,7 @@ from annotsv.constants import VALID_CHROM, VCF_HEADER
 from annotsv.context import Context
 from annotsv.enums import SVTypes
 from annotsv.schemas import Variant
-from annotsv.util import append_file, normalize_sv_type, is_empty_file
+from annotsv.util import append_file, normalize_sv_type, is_empty_file, ymd_hms
 
 
 def open_vcf(vcf_file: Path):
@@ -28,10 +25,7 @@ def vcf_annotation(chrom: str, start: int, end: int, sv_type: str):
 
 
 def vcf2bed(app: Context):
-    bedfile = (
-        app.config.output_dir
-        / f"{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}_AnnotSV_inputSVfile.bed"
-    )
+    bedfile = app.config.output_dir / f"{ymd_hms()}_AnnotSV_inputSVfile.bed"
     bed_out = bedfile.open("wt")
 
     if "annotated" in app.config.output_file.name:

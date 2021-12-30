@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import csv
-import datetime
 import gzip
 import re
 from dataclasses import dataclass
 from typing import Dict, Set
 from annotsv.context import Context
-from annotsv.util import strtobool
+from annotsv.util import ymd
 
 GENCC_COLS = {
     "gene": "gene_symbol",
@@ -37,19 +36,14 @@ def check_gencc_gene_file(app: Context):
     )
 
     if len(formatted_files) > 1:
-        app.log.info(f"Several GenCC files exist: {formatted_files}")
-        app.log.info(f"Keeping only {formatted_files[-1]}")
-        for gf in formatted_files:
-            gf.rename(f"{gf}.notused")
+        app.keep_last_file("GenCC", formatted_files)
     elif downloaded_file.exists() and not formatted_files:
         update_gencc_gene_file(app)
 
 
 def update_gencc_gene_file(app: Context):
     downloaded_file = app.config.extann_dir / "GenCC/submissions-export-tsv"
-    formatted_file = (
-        app.config.extann_dir / f"GenCC/{datetime.date.today().strftime('%Y%m%d')}_GenCC.tsv.gz"
-    )
+    formatted_file = app.config.extann_dir / f"GenCC/{ymd()}_GenCC.tsv.gz"
 
     app.log.info(
         f"GenCC configuration - creation of {formatted_file} (done only once during first GenCC annotation)"
@@ -73,7 +67,6 @@ def update_gencc_gene_file(app: Context):
                 genes[gene_name] = Gene(row)
             else:
                 genes[gene_name].update(row)
-    breakpoint()
 
     with gzip.open(formatted_file, "wt") as tsv_out:
         tsv_out.write("genes\tGenCC_disease\tGenCC_moi\tGenCC_classification\tGenCC_pmid\n")

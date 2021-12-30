@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import datetime
 import gzip
 import re
 from pathlib import Path
+from typing import List
 
 from annotsv.enums import SVTypes
 
@@ -121,3 +123,11 @@ def is_empty_file(file: Path):
             if line.strip() and not line.startswith("#"):
                 return False
     return True
+
+
+def ymd():
+    return datetime.date.today().strftime("%Y%m%d")
+
+
+def ymd_hms():
+    return datetime.datetime.now().strftime("%Y%m%d-%H%M%S")

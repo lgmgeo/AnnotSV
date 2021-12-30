@@ -45,3 +45,8 @@ class Context:
                 break
         self.sv_ident.add(svid)
         return svid
+
+    def keep_last_file(self, file_type: str, files: List[Path]):
+        self.log.info(f"Found multiple {file_type} files, only keep last: {files}")
+        for fpath in files[:-1]:
+            fpath.rename(f"{fpath}.notused")

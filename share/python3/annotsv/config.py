@@ -131,6 +131,10 @@ class AnnotSVConfig(BaseModel):
         return self.annotation_dir / f"Genes/{self.genome_build}"
 
     @property
+    def omim_dir(self):
+        return self.extann_dir / "OMIM"
+
+    @property
     def promoter_dir(self):
         return self.annotation_dir / f"FtIncludedInSV/Promoter/{self.genome_build}"
 
