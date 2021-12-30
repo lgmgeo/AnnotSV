@@ -1,37 +1,44 @@
 from __future__ import annotations
 from pathlib import Path
 
-from typing import Any, Dict, List, Optional, Set, Tuple
+from logging import Logger
+from typing import Dict, List, Optional, Set, Tuple
 
 from annotsv.config import AnnotSVConfig
 
 
 class Context:
     config: AnnotSVConfig
+    log: Logger
     sv_ident: Set[str]
     id_map: Dict[Tuple[str, str, str], str]
     sv_lens: Dict[str, int]
     vcf_header: Optional[List[str]] = None
     bed_header: Optional[Path] = None
+    genes_file: Optional[Path] = None
 
-    def __init__(self, config: AnnotSVConfig) -> None:
+    def __init__(self, config: AnnotSVConfig, log: Logger) -> None:
         self.config = config
+        self.log = log
         self.sv_ident = set()
         self.id_map = {}
         self.sv_lens = {}
 
-    def get_id(self, sv_key: str, ref: str, alt: str):
-        """sv_key: f"{chrom}_{pos}_{end}_{svtype}" """
-        svid = self.id_map.get((sv_key, ref, alt))
+    def abort(self, msg: str):
+        self.log.error(msg)
+        exit(2)
+
+    def get_id(self, var_ident: str, ref: str, alt: str):
+        svid = self.id_map.get((var_ident, ref, alt))
         if svid is None:
-            svid = self.gen_id(sv_key)
-            self.id_map[(sv_key, ref, alt)] = svid
+            svid = self.gen_id(var_ident)
+            self.id_map[(var_ident, ref, alt)] = svid
         return svid
 
-    def gen_id(self, sv_key: str):
+    def gen_id(self, var_ident: str):
         i = 1
         while True:
-            svid = f"{sv_key}_{i}"
+            svid = f"{var_ident}_{i}"
             if svid in self.sv_ident:
                 i += 1
             else:

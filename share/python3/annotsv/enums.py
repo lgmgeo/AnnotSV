@@ -38,10 +38,10 @@ class ConfigTypes(BaseEnum):
 
 
 class GenomeBuild(BaseEnum):
-    GRCH37 = auto()
-    GRCH38 = auto()
-    MM9 = auto()
-    MM10 = auto()
+    GRCh37 = auto()
+    GRCh38 = auto()
+    mm9 = auto()
+    mm10 = auto()
 
 
 class MetricFormat(BaseEnum):

@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Optional
 
 import typer
 
-from annotsv import constants
+from annotsv import constants, genes, gencc
 from annotsv.config import load_config
 from annotsv.context import Context
 from annotsv.enums import AnnotationMode, GenomeBuild, MetricFormat, TranscriptSource
@@ -130,7 +130,7 @@ def annotsv(
         help="Path of tab separated values file(s) to integrate external gene annotations into the output file. The first line should be a header including a column entitled 'genes'. Gzipped files are supported",
     ),
     genome_build: GenomeBuild = typer.Option(
-        GenomeBuild.GRCH38,
+        GenomeBuild.GRCh38,
         "--genomeBuild",
         case_sensitive=False,
         help="Genome build used",
@@ -294,12 +294,12 @@ def annotsv(
         params["snvIndelSamples"] = []
 
     config = load_config(params)
-    app = Context(config)
+    app = Context(config, logger)
 
     if ".vcf" in app.config.sv_input_file.suffixes:
-        logger.info(f"Converting input {app.config.sv_input_file} to BED...")
+        app.log.info(f"Converting input {app.config.sv_input_file} to BED...")
         sv_input_bed = vcf2bed(app)
-        logger.info(f"Finished creating {sv_input_bed}")
+        app.log.info(f"Finished creating {sv_input_bed}")
     else:
         app.bed_header = app.config.sv_input_file.with_suffix(".header.tsv")
         if not app.bed_header.exists():
@@ -313,8 +313,21 @@ def annotsv(
                         else:
                             break
 
-    # breakpoint()
-    pass
+    check_annotation_files(app)
+
+
+###
+
+
+def check_annotation_files(app: Context):
+    if app.config.tx is TranscriptSource.REFSEQ:
+        genes.check_genes_refseq_file(app)
+    elif app.config.tx is TranscriptSource.ENSEMBL:
+        genes.check_genes_ensembl_file(app)
+    else:
+        app.abort(f"Invalid transcript source: {app.config.tx}")
+
+    gencc.check_gencc_gene_file(app)
 
 
 ###

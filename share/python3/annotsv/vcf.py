@@ -15,8 +15,6 @@ from annotsv.enums import SVTypes
 from annotsv.schemas import Variant
 from annotsv.util import append_file, normalize_sv_type, is_empty_file
 
-logger = logging.getLogger(__name__)
-
 
 def open_vcf(vcf_file: Path):
     if vcf_file.suffix == ".gz":
@@ -195,7 +193,7 @@ def vcf2bed(app: Context):
     bed_out.close()
 
     if app.config.candidate_snv_indel_files and gt_missing:
-        logger.warning(
+        app.log.warning(
             "The SV genotype is not indicated in the FORMAT column under the 'GT' field. "
             "Compound heterozygosity analysis won't be processed!"
         )

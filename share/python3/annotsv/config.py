@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Extra, Field, PositiveInt, validator
 
-from annotsv.constants import install_dir
+from annotsv import constants
 from annotsv.enums import (
     AnnotationMode,
     ConfigTypes,
@@ -24,7 +24,7 @@ from annotsv.util import from_camel, to_camel
 # NOTE:
 #   config priority: CLI > configfile > class defaults
 
-default_config_file = install_dir / "etc" / "AnnotSV" / "configfile"
+default_config_file = constants.install_dir / "etc" / "AnnotSV" / "configfile"
 required_output_cols = (
     "AnnotSV_ID",
     "SV_chrom",
@@ -65,10 +65,10 @@ required_output_cols = (
 RANK_PATTERN = r"(?:[1-5](?:-[1-5])?)|NA"
 HPO_PATTERN = r"HP:\d+$"
 ORGANISM_MAP = {
-    GenomeBuild.GRCH37: Organisms.Human,
-    GenomeBuild.GRCH38: Organisms.Human,
-    GenomeBuild.MM9: Organisms.Mouse,
-    GenomeBuild.MM10: Organisms.Mouse,
+    GenomeBuild.GRCh37: Organisms.Human,
+    GenomeBuild.GRCh38: Organisms.Human,
+    GenomeBuild.mm9: Organisms.Mouse,
+    GenomeBuild.mm10: Organisms.Mouse,
 }
 
 
@@ -117,6 +117,22 @@ class AnnotSVConfig(BaseModel):
     @property
     def organism(self):
         return ORGANISM_MAP[self.genome_build]
+
+    @property
+    def annotation_dir(self):
+        return constants.annotation_dir / f"Annotations_{self.organism}"
+
+    @property
+    def extann_dir(self):
+        return self.annotation_dir / "Gene-based"
+
+    @property
+    def genes_dir(self):
+        return self.annotation_dir / f"Genes/{self.genome_build}"
+
+    @property
+    def promoter_dir(self):
+        return self.annotation_dir / f"FtIncludedInSV/Promoter/{self.genome_build}"
 
     @validator("hpo")
     def validate_hpo(cls, v: Optional[str]):
