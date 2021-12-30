@@ -16,6 +16,7 @@ class Context:
     gccontent_ann: bool
     repeat_ann: bool
     segdup_ann: bool
+    gap_ann: bool
     vcf_header: Optional[List[str]] = None
     bed_header: Optional[Path] = None
     genes_file: Optional[Path] = None
@@ -37,6 +38,7 @@ class Context:
         self.segdup_ann = any(
             f"SegDup_{x}" in self.config.output_columns for x in ["left", "right"]
         )
+        self.gap_ann = any(f"Gap_{x}" in self.config.output_columns for x in ["left", "right"])
 
     def abort(self, msg: str):
         self.log.error(msg)

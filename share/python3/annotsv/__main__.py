@@ -16,6 +16,7 @@ from annotsv import (
     ddd,
     exac,
     exomiser,
+    gap,
     gccontent,
     gencc,
     genes,
@@ -362,6 +363,7 @@ def check_annotation_files(app: Context):
     gccontent.check_fasta_files(app)
     repeat.check_repeat_file(app)
     segdup.check_segdup_file(app)
+    gap.check_gap_file(app)
 
     app.log.info("Finished checking all annotation files")
 

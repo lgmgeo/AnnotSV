@@ -152,6 +152,10 @@ class AnnotSVConfig(BaseModel):
         return self.annotation_dir / "Gene-based"
 
     @property
+    def gap_dir(self):
+        return self.breakpoint_dir / f"Gap/{self.genome_build}"
+
+    @property
     def gcc_dir(self):
         return self.breakpoint_dir / f"GCcontent/{self.genome_build}"
 
