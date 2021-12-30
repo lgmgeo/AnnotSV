@@ -1,6 +1,7 @@
 from __future__ import annotations
+from pathlib import Path
 
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 from annotsv.config import AnnotSVConfig
 
@@ -9,14 +10,14 @@ class Context:
     config: AnnotSVConfig
     sv_ident: Set[str]
     id_map: Dict[Tuple[str, str, str], str]
-    vcf_header: Optional[List[str]]
     sv_lens: Dict[str, int]
+    vcf_header: Optional[List[str]] = None
+    bed_header: Optional[Path] = None
 
     def __init__(self, config: AnnotSVConfig) -> None:
         self.config = config
         self.sv_ident = set()
         self.id_map = {}
-        self.vcf_header = None
         self.sv_lens = {}
 
     def get_id(self, sv_key: str, ref: str, alt: str):

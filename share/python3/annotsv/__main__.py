@@ -13,7 +13,7 @@ from annotsv import constants
 from annotsv.config import load_config
 from annotsv.context import Context
 from annotsv.enums import AnnotationMode, GenomeBuild, MetricFormat, TranscriptSource
-from annotsv.util import strtobool, to_camel
+from annotsv.util import append_file, strtobool, to_camel
 from annotsv.vcf import vcf2bed
 
 ### validation / helper funcs
@@ -297,9 +297,21 @@ def annotsv(
     app = Context(config)
 
     if ".vcf" in app.config.sv_input_file.suffixes:
+        logger.info(f"Converting input {app.config.sv_input_file} to BED...")
         sv_input_bed = vcf2bed(app)
+        logger.info(f"Finished creating {sv_input_bed}")
     else:
-        ...
+        app.bed_header = app.config.sv_input_file.with_suffix(".header.tsv")
+        if not app.bed_header.exists():
+            with app.bed_header.open("wt") as header:
+                with app.config.sv_input_file.open("rt") as fh:
+                    for line in fh:
+                        if line.strip() == "":
+                            continue
+                        elif line.startswith("#"):
+                            header.write(f"{line}\n")
+                        else:
+                            break
 
     # breakpoint()
     pass
