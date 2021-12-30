@@ -9,7 +9,19 @@ from typing import Any, Dict, List, Optional
 
 import typer
 
-from annotsv import constants, genes, gencc, omim, ddd, clingen, exomiser, loeuf
+from annotsv import (
+    constants,
+    genes,
+    gencc,
+    omim,
+    ddd,
+    clingen,
+    exomiser,
+    loeuf,
+    benignsv,
+    exac,
+    gccontent,
+)
 from annotsv.config import load_config
 from annotsv.context import Context
 from annotsv.enums import AnnotationMode, GenomeBuild, MetricFormat, TranscriptSource
@@ -338,10 +350,14 @@ def check_annotation_files(app: Context):
     loeuf.check_loeuf_file(app)
 
     # Benign genes / regions annotations
+    benignsv.check_benign_files(app)
 
     # GeneIntolerance (ExAc) annotations
+    exac.check_gene_intolerance_file(app)
+    exac.check_cnv_intolerance_file(app)
 
     # Breakpoint annotations
+    gccontent.check_fasta_files(app)
 
     app.log.info("Finished checking all annotation files")
 

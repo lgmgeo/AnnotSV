@@ -13,6 +13,7 @@ class Context:
     sv_ident: Set[str]
     id_map: Dict[Tuple[str, str, str], str]
     sv_lens: Dict[str, int]
+    gccontent_ann: bool
     vcf_header: Optional[List[str]] = None
     bed_header: Optional[Path] = None
     genes_file: Optional[Path] = None
@@ -23,6 +24,10 @@ class Context:
         self.sv_ident = set()
         self.id_map = {}
         self.sv_lens = {}
+        self.gccontent_ann = (
+            "GC_content_left" in self.config.output_columns
+            or "GC_content_right" in self.config.output_columns
+        )
 
     def abort(self, msg: str):
         self.log.error(msg)

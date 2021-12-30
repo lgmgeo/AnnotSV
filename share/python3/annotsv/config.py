@@ -124,11 +124,23 @@ class AnnotSVConfig(BaseModel):
 
     @property
     def benign_dir(self):
+        return self.benign_root / self.genome_build.name
+
+    @property
+    def benign_root(self):
         return self.annotation_dir / f"SVincludedInFt/BenignSV"
+
+    @property
+    def breakpoint_dir(self):
+        return self.annotation_dir / "BreakpointsAnnotations"
 
     @property
     def clingen_dir(self):
         return self.extann_dir / "ClinGen"
+
+    @property
+    def exac_dir(self):
+        return self.extann_dir / "ExAC"
 
     @property
     def exomiser_dir(self):
@@ -138,6 +150,10 @@ class AnnotSVConfig(BaseModel):
     @property
     def extann_dir(self):
         return self.annotation_dir / "Gene-based"
+
+    @property
+    def gcc_dir(self):
+        return self.breakpoint_dir / f"GCcontent/{self.genome_build}"
 
     @property
     def genes_dir(self):
