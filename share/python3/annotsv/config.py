@@ -180,6 +180,14 @@ class AnnotSVConfig(BaseModel):
         return self.extann_dir / "OMIM"
 
     @property
+    def pathogenic_dir(self):
+        return self.pathogenic_root / self.genome_build.name
+
+    @property
+    def pathogenic_root(self):
+        return self.annotation_dir / "FtIncludedInSV/PathogenicSV"
+
+    @property
     def promoter_dir(self):
         return self.annotation_dir / f"FtIncludedInSV/Promoter/{self.genome_build}"
 

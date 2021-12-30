@@ -24,6 +24,7 @@ from annotsv import (
     genes,
     loeuf,
     omim,
+    pathogenicsv,
     repeat,
     segdup,
 )
@@ -368,6 +369,9 @@ def check_annotation_files(app: Context):
     gap.check_gap_file(app)
     encode_blacklist.check_blacklist_file(app)
     cytoband.check_cytoband_file(app)
+
+    # FtIncludedInSV annotations
+    pathogenicsv.check_pathogenic_files(app)
 
     app.log.info("Finished checking all annotation files")
 
