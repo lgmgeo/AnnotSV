@@ -171,6 +171,10 @@ class AnnotSVConfig(BaseModel):
     def promoter_dir(self):
         return self.annotation_dir / f"FtIncludedInSV/Promoter/{self.genome_build}"
 
+    @property
+    def repeat_dir(self):
+        return self.breakpoint_dir / f"Repeat/{self.genome_build}"
+
     @validator("hpo")
     def validate_hpo(cls, v: Optional[str]):
         if v is None or v == "":

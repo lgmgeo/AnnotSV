@@ -10,17 +10,18 @@ from typing import Any, Dict, List, Optional
 import typer
 
 from annotsv import (
-    constants,
-    genes,
-    gencc,
-    omim,
-    ddd,
-    clingen,
-    exomiser,
-    loeuf,
     benignsv,
+    clingen,
+    constants,
+    ddd,
     exac,
+    exomiser,
     gccontent,
+    gencc,
+    genes,
+    loeuf,
+    omim,
+    repeat,
 )
 from annotsv.config import load_config
 from annotsv.context import Context
@@ -358,6 +359,7 @@ def check_annotation_files(app: Context):
 
     # Breakpoint annotations
     gccontent.check_fasta_files(app)
+    repeat.check_repeat_file(app)
 
     app.log.info("Finished checking all annotation files")
 

@@ -16,3 +16,4 @@ test/*.vcf
 test/*.tbi
 test/output*
 
+Annotations_*.gz
