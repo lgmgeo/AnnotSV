@@ -131,6 +131,10 @@ class AnnotSVConfig(BaseModel):
         return self.annotation_dir / f"SVincludedInFt/BenignSV"
 
     @property
+    def blacklist_dir(self):
+        return self.breakpoint_dir / f"ENCODEblacklist/{self.genome_build}"
+
+    @property
     def breakpoint_dir(self):
         return self.annotation_dir / "BreakpointsAnnotations"
 

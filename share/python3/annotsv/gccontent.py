@@ -11,16 +11,17 @@ from annotsv.context import Context
 def check_fasta_files(app: Context):
     downloaded_files = list(app.config.gcc_dir.glob("*chromFa.tar.gz"))
     formatted_file = app.config.gcc_dir / f"{app.config.genome_build}_chromFa.fasta"
+    label = "GCcontent"
 
     if app.gccontent_ann is False:
-        app.log.debug("No GCcontent in output columns, ignoring")
+        app.log.debug(f"No {label} in output columns, ignoring")
     elif not downloaded_files and not formatted_file.exists():
-        app.log.debug("No GCcontent annotation")
+        app.log.debug(f"No {label} annotation")
         app.gccontent_ann = False
     elif not formatted_file.exists():
         update_fasta_files(app)
     else:
-        app.log.debug("No new GCcontent annotation to format")
+        app.log.debug(f"No new {label} annotation to format")
 
 
 def update_fasta_files(app: Context):

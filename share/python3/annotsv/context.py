@@ -17,6 +17,7 @@ class Context:
     repeat_ann: bool
     segdup_ann: bool
     gap_ann: bool
+    blacklist_ann: bool
     vcf_header: Optional[List[str]] = None
     bed_header: Optional[Path] = None
     genes_file: Optional[Path] = None
@@ -39,6 +40,11 @@ class Context:
             f"SegDup_{x}" in self.config.output_columns for x in ["left", "right"]
         )
         self.gap_ann = any(f"Gap_{x}" in self.config.output_columns for x in ["left", "right"])
+        self.blacklist_ann = any(
+            f"ENCODE_blacklist_{x}{y}" in self.config.output_columns
+            for x in ["", "characteristics_"]
+            for y in ["left", "right"]
+        )
 
     def abort(self, msg: str):
         self.log.error(msg)

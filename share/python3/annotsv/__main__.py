@@ -14,6 +14,7 @@ from annotsv import (
     clingen,
     constants,
     ddd,
+    encode_blacklist,
     exac,
     exomiser,
     gap,
@@ -364,6 +365,7 @@ def check_annotation_files(app: Context):
     repeat.check_repeat_file(app)
     segdup.check_segdup_file(app)
     gap.check_gap_file(app)
+    encode_blacklist.check_blacklist_file(app)
 
     app.log.info("Finished checking all annotation files")
 
