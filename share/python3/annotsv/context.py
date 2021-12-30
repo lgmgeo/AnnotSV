@@ -15,6 +15,7 @@ class Context:
     sv_lens: Dict[str, int]
     gccontent_ann: bool
     repeat_ann: bool
+    segdup_ann: bool
     vcf_header: Optional[List[str]] = None
     bed_header: Optional[Path] = None
     genes_file: Optional[Path] = None
@@ -25,14 +26,16 @@ class Context:
         self.sv_ident = set()
         self.id_map = {}
         self.sv_lens = {}
-        self.gccontent_ann = (
-            "GC_content_left" in self.config.output_columns
-            or "GC_content_right" in self.config.output_columns
+        self.gccontent_ann = any(
+            f"GC_content_{x}" in self.config.output_columns for x in ["left", "right"]
         )
         self.repeat_ann = any(
             f"Repeat_{x}_{y}" in self.config.output_columns
             for x in ["coord", "type"]
             for y in ["left", "right"]
+        )
+        self.segdup_ann = any(
+            f"SegDup_{x}" in self.config.output_columns for x in ["left", "right"]
         )
 
     def abort(self, msg: str):

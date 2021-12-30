@@ -175,6 +175,10 @@ class AnnotSVConfig(BaseModel):
     def repeat_dir(self):
         return self.breakpoint_dir / f"Repeat/{self.genome_build}"
 
+    @property
+    def segdup_dir(self):
+        return self.breakpoint_dir / f"SegDup/{self.genome_build}"
+
     @validator("hpo")
     def validate_hpo(cls, v: Optional[str]):
         if v is None or v == "":

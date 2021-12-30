@@ -22,6 +22,7 @@ from annotsv import (
     loeuf,
     omim,
     repeat,
+    segdup,
 )
 from annotsv.config import load_config
 from annotsv.context import Context
@@ -360,6 +361,7 @@ def check_annotation_files(app: Context):
     # Breakpoint annotations
     gccontent.check_fasta_files(app)
     repeat.check_repeat_file(app)
+    segdup.check_segdup_file(app)
 
     app.log.info("Finished checking all annotation files")
 
