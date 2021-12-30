@@ -35,10 +35,14 @@ def check_gencc_gene_file(app: Context):
         app.config.extann_dir.glob("GenCC/*_GenCC.tsv.gz")
     )
 
-    if len(formatted_files) > 1:
+    if not downloaded_file.exists() and not formatted_files:
+        app.log.debug("No GenCC annotation files")
+    elif len(formatted_files) > 1:
         app.keep_last_file("GenCC", formatted_files)
-    elif downloaded_file.exists() and not formatted_files:
+    elif not formatted_files:
         update_gencc_gene_file(app)
+    else:
+        app.log.debug("No new GenCC annotation to format")
 
 
 def update_gencc_gene_file(app: Context):

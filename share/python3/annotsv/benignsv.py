@@ -1,41 +1,63 @@
 from pathlib import Path
 
-from annotsv.constants import annotation_dir
+from annotsv.context import Context
 from annotsv.enums import GenomeBuild
 
 
-def checkBenignFiles(organism, genome_build: GenomeBuild):
-    benign_dir = annotation_dir / f"Annotations_{organism}/SVincludedInFt/BenignSV/{genome_build}"
-    benign_files = {"k": Path()}
+def check_benign_files(app: Context):
+    for build in GenomeBuild:
+        benign_dir = app.config.benign_dir / build.name
+        benign_loss_file = benign_dir / f"benign_Loss_SV_{build}.sorted.bed"
+        benign_gain_file = benign_dir / f"benign_Gain_SV_{build}.sorted.bed"
+        benign_ins_file = benign_dir / f"benign_Ins_SV_{build}.sorted.bed"
+        benign_inv_file = benign_dir / f"benign_Inv_SV_{build}.sorted.bed"
+
+        check_gnomad_file(app)
+        check_dgv_file(app)
+        check_ddd_file(app)
+        check_1000g_file(app)
+        check_clingen_hits_file(app)
+        check_clinvar_file(app)
+        check_imh_file(app)
+        check_cmri_file(app)
+
+
+def check_clinvar_file(app: Context):
     ...
 
 
-def checkClinVar_benignFile(genome_build: GenomeBuild):
+def check_clingen_hits_file(app: Context):
     ...
 
 
-def checkClinGenHITS_benignFile(genome_build: GenomeBuild):
+def check_cmri_file(app: Context):
     ...
 
 
-def checkDGV_benignFile(genome_build: GenomeBuild):
+def check_dgv_file(app: Context):
     ...
 
 
-def checkGnomAD_benignFile(genome_build: GenomeBuild):
+def check_gnomad_file(app: Context):
     ...
 
 
-def checkDDD_benignFile(genome_build: GenomeBuild):
+def check_ddd_file(app: Context):
     ...
 
 
-def check1000g_benignFile(genome_build: GenomeBuild):
+def check_1000g_file(app: Context):
     ...
 
 
-def checkIMH_benignFile(genome_build: GenomeBuild):
+def check_imh_file(app: Context):
     ...
+
+
+def _tmp_benign_files(app: Context, build: GenomeBuild):
+    benign_dir = app.config.benign_dir / build.name
+    for ftype in ["Loss", "Gain", "Ins", "inv"]:
+        ...
 
 
 def benignSVannotation(SVchrom, SVstart, SVend):

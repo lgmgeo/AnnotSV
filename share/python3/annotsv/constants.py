@@ -4,6 +4,7 @@ from pathlib import Path
 
 install_dir = Path(__file__).absolute().parents[3]
 annotation_dir = install_dir / "share" / "AnnotSV"
+exomiser_dir = annotation_dir / "Annotations_Exomiser"
 etc_dir = install_dir / "etc" / "AnnotSV"
 doc_dir = install_dir / "share" / "doc" / "AnnotSV"
 bash_dir = install_dir / "share" / "bash"

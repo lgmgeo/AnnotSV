@@ -123,12 +123,29 @@ class AnnotSVConfig(BaseModel):
         return constants.annotation_dir / f"Annotations_{self.organism}"
 
     @property
+    def benign_dir(self):
+        return self.annotation_dir / f"SVincludedInFt/BenignSV"
+
+    @property
+    def clingen_dir(self):
+        return self.extann_dir / "ClinGen"
+
+    @property
+    def exomiser_dir(self):
+        # for consistency
+        return constants.exomiser_dir
+
+    @property
     def extann_dir(self):
         return self.annotation_dir / "Gene-based"
 
     @property
     def genes_dir(self):
         return self.annotation_dir / f"Genes/{self.genome_build}"
+
+    @property
+    def ncbi_dir(self):
+        return self.extann_dir / "NCBIgeneID"
 
     @property
     def omim_dir(self):

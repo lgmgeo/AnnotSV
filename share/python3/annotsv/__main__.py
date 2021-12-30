@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Optional
 
 import typer
 
-from annotsv import constants, genes, gencc, omim
+from annotsv import constants, genes, gencc, omim, ddd, clingen, exomiser, loeuf
 from annotsv.config import load_config
 from annotsv.context import Context
 from annotsv.enums import AnnotationMode, GenomeBuild, MetricFormat, TranscriptSource
@@ -26,7 +26,7 @@ def to_bool(ctx: typer.Context, param: typer.CallbackParam, val):
 
 
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger("annotsv")
 
@@ -327,9 +327,21 @@ def check_annotation_files(app: Context):
     else:
         app.abort(f"Invalid transcript source: {app.config.tx}")
 
+    # Gene annotations
     gencc.check_gencc_gene_file(app)
     omim.check_omim_file(app)
     omim.check_morbid_file(app)
+    ddd.check_ddd_file(app)
+    ddd.check_hi_file(app)
+    clingen.check_clingen_file(app)
+    exomiser.check_exomiser_installation(app)
+    loeuf.check_loeuf_file(app)
+
+    # Benign genes / regions annotations
+
+    # GeneIntolerance (ExAc) annotations
+
+    # Breakpoint annotations
 
     app.log.info("Finished checking all annotation files")
 

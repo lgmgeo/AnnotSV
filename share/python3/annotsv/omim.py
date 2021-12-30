@@ -31,16 +31,12 @@ def check_omim_file(app: Context):
     omim2_files = list(app.config.omim_dir.glob("*_OMIM-2-annotations.tsv.gz"))
 
     if not file_downloaded.exists():
-        return
-
-    if len(omim1_files) > 1:
+        app.log.debug("No new OMIM annotation to format")
+    elif len(omim1_files) > 1:
         app.keep_last_file("OMIM-1", omim1_files)
-        return
     elif len(omim2_files) > 1:
         app.keep_last_file("OMIM-2", omim2_files)
-        return
-
-    if not omim1_files and not omim2_files:
+    elif not omim1_files or not omim2_files:
         ## - Create the 'date'_OMIM-1-annotations.tsv and 'date'_OMIM-2-annotations.tsv files.
         ##   Header1: genes, OMIM_ID
         ##   Header2: genes, OMIM_phenotype, OMIM_inheritance
@@ -82,17 +78,15 @@ def check_morbid_file(app: Context):
     candidate_files = list(app.config.omim_dir.glob("*_morbidCandidate.tsv.gz"))
 
     if not file_downloaded.exists() and not formatted_files:
-        return
-
-    if len(formatted_files) > 1:
+        app.log.debug("No Morbid annotation")
+    elif len(formatted_files) > 1:
         app.keep_last_file("OMIM Morbid Genes", formatted_files)
-        return
     elif len(candidate_files) > 1:
         app.keep_last_file("OMIM Morbid Genes candidate", candidate_files)
-        return
-
-    if not formatted_files:
+    elif not formatted_files:
         raise NotImplementedError()
+    else:
+        app.log.debug(f"No new Morbid annotation to format")
 
 
 def omim2phenotype(app: Context, omim_id: str):
