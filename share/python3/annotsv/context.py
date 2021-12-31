@@ -18,10 +18,16 @@ class Context:
     segdup_ann: bool
     gap_ann: bool
     blacklist_ann: bool
-    cytoband_ann: bool = False  # modified in annotsv.cytoband if relevant
+    mirna_ann: bool = False  # enabled in annotsv.regulartory_elements
+    gh_ann: bool = False  # enabled in annotsv.regulartory_elements
+    ea_ann: bool = False  # enabled in annotsv.regulartory_elements
+    promoter_ann: bool = False  # enabled in annotsv.regulartory_elements
+    cytoband_ann: bool = False  # enabled in annotsv.cytoband
     vcf_header: Optional[List[str]] = None
     bed_header: Optional[Path] = None
     genes_file: Optional[Path] = None
+    refseq_genes: Set[str]
+    ensembl_genes: Set[str]
 
     def __init__(self, config: AnnotSVConfig, log: Logger) -> None:
         self.config = config
@@ -29,6 +35,8 @@ class Context:
         self.sv_ident = set()
         self.id_map = {}
         self.sv_lens = {}
+        self.refseq_genes = set()
+        self.ensembl_genes = set()
         self.gccontent_ann = any(
             f"GC_content_{x}" in self.config.output_columns for x in ["left", "right"]
         )

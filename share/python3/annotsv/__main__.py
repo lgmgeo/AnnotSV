@@ -25,6 +25,7 @@ from annotsv import (
     loeuf,
     omim,
     pathogenicsv,
+    regulatory_elements,
     repeat,
     segdup,
 )
@@ -265,7 +266,7 @@ def annotsv(
         help="Number of the column describing the SV type (DEL, DUP) if the input SV file is a BED",
     ),
     tx: TranscriptSource = typer.Option(
-        TranscriptSource.REFSEQ,
+        TranscriptSource.RefSeq,
         "--tx",
         case_sensitive=False,
         help="Origin of the transcripts",
@@ -338,7 +339,7 @@ def annotsv(
 
 
 def check_annotation_files(app: Context):
-    if app.config.tx is TranscriptSource.REFSEQ:
+    if app.config.tx is TranscriptSource.RefSeq:
         genes.check_genes_refseq_file(app)
     elif app.config.tx is TranscriptSource.ENSEMBL:
         genes.check_genes_ensembl_file(app)
@@ -372,6 +373,10 @@ def check_annotation_files(app: Context):
 
     # FtIncludedInSV annotations
     pathogenicsv.check_pathogenic_files(app)
+    regulatory_elements.check_promoter_file(app)
+    regulatory_elements.check_ea_files(app)
+    regulatory_elements.check_gh_files(app)
+    regulatory_elements.check_mir_target_link_files(app)
 
     app.log.info("Finished checking all annotation files")
 

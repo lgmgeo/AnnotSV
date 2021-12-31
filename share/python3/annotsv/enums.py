@@ -55,7 +55,7 @@ class Organisms(BaseEnum):
 
 
 class TranscriptSource(BaseEnum):
-    REFSEQ = auto()
+    RefSeq = auto()
     ENSEMBL = auto()
 
 
