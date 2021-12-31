@@ -13,6 +13,7 @@ from annotsv import (
     benignsv,
     clingen,
     constants,
+    cosmic,
     cytoband,
     ddd,
     encode_blacklist,
@@ -29,6 +30,7 @@ from annotsv import (
     repeat,
     segdup,
     tad,
+    user_bed,
 )
 from annotsv.config import load_config
 from annotsv.context import Context
@@ -379,6 +381,11 @@ def check_annotation_files(app: Context):
     regulatory_elements.check_gh_files(app)
     regulatory_elements.check_mir_target_link_files(app)
     tad.check_tad_files(app)
+    cosmic.check_cosmic_file(app)
+
+    # Users BED regions annotations
+    # (from $ANNOTSV/share/AnnotSV/Annotations_$g_AnnotSV(organism)/Users/GRCh*/*ncludedIn*/*.bed)
+    user_bed.check_users_bed_files(app)
 
     app.log.info("Finished checking all annotation files")
 

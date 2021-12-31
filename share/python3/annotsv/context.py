@@ -19,6 +19,7 @@ class Context:
     gap_ann: bool
     blacklist_ann: bool
     tad_ann: bool
+    cosmic_ann: bool = False  # enabled in annotsv.cosmic
     mirna_ann: bool = False  # enabled in annotsv.regulartory_elements
     gh_ann: bool = False  # enabled in annotsv.regulartory_elements
     ea_ann: bool = False  # enabled in annotsv.regulartory_elements

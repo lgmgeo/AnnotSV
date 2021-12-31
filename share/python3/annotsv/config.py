@@ -123,6 +123,11 @@ class AnnotSVConfig(BaseModel):
         return constants.annotation_dir / f"Annotations_{self.organism}"
 
     @property
+    def annotation_root(self):
+        # consistency / convenience
+        return constants.annotation_dir
+
+    @property
     def benign_dir(self):
         return self.benign_root / self.genome_build.name
 
@@ -141,6 +146,10 @@ class AnnotSVConfig(BaseModel):
     @property
     def clingen_dir(self):
         return self.extann_dir / "ClinGen"
+
+    @property
+    def cosmic_dir(self):
+        return self.annotation_dir / f"FtIncludedInSV/COSMIC/{self.genome_build}"
 
     @property
     def cytoband_dir(self):
@@ -214,6 +223,10 @@ class AnnotSVConfig(BaseModel):
     @property
     def tad_dir(self):
         return self.annotation_dir / f"FtIncludedInSV/TAD/{self.genome_build}"
+
+    @property
+    def user_bed_dir(self):
+        return self.annotation_dir / f"Users/{self.genome_build}"
 
     @validator("hpo")
     def validate_hpo(cls, v: Optional[str]):
