@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 import csv
+from pathlib import Path
 import re
-from dataclasses import dataclass
-from annotsv.context import Context
+from typing import TYPE_CHECKING
 from annotsv.util import ymd
+from annotsv.schemas import AnnotationValidator, ResolvedFiles
+
+if TYPE_CHECKING:
+    from annotsv.context import Context
 
 OMIM_COLS = {
     "gene1": "Gene Symbols",
@@ -99,3 +103,64 @@ def omim_gene2phenotype(app: Context, omim_gene: str):
 
 def is_morbid(app: Context, gene: str):
     ...
+
+
+class OmimValidator(AnnotationValidator):
+    def __init__(self, app: Context):
+        downloaded_rf = ResolvedFiles(app.config.omim_dir, "genemap2.txt")
+        formatted_rf = ResolvedFiles()
+        formatted_rf.add(ResolvedFiles(app.config.omim_dir, "*_OMIM-1-annotations.tsv.gz"))
+        formatted_rf.add(ResolvedFiles(app.config.omim_dir, "*_OMIM-2-annotations.tsv.gz"))
+        super().__init__(app, label="OMIM", downloaded=downloaded_rf, formatted=formatted_rf)
+
+    def update(self):
+        ## - Create the 'date'_OMIM-1-annotations.tsv and 'date'_OMIM-2-annotations.tsv files.
+        ##   Header1: genes, OMIM_ID
+        ##   Header2: genes, OMIM_phenotype, OMIM_inheritance
+        downloaded_file = self.downloaded_path()
+        omim1_file = self.formatted_path().with_name(self.formatted.patterns[0].replace("*", ymd()))
+        omim2_file = self.formatted_path().with_name(self.formatted.patterns[1].replace("*", ymd()))
+
+        self._app.log.info(
+            f"creating {omim1_file.name}, {omim2_file.name} in {self._app.config.omim_dir}"
+        )
+        with downloaded_file.open("rt") as fh:
+            reader = csv.DictReader(fh, delimiter="\t")
+            if not reader.fieldnames:
+                self._app.abort(f"No header found in {downloaded_file}")
+            # WHY DO I NEED TO ASSERT THIS
+            assert reader.fieldnames
+
+            for fname in OMIM_COLS.values():
+                if fname not in reader.fieldnames:
+                    self._app.abort(f"Missing required field {fname} in {downloaded_file}")
+
+            for row in reader:
+                all_genes = set(row[OMIM_COLS["gene1"]].split(","))
+                all_genes.add(row[OMIM_COLS["gene2"]])
+
+                pheno_tmp = row[OMIM_COLS["pheno"]]
+                for pat, repl in PHENO_MAP.items():
+                    pheno_tmp = re.sub(pat, repl, pheno_tmp, re.I)
+
+                for p in pheno_tmp.split(";"):
+                    match = re.search(r" *(.*?\(\d+\)),? *(.*)", p)
+                    if match:
+                        lpheno, linherit = match.groups()
+                        if linherit:
+                            linherit = re.sub(r" *, +", ",", linherit)
+                            # TODO: finish later. file creation unnecessary if using downloaded annotation
+
+        raise NotImplementedError()
+
+
+class MorbidValidator(AnnotationValidator):
+    def __init__(self, app: Context):
+        downloaded_rf = ResolvedFiles(app.config.omim_dir, "morbidmap.txt")
+        formatted_rf = ResolvedFiles()
+        formatted_rf.add(ResolvedFiles(app.config.omim_dir, "*_morbid.tsv.gz"))
+        formatted_rf.add(ResolvedFiles(app.config.omim_dir, "*_morbidCandidate.tsv.gz"))
+        super().__init__(app, label="Morbid", downloaded=downloaded_rf, formatted=formatted_rf)
+
+    def update(self):
+        raise NotImplementedError()

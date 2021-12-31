@@ -349,13 +349,23 @@ def check_annotation_files(app: Context):
     else:
         app.abort(f"Invalid transcript source: {app.config.tx}")
 
+    v = clingen.ClingenValidator(app)
+
+    validators = [
+        clingen.ClingenValidator(app),
+        gencc.GenCCValidator(app),
+        omim.OmimValidator(app),
+        omim.MorbidValidator(app),
+    ]
+
+    for v in validators:
+        v.check()
+
     # Gene annotations
-    gencc.check_gencc_gene_file(app)
-    omim.check_omim_file(app)
-    omim.check_morbid_file(app)
+    # omim.check_omim_file(app)
+    # omim.check_morbid_file(app)
     ddd.check_ddd_file(app)
     ddd.check_hi_file(app)
-    clingen.check_clingen_file(app)
     exomiser.check_exomiser_installation(app)
     loeuf.check_loeuf_file(app)
 

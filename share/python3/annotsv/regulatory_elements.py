@@ -52,6 +52,7 @@ def check_promoter_file(app: Context):
 ##   move in the “$ANNOTSV/share/AnnotSV/Annotations_Human/FtIncludedInSV/RegulatoryElements/GRCh38” directory.
 def check_ea_files(app: Context):
     # GRCh38 version should be manually created by lift over
+    downloaded_files = list(app.config.reg_elements_dir.glob("*_EP.txt"))
     formatted_refseq = (
         app.config.reg_elements_dir / f"EA_RefSeq_{app.config.genome_build}.sorted.bed"
     )
@@ -61,7 +62,6 @@ def check_ea_files(app: Context):
     ea_file = (
         app.config.reg_elements_dir / f"EA_{app.config.tx}_{app.config.genome_build}.sorted.bed"
     )
-    downloaded_files = list(app.config.reg_elements_dir.glob("*_EP.txt"))
     label = "EnhancerAtlas"
 
     if ea_file.exists():

@@ -173,6 +173,10 @@ class AnnotSVConfig(BaseModel):
         return self.breakpoint_dir / f"Gap/{self.genome_build}"
 
     @property
+    def gencc_dir(self):
+        return self.extann_dir / "GCC"
+
+    @property
     def gcc_dir(self):
         return self.breakpoint_dir / f"GCcontent/{self.genome_build}"
 

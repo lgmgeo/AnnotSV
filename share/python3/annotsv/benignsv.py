@@ -118,5 +118,5 @@ def _benign_files(app: Context, build: GenomeBuild, tmp: bool = False):
     return files
 
 
-def benignSVannotation(SVchrom, SVstart, SVend):
+def benignSVannotation(app: Context, SVchrom, SVstart, SVend):
     ...

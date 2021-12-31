@@ -2,9 +2,10 @@ from __future__ import annotations
 from pathlib import Path
 
 from logging import Logger
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Optional, Set, Tuple, NoReturn
 
 from annotsv.config import AnnotSVConfig
+from annotsv.schemas import Annotator
 
 
 class Context:
@@ -13,6 +14,15 @@ class Context:
     sv_ident: Set[str]
     id_map: Dict[Tuple[str, str, str], str]
     sv_lens: Dict[str, int]
+    refseq_genes: Set[str]
+    ensembl_genes: Set[str]
+    vcf_header: Optional[List[str]] = None
+    bed_header: Optional[Path] = None
+    genes_file: Optional[Path] = None
+    enabled_annotation: Set[str]
+    disabled_annotation: Set[str]
+    annotators: Dict[str, "Annotator"]
+
     gccontent_ann: bool
     repeat_ann: bool
     segdup_ann: bool
@@ -25,11 +35,6 @@ class Context:
     ea_ann: bool = False  # enabled in annotsv.regulartory_elements
     promoter_ann: bool = False  # enabled in annotsv.regulartory_elements
     cytoband_ann: bool = False  # enabled in annotsv.cytoband
-    vcf_header: Optional[List[str]] = None
-    bed_header: Optional[Path] = None
-    genes_file: Optional[Path] = None
-    refseq_genes: Set[str]
-    ensembl_genes: Set[str]
 
     def __init__(self, config: AnnotSVConfig, log: Logger) -> None:
         self.config = config
@@ -39,6 +44,10 @@ class Context:
         self.sv_lens = {}
         self.refseq_genes = set()
         self.ensembl_genes = set()
+        self.enabled_annotation = set()
+        self.disabled_annotation = set()
+        self.annotators = {}
+
         self.gccontent_ann = any(
             f"GC_content_{x}" in self.config.output_columns for x in ["left", "right"]
         )
@@ -60,7 +69,7 @@ class Context:
             x in self.config.output_columns for x in ["TAD_coordinate", "ENCODE_experiment"]
         )
 
-    def abort(self, msg: str):
+    def abort(self, msg: str) -> NoReturn:
         self.log.error(msg)
         exit(2)
 

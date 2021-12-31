@@ -2,11 +2,15 @@ from __future__ import annotations
 
 import csv
 import gzip
+from pathlib import Path
 import re
 from dataclasses import dataclass
-from typing import Dict, Set
-from annotsv.context import Context
+from typing import Dict, Set, TYPE_CHECKING
 from annotsv.util import ymd
+from annotsv.schemas import AnnotationValidator, ResolvedFiles
+
+if TYPE_CHECKING:
+    from annotsv.context import Context
 
 GENCC_COLS = {
     "gene": "gene_symbol",
@@ -17,67 +21,67 @@ GENCC_COLS = {
 }
 
 
-### GenCC
-#####################################
-# GenCC downloaded file: https://search.thegencc.org/download/action/submissions-export-tsv
-#
-# Header:
-# "uuid","gene_curie","gene_symbol","disease_curie","disease_title","disease_original_curie","disease_original_title","classification_curie","classification_title","moi_curie","moi_title","submitter_curie","submitter_title","submitted_as_hgnc_id","submitted_as_hgnc_symbol","submitted_as_disease_id","submitted_as_disease_name","submitted_as_moi_id","submitted_as_moi_name","submitted_as_submitter_id","submitted_as_submitter_name","submitted_as_classification_id","submitted_as_classification_name","submitted_as_date","submitted_as_public_report_url","submitted_as_notes","submitted_as_pmids","submitted_as_assertion_criteria_url","submitted_as_submission_id","submitted_run_date"
+class GenCCValidator(AnnotationValidator):
+    def __init__(self, app: Context):
+        downloaded_rf = ResolvedFiles(app.config.gencc_dir, "submissions-export-tsv")
+        formatted_rf = ResolvedFiles()
+        formatted_rf.add(ResolvedFiles(app.config.gencc_dir, "*_GenCC.tsv"))
+        formatted_rf.add(ResolvedFiles(app.config.gencc_dir, "*_GenCC.tsv.gz"))
+        super().__init__(
+            app,
+            label="GenCC",
+            downloaded=downloaded_rf,
+            formatted=formatted_rf,
+        )
 
-## - Check if the following GenCC file has been downloaded:
-#    - submissions-export-tsv
-#
-## - Check and create if necessary the following file:
-#    - 'date'_GenCC.sorted.tsv.gz
-def check_gencc_gene_file(app: Context):
-    downloaded_file = app.config.extann_dir / "GenCC/submissions-export-tsv"
-    formatted_files = list(app.config.extann_dir.glob("GenCC/*_GenCC.tsv")) + list(
-        app.config.extann_dir.glob("GenCC/*_GenCC.tsv.gz")
-    )
+    ### GenCC
+    #####################################
+    # GenCC downloaded file: https://search.thegencc.org/download/action/submissions-export-tsv
+    #
+    # Header:
+    # "uuid","gene_curie","gene_symbol","disease_curie","disease_title","disease_original_curie","disease_original_title","classification_curie","classification_title","moi_curie","moi_title","submitter_curie","submitter_title","submitted_as_hgnc_id","submitted_as_hgnc_symbol","submitted_as_disease_id","submitted_as_disease_name","submitted_as_moi_id","submitted_as_moi_name","submitted_as_submitter_id","submitted_as_submitter_name","submitted_as_classification_id","submitted_as_classification_name","submitted_as_date","submitted_as_public_report_url","submitted_as_notes","submitted_as_pmids","submitted_as_assertion_criteria_url","submitted_as_submission_id","submitted_run_date"
+    ## - Check if the following GenCC file has been downloaded:
+    #    - submissions-export-tsv
+    #
+    ## - Check and create if necessary the following file:
+    #    - 'date'_GenCC.sorted.tsv.gz
+    def update(self):
+        downloaded_file = self.downloaded_path()
+        formatted_file = self.formatted_path().with_name(
+            self.formatted.patterns[1].replace("*", ymd())
+        )
 
-    if not downloaded_file.exists() and not formatted_files:
-        app.log.debug("No GenCC annotation files")
-    elif len(formatted_files) > 1:
-        app.keep_last_file("GenCC", formatted_files)
-    elif not formatted_files:
-        update_gencc_gene_file(app)
-    else:
-        app.log.debug("No new GenCC annotation to format")
+        self._app.log.info(
+            f"GenCC configuration - creation of {formatted_file} (done only once during first GenCC annotation)"
+        )
 
+        # GenCC says it's tsv, but it's still just a csv
+        with downloaded_file.open("rt") as csv_in:
+            rdr = csv.DictReader(csv_in)
+            if rdr.fieldnames is None:
+                self._app.abort(f"No header found in {downloaded_file}")
 
-def update_gencc_gene_file(app: Context):
-    downloaded_file = app.config.extann_dir / "GenCC/submissions-export-tsv"
-    formatted_file = app.config.extann_dir / f"GenCC/{ymd()}_GenCC.tsv.gz"
+            # stupid type checker
+            assert rdr.fieldnames
+            for fname in GENCC_COLS.values():
+                if fname not in rdr.fieldnames:
+                    self._app.abort(f"{fname} not found in {downloaded_file} header")
 
-    app.log.info(
-        f"GenCC configuration - creation of {formatted_file} (done only once during first GenCC annotation)"
-    )
+            genes: Dict[str, Gene] = {}
+            for row in rdr:
+                gene_name = row[GENCC_COLS["gene"]]
 
-    # GenCC says it's tsv, but it's still just a csv
-    with downloaded_file.open("rt") as csv_in:
-        rdr = csv.DictReader(csv_in)
-        if rdr.fieldnames is None:
-            app.abort(f"No header found in {downloaded_file}")
+                if gene_name not in genes:
+                    genes[gene_name] = Gene(row)
+                else:
+                    genes[gene_name].update(row)
 
-        for fname in GENCC_COLS.values():
-            if fname not in rdr.fieldnames:
-                app.abort(f"{fname} not found in {downloaded_file} header")
+        with gzip.open(formatted_file, "wt") as tsv_out:
+            tsv_out.write("genes\tGenCC_disease\tGenCC_moi\tGenCC_classification\tGenCC_pmid\n")
+            for g in sorted(genes):
+                tsv_out.write(f"{genes[g]}\n")
 
-        genes: Dict[str, Gene] = {}
-        for row in rdr:
-            gene_name = row[GENCC_COLS["gene"]]
-
-            if gene_name not in genes:
-                genes[gene_name] = Gene(row)
-            else:
-                genes[gene_name].update(row)
-
-    with gzip.open(formatted_file, "wt") as tsv_out:
-        tsv_out.write("genes\tGenCC_disease\tGenCC_moi\tGenCC_classification\tGenCC_pmid\n")
-        for g in sorted(genes):
-            tsv_out.write(f"{genes[g]}\n")
-
-    downloaded_file.unlink()
+        downloaded_file.unlink()
 
 
 @dataclass
