@@ -1,18 +1,19 @@
 from __future__ import annotations
+from typing import List
 
 from annotsv.context import Context
 
 
-def check_repeat_file(app: Context):
-    downloaded_file = app.config.repeat_dir / "Repeat.bed"
-    formatted_files = list(app.config.repeat_dir.glob("*_Repeat.sorted.bed"))
-    label = "Repeat"
+def check_tad_files(app: Context):
+    downloaded_files = list(app.config.tad_dir.glob("ENC*.bed"))
+    formatted_files = list(app.config.tad_dir.glob("*_boundariesTAD.sorted.bed"))
+    label = "TAD"
 
-    if app.repeat_ann is False:
+    if app.tad_ann is False:
         app.log.debug(f"No {label} data in output columns, ignoring")
-    elif not downloaded_file.exists() and not formatted_files:
+    elif not downloaded_files and not formatted_files:
         app.log.debug(f"No {label} annotation")
-        app.repeat_ann = False
+        app.tad_ann = False
     elif len(formatted_files) > 1:
         app.keep_last_file(label, formatted_files)
     elif not formatted_files:
@@ -21,5 +22,5 @@ def check_repeat_file(app: Context):
         app.log.debug(f"No new {label} annotation to format")
 
 
-def repeat_annotation(app: Context, breakpoint_chrom: str, breakpoint_pos: int):
+def tad_annotation(app: Context, sv_chrom: str, sv_start: int, sv_end: int, ilist: List):
     ...

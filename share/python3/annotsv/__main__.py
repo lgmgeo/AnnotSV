@@ -28,6 +28,7 @@ from annotsv import (
     regulatory_elements,
     repeat,
     segdup,
+    tad,
 )
 from annotsv.config import load_config
 from annotsv.context import Context
@@ -377,6 +378,7 @@ def check_annotation_files(app: Context):
     regulatory_elements.check_ea_files(app)
     regulatory_elements.check_gh_files(app)
     regulatory_elements.check_mir_target_link_files(app)
+    tad.check_tad_files(app)
 
     app.log.info("Finished checking all annotation files")
 

@@ -18,6 +18,7 @@ class Context:
     segdup_ann: bool
     gap_ann: bool
     blacklist_ann: bool
+    tad_ann: bool
     mirna_ann: bool = False  # enabled in annotsv.regulartory_elements
     gh_ann: bool = False  # enabled in annotsv.regulartory_elements
     ea_ann: bool = False  # enabled in annotsv.regulartory_elements
@@ -53,6 +54,9 @@ class Context:
             f"ENCODE_blacklist_{x}{y}" in self.config.output_columns
             for x in ["", "characteristics_"]
             for y in ["left", "right"]
+        )
+        self.tad_ann = any(
+            x in self.config.output_columns for x in ["TAD_coordinate", "ENCODE_experiment"]
         )
 
     def abort(self, msg: str):

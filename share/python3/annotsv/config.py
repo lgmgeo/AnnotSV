@@ -211,6 +211,10 @@ class AnnotSVConfig(BaseModel):
     def segdup_dir(self):
         return self.breakpoint_dir / f"SegDup/{self.genome_build}"
 
+    @property
+    def tad_dir(self):
+        return self.annotation_dir / f"FtIncludedInSV/TAD/{self.genome_build}"
+
     @validator("hpo")
     def validate_hpo(cls, v: Optional[str]):
         if v is None or v == "":
