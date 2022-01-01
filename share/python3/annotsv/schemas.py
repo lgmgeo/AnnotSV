@@ -4,7 +4,7 @@ import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, List, Optional, Tuple
+from typing import TYPE_CHECKING, List, Optional, Tuple, Union
 
 import cyvcf2
 
@@ -61,23 +61,45 @@ class AnnotationValidator(ABC):
         label: str,
         downloaded: ResolvedFiles,
         formatted: ResolvedFiles,
+        extra_downloaded: List[ResolvedFiles] = None,
+        extra_formatted: List[ResolvedFiles] = None,
     ):
         self._app = app
         self.label = label
-        self.downloaded = downloaded
-        self.formatted = formatted
+        self.downloaded = [downloaded]
+        if extra_downloaded:
+            self.downloaded.extend(extra_downloaded)
+        self.formatted = [formatted]
+        if extra_formatted:
+            self.formatted.extend(extra_formatted)
 
-    def check(self):
-        downloaded = self.downloaded.resolve()
-        formatted = self.formatted.resolve()
+    def get_downloaded(self):
+        return self._get_files(self.downloaded)
 
+    def get_formatted(self):
+        return self._get_files(self.formatted)
+
+    def _get_files(self, rflist: List[ResolvedFiles]) -> List[Union[Path, List[Path]]]:
+        return [d.resolve() for d in rflist]
+
+    def downloaded_exist(self):
+        return self._files_exist(self.downloaded)
+
+    def formatted_exist(self):
+        return self._files_exist(self.formatted)
+
+    def _files_exist(self, rflist: List[ResolvedFiles]):
+        return all(rf.exists for rf in rflist)
+
+    def check(self) -> bool:
         success = True
-        if not self.downloaded.exists and not self.formatted.exists:
+        if not self.downloaded_exist() and not self.formatted_exist():
             self._app.log.debug(f"No {self.label} annotation")
             success = False
-        elif self.formatted.should_trim():
-            self.formatted.keep_last(self.label, self._app)
-        elif self.downloaded.exists:
+        elif any(rf.should_trim() for rf in self.formatted):
+            for rf in self.formatted:
+                rf.keep_last(self.label, self._app)
+        elif self.downloaded_exist():
             self.update()
         else:
             self._app.log.debug(f"No new {self.label} annotation to format")
@@ -87,18 +109,29 @@ class AnnotationValidator(ABC):
     def update(self):
         ...
 
-    # annoying, but makes typer checker happy
+    # # annoying, but makes typer checker happy
     def downloaded_path(self):
-        return self._get_path(self.downloaded)
+        return self._get_path(self.downloaded[0])
 
     def formatted_path(self):
-        return self._get_path(self.formatted)
+        return self._get_path(self.formatted[0])
 
     def _get_path(self, rf: ResolvedFiles):
         rf_path = rf.resolve()
-        if not isinstance(rf_path, Path):
-            raise ValueError(f"Got unexpected non-Path downloaded_file: {rf_path!r}")
+        if isinstance(rf_path, list):
+            if not isinstance(rf_path[0], Path):
+                raise ValueError(f"Got unexpected non-Path file: {rf_path[0]!r}")
+            rf_path = rf_path[0]
         return rf_path
+
+    # def downloaded_list(self):
+    #     return self._get_path_list(self.)
+
+    # def _get_path_list(self, rf_list: List[ResolvedFiles]):
+    #     rf_pathlist = rf.resolve()
+    #     if not isinstance(rf_pathlist, list):
+    #         raise ValueError(f"Got unexpected non-list when resolving {rf}: {rf_pathlist!r}")
+    #     return rf_pathlist
 
 
 class Annotator(ABC):
@@ -162,7 +195,7 @@ class ResolvedFiles:
             raise ValueError(f"Cannot return patterns from an empty object")
 
     def resolve(self, skip_cache: bool = False):
-        # cache results for possible expensive globs on slow filesystems
+        # cache results for possible expensive globs on slow filesystems (NFS)
         if not self._resolved or skip_cache:
             if self._members:
                 self._resolved = [r.resolve() for r in self._members]

@@ -118,8 +118,12 @@ class OmimValidator(AnnotationValidator):
         ##   Header1: genes, OMIM_ID
         ##   Header2: genes, OMIM_phenotype, OMIM_inheritance
         downloaded_file = self.downloaded_path()
-        omim1_file = self.formatted_path().with_name(self.formatted.patterns[0].replace("*", ymd()))
-        omim2_file = self.formatted_path().with_name(self.formatted.patterns[1].replace("*", ymd()))
+        omim1_file = self.formatted_path().with_name(
+            self.formatted[0].patterns[0].replace("*", ymd())
+        )
+        omim2_file = self.formatted_path().with_name(
+            self.formatted[1].patterns[0].replace("*", ymd())
+        )
 
         self._app.log.info(
             f"creating {omim1_file.name}, {omim2_file.name} in {self._app.config.omim_dir}"
@@ -157,10 +161,15 @@ class OmimValidator(AnnotationValidator):
 class MorbidValidator(AnnotationValidator):
     def __init__(self, app: Context):
         downloaded_rf = ResolvedFiles(app.config.omim_dir, "morbidmap.txt")
-        formatted_rf = ResolvedFiles()
-        formatted_rf.add(ResolvedFiles(app.config.omim_dir, "*_morbid.tsv.gz"))
-        formatted_rf.add(ResolvedFiles(app.config.omim_dir, "*_morbidCandidate.tsv.gz"))
-        super().__init__(app, label="Morbid", downloaded=downloaded_rf, formatted=formatted_rf)
+        formatted_rf = ResolvedFiles(app.config.omim_dir, "*_morbid.tsv.gz")
+        candidate_rf = ResolvedFiles(app.config.omim_dir, "*_morbidCandidate.tsv.gz")
+        super().__init__(
+            app,
+            label="Morbid",
+            downloaded=downloaded_rf,
+            formatted=formatted_rf,
+            extra_formatted=[candidate_rf],
+        )
 
     def update(self):
         raise NotImplementedError()

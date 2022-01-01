@@ -156,6 +156,10 @@ class AnnotSVConfig(BaseModel):
         return self.annotation_dir / f"AnyOverlap/CytoBand/{self.genome_build}"
 
     @property
+    def ddd_dir(self):
+        return self.extann_dir / "DDD"
+
+    @property
     def exac_dir(self):
         return self.extann_dir / "ExAC"
 
@@ -174,7 +178,7 @@ class AnnotSVConfig(BaseModel):
 
     @property
     def gencc_dir(self):
-        return self.extann_dir / "GCC"
+        return self.extann_dir / "GenCC"
 
     @property
     def gcc_dir(self):
@@ -183,6 +187,10 @@ class AnnotSVConfig(BaseModel):
     @property
     def genes_dir(self):
         return self.annotation_dir / f"Genes/{self.genome_build}"
+
+    @property
+    def gnomad_dir(self):
+        return self.extann_dir / "gnomAD"
 
     @property
     def ncbi_dir(self):

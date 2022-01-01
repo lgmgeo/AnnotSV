@@ -352,22 +352,21 @@ def check_annotation_files(app: Context):
     v = clingen.ClingenValidator(app)
 
     validators = [
+        # Gene annotations
         clingen.ClingenValidator(app),
         gencc.GenCCValidator(app),
         omim.OmimValidator(app),
         omim.MorbidValidator(app),
+        ddd.DDDValidator(app),
+        ddd.HaploinsufficiencyValidator(app),
+        exomiser.ExomiserValidator(app),
+        loeuf.LoeufValidator(app),
     ]
 
     for v in validators:
-        v.check()
-
-    # Gene annotations
-    # omim.check_omim_file(app)
-    # omim.check_morbid_file(app)
-    ddd.check_ddd_file(app)
-    ddd.check_hi_file(app)
-    exomiser.check_exomiser_installation(app)
-    loeuf.check_loeuf_file(app)
+        # TODO: if check is False and annotation is optional, disable it
+        if v.check() is False:
+            breakpoint()
 
     # Benign genes / regions annotations
     benignsv.check_benign_files(app)

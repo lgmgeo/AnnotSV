@@ -24,9 +24,7 @@ GENCC_COLS = {
 class GenCCValidator(AnnotationValidator):
     def __init__(self, app: Context):
         downloaded_rf = ResolvedFiles(app.config.gencc_dir, "submissions-export-tsv")
-        formatted_rf = ResolvedFiles()
-        formatted_rf.add(ResolvedFiles(app.config.gencc_dir, "*_GenCC.tsv"))
-        formatted_rf.add(ResolvedFiles(app.config.gencc_dir, "*_GenCC.tsv.gz"))
+        formatted_rf = ResolvedFiles(app.config.gencc_dir, "*_GenCC.tsv", "*_GenCC.tsv.gz")
         super().__init__(
             app,
             label="GenCC",
@@ -48,7 +46,7 @@ class GenCCValidator(AnnotationValidator):
     def update(self):
         downloaded_file = self.downloaded_path()
         formatted_file = self.formatted_path().with_name(
-            self.formatted.patterns[1].replace("*", ymd())
+            self.formatted[0].patterns[1].replace("*", ymd())
         )
 
         self._app.log.info(

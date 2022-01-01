@@ -1,9 +1,21 @@
 from __future__ import annotations
 
-from annotsv.context import Context
+from typing import TYPE_CHECKING
+from annotsv.schemas import AnnotationValidator, ResolvedFiles
 from annotsv.enums import GenomeBuild
 
+if TYPE_CHECKING:
+    from annotsv.context import Context
+
 BENIGN_SVTYPES = ["Loss", "Gain", "Ins", "Inv"]
+
+
+class BenignValidator(AnnotationValidator):
+    def __init__(self, app: Context):
+        # , *, label: str, downloaded: ResolvedFiles, formatted: ResolvedFiles, extra_downloaded: List[ResolvedFiles] = None, extra_formatted: List[ResolvedFiles] = None):
+        # super().__init__(app, label, downloaded, formatted, extra_downloaded=extra_downloaded, extra_formatted=extra_formatted)
+        ...
+
 
 # Creation / update (if some data source files are presents) of:
 # - $benignLossFile_Sorted
