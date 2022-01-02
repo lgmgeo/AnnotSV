@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 from annotsv.schemas import AnnotationValidator, ResolvedFiles
 from annotsv.enums import GenomeBuild
 
@@ -11,111 +11,107 @@ BENIGN_SVTYPES = ["Loss", "Gain", "Ins", "Inv"]
 
 
 class BenignValidator(AnnotationValidator):
+    def __init__(
+        self,
+        app: Context,
+        *,
+        label: str,
+        downloaded_pattern: str,
+        extra_patterns: List[str] = None,
+    ):
+        self._app = app
+        self.label = f"benign {label}"
+        self.formatted = []
+        self.downloaded = []
+        plist = [downloaded_pattern]
+        if extra_patterns:
+            plist.extend(extra_patterns)
+        for build in [GenomeBuild.GRCh37, GenomeBuild.GRCh38]:
+            for pattern in plist:
+                # some patterns also have build in filename, so do a str.format just in case
+                self.downloaded.append(
+                    ResolvedFiles(
+                        self._app.config.benign_root / build.name,
+                        pattern.format(build=build.name, build_lower=build.name.lower()),
+                    )
+                )
+
+    def check(self):
+        if self.downloaded_exist():
+            self.update()
+        else:
+            self._app.log.debug(f"No new {self.label} annotation to format")
+        return True
+
+
+class ClingenValidator(BenignValidator):
     def __init__(self, app: Context):
-        # , *, label: str, downloaded: ResolvedFiles, formatted: ResolvedFiles, extra_downloaded: List[ResolvedFiles] = None, extra_formatted: List[ResolvedFiles] = None):
-        # super().__init__(app, label, downloaded, formatted, extra_downloaded=extra_downloaded, extra_formatted=extra_formatted)
-        ...
+        super().__init__(
+            app,
+            label="ClinGen HITS",
+            downloaded_pattern="ClinGen_gene_curation_list_{build}.tsv",
+            extra_patterns=["ClinGen_region_curation_list_{build}.tsv"],
+        )
 
-
-# Creation / update (if some data source files are presents) of:
-# - $benignLossFile_Sorted
-# - $benignGainFile_Sorted
-# - $benignInsFile_Sorted
-# - $benignInvFile_Sorted
-def check_benign_files(app: Context):
-    for build in [GenomeBuild.GRCh37, GenomeBuild.GRCh38]:
-        check_gnomad_file(app, build)
-        check_dgv_file(app, build)
-        check_ddd_file(app, build)
-        check_1000g_file(app, build)
-        check_clingen_hits_file(app, build)
-        check_clinvar_file(app, build)
-        check_imh_file(app, build)
-        check_cmri_file(app, build)
-
-        sorted_files = _benign_files(app, build)
-        tmp_files = _benign_files(app, build, tmp=True)
-        for idx, sv_type in enumerate(BENIGN_SVTYPES):
-            if tmp_files[idx].exists():
-                raise NotImplementedError()
-
-
-def check_1000g_file(app: Context, build: GenomeBuild):
-    downloaded_files = list(app.config.benign_root.glob(f"{build}/ALL.wgs.mergedSV*.vcf.gz"))
-
-    if downloaded_files:
+    def update(self):
         raise NotImplementedError()
-    else:
-        app.log.debug(f"No new benign {build} 1000g annotation to format")
 
 
-def check_clingen_hits_file(app: Context, build: GenomeBuild):
-    downloaded_gene_file = (
-        app.config.benign_root / f"{build}/ClinGen_gene_curation_list_{build}.tsv"
-    )
-    downloaded_region_file = (
-        app.config.benign_root / f"{build}/ClinGen_region_curation_list_{build}.tsv"
-    )
+class ClinvarValidator(BenignValidator):
+    def __init__(self, app: Context):
+        super().__init__(app, label="ClinVar", downloaded_pattern="clinvar*.vcf.gz")
 
-    if downloaded_gene_file.exists() or downloaded_region_file.exists():
+    def update(self):
         raise NotImplementedError()
-    else:
-        app.log.debug(f"No new benign {build} clingen annotation to format")
 
 
-def check_clinvar_file(app: Context, build: GenomeBuild):
-    files_downloaded = list(app.config.benign_root.glob(f"{build}/clinvar*.vcf.gz"))
+class CMRIValidator(BenignValidator):
+    def __init__(self, app: Context):
+        super().__init__(app, label="CMRI", downloaded_pattern="pb_joint_merged.sv.vcf")
 
-    if files_downloaded:
+    def update(self):
         raise NotImplementedError()
-    else:
-        app.log.debug(f"No new benign {build} clinvar annotation to format")
 
 
-def check_cmri_file(app: Context, build: GenomeBuild):
-    downloaded_file = app.config.benign_root / f"{build}/pb_joint_merged.sv.vcf"
+class DDDValidator(BenignValidator):
+    def __init__(self, app: Context):
+        super().__init__(app, label="DDD", downloaded_pattern="population_cnv_{build_lower}.txt.gz")
 
-    if downloaded_file.exists():
+    def update(self):
         raise NotImplementedError()
-    else:
-        app.log.debug(f"No new benign {build} CMRI annotation to format")
 
 
-def check_ddd_file(app: Context, build: GenomeBuild):
-    downloaded_file = app.config.benign_root / f"{build}/population_cnv_{build.name.lower()}.txt.gz"
+class DGVValidator(BenignValidator):
+    def __init__(self, app: Context):
+        super().__init__(app, label="DGV", downloaded_pattern="GRCh3*_hg*_variants_*.txt")
 
-    if downloaded_file.exists():
+    def update(self):
         raise NotImplementedError()
-    else:
-        app.log.debug(f"No new benign {build} DDD annotation to format")
 
 
-def check_dgv_file(app: Context, build: GenomeBuild):
-    downloaded_files = list(app.config.benign_root.glob(f"{build}/GRCh3*_hg*_variants_*.txt"))
-
-    if downloaded_files:
-        raise NotImplementedError()
-    else:
-        app.log.debug(f"No new benign {build} DGV annotation to format")
-
-
-def check_gnomad_file(app: Context, build: GenomeBuild):
+class GnomadValidator(BenignValidator):
     # GRCh37 only (not yet available in GRCh38, 2021/10/05)
-    downloaded_file = app.config.benign_root / f"{build}/gnomad_v2.1_sv.sites.bed.gz"
+    def __init__(self, app: Context):
+        super().__init__(app, label="gnomAD", downloaded_pattern="gnomad_v2.1_sv.sites.bed.gz")
 
-    if downloaded_file.exists():
+    def update(self):
         raise NotImplementedError()
-    else:
-        app.log.debug(f"No new benign {build} gnomAD annotation to format")
 
 
-def check_imh_file(app: Context, build: GenomeBuild):
-    downloaded_files = list(app.config.benign_root.glob(f"{build}/*callset.public.bedpe.gz"))
+class IMHValidator(BenignValidator):
+    def __init__(self, app: Context):
+        super().__init__(app, label="IMH", downloaded_pattern="*callset.public.bedpe.gz")
 
-    if downloaded_files:
+    def update(self):
         raise NotImplementedError()
-    else:
-        app.log.debug(f"No new benign {build} IMH annotation to format")
+
+
+class ThousandGenomesValidator(BenignValidator):
+    def __init__(self, app: Context):
+        super().__init__(app, label="1000g", downloaded_pattern="ALL.wgs.mergedSV*.vcf.gz")
+
+    def update(self):
+        raise NotImplementedError()
 
 
 def _benign_files(app: Context, build: GenomeBuild, tmp: bool = False):

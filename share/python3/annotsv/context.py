@@ -21,7 +21,7 @@ class Context:
     genes_file: Optional[Path] = None
     enabled_annotation: Set[str]
     disabled_annotation: Set[str]
-    annotators: Dict[str, "Annotator"]
+    annotators: Dict[str, Annotator]
 
     gccontent_ann: bool
     repeat_ann: bool

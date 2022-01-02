@@ -1,6 +1,10 @@
 from __future__ import annotations
 
-from annotsv.context import Context
+from typing import TYPE_CHECKING
+from annotsv.schemas import AnnotationValidator, ResolvedFiles
+
+if TYPE_CHECKING:
+    from annotsv.context import Context
 
 ## - Check if the following chromFa files has been downloaded:
 #    - *chromFa.tar.gz
@@ -8,24 +12,19 @@ from annotsv.context import Context
 ## - Check and create if necessary the following file:
 #    - 'date'_genomeBuild_chromFa.fasta
 #    - 'date'_genomeBuild_chromFa.chromSizes
-def check_fasta_files(app: Context):
-    downloaded_files = list(app.config.gcc_dir.glob("*chromFa.tar.gz"))
-    formatted_file = app.config.gcc_dir / f"{app.config.genome_build}_chromFa.fasta"
-    label = "GCcontent"
-
-    if app.gccontent_ann is False:
-        app.log.debug(f"No {label} in output columns, ignoring")
-    elif not downloaded_files and not formatted_file.exists():
-        app.log.debug(f"No {label} annotation")
-        app.gccontent_ann = False
-    elif not formatted_file.exists():
-        update_fasta_files(app)
-    else:
-        app.log.debug(f"No new {label} annotation to format")
 
 
-def update_fasta_files(app: Context):
-    raise NotImplementedError()
+class FastaValidator(AnnotationValidator):
+    def __init__(self, app: Context):
+        super().__init__(
+            app,
+            label="GCcontent",
+            downloaded=ResolvedFiles(app.config.gcc_dir, "*chromFa.tar.gz"),
+            formatted=ResolvedFiles(app.config.gcc_dir, f"{app.config.genome_build}_chromFa.fasta"),
+        )
+
+    def update(self):
+        raise NotImplementedError()
 
 
 def gc_content_annotation(app: Context, breakpoint_chrom: str, breakpoint_pos: int):

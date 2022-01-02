@@ -4,7 +4,6 @@ import datetime
 import gzip
 import re
 from pathlib import Path
-from typing import List
 
 from annotsv.enums import SVTypes
 

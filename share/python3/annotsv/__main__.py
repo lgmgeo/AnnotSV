@@ -337,6 +337,12 @@ def annotsv(
 
     check_annotation_files(app)
 
+    config_str = "\n\t".join(
+        f"--{key} {val}"
+        for key, val in sorted(app.config.dict(by_alias=True).items(), key=lambda x: x[0])
+    )
+    app.log.info(f"AnnotSV was run with the following arguments:\n\t{config_str}\n")
+
 
 ###
 
@@ -361,40 +367,45 @@ def check_annotation_files(app: Context):
         ddd.HaploinsufficiencyValidator(app),
         exomiser.ExomiserValidator(app),
         loeuf.LoeufValidator(app),
+        # Benign genes / regions annotations
+        benignsv.GnomadValidator(app),
+        benignsv.DGVValidator(app),
+        benignsv.DDDValidator(app),
+        benignsv.ThousandGenomesValidator(app),
+        benignsv.ClingenValidator(app),
+        benignsv.ClinvarValidator(app),
+        benignsv.IMHValidator(app),
+        benignsv.CMRIValidator(app),
+        # GeneIntolerance (ExAc) annotations
+        exac.GeneIntoleranceValidator(app),
+        exac.CNVIntoleranceValidator(app),
+        # Breakpoint annotations
+        gccontent.FastaValidator(app),
+        repeat.RepeatValidator(app),
+        segdup.SegDupValidator(app),
+        gap.GapValidator(app),
+        encode_blacklist.BlacklistValidator(app),
+        cytoband.CytobandValidator(app),
+        # FtIncludedInSV annotations
+        pathogenicsv.ClinvarValidator(app),
+        pathogenicsv.ClingenValidator(app),
+        pathogenicsv.DBVarValidator(app),
+        pathogenicsv.OMIMValidator(app),
+        pathogenicsv.SnvIndelValidator(app),
+        regulatory_elements.PromoterValidator(app),
+        regulatory_elements.EnhancerAtlasValidator(app),
+        regulatory_elements.GenehancerValidator(app),
+        regulatory_elements.MirTargetLinkValidator(app),
+        tad.TadValidator(app),
+        cosmic.CosmicValidator(app),
+        # Users BED regions annotations
+        user_bed.UserBEDValidator(app),
     ]
 
     for v in validators:
         # TODO: if check is False and annotation is optional, disable it
-        if v.check() is False:
+        if v.check() is False and v.label not in ("GeneHancer", "COSMIC"):
             breakpoint()
-
-    # Benign genes / regions annotations
-    benignsv.check_benign_files(app)
-
-    # GeneIntolerance (ExAc) annotations
-    exac.check_gene_intolerance_file(app)
-    exac.check_cnv_intolerance_file(app)
-
-    # Breakpoint annotations
-    gccontent.check_fasta_files(app)
-    repeat.check_repeat_file(app)
-    segdup.check_segdup_file(app)
-    gap.check_gap_file(app)
-    encode_blacklist.check_blacklist_file(app)
-    cytoband.check_cytoband_file(app)
-
-    # FtIncludedInSV annotations
-    pathogenicsv.check_pathogenic_files(app)
-    regulatory_elements.check_promoter_file(app)
-    regulatory_elements.check_ea_files(app)
-    regulatory_elements.check_gh_files(app)
-    regulatory_elements.check_mir_target_link_files(app)
-    tad.check_tad_files(app)
-    cosmic.check_cosmic_file(app)
-
-    # Users BED regions annotations
-    # (from $ANNOTSV/share/AnnotSV/Annotations_$g_AnnotSV(organism)/Users/GRCh*/*ncludedIn*/*.bed)
-    user_bed.check_users_bed_files(app)
 
     app.log.info("Finished checking all annotation files")
 

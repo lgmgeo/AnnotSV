@@ -1,24 +1,26 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING
+from annotsv.schemas import AnnotationValidator, ResolvedFiles
 
-from annotsv.context import Context
+if TYPE_CHECKING:
+    from annotsv.context import Context
 
-# Check the cytoband annotations files
-# Create : .../Annotations_$g_AnnotSV(organism)/AnyOverlap/CytoBand/$g_AnnotSV(genomeBuild)/cytoBand_$g_AnnotSV(genomeBuild).formatted.sorted.bed
-# (After the formatting step, the "cytoBand_$g_AnnotSV(genomeBuild).bed" is deleted)
-def check_cytoband_file(app: Context):
-    label = "cytoBand"
-    cytoband_bedfile = app.config.cytoband_dir / f"{label}_{app.config.genome_build}.bed"
-    formatted_file = cytoband_bedfile.with_suffix(".formatted.bed")
-    formatted_sorted_file = cytoband_bedfile.with_suffix(".formatted.sorted.bed")
-    header_file = cytoband_bedfile.with_suffix(".header.tsv")
 
-    if cytoband_bedfile.exists():
+class CytobandValidator(AnnotationValidator):
+    def __init__(self, app: Context):
+        pattern_stem = f"cytoBand_{app.config.genome_build}"
+        super().__init__(
+            app,
+            label="cytoBand",
+            downloaded=ResolvedFiles(app.config.cytoband_dir, f"{pattern_stem}.bed"),
+            formatted=ResolvedFiles(
+                app.config.cytoband_dir, f"{pattern_stem}.formatted.sorted.bed"
+            ),
+            extra_formatted=[ResolvedFiles(app.config.cytoband_dir, f"{pattern_stem}.header.tsv")],
+        )
+
+    def update(self):
         raise NotImplementedError()
-    elif formatted_sorted_file.exists() and header_file.exists():
-        app.log.debug(f"Enabling {label} annotation")
-        app.cytoband_ann = True
-    else:
-        app.log.debug(f"No {label} annotation, ignoring")
 
 
 def cytoband_annotation(app: Context, breakpoint_chrom: str, breakpoint_pos: int):

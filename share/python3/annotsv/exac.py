@@ -1,6 +1,10 @@
 from __future__ import annotations
 
-from annotsv.context import Context
+from typing import TYPE_CHECKING
+from annotsv.schemas import AnnotationValidator, ResolvedFiles
+
+if TYPE_CHECKING:
+    from annotsv.context import Context
 
 # ExAC downloaded file: "fordist_cleaned_nonpsych_z_pli_rec_null_data.txt"
 # Header:
@@ -23,6 +27,23 @@ def check_gene_intolerance_file(app: Context):
         raise NotImplementedError()
     else:
         app.log.debug("No new gene intolerance annotation to format")
+
+
+class GeneIntoleranceValidator(AnnotationValidator):
+    def __init__(self, app: Context):
+        super().__init__(
+            app,
+            label="Gene Inolerance",
+            downloaded=ResolvedFiles(
+                app.config.exac_dir, "fordist_cleaned_nonpsych_z_pli_rec_null_data.txt"
+            ),
+            formatted=ResolvedFiles(
+                app.config.exac_dir, "*_GeneIntolerance-Zscore.annotations.tsv.gz"
+            ),
+        )
+
+    def update(self):
+        raise NotImplementedError()
 
 
 # gene: Gencode ID
@@ -67,3 +88,16 @@ def check_cnv_intolerance_file(app: Context):
         raise NotImplementedError()
     else:
         app.log.debug("No new cnv intolerance annotation to format")
+
+
+class CNVIntoleranceValidator(AnnotationValidator):
+    def __init__(self, app: Context):
+        super().__init__(
+            app,
+            label="CNV Intolerance",
+            downloaded=ResolvedFiles(app.config.exac_dir, "exac-final-cnv.gene.scores071316"),
+            formatted=ResolvedFiles(app.config.exac_dir, "*_ExAC.CNV-Zscore.annotations.tsv.gz"),
+        )
+
+    def update(self):
+        raise NotImplementedError()

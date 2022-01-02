@@ -1,17 +1,22 @@
 from __future__ import annotations
 
-from annotsv.context import Context
+from typing import TYPE_CHECKING
+
+from annotsv.schemas import AnnotationValidator, ResolvedFiles
+
+if TYPE_CHECKING:
+    from annotsv.context import Context
 
 
-def check_cosmic_file(app: Context):
-    downloaded_file = app.config.cosmic_dir / "CosmicCompleteCNA.tsv.gz"
-    formatted_file = app.config.cosmic_dir / f"CosmicCompleteCNA_{app.config.genome_build}.bed"
-    label = "COSMIC"
+class CosmicValidator(AnnotationValidator):
+    def __init__(self, app: Context):
+        rf_dir = app.config.cosmic_dir
+        super().__init__(
+            app,
+            label="COSMIC",
+            downloaded=ResolvedFiles(rf_dir, "CosmicCompleteCNA.tsv.gz"),
+            formatted=ResolvedFiles(rf_dir, f"CosmicCompleteCNA_{app.config.genome_build}.bed"),
+        )
 
-    if formatted_file.exists():
-        app.log.debug(f"Enabling {label} annotation")
-        app.cosmic_ann = True
-    elif not downloaded_file.exists():
-        app.log.debug(f"No {label} annotation")
-    else:
+    def update(self):
         raise NotImplementedError()

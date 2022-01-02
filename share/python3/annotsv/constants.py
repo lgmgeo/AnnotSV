@@ -64,3 +64,8 @@ VCF_HEADER = (
     "INFO",
     "FORMAT",
 )
+
+BED_CHROM = 0
+BED_START = 1
+BED_END = 2
+BED_CUSTOM = 3

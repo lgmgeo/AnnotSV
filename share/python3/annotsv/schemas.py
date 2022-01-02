@@ -4,7 +4,7 @@ import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, List, Optional, Sequence, Tuple, Union
 
 import cyvcf2
 
@@ -83,18 +83,15 @@ class AnnotationValidator(ABC):
         return [d.resolve() for d in rflist]
 
     def downloaded_exist(self):
-        return self._files_exist(self.downloaded)
+        return self.downloaded and any(rf.exists for rf in self.downloaded)
 
     def formatted_exist(self):
-        return self._files_exist(self.formatted)
+        return self.formatted and all(rf.exists for rf in self.formatted)
 
-    def _files_exist(self, rflist: List[ResolvedFiles]):
-        return all(rf.exists for rf in rflist)
-
-    def check(self) -> bool:
+    def check(self):
         success = True
         if not self.downloaded_exist() and not self.formatted_exist():
-            self._app.log.debug(f"No {self.label} annotation")
+            self._app.log.debug(f"No {self.label} annotation found")
             success = False
         elif any(rf.should_trim() for rf in self.formatted):
             for rf in self.formatted:
@@ -234,7 +231,7 @@ class ResolvedFiles:
             if len(self._resolved) == 1:
                 app.log.debug(f"Not trimming list of single Path")
             else:
-                app.keep_last_file(label, self._resolved)
+                app.keep_last_file(label, self._resolved)  # type: ignore
             # if self._resolved is None:
             #     self.resolve()
             # assert self._resolved and self.pattern
