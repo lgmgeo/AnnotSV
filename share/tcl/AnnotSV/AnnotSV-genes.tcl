@@ -335,7 +335,7 @@ proc genesAnnotation {} {
     #   - the one selected by the user with the "-txFile" option
     #   - the one with the most of "bp" of overlapped CDS (=overlappedCDSlength)
     #   - if x transcript with same "bp of overlapped CDS", the one with the most of "bp" of overlapped transcript (=overlapped "UTR, exon, intron" = overlappedTxLength)
-    set f [open $splitBedFile]    
+    set f [open $splitBedFile]
     while {![eof $f]} {
 	set L [gets $f]
 	if {$L eq ""} {continue}
@@ -358,7 +358,7 @@ proc genesAnnotation {} {
 		if {$i_toWrite > 10000} {
 		    WriteTextInFile [join $L_linesToWrite "\n"] "$FullAndSplitBedFile"
 		    set L_linesToWrite {}
-		    set $i_toWrite 0
+		    set i_toWrite 0
 		}
 		# Writing of 1 "split" line...
 		if {$SVfromBED eq $oldSplitSV} {
