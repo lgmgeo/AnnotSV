@@ -94,7 +94,7 @@ proc updateGenCCgeneFile {} {
     foreach L [LinesFromFile $GenCCfileDownloaded] {
 	if {[regexp  "^\"uuid" $L]} {
 	    set ntext "field not found - Exit with error"
-	    set Ls [::csv::split $L]
+	    set Ls [::csv::split $L "\t"]
 	    set i_gene    [lsearch -regexp $Ls "gene_symbol"];         if {$i_gene == -1} {puts "Bad syntax into $GenCCfileDownloaded.\ngene_symbol $ntext"; exit 2}
 	    set i_disease [lsearch -regexp $Ls "disease_title"];       if {$i_disease == -1} {puts "Bad syntax into $GenCCfileDownloaded.\ndisease_title $ntext"; exit 2}
 	    set i_moi     [lsearch -regexp $Ls "moi_title"];           if {$i_moi == -1} {puts "Bad syntax into $GenCCfileDownloaded.\nmoi_title $ntext"; exit 2}
@@ -102,7 +102,7 @@ proc updateGenCCgeneFile {} {
 	    set i_pmid    [lsearch -regexp $Ls "submitted_as_pmids"];  if {$i_pmid == -1} {puts "Bad syntax into $GenCCfileDownloaded.\nsubmitted_as_pmids $ntext"; exit 2}
 	    continue
 	}
-	set Ls [::csv::split $L]
+	set Ls [::csv::split $L "\t"]
 
 	set gene [lindex $Ls $i_gene]
 	lappend L_genes "$gene"
