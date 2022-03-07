@@ -154,9 +154,12 @@ proc configureAnnotSV {argv} {
     ## annotationsDir: It must be an existing directory (or "" for the default)
     if {$g_AnnotSV(annotationsDir) eq ""} {
 	set g_AnnotSV(annotationsDir) "$g_AnnotSV(installDir)/share/AnnotSV"
-    } elseif {![file isdirectory $g_AnnotSV(annotationsDir)]} {
-	puts "AnnotSV needs in argument an existing path of the annotations directory (-annotationsDir = \"$g_AnnotSV(annotationsDir)\") - Exit with error."
-	exit 2
+    } else {
+	regsub "/+$" $g_AnnotSV(annotationsDir) "" g_AnnotSV(annotationsDir)
+	if {![file isdirectory $g_AnnotSV(annotationsDir)]} {
+	    puts "AnnotSV needs in argument an existing path of the annotations directory (-annotationsDir = \"$g_AnnotSV(annotationsDir)\") - Exit with error."
+	    exit 2
+	}
     }
 
     ## SVinputFile: We should have a bed or VCF input file
