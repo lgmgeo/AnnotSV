@@ -327,8 +327,7 @@ proc genesAnnotation {} {
 	}
 	set SVfromBED "[join $Ls_fromBED "\t"]"
     }
-
-    
+   
     # We have several annotations for 1 SV: 1 by gene.
     #
     # Keep only 1 transcript by gene:
@@ -351,7 +350,6 @@ proc genesAnnotation {} {
 
 	if {$splitSV ne $oldSplitSV} {;# new annotated SV line (all the split lines are done for the oldSV) => we write all information about the oldSV
 	    while {$SVfromBED ne $splitSV} {
-
 		# Writing of the "full" SV line (not present in the $splitBedFile file, if not covering a gene)
 		lappend L_linesToWrite "[lindex $L_Bed $n]\tfull"
 		incr i_toWrite
@@ -393,6 +391,7 @@ proc genesAnnotation {} {
 		    unset L_annot
 		    unset L_overlappedTxLength
 		    unset L_overlappedCDSlength
+		    unset L_completeCDSlength
 		    # check the catch
 		    catch {unset Finish}
 		    set L_genes {}	     
