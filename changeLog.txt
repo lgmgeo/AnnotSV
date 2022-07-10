@@ -1,9 +1,9 @@
 ############################################################################################################
-# AnnotSV 3.1.1                                                                                            #
+# AnnotSV 3.1.2                                                                                            #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
-# Copyright (C) 2017-2021 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
+# Copyright (C) 2017-2022 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
 #                                                                                                          #
 ############################################################################################################
 
@@ -11,10 +11,14 @@
 For more details, please see the README file.
 
 
+July 10, 2022, AnnotSV version 3.1.2
+	- fix: Add important bugfix concerning the GRCh38 coordinates of the morbid genes
+	- fix: Add bugfix concerning some Overlapped_CDS_percent values
+
+
 November 25, 2021, AnnotSV version 3.1.1
 	- Add bugfix when setting the ANNOTSV global environmental variable with a final "/"
 	- Update the documentation, add of the AnnotSV logo
-
 
 November 08, 2021, AnnotSV version 3.1
 	- Change the -genomeBuild default value to "GRCh38" (instead of GRCh37)

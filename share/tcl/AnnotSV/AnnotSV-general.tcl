@@ -1,9 +1,9 @@
 ############################################################################################################
-# AnnotSV 3.1.1                                                                                            #
+# AnnotSV 3.1.2                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
-# Copyright (C) 2017-2021 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
+# Copyright (C) 2017-2022 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
 #                                                                                                          #
 # This is part of AnnotSV source code.                                                                     #
 #                                                                                                          #
