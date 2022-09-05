@@ -12,8 +12,10 @@ For more details, please see the README file.
 
 
 July 10, 2022, AnnotSV version 3.1.2
-	- fix: Add important bugfix concerning the GRCh38 coordinates of the morbid genes
-	- fix: Add bugfix concerning some Overlapped_CDS_percent values
+	- Add important bugfix concerning the GRCh38 coordinates of the morbid genes
+	- Add bugfix concerning some Overlapped_CDS_percent values
+	- As part of the GenCC, the DDG2P gene annotations was removed from AnnotSV to avoid redundancy 
+
 
 
 November 25, 2021, AnnotSV version 3.1.1
