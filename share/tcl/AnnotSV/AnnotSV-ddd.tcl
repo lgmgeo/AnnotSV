@@ -97,7 +97,7 @@ proc updateDDDgeneFile {} {
 	    set Ls [::csv::split $L]
 	    set i_gene      [lsearch -regexp $Ls "gene symbol"];          if {$i_gene == -1} {puts "Bad syntax into $DDDfileDownloaded.\ngene symbol field not found - Exit with error"; exit 2}
 	    set i_disease   [lsearch -regexp $Ls "disease name"];         if {$i_disease == -1} {puts "Bad syntax into $DDDfileDownloaded.\ndisease name field not found - Exit with error"; exit 2}
-	    set i_category  [lsearch -regexp $Ls "DDD category"];         if {$i_category == -1} {puts "Bad syntax into $DDDfileDownloaded.\nDDD category field not found - Exit with error"; exit 2}
+	    set i_category  [lsearch -regexp $Ls "confidence category"];         if {$i_category == -1} {puts "Bad syntax into $DDDfileDownloaded.\nDDD category field not found - Exit with error"; exit 2}
 	    set i_allelic   [lsearch -regexp $Ls "allelic requirement"];  if {$i_allelic == -1} {puts "Bad syntax into $DDDfileDownloaded.\nallelic requirement field not found - Exit with error"; exit 2}
 	    set i_mutation  [lsearch -regexp $Ls "mutation consequence"]; if {$i_mutation == -1} {puts "Bad syntax into $DDDfileDownloaded.\nmutation consequence field not found - Exit with error"; exit 2}
 	    set i_pmids     [lsearch -regexp $Ls "pmids"];                if {$i_pmids == -1} {puts "Bad syntax into $DDDfileDownloaded.\npmids field not found - Exit with error"; exit 2}
