@@ -272,7 +272,7 @@ proc checkClinGenHITS_pathogenicFile {genomeBuild} {
 		set Ls [split $L "\t"]		
 		# Header 1 and 2:
 		#################
-		#Gene Symbol    Gene ID cytoBand        Genomic Location        Haploinsufficiency Score        Haploinsufficiency Description  Haploinsufficiency PMID1        Haploinsufficiency PMID2        Haploinsufficiency PMID3 Triplosensitivity Score  Triplosensitivity Description   Triplosensitivity PMID1 Triplosensitivity PMID2 Triplosensitivity PMID3 Date Last Evaluated     Loss phenotype OMIM ID  Triplosensitive phenotype OMIM ID
+		#Gene Symbol    Gene ID cytoBand        Genomic Location        Haploinsufficiency Score        Haploinsufficiency Description  Haploinsufficiency PMID1        Haploinsufficiency PMID2        Haploinsufficiency PMID3 Triplosensitivity Score  Triplosensitivity Description   Triplosensitivity PMID1 Triplosensitivity PMID2 Triplosensitivity PMID3 Date Last Evaluated     Haploinsufficiency Disease ID  Triplosensitivity Disease ID
 		
 		#ISCA ID        ISCA Region Name        cytoBand        Genomic Location        Haploinsufficiency Score        Haploinsufficiency Description  Haploinsufficiency PMID1        Haploinsufficiency PMID2        Haploinsufficiency PMID3  Triplosensitivity Score Triplosensitivity Description   Triplosensitivity PMID1 Triplosensitivity PMID2 Triplosensitivity PMID3 Date Last Evaluated     Loss phenotype OMIM ID  Triplosensitive phenotype OMIM ID
 		
@@ -283,8 +283,8 @@ proc checkClinGenHITS_pathogenicFile {genomeBuild} {
 		    set i_coord [lsearch -exact $Ls "Genomic Location"]; if {$i_coord == -1} {puts "$ClinGenFileDownloaded"; puts "Bad header line syntax. Genomic Location column not found - Exit with error"; exit 2}
 		    set i_hi [lsearch -exact $Ls "Haploinsufficiency Score"]; if {$i_hi == -1} {puts "$ClinGenFileDownloaded"; puts "Bad header line syntax. Haploinsufficiency Score column not found - Exit with error"; exit 2}
 		    set i_ts [lsearch -exact $Ls "Triplosensitivity Score"]; if {$i_ts == -1} {puts "$ClinGenFileDownloaded"; puts "Bad header line syntax. Triplosensitivity Score column not found - Exit with error"; exit 2}
-		    set i_omimloss [lsearch -exact $Ls "Loss phenotype OMIM ID"]; if {$i_omimloss == -1} {puts "$ClinGenFileDownloaded"; puts "Bad header line syntax. Loss phenotype OMIM ID column not found - Exit with error"; exit 2}
-		    set i_omimgain [lsearch -exact $Ls "Triplosensitive phenotype OMIM ID"]; if {$i_omimgain == -1} {puts "$ClinGenFileDownloaded"; puts "Bad header line syntax. Triplosensitive phenotype OMIM ID column not found - Exit with error"; exit 2}
+		    set i_omimloss [lsearch -exact $Ls "Haploinsufficiency Disease ID"]; if {$i_omimloss == -1} {puts "$ClinGenFileDownloaded"; puts "Bad header line syntax. Haploinsufficiency Disease ID column not found - Exit with error"; exit 2}
+		    set i_omimgain [lsearch -exact $Ls "Triplosensitivity Disease ID"]; if {$i_omimgain == -1} {puts "$ClinGenFileDownloaded"; puts "Bad header line syntax. Triplosensitivity Disease ID column not found - Exit with error"; exit 2}
 		    continue
 		}
 		if {[regexp "^#" $L]} {continue}
