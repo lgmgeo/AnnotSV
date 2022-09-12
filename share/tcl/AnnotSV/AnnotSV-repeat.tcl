@@ -71,6 +71,8 @@ proc checkRepeatFile {} {
 	    set L [gets $f]
 	    if {$L eq ""} {continue}
 	    regsub "^chr" $L "" L
+	    set chrom [lindex $L 0]
+	    if {[lsearch -exact {1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 X Y M MT} $chrom] eq -1} {continue}
 	    lappend L_Text "$L"
 	    if {$i>500000} {
 		WriteTextInFile [join $L_Text "\n"] $repeatFileFormatted.tmp

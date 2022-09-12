@@ -141,15 +141,15 @@ install-human-annotation: Annotations_Human_$(VERSION).tar.gz install-exomiser
 	@echo ""
 	@echo "--> Human annotation installed"
 
-install-exomiser-1: 2109_phenotype.zip
+install-exomiser-1: 2202_phenotype.zip
 	@echo ""
 	@echo "Installation of Exomiser data:"
 	@echo ""
-	$(MKDIR) -p $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/2109
-	tar -xf 2109_hg19.tar.gz -C $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/2109/
-	unzip 2109_phenotype.zip -d $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/2109/
-	$(RM) -rf 2109_phenotype.zip
-	$(RM) -rf 2109_hg19.tar.gz
+	$(MKDIR) -p $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/2202
+	tar -xf 2202_hg19.tar.gz -C $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/2202/
+	unzip 2202_phenotype.zip -d $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/2202/
+	$(RM) -rf 2202_phenotype.zip
+	$(RM) -rf 2202_hg19.tar.gz
 
 install-exomiser-2:
 	install -p -m 0755 $(PROPERTIES) $(DESTDIR)$(ETCDIR)/$(ANNOTSV)
@@ -179,7 +179,7 @@ Annotations_%.tar.gz:
 	@echo ""
 	@echo "Download Exomiser supporting data files:"
 	@echo ""
-	curl -C - -LO https://www.lbgi.fr/~geoffroy/Annotations/2109_hg19.tar.gz
+	curl -C - -LO https://www.lbgi.fr/~geoffroy/Annotations/2202_hg19.tar.gz
 	curl -C - -LO https://data.monarchinitiative.org/exomiser/data/$@
 
 
