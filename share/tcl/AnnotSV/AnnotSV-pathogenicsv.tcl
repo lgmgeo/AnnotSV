@@ -256,61 +256,96 @@ proc checkClinGenHITS_pathogenicFile {genomeBuild} {
 	puts "\t   >>> ClinGen parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
     } else {return}
 
-    set L_files "$ClinGenFileDownloaded1"
-    lappend L_files "$ClinGenFileDownloaded2"
-
     set L_toWriteLoss {}
     set L_toWriteGain {}
     set pathogenicLossFile_Tmp "$pathogenicDir/pathogenic_Loss_SV_$genomeBuild.tmp.bed"
     set pathogenicGainFile_Tmp "$pathogenicDir/pathogenic_Gain_SV_$genomeBuild.tmp.bed"
 
-    foreach ClinGenFileDownloaded "$L_files" {
-	if {$ClinGenFileDownloaded ne ""} {	
-	    set f [open "$ClinGenFileDownloaded"]
-	    while {! [eof $f]} {
-		set L [gets $f]
-		set Ls [split $L "\t"]		
-		# Header 1 and 2:
-		#################
-		#Gene Symbol    Gene ID cytoBand        Genomic Location        Haploinsufficiency Score        Haploinsufficiency Description  Haploinsufficiency PMID1        Haploinsufficiency PMID2        Haploinsufficiency PMID3 Triplosensitivity Score  Triplosensitivity Description   Triplosensitivity PMID1 Triplosensitivity PMID2 Triplosensitivity PMID3 Date Last Evaluated     Loss phenotype OMIM ID  Triplosensitive phenotype OMIM ID
-		
-		#ISCA ID        ISCA Region Name        cytoBand        Genomic Location        Haploinsufficiency Score        Haploinsufficiency Description  Haploinsufficiency PMID1        Haploinsufficiency PMID2        Haploinsufficiency PMID3  Triplosensitivity Score Triplosensitivity Description   Triplosensitivity PMID1 Triplosensitivity PMID2 Triplosensitivity PMID3 Date Last Evaluated     Loss phenotype OMIM ID  Triplosensitive phenotype OMIM ID
-		
-		# Selection of the pathogenic variants to keep:
-		###########################################
-		if {[regexp "(^#Gene Symbol)|(^#ISCA ID)" $L]} {
-		    set i_id 0 ;# variantaccession
-		    set i_coord [lsearch -exact $Ls "Genomic Location"]; if {$i_coord == -1} {puts "$ClinGenFileDownloaded"; puts "Bad header line syntax. Genomic Location column not found - Exit with error"; exit 2}
-		    set i_hi [lsearch -exact $Ls "Haploinsufficiency Score"]; if {$i_hi == -1} {puts "$ClinGenFileDownloaded"; puts "Bad header line syntax. Haploinsufficiency Score column not found - Exit with error"; exit 2}
-		    set i_ts [lsearch -exact $Ls "Triplosensitivity Score"]; if {$i_ts == -1} {puts "$ClinGenFileDownloaded"; puts "Bad header line syntax. Triplosensitivity Score column not found - Exit with error"; exit 2}
-		    set i_omimloss [lsearch -exact $Ls "Loss phenotype OMIM ID"]; if {$i_omimloss == -1} {puts "$ClinGenFileDownloaded"; puts "Bad header line syntax. Loss phenotype OMIM ID column not found - Exit with error"; exit 2}
-		    set i_omimgain [lsearch -exact $Ls "Triplosensitive phenotype OMIM ID"]; if {$i_omimgain == -1} {puts "$ClinGenFileDownloaded"; puts "Bad header line syntax. Triplosensitive phenotype OMIM ID column not found - Exit with error"; exit 2}
-		    continue
-		}
-		if {[regexp "^#" $L]} {continue}
-		
-		set ID [lindex $Ls $i_id]
-		set coord [lindex $Ls $i_coord]
-		regsub -all "(chr)| " $coord "" coord
-		if { ![regexp "(\[0-9XYMT\]+):(\[0-9\]+)-(\[0-9\]+)" $coord match chrom start end] } {continue} ;# In GRCh38, some coordinates = "tbd" (to be determined)
-		set hi [lindex $Ls $i_hi]
-		set ts [lindex $Ls $i_ts]
-		set hpo ""
-		if {$hi eq "3"} {
-		    set OMIM [lindex $Ls $i_omimloss]
-		    set phenotype [fromOMIMtoPhenotype $OMIM]
-		    lappend L_toWriteLoss "$chrom\t$start\t$end\t$phenotype\t$hpo\tHI3:$ID\t$coord"
-		}
-		if {$ts eq "3"} {
-		    set OMIM [lindex $Ls $i_omimgain]
-		    set phenotype [fromOMIMtoPhenotype $OMIM]
-		    lappend L_toWriteGain "$chrom\t$start\t$end\t$phenotype\t$hpo\tTS3:$ID\t$coord"
-		} 
-	    }
-	    close $f
+    ## ClinGenFileDownloaded1 parsing
+    #################################
+    set f [open "$ClinGenFileDownloaded1"]
+    while {! [eof $f]} {
+	set L [gets $f]
+	set Ls [split $L "\t"]		
+	# Header 1:
+	###########	
+	#Gene Symbol    Gene ID cytoBand        Genomic Location        Haploinsufficiency Score        Haploinsufficiency Description  Haploinsufficiency PMID1        Haploinsufficiency PMID2        Haploinsufficiency PMID3        Haploinsufficiency PMID4        Haploinsufficiency PMID5        Haploinsufficiency PMID6        Triplosensitivity Score Triplosensitivity Description   Triplosensitivity PMID1 Triplosensitivity PMID2 Triplosensitivity PMID3 Triplosensitivity PMID4 Triplosensitivity PMID5 Triplosensitivity PMID6 Date Last Evaluated     Haploinsufficiency Disease ID   Triplosensitivity Disease ID
+	    	    
+	# Selection of the pathogenic variants to keep:
+	###############################################
+	if {[regexp "(^#Gene Symbol)|(^#ISCA ID)" $L]} {
+	    set i_id 0 ; #"Gene Symbol" (gene) or #"ISCA ID" (region)
+	    set i_coord [lsearch -exact $Ls "Genomic Location"]; if {$i_coord == -1} {puts "$ClinGenFileDownloaded"; puts "Bad header line syntax. \"Genomic Location\" column not found - Exit with error"; exit 2}
+	    set i_hi [lsearch -exact $Ls "Haploinsufficiency Score"]; if {$i_hi == -1} {puts "$ClinGenFileDownloaded"; puts "Bad header line syntax. \"Haploinsufficiency Score\" column not found - Exit with error"; exit 2}
+	    set i_ts [lsearch -exact $Ls "Triplosensitivity Score"]; if {$i_ts == -1} {puts "$ClinGenFileDownloaded"; puts "Bad header line syntax. \"Triplosensitivity\" Score column not found - Exit with error"; exit 2}
+	    continue
 	}
+	if {[regexp "^#" $L]} {continue}
+	
+	set ID [lindex $Ls $i_id]
+	set coord [lindex $Ls $i_coord]
+	regsub -all "(chr)| " $coord "" coord
+	if { ![regexp "(\[0-9XYMT\]+):(\[0-9\]+)-(\[0-9\]+)" $coord match chrom start end] } {continue} ;# In GRCh38, some coordinates = "tbd" (to be determined)
+	set hi [lindex $Ls $i_hi]
+	set ts [lindex $Ls $i_ts]
+	set hpo ""
+	if {$hi eq "3"} {
+	    # Phenotype is only available for Gene ID (not for ISCA region)
+	    set phenotype [fromOMIMgeneToPhenotype $ID]
+	    lappend L_toWriteLoss "$chrom\t$start\t$end\t$phenotype\t$hpo\tHI3:$ID\t$coord"
+	}
+	if {$ts eq "3"} {
+	    set phenotype [fromOMIMgeneToPhenotype $ID]
+	    lappend L_toWriteGain "$chrom\t$start\t$end\t$phenotype\t$hpo\tTS3:$ID\t$coord"
+	} 
     }
-    
+    close $f
+
+	
+    ## ClinGenFileDownloaded2 parsing
+    #################################
+    set f [open "$ClinGenFileDownloaded2"]
+    while {! [eof $f]} {
+	set L [gets $f]
+	set Ls [split $L "\t"]
+	
+	# Header 2:
+	###########	
+	#ISCA ID        ISCA Region Name        cytoBand        Genomic Location        Haploinsufficiency Score        Haploinsufficiency Description  Haploinsufficiency PMID1        Haploinsufficiency PMID2       Haploinsufficiency PMID3 Haploinsufficiency PMID4        Haploinsufficiency PMID5        Haploinsufficiency PMID6        Triplosensitivity Score Triplosensitivity Description   Triplosensitivity PMID1 Triplosensitivity PMID2 Triplosensitivity PMID3 Triplosensitivity PMID4 Triplosensitivity PMID5 Triplosensitivity PMID6 Date Last Evaluated     Haploinsufficiency Disease ID   Triplosensitivity Disease ID
+	    
+	# Selection of the pathogenic variants to keep:
+	###########################################
+	if {[regexp "(^#Gene Symbol)|(^#ISCA ID)" $L]} {
+	    set i_id 0 ; #"Gene Symbol" (gene) or #"ISCA ID" (region)
+	    set i_coord [lsearch -exact $Ls "Genomic Location"]; if {$i_coord == -1} {puts "$ClinGenFileDownloaded"; puts "Bad header line syntax. \"Genomic Location\" column not found - Exit with error"; exit 2}
+	    set i_hi [lsearch -exact $Ls "Haploinsufficiency Score"]; if {$i_hi == -1} {puts "$ClinGenFileDownloaded"; puts "Bad header line syntax. \"Haploinsufficiency Score\" column not found - Exit with error"; exit 2}
+	    set i_ts [lsearch -exact $Ls "Triplosensitivity Score"]; if {$i_ts == -1} {puts "$ClinGenFileDownloaded"; puts "Bad header line syntax. \"Triplosensitivity\" Score column not found - Exit with error"; exit 2}
+	    set i_isca [lsearch -exact $Ls "ISCA Region Name"]; if {$i_isca == -1} {puts "$ClinGenFileDownloaded"; puts "Bad header line syntax. \"ISCA Region Name\" column not found - Exit with error"; exit 2}
+	    continue
+	}
+	if {[regexp "^#" $L]} {continue}
+	
+	set ID [lindex $Ls $i_id]
+	set coord [lindex $Ls $i_coord]
+	regsub -all "(chr)| " $coord "" coord
+	if { ![regexp "(\[0-9XYMT\]+):(\[0-9\]+)-(\[0-9\]+)" $coord match chrom start end] } {continue} ;# In GRCh38, some coordinates = "tbd" (to be determined)
+	set hi [lindex $Ls $i_hi]
+	set ts [lindex $Ls $i_ts]
+	set iscaRegionName [lindex $Ls $i_isca]
+	set hpo ""
+	if {$hi eq "3"} {
+	    # Phenotype is only available for Gene ID (not for ISCA region)
+	    set phenotype "$iscaRegionName"
+	    lappend L_toWriteLoss "$chrom\t$start\t$end\t$phenotype\t$hpo\tHI3:$ID\t$coord"
+	}
+	if {$ts eq "3"} {
+	    set phenotype "$iscaRegionName"
+	    lappend L_toWriteGain "$chrom\t$start\t$end\t$phenotype\t$hpo\tTS3:$ID\t$coord"
+	} 
+    }
+    close $f
+
+
     # Writing:
     ##########
     puts "\t       ([llength $L_toWriteLoss] SV Loss + [llength $L_toWriteGain] SV Gain)"
