@@ -12,18 +12,18 @@ For more details, please see the README file.
 
 
 September 12, 2022, AnnotSV version 3.1.3
-	- Update Human annotations
-	- Use new ClinGen data source format ("OMIM ID" no longer reported)
+	- Human annotation update
+	- Use of the new ClinGen data source format ("OMIM ID" no longer reported)
 	- Removing of the DDG2P gene annotations (to avoid redundancy with GenCC)
+	- Documentation update 
 
 July 10, 2022, AnnotSV version 3.1.2
 	- Add important bugfix concerning the GRCh38 coordinates of the morbid genes
 	- Add bugfix concerning some Overlapped_CDS_percent values
-	- As part of the GenCC, the DDG2P gene annotations was removed from AnnotSV to avoid redundancy 
 
 November 25, 2021, AnnotSV version 3.1.1
 	- Add bugfix when setting the ANNOTSV global environmental variable with a final "/"
-	- Update the documentation, add of the AnnotSV logo
+	- Documentation update
 
 November 08, 2021, AnnotSV version 3.1
 	- Change the -genomeBuild default value to "GRCh38" (instead of GRCh37)
