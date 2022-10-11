@@ -1,0 +1,49 @@
+name: Tests
+
+on:
+  pull_request:
+    paths-ignore:
+      - "docs/**"
+      - "news/**"
+      - "*.md"
+  push:
+    branches:
+      - master
+      - main
+      - 4.0.0
+    paths-ignore:
+      - "docs/**"
+      - "news/**"
+      - "*.md"
+
+jobs:
+  Testing:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8, 3.9, '3.10']
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up PDM
+        uses: pdm-project/setup-pdm@main
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Set Variables
+        id: set_variables
+        run: |
+          echo "::set-output name=PIP_CACHE::$(pip cache dir)"
+          echo "::set-output name=PDM_CACHE::$(pdm config cache_dir)"
+      - name: Cache PIP
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ steps.set_variables.outputs.PIP_CACHE }}
+            ${{ steps.set_variables.outputs.PDM_CACHE }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: pip install nox
+      - name: Run Tests
+        run: nox -s test-${{ matrix.python-version }}

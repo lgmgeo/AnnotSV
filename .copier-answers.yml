@@ -1,0 +1,19 @@
+# Changes here will be overwritten by Copier
+_commit: 0.3.5
+_src_path: gh:pdm-project/copier-pdm
+author_email: veronique.geoffroy@inserm.fr
+author_fullname: 'Geoffroy Véronique '
+author_username: lgmgeo
+build_doc: true
+copyright_date: '2022'
+copyright_holder: Geoffroy Véronique
+copyright_holder_email: veronique.geoffroy@inserm.fr
+copyright_license: GPL-3.0
+project_description: 'Annotation and Ranking of Structural Variation '
+project_name: AnnotSv
+python_package_distribution_name: annotsv
+python_package_import_name: annotsv
+python_package_requires_python: '>=3.7'
+repository_name: AnnotSV
+repository_namespace: lgmgeo
+

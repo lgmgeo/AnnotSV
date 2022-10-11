@@ -1,0 +1,30 @@
+name: Documentation
+
+on:
+  push:
+    branches:
+      - master
+      - main
+    paths:
+      - "*.md"
+      - docs/**
+
+jobs:
+  build-doc:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: pdm-project/setup-pdm@v2
+        with:
+          python-version: 3.8
+          architecture: "x64"
+      - name: Build pages
+        run: |
+          pdm install -s doc
+          cd docs && pdm run mkdocs build
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/site

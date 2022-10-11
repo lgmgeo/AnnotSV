@@ -1,57 +1,54 @@
-# AnnotSV: An integrated tool for Structural Variations annotation and ranking 
+# AnnotSv
 
-## QUICK INSTALLATION
+[![Tests](https://github.com/lgmgeo/AnnotSV/workflows/Tests/badge.svg)](https://github.com/lgmgeo/AnnotSV/actions?query=workflow%3Aci)
+[![pypi version](https://img.shields.io/pypi/v/AnnotSV.svg)](https://pypi.org/project/AnnotSV/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![pdm-managed](https://img.shields.io/badge/pdm-managed-blueviolet)](https://pdm.fming.dev)
 
-1. The sources can be cloned to any directory:
-```
-cd /path/to/install/
-git clone https://github.com/lgmgeo/AnnotSV.git
-```
-2. Then, the user can easily install the package using make:
-```
-cd /path/to/install/AnnotSV
-make PREFIX=. install
-make PREFIX=. install-human-annotation
-make PREFIX=. install-mouse-annotation
-```
+Annotation and Ranking of Structural Variation
 
-3. Set the global environmental variable as the location of the git repo on your system. 
+## Requirements
 
-In csh:
-```
-setenv ANNOTSV /path/to/install/AnnotSV
-```
-In bash:
-```
-export ANNOTSV=/path/to/install/AnnotSV
+AnnotSv requires Python >=3.7
+
+## Installation
+
+It is recommended to install with `pipx`, if `pipx` haven't been installed yet, refer to the [pipx's docs](https://github.com/pipxproject/pipx)
+
+```bash
+$ pipx install annotsv
 ```
 
-## TEST
+Alternatively, install with `pip` to the user site:
 
-1. Change to the repo directory, and run the test
+```bash
+$ python -m pip install --user annotsv
 ```
-cd /path/to/install/AnnotSV/share/doc/AnnotSV/Example/
-$ANNOTSV/bin/AnnotSV -SVinputFile test.bed -outputFile ./test.annotated.tsv -svtBEDcol 4
+
+## Contribute
+
+### Run
+
 ```
-2. Examine the output
+pdm run -m annotsv -h
+```
 
-Happy exploring!
+### Test
 
+```
+pdm run test
+```
 
-## COLLABORATIVE WORK
+### Lint
 
-Anyone interested in implementing new annotations/features in AnnotSV?
+```
+pdm run black
+pdm run isort
+pdm run mypy
+```
 
-Thanks to the [AnnotSV user community](https://lbgi.fr/AnnotSV/acknowledgments):
+### Install from source
 
-    - Bugs could be tackled efficiently
-
-    - New ideas could be investigated faster
-
-
-I look forward to the opportunity to work together,
-
-feel free to fork the page if you want to help :-)
-
-Véronique
-
+```
+python -m pip install --user .
+```

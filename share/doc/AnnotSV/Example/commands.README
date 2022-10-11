@@ -1,3 +1,0 @@
-
-$ANNOTSV/bin/AnnotSV -SVinputFile test.bed -outputFile ./test.annotated.tsv -svtBEDcol 4 -genomeBuild GRCh37
-
