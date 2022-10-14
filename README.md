@@ -27,10 +27,16 @@ $ python -m pip install --user annotsv
 
 ## Contribute
 
+### Prepare
+
+```
+pdm install
+```
+
 ### Run
 
 ```
-pdm run -m annotsv -h
+pdm run AnnotSV
 ```
 
 ### Test
