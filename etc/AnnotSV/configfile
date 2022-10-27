@@ -1,74 +1,52 @@
 # This file is used to simplify the configuration of AnnotSV.
-
 # Anything behind a hashtag is considered as a comment
-
 # Please, feel free to change the AnnotSV options.
 
 #------------------
-
 # AnnotSV Options :
-
 #------------------
 
--benignAF: 0.01
-
+-annotationsDir: ""
 -annotationMode: "both"
-
 -bcftools: "bcftools"
-
 -bedtools: "bedtools"
-
--candidateGenesFiltering: "no"
-
+-benignAF: 0.01
 -candidateGenesFiltering: 0
-
 -genomeBuild: GRCh38
-
 -hpo: ""
-
 -includeCI: 1
-
 -metrics: "us"
-
 -minTotalNumber: "500"
-
+-outputDir: ""
+-outputFile: ""
 -overlap: 100
-
 -overwrite: 1
-
 -promoterSize: 500
-
 -rankFiltering: "1-5,NA"
-
 -reciprocal: 0
-
 -snvindelPASS: 0
-
--REreport: "no"
-
+-REreport: 0
+-REselect1: 1
+-REselect2: 1
 -samplesidBEDcol: "-1"
-
 # -samplesidTSVcol: "-1"
-
+-snvIndelPASS: 0
+-snvIndelSamples: ""
 -SVinputInfo: 1
-
 -SVminSize: 50
-
 -svtBEDcol: "-1"
-
 # -svtTSVcol: "-1"
-
 -tx: "RefSeq"
+-txFile: ""
+
+
 
 #------------------------
-
 # AnnotSV Output columns:
-
 #------------------------
 
 # Output column names are listed below.
-
-# In order to disable default annotations provided by AnnotSV, some column names (the ones that are not marked with an \*) can be commented with a hash character ("#") by the user.
+# In order to disable default annotations provided by AnnotSV, some column names (the ones that are not marked at the end with an "_") can be commented with a hash character ("#") by the user.
 
 AnnotSV_ID _
 SV_chrom _
@@ -77,7 +55,7 @@ SV_end _
 SV_length _
 SV_type _
 Samples_ID
-Annotation_mode \*
+Annotation_mode _
 
 # Genes annotations:
 
@@ -86,10 +64,11 @@ Gene_count _
 Tx _
 Tx_start _
 Tx_end _
-Exon_count
 Overlapped_tx_length _
 Overlapped_CDS_length _
+Overlapped_CDS_percent
 Frameshift _
+Exon_count
 Location _
 Location2 _
 Dist_nearest_SS _
@@ -99,7 +78,7 @@ Intersect_end _
 
 # Regulatory Elements annotations:
 
-RE_gene \*
+RE_gene _
 
 # Annotations with benign genes or genomic regions:
 
@@ -130,10 +109,6 @@ P_ins_phen
 P_ins_hpo
 P_ins_source
 P_ins_coord
-P_inv_phen
-P_inv_hpo
-P_inv_source
-P_inv_coord
 
 # Annotations with pathogenic snv/indel:
 
@@ -149,6 +124,7 @@ Cosmic_mut_typ
 
 TAD_coordinate
 ENCODE_experiment
+CytoBand
 GC_content_left
 GC_content_right
 Repeat_coord_left
@@ -173,11 +149,6 @@ GenCC_disease
 GenCC_moi  
 GenCC_classification  
 GenCC_pmid
-DDD_status
-DDD_mode
-DDD_consequence
-DDD_disease
-DDD_pmid
 DDD_HI_percent
 ExAC_synZ
 ExAC_misZ
@@ -188,7 +159,7 @@ LOEUF_bin
 ExAC_pLI  
 GnomAD_pLI _
 OMIM_morbid _
-OMIM_morbid_candidate \*
+OMIM_morbid_candidate _
 OMIM_ID
 OMIM_phenotype
 OMIM_inheritance
@@ -201,4 +172,4 @@ Fish_pheno_evidence
 
 AnnotSV_ranking_score _
 AnnotSV_ranking_criteria _
-ACMG_class \*
+ACMG_class _

@@ -12,6 +12,9 @@ SEPS = (
 
 
 def main() -> None:
+    ```
+    Comparaison of 2 annotated files (one created by AnnotSV-Tcl and one created by AnnotSV-python)
+    ```
     files = sys.argv[1:]
     if len(files) != 2:
         print(f"too many files: {files}")

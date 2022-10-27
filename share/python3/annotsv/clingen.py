@@ -11,7 +11,7 @@ if typing.TYPE_CHECKING:
 class ClingenValidator(AnnotationValidator):
     def __init__(self, app: Context):
         download_rf = ResolvedFiles(app.config.clingen_dir, "ClinGen_gene_curation_list_*.tsv")
-        formatted_rf = ResolvedFiles(app.config.clingen_dir, "*_ClinGenAnnotations.tsv.gz")
+        formatted_rf = ResolvedFiles(app.config.clingen_dir, "*_ClinGenAnnotations.tsv")
         super().__init__(
             app,
             label="ClinGen",
