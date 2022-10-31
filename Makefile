@@ -205,6 +205,9 @@ uninstall1:
 	$(RM) -rf $(DESTDIR)$(SHAREDIR)/bash
 	$(RM) -rf $(DESTDIR)$(ETCDIR)/$(ANNOTSV)
 	$(RM) -rf $(DESTDIR)$(PREFIX)/Makefile
+	$(RM) -rf $(DESTDIR)$(PREFIX)/README.md
+	$(RM) -rf $(DESTDIR)$(PREFIX)/Scoring_Criteria_AnnotS_*.xlsx
+	$(RM) -rf $(DESTDIR)$(PREFIX)/.git
 
 uninstall2:
 	$(RMDIR) --ignore-fail-on-non-empty $(DESTDIR)$(BINDIR) $(DESTDIR)$(TCLDIR) $(DESTDIR)$(DOCDIR) $(DESTDIR)$(SHAREDIR) $(DESTDIR)$(ETCDIR)
