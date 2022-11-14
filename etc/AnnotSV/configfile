@@ -87,6 +87,12 @@ B_ins_AFmax
 B_inv_source                    
 B_inv_coord
 B_inv_AFmax
+po_B_gain_source                   
+po_B_gain_coord                    
+po_B_gain_add_genes                    
+po_B_loss_source                   
+po_B_loss_coord                    
+po_B_loss_add_genes                    
 
 # Annotations with pathogenic genes or genomic regions:
 P_gain_phen 
@@ -105,6 +111,16 @@ P_inv_phen
 P_inv_hpo
 P_inv_source
 P_inv_coord
+po_P_gain_phen
+po_P_gain_hpo
+po_P_gain_source
+po_P_gain_coord
+po_P_gain_percent
+po_P_loss_phen
+po_P_loss_hpo
+po_P_loss_source
+po_P_loss_coord
+po_P_loss_percent
 
 # Annotations with pathogenic snv/indel:
 P_snvindel_nb

@@ -34,7 +34,7 @@ proc SVprepareRanking {L_header} {
     set g_AnnotSV(ranking) 0
     set Ls [split $L_header "\t"]
 
-    # The user is using a VCF SV input file: the svtTSVcol is necessarily the 6th in the corresponding output annotated file.tsv
+    # The user is using a VCF SV input file: the svtTSVcol ("SV_type") is necessarily the 6th in the corresponding output annotated file.tsv
     if {[regexp ".vcf$|.vcf.gz$" $g_AnnotSV(SVinputFile)]} {
 	set g_AnnotSV(svtTSVcol) 5
 	set g_AnnotSV(svtBEDcol) 3
@@ -43,7 +43,7 @@ proc SVprepareRanking {L_header} {
     # "SV_type" is compulsory for the ranking
     if {$g_AnnotSV(svtTSVcol) eq -1} {return}
 
-    # Check if we have all the needed infoloeufrmation for ranking
+    # Check if we have all the needed information for ranking
     # unset g_i <=> no SV ranking  
     set g_i(gene)     [lsearch -regexp $Ls "Gene_name"];      if {$g_i(gene) == -1} {unset g_i; return}  
     set g_i(NbGenes)  [lsearch -regexp $Ls "Gene_count"]; if {$g_i(NbGenes) == -1} {unset g_i; return}  

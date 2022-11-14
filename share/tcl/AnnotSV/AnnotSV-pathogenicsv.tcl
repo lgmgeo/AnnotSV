@@ -641,3 +641,125 @@ proc pathogenicSVannotation {SVchrom SVstart SVend} {
 	return $pathogenicText(Empty)
     }
 }
+
+
+
+
+# Return the PARTIALLY overlapped (po) SV annotation 
+proc poPathogenicSVannotation {SVchrom SVstart SVend} {
+
+    global g_AnnotSV
+    global poPathogenicText
+
+    set pathogenicDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/FtIncludedInSV/PathogenicSV/$g_AnnotSV(genomeBuild)"
+    
+    if {![info exists poPathogenicText(DONE)]} {
+	# headerOutput:         po_P_gain_phen  po_P_gain_hpo  po_P_gain_source  po_P_gain_coord  po_P_gain_percent 
+	#                       po_P_loss_phen  po_P_loss_hpo  po_P_loss_source  po_P_loss_coord  po_P_loss_percent
+
+	set L_poPathogenicText(Empty) {}
+	foreach svtype {"gain" "loss"} {
+	    # Keep only the user requested columns (defined in the configfile)
+	    if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^po_P_${svtype}_"] eq -1} { continue }
+	    lappend L_poPathogenicText(Empty) {*}{"" "" "" "" ""}
+	}
+	set poPathogenicText(Empty) "[join $L_poPathogenicText(Empty) "\t"]"
+	
+	foreach svtype {"Gain" "Loss"} {
+	    
+	    # Keep only the user requested columns (defined in the configfile)
+	    if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^po_P_[string tolower ${svtype}]_"] eq -1} { continue }
+	    
+	    # Intersect
+	    set pathogenicBEDfile [glob -nocomplain "$pathogenicDir/pathogenic_${svtype}_SV_$g_AnnotSV(genomeBuild).sorted.bed"]
+	    regsub -nocase "(.formatted)?.bed$" $g_AnnotSV(bedFile) ".intersect.po_pathogenic-$svtype" tmpFile
+	    set tmpFile "$g_AnnotSV(outputDir)/[file tail $tmpFile]"
+	    file delete -force $tmpFile
+	    # Any overlap
+	    if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $pathogenicBEDfile -b $g_AnnotSV(fullAndSplitBedFile) -wa -wb > $tmpFile} Message]} {
+		if {[catch {exec $g_AnnotSV(bedtools) intersect -a $pathogenicBEDfile -b $g_AnnotSV(fullAndSplitBedFile) -wa -wb > $tmpFile} Message]} {
+		    puts "-- poPathogenicSVAnnotation, $svtype --"
+		    puts "$g_AnnotSV(bedtools) intersect -sorted -a $pathogenicBEDfile -b $g_AnnotSV(fullAndSplitBedFile) -wa -wb > $tmpFile"
+		    puts "$Message"
+		    puts "Exit with error"
+		    exit 2
+		}
+	    }
+	    # Parse
+	    set f [open $tmpFile]
+	    while {![eof $f]} {
+		set L [gets $f]
+		if {$L eq ""} {continue}
+		set Ls [split $L "\t"]
+
+		set po_pathogenic_phen [lindex $Ls 3]
+		set po_pathogenic_hpo [lindex $Ls 4]
+		set po_pathogenic_source [lindex $Ls 5]
+		set po_pathogenic_coord [lindex $Ls 6]
+
+		set SVtoAnn_chrom [lindex $Ls 7]
+		set SVtoAnn_start [lindex $Ls 8]
+		set SVtoAnn_end   [lindex $Ls 9]
+
+		if {[regexp "\[0-9\]+:(\[0-9\]+)-(\[0-9\]+)" $po_pathogenic_coord match startP endP]} {
+		    if {$SVtoAnn_end > $endP} {set po_end $endP} else {set po_end $SVtoAnn_end}
+		    if {$SVtoAnn_start > $startP} {set po_start $SVtoAnn_start} else {set po_start $startP}		    
+		    set percent [format "%.2f" [expr {($po_end-$po_start)*100.0/($endP-$startP)}]]
+
+		    if {$percent == 100} {continue}
+		    
+		    set SVtoAnn "$SVtoAnn_chrom,$SVtoAnn_start,$SVtoAnn_end"
+		    lappend L_allSVtoAnn $SVtoAnn
+		    if {$po_pathogenic_phen ne ""} {
+			lappend L_po_pathogenic_phen($SVtoAnn,$svtype) $po_pathogenic_phen
+		    }
+		    if {$po_pathogenic_hpo ne ""} {
+			lappend L_po_pathogenic_hpo($SVtoAnn,$svtype) {*}[split $po_pathogenic_hpo " "]
+		    }
+		    lappend L_po_pathogenic_source($SVtoAnn,$svtype) $po_pathogenic_source
+		    lappend L_po_pathogenic_coord($SVtoAnn,$svtype) $po_pathogenic_coord
+		    lappend L_po_pathogenic_percent($SVtoAnn,$svtype) $percent
+		}
+	    }
+	    file delete -force $tmpFile
+	}
+	    
+	# Loading pathogenic final annotation for each SV
+	if {[info exists L_allSVtoAnn]} {
+	    foreach SVtoAnn [lsort -unique $L_allSVtoAnn] {
+		
+		foreach svtype {"Gain" "Loss"} {
+		    
+		    # Keep only the user requested columns (defined in the configfile)
+		    if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^P_[string tolower ${svtype}]_"] eq -1} { continue }
+			
+		    if {[info exists L_po_pathogenic_coord($SVtoAnn,$svtype)]} {
+			if {[info exists L_po_pathogenic_phen($SVtoAnn,$svtype)]} {
+			    lappend L_poPathogenicText($SVtoAnn) "[join [lsort -unique $L_po_pathogenic_phen($SVtoAnn,$svtype)] ";"]"
+			} else {
+			    lappend L_poPathogenicText($SVtoAnn) ""
+			}
+			if {[info exists L_poPathogenic_hpo($SVtoAnn,$svtype)]} {
+			    lappend L_poPathogenicText($SVtoAnn) "[join [lsort -unique $L_po_pathogenic_hpo($SVtoAnn,$svtype)] ";"]"
+			} else {
+			    lappend L_poPathogenicText($SVtoAnn) ""
+			}
+			lappend L_poPathogenicText($SVtoAnn) "[join [lsort -unique $L_po_pathogenic_source($SVtoAnn,$svtype)] ";"]"
+			lappend L_poPathogenicText($SVtoAnn) "[join [lsort -unique $L_po_pathogenic_coord($SVtoAnn,$svtype)] ";"]"
+			lappend L_poPathogenicText($SVtoAnn) "[join [lsort -unique $L_po_pathogenic_percent($SVtoAnn,$svtype)] ";"]"
+		    } else {
+			lappend L_poPathogenicText($SVtoAnn) {*}{"" "" "" "" ""}
+		    }
+		}
+		set poPathogenicText($SVtoAnn) [join $L_poPathogenicText($SVtoAnn) "\t"]
+	    }
+	}
+	set poPathogenicText(DONE) 1	
+    }
+    puts [join [array get poPathogenicText] "\n"]
+    if {[info exist poPathogenicText($SVchrom,$SVstart,$SVend)]} {
+	return $poPathogenicText($SVchrom,$SVstart,$SVend)
+    } else {
+	return $poPathogenicText(Empty)
+    }
+}

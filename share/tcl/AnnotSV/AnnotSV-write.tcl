@@ -136,6 +136,14 @@ proc OrganizeAnnotation {} {
 	}
     }
     
+    ####### "Partially overlapped pathogenic SV header"
+    if {$g_AnnotSV(organism) eq "Human"} {
+	foreach svtype "gain loss" {
+	    if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^P_[string tolower ${svtype}]_"] eq -1} { continue }
+	    append headerOutput "\tpo_P_${svtype}_phen\tpo_P_${svtype}_hpo\tpo_P_${svtype}_source\tpo_P_${svtype}_coord\tpo_P_${svtype}_percent"
+	}
+    }
+    
     ####### "Pathogenic snv/indel header"
     if {$g_AnnotSV(organism) eq "Human"} {
 	if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^P_snvindel_"] ne -1} { 
@@ -762,6 +770,13 @@ proc OrganizeAnnotation {} {
 	    set pathogenicText "[pathogenicSVannotation $SVchrom $SVleft $SVright]"
 	} 
 
+	# Annotations with "partially overlapped" (po) pathogenic genes or genomic regions
+	if {$AnnotationMode eq "split" && $g_AnnotSV(organism) eq "Human"} {
+	    set poPathogenicText "[poPathogenicSVannotation $SVchrom $intersectStart $intersectEnd]"
+	} else {
+	    set poPathogenicText "[poPathogenicSVannotation $SVchrom $SVleft $SVright]"
+	} 
+
 	# Annotations with pathogenic snv/indel (FtIncludedInSV)
 	if {$AnnotationMode eq "split" && $g_AnnotSV(organism) eq "Human"} {
 	    set pathoSNVindelText "[pathoSNVindelAnnotation $SVchrom $intersectStart $intersectEnd]"
@@ -1101,6 +1116,11 @@ proc OrganizeAnnotation {} {
 	#######  "Annotations with pathogenic genes or genomic regions (FtIncludedInSV)"
 	if {$g_AnnotSV(organism) eq "Human"} {
 	    append TextToWrite "\t$pathogenicText"
+	}
+	
+	#######  "Annotations with "partially overlapped" pathogenic genes or genomic regions"
+	if {$g_AnnotSV(organism) eq "Human"} {
+	    append TextToWrite "\t$poPathogenicText"
 	}
 	
 	#######  "Annotations with pathogenic snv/indel (FtIncludedInSV)"
