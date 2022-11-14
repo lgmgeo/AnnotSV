@@ -756,7 +756,6 @@ proc poPathogenicSVannotation {SVchrom SVstart SVend} {
 	}
 	set poPathogenicText(DONE) 1	
     }
-    puts [join [array get poPathogenicText] "\n"]
     if {[info exist poPathogenicText($SVchrom,$SVstart,$SVend)]} {
 	return $poPathogenicText($SVchrom,$SVstart,$SVend)
     } else {

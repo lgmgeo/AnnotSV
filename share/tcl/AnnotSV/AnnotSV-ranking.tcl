@@ -55,7 +55,9 @@ proc SVprepareRanking {L_header} {
     set g_i(Pgain)      [lsearch -regexp $Ls "P_gain_coord"];  if {$g_i(Pgain) == -1} {unset g_i; return}  
     set g_i(Bloss)      [lsearch -regexp $Ls "B_loss_coord"];  if {$g_i(Bloss) == -1} {unset g_i; return}  
     set g_i(Bgain)      [lsearch -regexp $Ls "B_gain_coord"];  if {$g_i(Bgain) == -1} {unset g_i; return}  
-    set g_i(Psnvindel)  [lsearch -regexp $Ls "P_snvindel_nb"]; if {$g_i(Psnvindel) == -1} {unset g_i; return} 
+    set g_i(Psnvindel)  [lsearch -regexp $Ls "P_snvindel_nb"]; if {$g_i(Psnvindel) == -1} {unset g_i; return}
+    
+    set g_i(poPloss)    [lsearch -regexp $Ls "po_P_loss_coord"];  if {$g_i(poPloss) == -1} {unset g_i; return}  
 
     set g_i(HI) [lsearch -regexp $Ls "HI"];     if {$g_i(HI) == -1} {unset g_i; return}  
     set g_i(TS) [lsearch -regexp $Ls "TS"];     if {$g_i(TS) == -1} {unset g_i; return}  
@@ -107,6 +109,7 @@ proc SVrankingLoss {L_annotations} {
 	set NbGenes   [lindex $Ls $g_i(NbGenes)]
 	set REgene    [lindex $Ls $g_i(REgene)]
 	set Ploss     [lindex $Ls $g_i(Ploss)]
+	set poPloss   [lindex $Ls $g_i(poPloss)]
 	set Bloss     [lindex $Ls $g_i(Bloss)]
 	
 	## Section 1: Initial assessment of genomic content
@@ -127,13 +130,19 @@ proc SVrankingLoss {L_annotations} {
 	if {$Ploss ne ""} {
 	    # 2A. Complete overlap of an established HI gene/genomic region (+1.00)
 	    set g_rankingExplanations($AnnotSV_ID,2A) "2A (cf P_loss_source, +1.00);"
-	} elseif {$Bloss ne ""} {
-	    # 2F. Completely contained within an established benign CNV region (-1.00)
-	    set g_rankingExplanations($AnnotSV_ID,2F) "2F (cf B_loss_source, -1.00);"
-	} elseif {0} {		
-	    # 2G. Overlaps an established benign CNV, but includes additional genomic material (+0.00)
-	    # Vero to improve
-	    set g_rankingExplanations($AnnotSV_ID,2G) "2G (+0.00);"
+	} else {
+	    if {$poPloss ne ""} {
+		# 2B. Partial overlap of a known pathogenic Loss SV (+0.00)
+		set g_rankingExplanations($AnnotSV_ID,2B) "2B (cf po_P_loss_source, +0.00);"
+	    }
+	    if {$Bloss ne ""} {
+		# 2F. Completely contained within an established benign CNV region (-1.00)
+		set g_rankingExplanations($AnnotSV_ID,2F) "2F (cf B_loss_source, -1.00);"
+	    } elseif {0} {		
+		# 2G. Overlaps an established benign CNV, but includes additional genomic material (+0.00)
+		# Vero to improve
+		set g_rankingExplanations($AnnotSV_ID,2G) "2G (+0.00);"
+	    }
 	}
 	
 	## Section 3: Evaluation of gene number
@@ -328,7 +337,9 @@ proc achieveSVrankingLoss {AnnotSV_ID} {
     ##            (Skip to section 3 if your copy-number loss DOES NOT overlap these types of genes/regions)
     #####################################################################################################################
 
-    # Add the higher score of the section 2
+    # Add the higher score of the section 2:
+    # - Evaluate scores from the higher (positive value) to the lower (negative value); stop the evaluation at the first match (only the higher match is reported)
+    #   (the "0" scores are evaluated in a second time)
     if {[info exists g_rankingExplanations($AnnotSV_ID,2A)]} {
 	# 2A
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+1.00}]
@@ -370,24 +381,30 @@ proc achieveSVrankingLoss {AnnotSV_ID} {
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.15}]
 	#set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+$g_rankingScore($AnnotSV_ID,maxLoeuf)}]
 	append g_rankingExplanations($AnnotSV_ID) "2H ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,2H)] "/"], +0.15);"
-    } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2C-2)]} {
-	# 2C-2
-	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.00}]
-	append g_rankingExplanations($AnnotSV_ID) "2C-2 ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,2C-2)] "/"],+0.00);"
-    } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2D-1)]} {
-	# 2D-1
-	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.00}]
-	append g_rankingExplanations($AnnotSV_ID) "2D-1 ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,2D-1)] "/"],+0.00);"
-    } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2G)]} {
-	# 2G
-	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+0.00}]
-	append g_rankingExplanations($AnnotSV_ID) "$g_rankingExplanations($AnnotSV_ID,2G)"
     } elseif {[info exists g_rankingExplanations($AnnotSV_ID,2F)]} {
 	# 2F
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)-1.00}]
 	append g_rankingExplanations($AnnotSV_ID) "$g_rankingExplanations($AnnotSV_ID,2F)"
     }
 
+    # - Evaluate the "0" scores; all the match are reported.
+    if {[info exists g_rankingExplanations($AnnotSV_ID,2B)] && ![regexp "2A|2C|2D|2E" $g_rankingExplanations($AnnotSV_ID)]} {
+	# 2B
+	append g_rankingExplanations($AnnotSV_ID) "$g_rankingExplanations($AnnotSV_ID,2B)"
+    }
+    if {[info exists g_rankingExplanations($AnnotSV_ID,2C-2)]} {
+	# 2C-2
+	append g_rankingExplanations($AnnotSV_ID) "2C-2 ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,2C-2)] "/"],+0.00);"
+    }
+    if {[info exists g_rankingExplanations($AnnotSV_ID,2D-1)]} {
+	# 2D-1
+	append g_rankingExplanations($AnnotSV_ID) "2D-1 ([join [lsort -unique $g_rankingExplanations($AnnotSV_ID,2D-1)] "/"],+0.00);"
+    }
+    if {[info exists g_rankingExplanations($AnnotSV_ID,2G)]} {
+	# 2G
+	append g_rankingExplanations($AnnotSV_ID) "$g_rankingExplanations($AnnotSV_ID,2G)"
+    } 
+    
     ## Section 3: Evaluation of gene number
     ####################################################################################################################
 
