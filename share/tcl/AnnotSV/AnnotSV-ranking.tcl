@@ -58,6 +58,8 @@ proc SVprepareRanking {L_header} {
     set g_i(Psnvindel)  [lsearch -regexp $Ls "P_snvindel_nb"]; if {$g_i(Psnvindel) == -1} {unset g_i; return}
     
     set g_i(poPloss)    [lsearch -regexp $Ls "po_P_loss_coord"];  if {$g_i(poPloss) == -1} {unset g_i; return}  
+    set g_i(poBlossAllG)   [lsearch -regexp $Ls "po_B_loss_allG_coord"];  if {$g_i(poBlossAllG) == -1} {unset g_i; return}
+    set g_i(poBlossSomeG)  [lsearch -regexp $Ls "po_B_loss_someG_coord"]; if {$g_i(poBlossSomeG) == -1} {unset g_i; return}
 
     set g_i(HI) [lsearch -regexp $Ls "HI"];     if {$g_i(HI) == -1} {unset g_i; return}  
     set g_i(TS) [lsearch -regexp $Ls "TS"];     if {$g_i(TS) == -1} {unset g_i; return}  
@@ -111,6 +113,8 @@ proc SVrankingLoss {L_annotations} {
 	set Ploss     [lindex $Ls $g_i(Ploss)]
 	set poPloss   [lindex $Ls $g_i(poPloss)]
 	set Bloss     [lindex $Ls $g_i(Bloss)]
+	set poBlossSomeG [lindex $Ls $g_i(poBlossSomeG)]
+	set poBlossAllG  [lindex $Ls $g_i(poBlossAllG)]
 	
 	## Section 1: Initial assessment of genomic content
 	####################################################################################################################
@@ -138,9 +142,8 @@ proc SVrankingLoss {L_annotations} {
 	    if {$Bloss ne ""} {
 		# 2F. Completely contained within an established benign CNV region (-1.00)
 		set g_rankingExplanations($AnnotSV_ID,2F) "2F (cf B_loss_source, -1.00);"
-	    } elseif {0} {		
+	    } elseif {$poBlossSomeG ne ""} {		
 		# 2G. Overlaps an established benign CNV, but includes additional genomic material (+0.00)
-		# Vero to improve
 		set g_rankingExplanations($AnnotSV_ID,2G) "2G (+0.00);"
 	    }
 	}
@@ -167,7 +170,12 @@ proc SVrankingLoss {L_annotations} {
 	##             OR there have been no reports associating either the CNV or any genes within the CNV with human phenotypes
 	##             caused by loss of function [LOF] or copy-number loss)
 	####################################################################################################################
-	
+
+	if {$poBlossAllG ne ""} {
+	    # 4O. Overlap with common population variation (completely contained within a common population CNV
+            #     OR contains no additional genomic material).(-1.00)
+	    set g_rankingExplanations($AnnotSV_ID,40) "40 (-1.00);"    
+	}
 	
 	## Section 5: Evaluation of inheritance pattern/family history for patient being studied			
 	####################################################################################################################
@@ -431,7 +439,13 @@ proc achieveSVrankingLoss {AnnotSV_ID} {
 
     # Add the higher score of the section 4
 
-    
+    if {[info exists g_rankingExplanations($AnnotSV_ID,40)]} {
+        # 4O
+        set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)-1.00}]
+        append g_rankingExplanations($AnnotSV_ID) "$g_rankingExplanations($AnnotSV_ID,4O)"
+    } 
+ 
+
     ## Section 5: Evaluation of inheritance pattern/family history for patient being studied			
     ####################################################################################################################
 
