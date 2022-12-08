@@ -192,6 +192,7 @@ checkLOEUFfile
 ##################
 # Annotations with benign genes or genomic regions?
 checkBenignFiles
+checkOverlappedGenesBenignFiles
 
 # Annotation with GeneIntolerance (ExAC)?
 checkGeneIntoleranceFile

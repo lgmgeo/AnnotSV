@@ -158,9 +158,19 @@ proc OrganizeAnnotation {} {
 	    append headerOutput "\tB_${svtype}_source\tB_${svtype}_coord\tB_${svtype}_AFmax"
 	}
     }
-    
+
+    ####### "Partially overlapping benign SV header"
+    if {$g_AnnotSV(organism) eq "Human"} {
+        foreach svtype "gain loss" {
+	    # Needed for the ranking
+            #if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^B_[string tolower ${svtype}]_"] eq -1} { continue }
+            append headerOutput "\tpo_B_${svtype}_allG_source\tpo_B_${svtype}_allG_coord"
+	    append headerOutput "\tpo_B_${svtype}_someG_source\tpo_B_${svtype}_someG_coord"
+        }
+    }
+   
+    ####### usersDir: "SVincludedInFt header" 
     set usersDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Users/$g_AnnotSV(genomeBuild)"
-    ####### usersDir: "SVincludedInFt header"
     if {[glob -nocomplain $usersDir/SVincludedInFt/*.formatted.sorted.bed] ne ""} {
 	foreach formattedUserBEDfile [glob -nocomplain $usersDir/SVincludedInFt/*.formatted.sorted.bed] {
 	    regsub -nocase ".formatted.sorted.bed$" $formattedUserBEDfile ".header.tsv" userHeaderFile
@@ -756,6 +766,7 @@ proc OrganizeAnnotation {} {
 	} 
 
 	# Regulatory elements annotation (only for the full lines)
+	# Human or mouse
 	set reText ""
 	if {$AnnotationMode eq "full"} {
 	    if {[info exists g_re($SVchrom\t$SVleft\t$SVright)]} {		
@@ -764,32 +775,51 @@ proc OrganizeAnnotation {} {
 	} 
 	
 	# Annotations with pathogenic genes or genomic regions (FtIncludedInSV)
-	if {$AnnotationMode eq "split" && $g_AnnotSV(organism) eq "Human"} {
-	    set pathogenicText "[pathogenicSVannotation $SVchrom $intersectStart $intersectEnd]"
-	} else {
-	    set pathogenicText "[pathogenicSVannotation $SVchrom $SVleft $SVright]"
+	if {$g_AnnotSV(organism) eq "Human"} {
+	    if {$AnnotationMode eq "split"} {
+	        set pathogenicText "[pathogenicSVannotation $SVchrom $intersectStart $intersectEnd]"
+	    } else {
+	        set pathogenicText "[pathogenicSVannotation $SVchrom $SVleft $SVright]"
+	    }
 	} 
 
 	# Annotations with "partially overlapped" (po) pathogenic genes or genomic regions
-	if {$AnnotationMode eq "split" && $g_AnnotSV(organism) eq "Human"} {
-	    set poPathogenicText "[poPathogenicSVannotation $SVchrom $intersectStart $intersectEnd]"
-	} else {
-	    set poPathogenicText "[poPathogenicSVannotation $SVchrom $SVleft $SVright]"
+        if {$g_AnnotSV(organism) eq "Human"} {
+    	    if {$AnnotationMode eq "split"} {
+	        # nothing for the split lines
+	        set poPathogenicText "[poPathogenicSVannotation "NULL" "NULL" "NULL"]"
+	    } else {
+	        set poPathogenicText "[poPathogenicSVannotation $SVchrom $SVleft $SVright]"
+	    }
 	} 
 
 	# Annotations with pathogenic snv/indel (FtIncludedInSV)
-	if {$AnnotationMode eq "split" && $g_AnnotSV(organism) eq "Human"} {
-	    set pathoSNVindelText "[pathoSNVindelAnnotation $SVchrom $intersectStart $intersectEnd]"
-	} else {
-	    set pathoSNVindelText "[pathoSNVindelAnnotation $SVchrom $SVleft $SVright]"
+        if {$g_AnnotSV(organism) eq "Human"} {
+	    if {$AnnotationMode eq "split"} {
+	        set pathoSNVindelText "[pathoSNVindelAnnotation $SVchrom $intersectStart $intersectEnd]"
+	    } else {
+	        set pathoSNVindelText "[pathoSNVindelAnnotation $SVchrom $SVleft $SVright]"
+	    }
 	} 
 
 	# Annotations with benign genes or genomic regions (SVincludedInFt)
-	if {$AnnotationMode eq "split" && $g_AnnotSV(organism) eq "Human"} {
-	    set benignText "[benignSVannotation $SVchrom $intersectStart $intersectEnd]"
-	} else {
-	    set benignText "[benignSVannotation $SVchrom $SVleft $SVright]"
+	if {$g_AnnotSV(organism) eq "Human"} {
+	    if {$AnnotationMode eq "split"} {
+	        set benignText "[benignSVannotation $SVchrom $intersectStart $intersectEnd]"
+	    } else {
+	        set benignText "[benignSVannotation $SVchrom $SVleft $SVright]"
+	    }
 	} 
+
+        # Annotations with "partially overlapping" (po) benign genomic regions
+        if {$g_AnnotSV(organism) eq "Human"} {
+            if {$AnnotationMode eq "split"} {
+                # nothing for the split lines
+                set poBenignText "[poBenignSVannotation "NULL" "NULL" "NULL" "NULL"]"
+            } else {
+                set poBenignText "[poBenignSVannotation $SVchrom $SVleft $SVright $geneName]"
+            }
+	}
 
 	# Annotations with cytoband (AnyOverlap)
 	if {$g_AnnotSV(cytoband)} {	    
@@ -1133,6 +1163,11 @@ proc OrganizeAnnotation {} {
 	    append TextToWrite "\t$benignText"
 	}
 	
+        #######  "Annotations with partially overlapping benign genomic regions"
+        if {$g_AnnotSV(organism) eq "Human"} {
+            append TextToWrite "\t$poBenignText"
+        }
+
 	#######  "Custom SVincludedInFt"
 	if {[glob -nocomplain $usersDir/SVincludedInFt/*.formatted.sorted.bed] ne ""} { ; # Don't put {$SVincludedInFTtext ne ""}: the user BED could have only 1 annotation column, and so $UserText can be equel to "" (without "\t")
 	    append TextToWrite "\t$SVincludedInFTtext"
@@ -1388,3 +1423,4 @@ proc OrganizeAnnotation {} {
     puts "\t$t\n"
 
 }
+

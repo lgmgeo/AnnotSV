@@ -87,12 +87,16 @@ B_ins_AFmax
 B_inv_source                    
 B_inv_coord
 B_inv_AFmax
-po_B_gain_source                   
-po_B_gain_coord                    
-po_B_gain_add_genes                    
+po_B_gain_allG_source                   
+po_B_gain_allG_coord                    
+po_B_gain_someG_source
+po_B_gain_someG_coord
+po_B_loss_allG_source
+po_B_loss_allG_coord
+po_B_loss_someG_source
+po_B_loss_someG_coord
 po_B_loss_source                   
 po_B_loss_coord                    
-po_B_loss_add_genes                    
 
 # Annotations with pathogenic genes or genomic regions:
 P_gain_phen 
