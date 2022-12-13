@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.1.3                                                                                            #
+# AnnotSV 3.2                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -144,7 +144,8 @@ proc SVrankingLoss {L_annotations} {
 	    }
 	    if {$Bloss ne ""} {
 		# 2F. Completely contained within an established benign CNV region (-1.00)
-		set g_rankingExplanations($AnnotSV_ID,2F) "2F (cf B_loss_source, -1.00);"
+		# 4O. Overlap with common population variation (completely contained within a common population CNV)
+		set g_rankingExplanations($AnnotSV_ID,2F) "2F/4O (cf B_loss_source, -1.00);"
 	    } elseif {$poBlossSomeG ne ""} {		
 		# 2G. Overlaps an established benign CNV, but includes additional genomic material (+0.00)
 		set g_rankingExplanations($AnnotSV_ID,2G) "2G (cf po_B_loss_someG_source, +0.00);"
@@ -177,7 +178,10 @@ proc SVrankingLoss {L_annotations} {
 	if {$poBlossAllG ne ""} {
 	    # 4O. Overlap with common population variation (completely contained within a common population CNV
             #     OR contains no additional genomic material).(-1.00)
-	    set g_rankingExplanations($AnnotSV_ID,40) "40 (cf B_loss_source and po_B_loss_allG_source, -1.00);"    
+	    if {![info exists g_rankingExplanations($AnnotSV_ID,2F)]} {
+		# Does not add a -1 additional score if 2F/4O is completed.
+		set g_rankingExplanations($AnnotSV_ID,40) "40 (cf B_loss_source and po_B_loss_allG_source, -1.00);"    
+	    }
 	}
 	
 	## Section 5: Evaluation of inheritance pattern/family history for patient being studied			
@@ -441,13 +445,11 @@ proc achieveSVrankingLoss {AnnotSV_ID} {
     ####################################################################################################################
 
     # Add the higher score of the section 4
-
     if {[info exists g_rankingExplanations($AnnotSV_ID,40)]} {
         # 4O
         set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)-1.00}]
-        append g_rankingExplanations($AnnotSV_ID) "$g_rankingExplanations($AnnotSV_ID,4O)"
+        append g_rankingExplanations($AnnotSV_ID) "$g_rankingExplanations($AnnotSV_ID,40)"
     } 
- 
 
     ## Section 5: Evaluation of inheritance pattern/family history for patient being studied			
     ####################################################################################################################

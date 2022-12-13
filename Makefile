@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.1.3                                                                                            #
+# AnnotSV 3.2                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -37,7 +37,7 @@ TCLVERSION           := tcl$(shell echo 'puts $${tcl_version};exit 0' | tclsh)
 TCLDIRDISTRIBUTED    := share/tcl
 TCLDIR               := $(SHAREDIR)/$(TCLVERSION)
 ANNOTSV              := AnnotSV
-VERSION              := 3.1.3
+VERSION              := 3.2
 RM                   := /bin/rm
 RMDIR                := /bin/rmdir
 MKDIR                := install -d
@@ -206,7 +206,7 @@ uninstall1:
 	$(RM) -rf $(DESTDIR)$(ETCDIR)/$(ANNOTSV)
 	$(RM) -rf $(DESTDIR)$(PREFIX)/Makefile
 	$(RM) -rf $(DESTDIR)$(PREFIX)/README.md
-	$(RM) -rf $(DESTDIR)$(PREFIX)/Scoring_Criteria_AnnotS_*.xlsx
+	$(RM) -rf $(DESTDIR)$(PREFIX)/Scoring_Criteria_AnnotSV_*.xlsx
 	$(RM) -rf $(DESTDIR)$(PREFIX)/.git
 
 uninstall2:
