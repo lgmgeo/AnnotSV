@@ -79,12 +79,13 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(svtTSVcol)                "-1"  ;# not given in parameter
     set g_AnnotSV(tx)                       "RefSeq"
     set g_AnnotSV(txFile)                   ""
+    set g_AnnotSV(vcf)                      "0"
 
     
     ###########################
     ## Load config file options
     ###########################
-    set lOptionsOk "annotationsDir annotationMode bcftools bedtools benignAF candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo includeCI metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering reciprocal REreport REselect1 REselect2 samplesidBEDcol snvIndelFiles snvIndelPASS snvIndelSamples SVinputFile SVinputInfo SVminSize svtBEDcol tx txFile"
+    set lOptionsOk "annotationsDir annotationMode bcftools bedtools benignAF candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo includeCI metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering reciprocal REreport REselect1 REselect2 samplesidBEDcol snvIndelFiles snvIndelPASS snvIndelSamples SVinputFile SVinputInfo SVminSize svtBEDcol tx txFile vcf"
     set configFile "$g_AnnotSV(etcDir)/configfile"
     if {[file exists "[file dirname $g_AnnotSV(SVinputFile)]/configfile"]} {
 	set configFile "[file dirname $g_AnnotSV(SVinputFile)]/configfile"
@@ -209,7 +210,7 @@ proc configureAnnotSV {argv} {
     }
 
     ## It must be a boolean: 1 or 0
-    foreach val {candidateGenesFiltering includeCI overwrite reciprocal REreport REselect1 REselect2 SVinputInfo snvIndelPASS} {
+    foreach val {candidateGenesFiltering includeCI overwrite reciprocal REreport REselect1 REselect2 SVinputInfo snvIndelPASS vcf} {
 	if {$g_AnnotSV($val) ne "1" && $g_AnnotSV($val) ne "0"} {
 	    puts "############################################################################"
 	    puts "Bad option value: -$val = $g_AnnotSV($val)"

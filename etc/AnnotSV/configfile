@@ -38,6 +38,8 @@
 
 -annotationMode:            "both"
 
+-vcf:			    0
+
 
 #------------------------
 # AnnotSV Output columns:
