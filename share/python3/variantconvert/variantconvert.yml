@@ -1,0 +1,41 @@
+name: variantconvert
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - ca-certificates=2022.3.18=haa95532_0
+  - certifi=2021.10.8=py38haa95532_2
+  - openssl=1.1.1n=h2bbff1b_0
+  - pip=21.2.2=py38haa95532_0
+  - python=3.8.13=h6244533_0
+  - setuptools=58.0.4=py38haa95532_0
+  - sqlite=3.38.0=h2bbff1b_0
+  - vc=14.2=h21ff451_1
+  - vs2015_runtime=14.27.29016=h5e58377_2
+  - wheel=0.37.1=pyhd3eb1b0_0
+  - wincertstore=0.2=py38haa95532_2
+  - pip:
+    - atomicwrites==1.4.0
+    - attrs==21.4.0
+    - black==22.3.0
+    - click==8.1.2
+    - colorama==0.4.4
+    - iniconfig==1.1.1
+    - mypy-extensions==0.4.3
+    - numpy==1.22.3
+    - natsort==8.2.0
+    - packaging==21.3
+    - pandas==1.4.1
+    - pathspec==0.9.0
+    - platformdirs==2.5.1
+    - pluggy==1.0.0
+    - py==1.11.0
+    - pyfaidx==0.7.1
+    - pyparsing==3.0.7
+    - pytest==7.1.1
+    - python-dateutil==2.8.2
+    - pytz==2022.1
+    - six==1.16.0
+    - tomli==2.0.1
+    - typing-extensions==4.1.1
+prefix: C:\Users\nicaises\Miniconda3\envs\variantconvert

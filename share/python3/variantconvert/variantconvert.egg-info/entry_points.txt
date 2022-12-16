@@ -1,0 +1,2 @@
+[console_scripts]
+variantconvert = variantconvert.__main__:main

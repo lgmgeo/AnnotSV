@@ -1,0 +1,7 @@
+pandas
+pyfaidx
+natsort
+
+[dev]
+black
+pytest
