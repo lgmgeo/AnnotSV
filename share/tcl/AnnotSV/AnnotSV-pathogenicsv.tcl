@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.2                                                                                              #
+# AnnotSV 3.2.1                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -702,6 +702,11 @@ proc poPathogenicSVannotation {SVchrom SVstart SVend} {
 		set SVtoAnn_end   [lindex $Ls 9]
 
 		if {[regexp "\[0-9\]+:(\[0-9\]+)-(\[0-9\]+)" $po_pathogenic_coord match startP endP]} {
+
+		    # Keep only the pathogenic SV > $g_AnnotSV(SVminSize) (50 by default)
+		    # WARNING: some dbVar SV have the same start and end locations (e.g. dbVar:nssv17171884)
+		    if {[expr {$endP-$startP}] < $g_AnnotSV(SVminSize)} {continue}
+
 		    if {$SVtoAnn_end > $endP} {set po_end $endP} else {set po_end $SVtoAnn_end}
 		    if {$SVtoAnn_start > $startP} {set po_start $SVtoAnn_start} else {set po_start $startP}		    
 		    set percent [format "%.2f" [expr {($po_end-$po_start)*100.0/($endP-$startP)}]]

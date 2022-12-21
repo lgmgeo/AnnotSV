@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.2                                                                                              #
+# AnnotSV 3.2.1                                                                                            #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
@@ -10,6 +10,10 @@
 
 For more details, please see the README file.
 
+
+
+December, 21, 2022, AnnotSV version 3.2.1
+	- Add bugfix concerning the partial overlap with some specific dbVar SV (same start and end locations)
 
 December 13, 2022, AnnotSV version 3.2
 	- Add of a new output format: VCF
