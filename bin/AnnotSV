@@ -1,11 +1,11 @@
 #!/usr/bin/env tclsh
 
 ############################################################################################################
-# AnnotSV 3.2.1                                                                                            #
+# AnnotSV 3.2.2                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
-# Copyright (C) 2017-2022 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
+# Copyright (C) 2017-2023 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
 #                                                                                                          #
 # This is part of AnnotSV source code.                                                                     #
 #                                                                                                          #
@@ -118,7 +118,7 @@ if {[regexp "\-version|\-Version" $argv]} {
     exit
 }
 puts ""
-puts "Copyright (C) 2017-2022 GEOFFROY Veronique"
+puts "Copyright (C) 2017-2023 GEOFFROY Veronique"
 puts ""
 puts "Please feel free to contact me for any suggestions or bug reports"
 puts "email: veronique.geoffroy@inserm.fr"

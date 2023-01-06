@@ -1,16 +1,17 @@
 ############################################################################################################
-# AnnotSV 3.2.1                                                                                            #
+# AnnotSV 3.2.2                                                                                            #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
-# Copyright (C) 2017-2022 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
+# Copyright (C) 2017-2023 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
 #                                                                                                          #
 ############################################################################################################
 
 
 For more details, please see the README file.
 
-
+January, 06, 2023, AnnotSV version 3.2.2
+	- Add bugfix concerning the use of variantconvert to create the VCF output file (GRCh37/GRCh38, configfiles)
 
 December, 21, 2022, AnnotSV version 3.2.1
 	- Add bugfix concerning the partial overlap with some specific dbVar SV (same start and end locations)
