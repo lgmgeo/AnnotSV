@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+"""
+@Author: Samuel Nicaise
+@Version: v1.0.0
+"""
 
 import hashlib
 

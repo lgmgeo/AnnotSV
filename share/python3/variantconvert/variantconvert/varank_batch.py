@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 """
+@Author: Samuel Nicaise
+@Version: v1.0.0
+
 #for testing:
 docker run --rm -ti --entrypoint=bash -v /home1:/home1 tsvconvert
 python /home1/L/NGS/BIO_INFO/BIO_INFO_Sam/scripts/variantconvert_project/variantconvert/variantconvert/__main__.py varankBatch -i /home1/L/NGS/BIO_INFO/BIO_INFO_Sam/scripts/variantconvert_project/examples/TSV/ -o /home1/BAS/nicaises/Tests/variantconvert_batch/new_BBS_from_varank.vcf -c /home1/L/NGS/BIO_INFO/BIO_INFO_Sam/scripts/variantconvert_project/variantconvert/configs/config_varank.json
