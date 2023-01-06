@@ -1435,9 +1435,14 @@ proc OrganizeAnnotation {} {
 
 	    puts "...creation of the VCF output file: $VCFoutputFile"
 	    puts "   AnnotSV relies on the variantconvert tool (https://github.com/SamuelNicaise/variantconvert)."
-	    puts "   A minimal Python 3.8 installation is required, as well as the natsort, panda and pyfaidx Python modules."
-	    catch {exec python3 $variantconvertDIR/variantconvert convert -i $outputFile -o $VCFoutputFile -fi annotsv -fo vcf -c $variantconvertDIR/configs/config_annotsv3.json} Message
-	    puts $Message
+	    puts "   A minimal Python 3.8 installation is required, as well as the natsort, panda and pyfaidx Python modules.\n"
+	    if {$g_AnnotSV(genomeBuild) == "GRCh37"} {
+	    	catch {exec python3 $variantconvertDIR/variantconvert convert -i $outputFile -o $VCFoutputFile -fi annotsv -fo vcf -c $variantconvertDIR/configs/config_annotsv3_from_vcf_GRCh37.json} Message
+	    	puts $Message
+	    } elseif {$g_AnnotSV(genomeBuild) == "GRCh38"} {
+                catch {exec python3 $variantconvertDIR/variantconvert convert -i $outputFile -o $VCFoutputFile -fi annotsv -fo vcf -c $variantconvertDIR/configs/config_annotsv3_from_vcf_GRCh38.json} Message
+                puts $Message
+            } 
 	    
 	} else {
 	    ## SVinputfile is not a VCF (but a BED)
