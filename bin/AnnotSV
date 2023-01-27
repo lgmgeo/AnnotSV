@@ -95,6 +95,7 @@ source $g_AnnotSV(tclDir)/AnnotSV-repeat.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-segdup.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-tad.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-userBED.tcl
+source $g_AnnotSV(tclDir)/AnnotSV-variantconvert.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-vcf.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-write.tcl
 
@@ -162,6 +163,10 @@ if {[regexp "\\.vcf(.gz)?$" $g_AnnotSV(SVinputFile)]} {
 	createBEDinputHeaderFile
     }
 }
+
+## Check VariantConvert configuration:
+######################################
+checkVariantconvertConfigfile
 
 ## Genes annotations:
 #####################

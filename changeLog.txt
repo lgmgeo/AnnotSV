@@ -10,6 +10,9 @@
 
 For more details, please see the README file.
 
+January, 27, 2023, AnnotSV version 3.2.3
+	- Add the creation of a VCF output file from a "BED" SV input file
+
 January, 06, 2023, AnnotSV version 3.2.2
 	- Add bugfix concerning the use of variantconvert to create the VCF output file (GRCh37/GRCh38, configfiles)
 

@@ -1427,15 +1427,17 @@ proc OrganizeAnnotation {} {
     ################# VCF output ###################
     ################################################
     if {$g_AnnotSV(vcf)} {
-	if {[regexp "\\.vcf(.gz)?$" $g_AnnotSV(SVinputFile)]} {
-	    ## SVinputfile is a VCF
-	    set g_AnnotSV(pythonDir) "$g_AnnotSV(installDir)/share/python3"
-	    set variantconvertDIR "$g_AnnotSV(pythonDir)/variantconvert"
-	    regsub ".tsv" $outputFile ".vcf" VCFoutputFile
+		
+	set g_AnnotSV(pythonDir) "$g_AnnotSV(installDir)/share/python3"
+	set variantconvertDIR "$g_AnnotSV(pythonDir)/variantconvert"
+	regsub ".tsv" $outputFile ".vcf" VCFoutputFile
+	
+	puts "...creation of the VCF output file: $VCFoutputFile"
+	puts "   AnnotSV relies on the variantconvert tool (https://github.com/SamuelNicaise/variantconvert)."
+	puts "   A minimal Python 3.8 installation is required, as well as the natsort, panda and pyfaidx Python modules.\n"
 
-	    puts "...creation of the VCF output file: $VCFoutputFile"
-	    puts "   AnnotSV relies on the variantconvert tool (https://github.com/SamuelNicaise/variantconvert)."
-	    puts "   A minimal Python 3.8 installation is required, as well as the natsort, panda and pyfaidx Python modules.\n"
+	if {[regexp "\\.vcf(.gz)?$" $g_AnnotSV(SVinputFile)]} {
+	    ## SVinputfile is a VCF	  
 	    if {$g_AnnotSV(genomeBuild) == "GRCh37"} {
 	    	catch {exec python3 $variantconvertDIR/variantconvert convert -i $outputFile -o $VCFoutputFile -fi annotsv -fo vcf -c $variantconvertDIR/configs/config_annotsv3_from_vcf_GRCh37.json} Message
 	    	puts $Message
@@ -1445,9 +1447,23 @@ proc OrganizeAnnotation {} {
             } 
 	    
 	} else {
-	    ## SVinputfile is not a VCF (but a BED)
-	    puts "...VCF output is only available with VCF input."
-	    puts "   No VCF output created."
+	    ## SVinputfile is a BED)	    
+	    if {$g_AnnotSV(samplesidBEDcol) == -1 || $g_AnnotSV(svtBEDcol) == -1 || $g_AnnotSV(SVinputInfo) == 0} {
+		puts "   WARNING: Given a \"BED\" SV input file, the user has to define the following options: -samplesidBEDcol and -svtBEDcol."
+		puts "            Moreover, the -SVinputInfo option should be set to 1."
+		puts "            => could not create the VCF output file:"
+		if {$g_AnnotSV(samplesidBEDcol) == -1} {puts "               -samplesidBEDcol $g_AnnotSV(samplesidBEDcol)"}
+		if {$g_AnnotSV(svtBEDcol) == -1}       {puts "               -svtBEDcol $g_AnnotSV(svtBEDcol)"}
+		if {$g_AnnotSV(SVinputInfo) == 0}      {puts "               -SVinputInfo $g_AnnotSV(SVinputInfo)"}
+	    } else {
+		if {$g_AnnotSV(genomeBuild) == "GRCh37"} {
+		    catch {exec python3 $variantconvertDIR/variantconvert convert -i $outputFile -o $VCFoutputFile -fi annotsv -fo vcf -c $variantconvertDIR/configs/config_annotsv3_from_bed_GRCh37.local.json} Message
+		    puts $Message
+		} elseif {$g_AnnotSV(genomeBuild) == "GRCh38"} {
+		    catch {exec python3 $variantconvertDIR/variantconvert convert -i $outputFile -o $VCFoutputFile -fi annotsv -fo vcf -c $variantconvertDIR/configs/config_annotsv3_from_bed_GRCh38.local.json} Message
+		    puts $Message
+		}
+	    }
 	}
     }
 }
