@@ -149,7 +149,6 @@ configureAnnotSV $argv
 
 
 ## Depending of the VCF or BED input format:
-set testHeader 0
 if {[regexp "\\.vcf(.gz)?$" $g_AnnotSV(SVinputFile)]} {
     ## SVinputfile is a VCF?
     ## -> need to be formated in bed
@@ -158,10 +157,9 @@ if {[regexp "\\.vcf(.gz)?$" $g_AnnotSV(SVinputFile)]} {
     ## SVinputfile is a BED
     set g_AnnotSV(bedFile) $g_AnnotSV(SVinputFile)
     regsub -nocase ".bed$" $g_AnnotSV(bedFile) ".header.tsv" BEDinputHeaderFile
-    if {![file exists $BEDinputHeaderFile]} {
-	set testHeader 1
-	createBEDinputHeaderFile
-    }
+    file delete -force $BEDinputHeaderFile
+    createBEDinputHeaderFile
+    addNAinSamplesIDbedCol
 }
 
 ## Check VariantConvert configuration:
@@ -286,7 +284,9 @@ puts "\t******************************************\n"
 genesAnnotation
 OrganizeAnnotation
 
-if {$testHeader} {file delete -force $BEDinputHeaderFile}
+if {[regexp "\\.bed$" $g_AnnotSV(SVinputFile)]} {
+    file delete -force $BEDinputHeaderFile
+}
 puts "\n...AnnotSV is done with the analysis ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 
 

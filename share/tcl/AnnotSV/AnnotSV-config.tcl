@@ -507,23 +507,95 @@ proc createBEDinputHeaderFile {} {
     ## SVinputfile is a BED
     regsub -nocase ".bed$" $g_AnnotSV(bedFile) ".header.tsv" BEDinputHeaderFile
 
-    ## The header file doesn't exist
-    if {![file exists $BEDinputHeaderFile]} {
-	set f [open $g_AnnotSV(bedFile)]
-	while {![eof $f]} {
-	    set L [gets $f]
-	    if {$L eq ""} {continue}
-	    if {[regexp "^#" $L]} {
-		set header $L
-		continue
+    ## Creation of the header file 
+    set f [open $g_AnnotSV(bedFile)]
+    while {![eof $f]} {
+	set L [gets $f]
+	if {$L eq ""} {continue}
+	if {[regexp "^#" $L]} {
+	    set header $L
+	    continue
+	}
+	break
+    }
+    close $f
+    if {[info exists header]} {	
+	if {$g_AnnotSV(samplesidBEDcol) == -1} {
+	    set i_samplesid [lsearch -exact "Samples_ID" [split $header "\t"]]
+	    if {$i_samplesid ne -1} {
+		set g_AnnotSV(samplesidBEDcol) [expr {$i_samplesid+1}]
+	    } else {
+		set header "$header\tSamples_ID"
+		set g_AnnotSV(samplesidBEDcol) [llength [split $header "\t"]]
 	    }
-	    break
 	}
-	close $f
-	if {[info exists header]} {
-	    WriteTextInFile "$header" $BEDinputHeaderFile
-	    set headerFileToRemove 1
+	WriteTextInFile "$header" $BEDinputHeaderFile
+	set headerFileToRemove 1
+    } else {
+	set header "SV_chrom\tSV_start\tSV_end"
+	set theBEDlength [llength [split [FirstLineFromFile $g_AnnotSV(bedFile)] "\t"]]
+	set i 4
+	set k 1
+	while {$i <= $theBEDlength} {
+	    if {$i eq $g_AnnotSV(svtBEDcol)} {
+		append header "\tSV_type"
+	    } elseif {$i eq $g_AnnotSV(samplesidBEDcol)} {
+		append header "\tSamples_ID"
+	    } else {
+		append header "\tuser#$k"; incr k
+	    }
+	    incr i
 	}
+
+	if {$g_AnnotSV(samplesidBEDcol) == -1} {
+	    append header "\tSamples_ID"
+	    #set g_AnnotSV(samplesidBEDcol) [expr {$theBEDlength+1}]
+	}
+	WriteTextInFile "$header" $BEDinputHeaderFile
+	set headerFileToRemove 1
     }
     return
 }
+
+proc addNAinSamplesIDbedCol {} {
+
+    global g_AnnotSV
+
+    ## SVinputfile is a BED, with no samplesid column
+    if {[regexp "\\.bed$" $g_AnnotSV(SVinputFile)] && $g_AnnotSV(samplesidBEDcol) == -1} {
+    	# Add a supplementary column in the BED input file with "NA" (corresponding to the sample name)
+	# => needed for variantconvert + to create the SV database (in the future)
+	set L_toWrite {}
+	set i 0
+	set f [open $g_AnnotSV(bedFile)]
+	regsub ".bed" $g_AnnotSV(bedFile) ".NA.bed" g_AnnotSV(NAbedFile)
+	file delete -force "$g_AnnotSV(NAbedFile)"
+	while {![eof $f]} {
+	    set L [gets $f]
+	    if {$L eq ""} {continue}
+	    if {[regexp "^#" $L]} {continue}
+	    set L "$L\tNA"
+	    if {![info exists theNAbedLength]} {set theNAbedLength [llength [split $L "\t"]]}
+	    lappend L_toWrite $L
+	    incr i
+	    if {$i > 100000} {
+		WriteTextInFile [join "$L_toWrite" "\n"] $g_AnnotSV(NAbedFile)
+		set L_toWrite {}
+		set i 0
+	    } 
+	}
+	close $f
+	WriteTextInFile [join "$L_toWrite" "\n"] $g_AnnotSV(NAbedFile)
+
+        regsub -nocase ".bed$" $g_AnnotSV(bedFile) ".header.tsv" BEDinputHeaderFile
+        regsub -nocase ".bed$" $g_AnnotSV(bedFile) ".NA.header.tsv" NAbedinputHeaderFile
+	file rename -force $BEDinputHeaderFile $NAbedinputHeaderFile
+
+        set g_AnnotSV(bedFile) $g_AnnotSV(NAbedFile)
+
+	# Number of the "Samples_ID" column in the new "NA" BED file (not the informatic count in a list!)
+	set g_AnnotSV(samplesidBEDcol) "$theNAbedLength"
+
+    }
+}
+

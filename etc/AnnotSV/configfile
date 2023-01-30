@@ -6,6 +6,8 @@
 # AnnotSV Options :
 #------------------
 
+-annotationMode:            "both"
+
 -benignAF:                  0.01
 
 -candidateGenesFiltering:   0
@@ -36,8 +38,6 @@
 
 -SVminSize:                 50
 
--annotationMode:            "both"
-
 -vcf:			    0
 
 
@@ -53,7 +53,7 @@ SV_start                        *
 SV_end                          *
 SV_length                       *
 SV_type                         *
-Samples_ID
+Samples_ID                      *
 Annotation_mode                 *
 
 # Genes annotations:

@@ -64,56 +64,41 @@ proc OrganizeAnnotation {} {
 	# SVinputFile = BED
 	if {$g_AnnotSV(SVinputInfo)} {
 	    # The user wants to keep all the columns from the SV BED input file
-	    regsub -nocase ".bed$" $g_AnnotSV(SVinputFile) ".header.tsv" headerSVinputFile
+            regsub -nocase "(.formatted)?(.sorted)?.bed$" $g_AnnotSV(bedFile) ".header.tsv" headerSVinputFile
 	    set theBEDlength [llength [split [FirstLineFromFile $g_AnnotSV(bedFile)] "\t"]] ;# theBEDlength = number of col in the SV input BED file
-
-	    if {[file exists $headerSVinputFile]} {
-		# The user has given a header for the SV BED input file
-		set headerFromTheUser [split [FirstLineFromFile $headerSVinputFile] "\t"]	
-		if {[llength $headerFromTheUser] ne $theBEDlength} { ;# A stupid error can be to have a "\t" at the end of the header line
-		    puts "Numbers of columns from $g_AnnotSV(SVinputFile) and $headerSVinputFile are different ($theBEDlength != [llength $headerFromTheUser])" 
-		    puts "=> Can not report: $headerFromTheUser"
-		} else {
-		    if {$g_AnnotSV(svtBEDcol) ne -1} {
-			set headerFromTheUser [lreplace $headerFromTheUser $g_AnnotSV(svtBEDcol) $g_AnnotSV(svtBEDcol) "SV_type"]
-		    }
-		    if {$g_AnnotSV(samplesidBEDcol) ne -1} {
-			set headerFromTheUser [lreplace $headerFromTheUser $g_AnnotSV(samplesidBEDcol) $g_AnnotSV(samplesidBEDcol) "Samples_ID"]
-		    }
-		    set k 1
-		    foreach colName [lrange $headerFromTheUser 3 end] {
-			if {$colName ne ""} {
-			    append headerOutput "\t$colName"
-			} else {
-			    append headerOutput "\tuser#$k"; incr k
-			}
-		    }
-		}	
+	    
+            # $headerSVinputFile created if needed in the proc "createBEDinputHeaderFile"
+	    set headerFromTheUser [split [FirstLineFromFile $headerSVinputFile] "\t"]	
+	    if {[llength $headerFromTheUser] ne $theBEDlength} { ;# A stupid error can be to have a "\t" at the end of the header line
+		puts "Numbers of columns from $g_AnnotSV(SVinputFile) and $headerSVinputFile are different ($theBEDlength != [llength $headerFromTheUser])" 
+		puts "=> Can not report: $headerFromTheUser"
 	    } else {
-		# No header given by the user
-		set i 5 ; # headerOutput = "AnnotSV_ID   SV_chrom    SV_start	   SV_end	SV_length"
-		set j [expr {$theBEDlength+2}]
+		if {$g_AnnotSV(svtBEDcol) ne -1} {
+		    set headerFromTheUser [lreplace $headerFromTheUser $g_AnnotSV(svtBEDcol) $g_AnnotSV(svtBEDcol) "SV_type"]
+		}
+		if {$g_AnnotSV(samplesidBEDcol) ne -1} {
+		    set headerFromTheUser [lreplace $headerFromTheUser $g_AnnotSV(samplesidBEDcol) $g_AnnotSV(samplesidBEDcol) "Samples_ID"]
+		}
+
 		set k 1
-		while {$i < $j} {
-		    if {$i eq $g_AnnotSV(svtTSVcol)} {
-			append headerOutput "\tSV_type"
-		    } elseif {$i eq $g_AnnotSV(samplesidTSVcol)} {
-			append headerOutput "\tSamples_ID"
+		foreach colName [lrange $headerFromTheUser 3 end] {
+		    if {$colName ne ""} {
+			append headerOutput "\t$colName"
 		    } else {
 			append headerOutput "\tuser#$k"; incr k
 		    }
-		    incr i
 		}
-	    }
+	    }	
 	} else {
 	    # At least the "SV_type" and the "samples_ID" columns should be reported for the ranking
 	    if {$g_AnnotSV(svtTSVcol) ne -1} {
-		# The user doesn't want to keep all the columns from the SV BED input file. We keep only the "SV_type" (for the ranking) 
 		append headerOutput "\tSV_type"
 	    }
-	    if {$g_AnnotSV(samplesidTSVcol) ne -1} {
-		append headerOutput "\tSamples_ID"
+	    if {$g_AnnotSV(samplesidTSVcol) eq -1} {
+                regsub -nocase "(.formatted)?(.sorted)?.bed$" $g_AnnotSV(bedFile) ".header.tsv" headerSVinputFile
+                set g_AnnotSV(samplesidTSVcol) [lsearch -exact [split [FirstLineFromFile $headerSVinputFile] "\t"] "Samples_ID"]
 	    }
+	    append headerOutput "\tSamples_ID"
 	}
     }
     append headerOutput "\tAnnotation_mode"
@@ -497,6 +482,7 @@ proc OrganizeAnnotation {} {
 	} else {
 	    set SVtype ""
 	}
+	
 	if {$g_AnnotSV(samplesidBEDcol) ne -1} { 
 	    set Samplesid [lindex $Ls "$g_AnnotSV(samplesidBEDcol)"]                    
 	} else {
@@ -1289,7 +1275,6 @@ proc OrganizeAnnotation {} {
 	}
 	set L_AnnotSV_ID [lsort -command DescendingSortOnElement1 [lsort -command DescendingSortOnElement2 $L_AnnotSV_ID_completed]]
     }
-
     set i_Annotation_mode [lsearch -exact [split $headerOutput "\t"] "Annotation_mode"]
     set i_genename        [lsearch -exact [split $headerOutput "\t"] "Gene_name"]
     set i 0
@@ -1299,7 +1284,6 @@ proc OrganizeAnnotation {} {
 	    set AnnMo [lindex [split $fullOrSplitLine "\t"] $i_Annotation_mode]
 	    set geneName [lindex [split $fullOrSplitLine "\t"] $i_genename]
 	    set lineCompleted ""
-
 	    if {$AnnMo eq "full"} {
 		# Note: the ranking is available only for the full lines
 		append lineCompleted "$fullOrSplitLine"
@@ -1411,9 +1395,12 @@ proc OrganizeAnnotation {} {
 	file delete -force $tmpBedFile ; # => a bedfile is present only if "-SVinputFile" is a VCF
     }
     if {[info exists headerFileToRemove]} {
-	regsub -nocase "(.formatted)?.bed$" $g_AnnotSV(bedFile) ".header.tsv" BEDinputHeaderFile
+	regsub -nocase "(.formatted)?(.sorted)?.bed$" $g_AnnotSV(bedFile) ".header.tsv" BEDinputHeaderFile
 	file delete -force $BEDinputHeaderFile
     }   
+    if {[info exist g_AnnotSV(NAbedFile)]} {
+	file delete -force $g_AnnotSV(NAbedFile)
+    }
 
     ################################################
     ################### Display ####################
@@ -1434,7 +1421,7 @@ proc OrganizeAnnotation {} {
 	
 	puts "...creation of the VCF output file: $VCFoutputFile"
 	puts "   AnnotSV relies on the variantconvert tool (https://github.com/SamuelNicaise/variantconvert)."
-	puts "   A minimal Python 3.8 installation is required, as well as the natsort, panda and pyfaidx Python modules.\n"
+	puts "   A minimal Python 3.8 installation is required, as well as the natsort, panda and pyfaidx Python modules."
 
 	if {[regexp "\\.vcf(.gz)?$" $g_AnnotSV(SVinputFile)]} {
 	    ## SVinputfile is a VCF	  
@@ -1448,20 +1435,21 @@ proc OrganizeAnnotation {} {
 	    
 	} else {
 	    ## SVinputfile is a BED)	    
-	    if {$g_AnnotSV(samplesidBEDcol) == -1 || $g_AnnotSV(svtBEDcol) == -1 || $g_AnnotSV(SVinputInfo) == 0} {
-		puts "   WARNING: Given a \"BED\" SV input file, the user has to define the following options: -samplesidBEDcol and -svtBEDcol."
-		puts "            Moreover, the -SVinputInfo option should be set to 1."
+	    if {$g_AnnotSV(svtBEDcol) == -1 } {
+		puts "   WARNING: With a \"BED\" SV input file, the user has to define the -svtBEDcol option."
 		puts "            => could not create the VCF output file:"
-		if {$g_AnnotSV(samplesidBEDcol) == -1} {puts "               -samplesidBEDcol $g_AnnotSV(samplesidBEDcol)"}
 		if {$g_AnnotSV(svtBEDcol) == -1}       {puts "               -svtBEDcol $g_AnnotSV(svtBEDcol)"}
-		if {$g_AnnotSV(SVinputInfo) == 0}      {puts "               -SVinputInfo $g_AnnotSV(SVinputInfo)"}
 	    } else {
 		if {$g_AnnotSV(genomeBuild) == "GRCh37"} {
 		    catch {exec python3 $variantconvertDIR/variantconvert convert -i $outputFile -o $VCFoutputFile -fi annotsv -fo vcf -c $variantconvertDIR/configs/config_annotsv3_from_bed_GRCh37.local.json} Message
-		    puts $Message
+		    regsub ".vcf$" $VCFoutputFile ".variantconvert.log" LogFile
+		    ReplaceTextInFile "$Message" $LogFile
+		    puts "   => cf $LogFile"
 		} elseif {$g_AnnotSV(genomeBuild) == "GRCh38"} {
 		    catch {exec python3 $variantconvertDIR/variantconvert convert -i $outputFile -o $VCFoutputFile -fi annotsv -fo vcf -c $variantconvertDIR/configs/config_annotsv3_from_bed_GRCh38.local.json} Message
-		    puts $Message
+		    regsub ".vcf$" $VCFoutputFile ".variantconvert.log" LogFile
+		    ReplaceTextInFile "$Message" $LogFile
+		    puts "   => cf $LogFile"		    
 		}
 	    }
 	}
