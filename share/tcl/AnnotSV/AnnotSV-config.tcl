@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.2.2                                                                                            #
+# AnnotSV 3.2.3                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -509,6 +509,7 @@ proc createBEDinputHeaderFile {} {
  
     ## SVinputfile is a BED
     regsub -nocase ".bed$" $g_AnnotSV(bedFile) ".header.tsv" BEDinputHeaderFile
+    set BEDinputHeaderFile "$g_AnnotSV(outputDir)/[file tail $BEDinputHeaderFile]"
 
     ## Creation of the header file 
     set f [open $g_AnnotSV(bedFile)]
@@ -594,7 +595,9 @@ proc addNAinSamplesIDbedCol {} {
 	WriteTextInFile [join "$L_toWrite" "\n"] $g_AnnotSV(NAbedFile)
 
         regsub -nocase ".bed$" $g_AnnotSV(bedFile) ".header.tsv" BEDinputHeaderFile
+        set BEDinputHeaderFile "$g_AnnotSV(outputDir)/[file tail $BEDinputHeaderFile]"
         regsub -nocase ".bed$" $g_AnnotSV(bedFile) ".NA.header.tsv" NAbedinputHeaderFile
+	set NAbedinputHeaderFile "$g_AnnotSV(outputDir)/[file tail $NAbedinputHeaderFile]"
 	file rename -force $BEDinputHeaderFile $NAbedinputHeaderFile
 
         set g_AnnotSV(bedFile) $g_AnnotSV(NAbedFile)
