@@ -1423,36 +1423,37 @@ proc OrganizeAnnotation {} {
 	puts "   AnnotSV relies on the variantconvert tool (https://github.com/SamuelNicaise/variantconvert)."
 	puts "   A minimal Python 3.8 installation is required, as well as the natsort, panda and pyfaidx Python modules."
 
+        regsub ".vcf$" $VCFoutputFile ".variantconvert.log" LogFile
+
 	if {[regexp "\\.vcf(.gz)?$" $g_AnnotSV(SVinputFile)]} {
 	    ## SVinputfile is a VCF	  
 	    if {$g_AnnotSV(genomeBuild) == "GRCh37"} {
 	    	catch {exec python3 $variantconvertDIR/variantconvert convert -i $outputFile -o $VCFoutputFile -fi annotsv -fo vcf -c $variantconvertDIR/configs/config_annotsv3_from_vcf_GRCh37.json} Message
-	    	puts $Message
 	    } elseif {$g_AnnotSV(genomeBuild) == "GRCh38"} {
                 catch {exec python3 $variantconvertDIR/variantconvert convert -i $outputFile -o $VCFoutputFile -fi annotsv -fo vcf -c $variantconvertDIR/configs/config_annotsv3_from_vcf_GRCh38.json} Message
-                puts $Message
             } 
-	    
 	} else {
 	    ## SVinputfile is a BED)	    
 	    if {$g_AnnotSV(svtBEDcol) == -1 } {
 		puts "   WARNING: With a \"BED\" SV input file, the user has to define the -svtBEDcol option."
 		puts "            => could not create the VCF output file:"
 		if {$g_AnnotSV(svtBEDcol) == -1}       {puts "               -svtBEDcol $g_AnnotSV(svtBEDcol)"}
+		return
 	    } else {
 		if {$g_AnnotSV(genomeBuild) == "GRCh37"} {
 		    catch {exec python3 $variantconvertDIR/variantconvert convert -i $outputFile -o $VCFoutputFile -fi annotsv -fo vcf -c $variantconvertDIR/configs/config_annotsv3_from_bed_GRCh37.local.json} Message
-		    regsub ".vcf$" $VCFoutputFile ".variantconvert.log" LogFile
-		    ReplaceTextInFile "$Message" $LogFile
-		    puts "   => cf $LogFile"
 		} elseif {$g_AnnotSV(genomeBuild) == "GRCh38"} {
 		    catch {exec python3 $variantconvertDIR/variantconvert convert -i $outputFile -o $VCFoutputFile -fi annotsv -fo vcf -c $variantconvertDIR/configs/config_annotsv3_from_bed_GRCh38.local.json} Message
-		    regsub ".vcf$" $VCFoutputFile ".variantconvert.log" LogFile
-		    ReplaceTextInFile "$Message" $LogFile
-		    puts "   => cf $LogFile"		    
 		}
 	    }
 	}
+
+        # variantconvert output
+        if {[regexp -nocase "error" $Message]} {
+            puts "Error:"
+        } 
+        ReplaceTextInFile "$Message" $LogFile
+        puts "   => cf $LogFile"
     }
 }
 

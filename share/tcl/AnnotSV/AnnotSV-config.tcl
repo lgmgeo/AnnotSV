@@ -503,7 +503,10 @@ proc createBEDinputHeaderFile {} {
     
     global g_AnnotSV
     global headerFileToRemove 
-
+    global addNAinBED
+ 
+    set addNAinBED 0
+ 
     ## SVinputfile is a BED
     regsub -nocase ".bed$" $g_AnnotSV(bedFile) ".header.tsv" BEDinputHeaderFile
 
@@ -525,7 +528,8 @@ proc createBEDinputHeaderFile {} {
 	    if {$i_samplesid ne -1} {
 		set g_AnnotSV(samplesidBEDcol) [expr {$i_samplesid+1}]
 	    } else {
-		set header "$header\tSamples_ID"
+		append header "\tSamples_ID"
+		set addNAinBED 1
 		set g_AnnotSV(samplesidBEDcol) [llength [split $header "\t"]]
 	    }
 	}
@@ -548,8 +552,9 @@ proc createBEDinputHeaderFile {} {
 	}
 
 	if {$g_AnnotSV(samplesidBEDcol) == -1} {
-	    append header "\tSamples_ID"
-	    #set g_AnnotSV(samplesidBEDcol) [expr {$theBEDlength+1}]
+            append header "\tSamples_ID"
+            set addNAinBED 1
+	    set g_AnnotSV(samplesidBEDcol) [expr {$theBEDlength+1}]
 	}
 	WriteTextInFile "$header" $BEDinputHeaderFile
 	set headerFileToRemove 1
@@ -560,9 +565,10 @@ proc createBEDinputHeaderFile {} {
 proc addNAinSamplesIDbedCol {} {
 
     global g_AnnotSV
+    global addNAinBED
 
     ## SVinputfile is a BED, with no samplesid column
-    if {[regexp "\\.bed$" $g_AnnotSV(SVinputFile)] && $g_AnnotSV(samplesidBEDcol) == -1} {
+    if {$addNAinBED} {
     	# Add a supplementary column in the BED input file with "NA" (corresponding to the sample name)
 	# => needed for variantconvert + to create the SV database (in the future)
 	set L_toWrite {}
@@ -575,7 +581,7 @@ proc addNAinSamplesIDbedCol {} {
 	    if {$L eq ""} {continue}
 	    if {[regexp "^#" $L]} {continue}
 	    set L "$L\tNA"
-	    if {![info exists theNAbedLength]} {set theNAbedLength [llength [split $L "\t"]]}
+	    #if {![info exists theNAbedLength]} {set theNAbedLength [llength [split $L "\t"]]}
 	    lappend L_toWrite $L
 	    incr i
 	    if {$i > 100000} {
@@ -594,7 +600,7 @@ proc addNAinSamplesIDbedCol {} {
         set g_AnnotSV(bedFile) $g_AnnotSV(NAbedFile)
 
 	# Number of the "Samples_ID" column in the new "NA" BED file (not the informatic count in a list!)
-	set g_AnnotSV(samplesidBEDcol) "$theNAbedLength"
+	# set g_AnnotSV(samplesidBEDcol) "$theNAbedLength"
 
     }
 }
