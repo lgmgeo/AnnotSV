@@ -140,52 +140,54 @@ proc checkOverlappedGenesBenignFiles {} {
 
     global g_AnnotSV
 
-    foreach genomeBuild {GRCh37 GRCh38} {
-	set benignDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/SVincludedInFt/BenignSV/$genomeBuild"
-	set genesDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes/$genomeBuild"
-
-	foreach tx {RefSeq ENSEMBL} {
-	    set GenesfileFormatted [glob -nocomplain $genesDir/genes.${tx}.sorted.bed]
-	
-	    foreach SVtype {Loss Gain Ins Inv} {
-		set benignBEDfile [glob -nocomplain "$benignDir/benign_${SVtype}_SV_$genomeBuild.sorted.bed"]
-
-		# Files to create 
-		set overlappedGenes_in_benign${SVtype}File "$benignDir/overlappedGenes_${tx}_in_benign_${SVtype}_SV_$genomeBuild.tsv"
-		if {[file exists [set overlappedGenes_in_benign${SVtype}File]]} {continue}
+    if {$g_AnnotSV(organism) eq "Human"} {
+	foreach genomeBuild {GRCh37 GRCh38} {
+	    set benignDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/SVincludedInFt/BenignSV/$genomeBuild"
+	    set genesDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes/$genomeBuild"
+	    
+	    foreach tx {RefSeq ENSEMBL} {
+		set GenesfileFormatted [glob -nocomplain $genesDir/genes.${tx}.sorted.bed]
 		
-		puts "\t   >>> creation of [set overlappedGenes_in_benign${SVtype}File]] ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
-
-		# Intersect
-		set tmpFile "$g_AnnotSV(outputDir)/[clock seconds]_overlappedGenes_${tx}_in_benign_${SVtype}_SV_$genomeBuild.tmp.bed"
-		file delete -force $tmpFile
-		if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $GenesfileFormatted -b $benignBEDfile -wa -wb > $tmpFile} Message]} {
-		    if {[catch {exec $g_AnnotSV(bedtools) intersect -a $GenesfileFormatted -b $benignBEDfile -wa -wb > $tmpFile} Message]} {
-			puts "-- checkOverlappedGenesBenignFiles, $genomeBuild, $tx, $SVtype --"
-			puts "$g_AnnotSV(bedtools) intersect -sorted -a $GenesfileFormatted -b $benignBEDfile -wa -wb > $tmpFile"
-			puts "$Message"
-			puts "Exit with error"
-			exit 2
+		foreach SVtype {Loss Gain Ins Inv} {
+		    set benignBEDfile [glob -nocomplain "$benignDir/benign_${SVtype}_SV_$genomeBuild.sorted.bed"]
+		    
+		    # Files to create 
+		    set overlappedGenes_in_benign${SVtype}File "$benignDir/overlappedGenes_${tx}_in_benign_${SVtype}_SV_$genomeBuild.tsv"
+		    if {[file exists [set overlappedGenes_in_benign${SVtype}File]]} {continue}
+		    
+		    puts "\t   >>> creation of [set overlappedGenes_in_benign${SVtype}File]] ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+		    
+		    # Intersect
+		    set tmpFile "$g_AnnotSV(outputDir)/[clock seconds]_overlappedGenes_${tx}_in_benign_${SVtype}_SV_$genomeBuild.tmp.bed"
+		    file delete -force $tmpFile
+		    if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $GenesfileFormatted -b $benignBEDfile -wa -wb > $tmpFile} Message]} {
+			if {[catch {exec $g_AnnotSV(bedtools) intersect -a $GenesfileFormatted -b $benignBEDfile -wa -wb > $tmpFile} Message]} {
+			    puts "-- checkOverlappedGenesBenignFiles, $genomeBuild, $tx, $SVtype --"
+			    puts "$g_AnnotSV(bedtools) intersect -sorted -a $GenesfileFormatted -b $benignBEDfile -wa -wb > $tmpFile"
+			    puts "$Message"
+			    puts "Exit with error"
+			    exit 2
+			}
 		    }
-		}
 				
-		# Parse
-		set f [open $tmpFile]
-		while {![eof $f]} {
-		    set L [gets $f]
-		    if {$L eq ""} {continue}
-		    set Ls [split $L "\t"]
-		    set geneName [lindex $Ls 4]
-		    set benignSVcoord [lindex $Ls end-1]
-		    lappend L_genes($benignSVcoord) "$geneName"
+		    # Parse
+		    set f [open $tmpFile]
+		    while {![eof $f]} {
+			set L [gets $f]
+			if {$L eq ""} {continue}
+			set Ls [split $L "\t"]
+			set geneName [lindex $Ls 4]
+			set benignSVcoord [lindex $Ls end-1]
+			lappend L_genes($benignSVcoord) "$geneName"
+		    }
+		    file delete -force $tmpFile
+		    set L_toWrite {}
+		    foreach coord [array names L_genes] {
+			lappend L_toWrite "$coord\t[join [lsort -unique $L_genes($coord)] ";"]"
+		    }
+		    WriteTextInFile [join $L_toWrite "\n"] [set overlappedGenes_in_benign${SVtype}File]
+		    unset L_genes
 		}
-		file delete -force $tmpFile
-		set L_toWrite {}
-		foreach coord [array names L_genes] {
-		    lappend L_toWrite "$coord\t[join [lsort -unique $L_genes($coord)] ";"]"
-		}
-		WriteTextInFile [join $L_toWrite "\n"] [set overlappedGenes_in_benign${SVtype}File]
-		unset L_genes
 	    }
 	}
     }
