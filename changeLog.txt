@@ -10,9 +10,10 @@
 
 For more details, please see the README file.
 
-January, 30, 2023, AnnotSV version 3.2.3
+January, 31, 2023, AnnotSV version 3.2.3
 	- "Samples_ID" field is now always reported in the output (default, sample = NA)
 	- Add the creation of a VCF output file from a "BED" SV input file. The "-vcf" and "-svtBEDcol" options are required.
+	- In VCF output, the GT is set to “1/.” for each SV if the GT is not given in input (BED input file)
 	- Add bugfix concerning Mouse annotation
 
 January, 06, 2023, AnnotSV version 3.2.2

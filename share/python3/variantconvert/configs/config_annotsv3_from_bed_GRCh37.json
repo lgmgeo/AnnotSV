@@ -6,7 +6,7 @@
 		"unique_variant_id": [
 			"AnnotSV_ID"
 		],
-		"default_genotype": "0/1",
+		"default_genotype": "1/.",
 		"mode": "full&split"
 	},
 	"GENOME": {
