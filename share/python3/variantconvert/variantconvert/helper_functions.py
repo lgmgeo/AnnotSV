@@ -4,9 +4,6 @@
 @Version: v1.0.0
 """
 
-from __future__ import division
-from __future__ import print_function
-
 from commons import get_genome
 
 
@@ -48,6 +45,9 @@ class HelperFunctions:
             "get_alt_from_arriba_breakpoint": self.get_alt_from_arriba_breakpoint,
             "readable_starfusion_annots": self.readable_starfusion_annots,
             "get_undefined_value": self.get_undefined_value,
+            "get_gt_from_varank": self.get_gt_from_varank,
+            "get_ad_from_varank": self.get_ad_from_varank,
+            "get_vaf_from_varank": self.get_vaf_from_varank,
         }
 
     def get(self, func_name):
@@ -83,9 +83,7 @@ class HelperFunctions:
             f[right_chr][int(right_start) - 1].seq,
         )
 
-    def get_alt_with_breakpoints(
-        self, chr1, pos1, strand1, ref1, chr2, pos2, strand2, ref2
-    ):
+    def get_alt_with_breakpoints(self, chr1, pos1, strand1, ref1, chr2, pos2, strand2, ref2):
         """
         See VCF 4.3 specification, section 5.4 "Specifying complex rearrangements with breakends"
 
@@ -118,9 +116,7 @@ class HelperFunctions:
         return (alt1, alt2)
 
     def get_alt_from_star_breakpoint(self, left_breakpoint, right_breakpoint):
-        left_ref, right_ref = self.get_ref_from_breakpoint(
-            left_breakpoint, right_breakpoint
-        )
+        left_ref, right_ref = self.get_ref_from_breakpoint(left_breakpoint, right_breakpoint)
         left_chr, left_pos, left_strand = left_breakpoint.split(":")
         right_chr, right_pos, right_strand = right_breakpoint.split(":")
 
@@ -135,9 +131,7 @@ class HelperFunctions:
             right_ref,
         )
 
-    def get_alt_from_arriba_breakpoint(
-        self, breakpoint1, breakpoint2, direction1, direction2
-    ):
+    def get_alt_from_arriba_breakpoint(self, breakpoint1, breakpoint2, direction1, direction2):
         """
         In Arriba, unlike with STAR-Fusion, breakpoints aren't directly given as "left" and "right" breakpoints.
         This information can be inferred from the "direction" column.
@@ -168,9 +162,7 @@ class HelperFunctions:
                 + str(direction2)
             )
 
-        return self.get_alt_with_breakpoints(
-            chr1, pos1, strand1, ref1, chr2, pos2, strand2, ref2
-        )
+        return self.get_alt_with_breakpoints(chr1, pos1, strand1, ref1, chr2, pos2, strand2, ref2)
 
     @staticmethod
     def get_alt_from_decon(cnv_type_field):
@@ -223,3 +215,18 @@ class HelperFunctions:
     @staticmethod
     def get_undefined_value():
         return "."
+
+    @staticmethod
+    def get_gt_from_varank(zigosity):
+        gt_dic = {"hom": "1/1", "het": "0/1"}
+        return gt_dic[zigosity]
+
+    @staticmethod
+    def get_ad_from_varank(total_read_depth, var_read_depth):
+        return str(int(total_read_depth) - int(var_read_depth)) + "," + var_read_depth
+
+    @staticmethod
+    def get_vaf_from_varank(var_read_percent):
+        if var_read_percent == ".":
+            return var_read_percent
+        return str(float(var_read_percent) / 100)

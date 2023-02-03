@@ -4,11 +4,9 @@
 @Version: v1.0.0
 """
 
-from __future__ import division
-from __future__ import print_function
-
 import logging as log
 import os
+import subprocess
 import time
 
 from functools import lru_cache
@@ -32,6 +30,14 @@ def set_log_level(verbosity):
         datefmt="%Y-%m-%d %H:%M:%S",
         level=configs[verbosity],
     )
+
+
+def run_shell(cmd):
+    if log.root.level <= 10:  # only show stdout/stderr if level is log.DEBUG
+        redirect = None
+    else:
+        redirect = subprocess.DEVNULL
+    subprocess.run(cmd, shell=True, stdout=redirect, stderr=redirect)
 
 
 def rename_duplicates_in_list(input_list):

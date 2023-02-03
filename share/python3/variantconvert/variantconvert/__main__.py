@@ -38,8 +38,6 @@ If you need a place to store variables unrelated to the vcf file (e.g number of 
 #TODO: add argument mode to deal with an entire folder of varank files (or varank files in general)
 #TODO: refactor with a Variant class and a VCF class
 """
-from __future__ import division
-from __future__ import print_function
 
 import argparse
 import os
@@ -56,9 +54,7 @@ from varank_batch import main_varank_batch
 def main_convert(args):
     set_log_level(args.verbosity)
     if args.inputFormat.lower() == "decon":
-        raise ValueError(
-            "DECON is handled as a TSV conversion. Use 'tsv' as input format"
-        )
+        raise ValueError("DECON is handled as a TSV conversion. Use 'tsv' as input format")
 
     factory = ConverterFactory()
     converter = factory.get_converter(
@@ -71,9 +67,7 @@ def main_convert(args):
                 "Converting from a Varank file requires setting the --coordConversionFile argument to an existing file"
             )
         if not os.path.exists(args.coordConversionFile):
-            raise ValueError(
-                "coordConversionFile does not exist:" + args.coordConversionFile
-            )
+            raise ValueError("coordConversionFile does not exist:" + args.coordConversionFile)
         converter.set_coord_conversion_file(args.coordConversionFile)
 
     converter.convert(args.inputFile, args.outputFile)
@@ -85,12 +79,8 @@ def main():
     parser_convert = subparsers.add_parser(
         "convert", help="convert a file containing genomic variants to an other format"
     )
-    parser_convert.add_argument(
-        "-i", "--inputFile", type=str, required=True, help="Input file"
-    )
-    parser_convert.add_argument(
-        "-o", "--outputFile", type=str, required=True, help="Output file"
-    )
+    parser_convert.add_argument("-i", "--inputFile", type=str, required=True, help="Input file")
+    parser_convert.add_argument("-o", "--outputFile", type=str, required=True, help="Output file")
     parser_convert.add_argument(
         "-fi", "--inputFormat", type=str, required=True, help="Input file format"
     )
@@ -122,9 +112,7 @@ def main():
         required=True,
         help="Input directory containing Varank TSV files and VCF_Coordinates_Conversion.tsv",
     )
-    parser_batch.add_argument(
-        "-o", "--outputFile", type=str, required=True, help="Output file"
-    )
+    parser_batch.add_argument("-o", "--outputFile", type=str, required=True, help="Output file")
     parser_batch.add_argument(
         "-c",
         "--configFile",
@@ -137,7 +125,7 @@ def main():
         "--ncores",
         type=int,
         default=6,
-        help="Number of cores for multiprocessing",
+        help="Number of cores for multiprocessing [default: 6]",
     )
     parser_batch.add_argument(
         "-bc",
@@ -160,6 +148,13 @@ def main():
         default="tabix",
         help="path to tabix executable [default: 'tabix']",
     )
+    parser_batch.add_argument(
+        "-mm",
+        "--max_merged",
+        type=int,
+        default=200,
+        help="maximum files merged at once by bcftools [default: 200]",
+    )
 
     parser_config = subparsers.add_parser(
         "config", help="change variables in config files [under construction]"
@@ -174,9 +169,7 @@ def main():
     )
 
     for myparser in (parser_convert, parser_batch, parser_config):
-        myparser.add_argument(
-            "-v", "--verbosity", type=str, default="info", help="Verbosity level"
-        )
+        myparser.add_argument("-v", "--verbosity", type=str, default="info", help="Verbosity level")
 
     args = parser.parse_args()
     if "verbosity" not in args:

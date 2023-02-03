@@ -1,6 +1,7 @@
 pandas
 pyfaidx
 natsort
+tqdm
 
 [dev]
 black

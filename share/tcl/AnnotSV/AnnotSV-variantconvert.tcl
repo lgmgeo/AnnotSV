@@ -23,6 +23,7 @@
 
 
 # - Check if the reference fasta file in the variantconvert bed configfiles has the good path
+# - Check if the "pip install -e ." command was already run
 proc checkVariantconvertConfigfile {} {
 
     global g_AnnotSV
@@ -31,12 +32,15 @@ proc checkVariantconvertConfigfile {} {
     # Use of variantconvert to create a vcf output
     if {$g_AnnotSV(vcf)} {
 	
-        ## SVinputfile is a BED
+        set g_AnnotSV(pythonDir) "$g_AnnotSV(installDir)/share/python3"
+        set variantconvertDIR "$g_AnnotSV(pythonDir)/variantconvert"
+
+	# - Check if the reference fasta file in the variantconvert bed configfiles has the good path
+        #############################################################################################
+
+	## SVinputfile is a BED
 	## (no need to have a reference fasta file from a VCF SVinputfile)
 	if {[regexp "\\.bed$" $g_AnnotSV(SVinputFile)]} {
-
-            set g_AnnotSV(pythonDir) "$g_AnnotSV(installDir)/share/python3"
-	    set variantconvertDIR "$g_AnnotSV(pythonDir)/variantconvert"
 
 	    if {$g_AnnotSV(genomeBuild) == "GRCh37"} {
                 set configfile "$variantconvertDIR/configs/config_annotsv3_from_bed_GRCh37.json"
@@ -72,5 +76,26 @@ proc checkVariantconvertConfigfile {} {
 	    }
 	}
     }
+	
+    # - Check if the "pip install -e ." command was already run
+    ###########################################################
+    if {![file exists $variantconvertDIR/pipinstall.flag]} {
+        set currentDir [pwd]
+        cd $variantconvertDIR
+        if {[catch {exec pip3 install -e .}]} {
+            if {[catch {exec pip install -e .} Message]} {
+                WriteTextInFile "$Message" $variantconvertDIR/pipinstall.flag
+            } else {
+                 WriteTextInFile "Done" $variantconvertDIR/pipinstall.flag
+            }
+        } else {
+            WriteTextInFile "Done" $variantconvertDIR/pipinstall.flag
+        }
+        cd $currentDir
+    }
+
 }
+
+
+
 

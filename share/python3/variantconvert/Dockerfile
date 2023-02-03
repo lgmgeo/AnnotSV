@@ -15,9 +15,10 @@ RUN chmod -R 755 /usr/local/lib/miniconda3/
 RUN rm -f /tmp/Miniconda3-latest-Linux-x86_64.sh
 
 #work env
-RUN conda create -n common python=3.9.7 pandas
+RUN conda create -n common python=3.10 pandas
 RUN /usr/local/lib/miniconda3/envs/common/bin/pip install pyfaidx
 RUN /usr/local/lib/miniconda3/envs/common/bin/pip install natsort
+RUN /usr/local/lib/miniconda3/envs/common/bin/pip install tqdm
 
 #bcftools
 ENV BCFTOOLS_INSTALL_DIR=/opt/bcftools

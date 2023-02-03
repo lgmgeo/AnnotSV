@@ -4,9 +4,6 @@
 @Version: v1.0.0
 """
 
-from __future__ import division
-from __future__ import print_function
-
 from converters.vcf_from_annotsv import VcfFromAnnotsv
 from converters.vcf_from_bed import VcfFromBed
 from converters.vcf_from_breakpoints import VcfFromBreakpoints

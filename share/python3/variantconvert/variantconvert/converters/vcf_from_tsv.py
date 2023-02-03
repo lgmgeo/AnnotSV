@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import division
-from __future__ import print_function
-
 import logging as log
 import os
 import pandas as pd
@@ -16,7 +13,6 @@ from helper_functions import HelperFunctions
 
 
 class VcfFromTsv(AbstractConverter):
-
     def _init_dataframe(self):
         self.df = pd.read_csv(
             self.filepath,
@@ -74,7 +70,7 @@ class VcfFromTsv(AbstractConverter):
         return id_dic
 
     def convert(self, tsv, output_path):
-        log.info("Converting to vcf from annotSV using config: " + self.config_filepath)
+        log.debug("Converting to vcf from annotSV using config: " + self.config_filepath)
 
         self.UNIQUE_ID = "__!UNIQUE_VARIANT_ID!__"
         self.filepath = tsv
@@ -148,9 +144,7 @@ class VcfFromTsv(AbstractConverter):
                 else:
                     sample_field_dic = {}
                     # If the variant exists in other lines in the source file, fetch their sample data now
-                    for index in unique_id_to_index_list[
-                        data[self.UNIQUE_ID][i]
-                    ]:
+                    for index in unique_id_to_index_list[data[self.UNIQUE_ID][i]]:
                         sample_field = []
                         for key, val in self.config["VCF_COLUMNS"]["FORMAT"].items():
                             if key == "GT" and val == "":
@@ -174,10 +168,7 @@ class VcfFromTsv(AbstractConverter):
                                         [
                                             "."
                                             for i in range(
-                                                len(
-                                                    self.config["VCF_COLUMNS"]["FORMAT"]
-                                                )
-                                                - 1
+                                                len(self.config["VCF_COLUMNS"]["FORMAT"]) - 1
                                             )
                                         ]
                                     )
@@ -186,15 +177,12 @@ class VcfFromTsv(AbstractConverter):
                                     [
                                         "."
                                         for i in range(
-                                            len(self.config["VCF_COLUMNS"]["FORMAT"])
-                                            - 1
+                                            len(self.config["VCF_COLUMNS"]["FORMAT"]) - 1
                                         )
                                     ]
                                 )
                             line += empty + "\t"
                     already_seen_variants.add(data[self.UNIQUE_ID][i])
                     line = line.rstrip("\t")
-                    print("after", line.split("\t"))
 
                 vcf.write(line + "\n")
-

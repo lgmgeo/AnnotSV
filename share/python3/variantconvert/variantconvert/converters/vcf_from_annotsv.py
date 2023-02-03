@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import division
-from __future__ import print_function
-
 import logging as log
 import os
 import pandas as pd
@@ -42,7 +39,15 @@ class VcfFromAnnotsv(AbstractConverter):
             inplace=True,
         )
         df.reset_index(drop=True, inplace=True)
-        df.fillna(".", inplace=True)
+
+        sample_col = self.config["VCF_COLUMNS"]["SAMPLE"]
+        if isinstance(sample_col, str) and sample_col != "":
+            # avoid replacing "NA" sample by a dot
+            df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
+            df.loc[:, sample_col] = df.loc[:, sample_col].fillna("NA")
+        else:
+            df.fillna(".", inplace=True)  # default empty value in VCF
+
         df = df.astype(str)
         log.debug(df)
         return df
@@ -56,9 +61,9 @@ class VcfFromAnnotsv(AbstractConverter):
                     sample_list.append(sample)
             else:
                 sample_list.append(cell)
-        # print(samples_col)
         sample_list = list(set(sample_list))
-        # print("sample_list:", sample_list)
+        sample_list.sort()  # ensures output is always the same, despite using a set() above
+
         if self.config["VCF_COLUMNS"]["FORMAT"] == "FORMAT":
             if not set(sample_list).issubset(self.input_df.columns):
                 raise ValueError(
@@ -180,13 +185,11 @@ class VcfFromAnnotsv(AbstractConverter):
         This will be used to write the INFO field
         """
         input_annot_df = self._build_input_annot_df()
-        # print(input_annot_df)
         annots_dic = {}
         id_col = self.config["VCF_COLUMNS"]["INFO"]["AnnotSV_ID"]
         for variant_id, df_variant in input_annot_df.groupby(id_col):
             merged_annots = self._merge_full_and_split(df_variant)
             annots_dic[variant_id] = merged_annots
-        # print(annots_dic)
         return annots_dic
 
     # TODO: merge this with the other create_vcf_header method if possible
@@ -288,18 +291,28 @@ class VcfFromAnnotsv(AbstractConverter):
         return header
 
     def _get_main_vcf_cols(self):
-        cols = []
-        for col in ["#CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER"]:
-            config_col = self.config["VCF_COLUMNS"][col]
-            if not isinstance(config_col, str):
-                self.input_df[col] = "."
-            elif config_col == "":
-                self.input_df[col] = "."
+        """
+        Some columns (cols_to_init_now) are not directly linked to a Varank TSV column.
+        They can be filled later, usually with a HELPER FUNC, but still have to be initiated in the data frame.
+        """
+        main_cols = []
+        cols_to_init_now = []
+
+        for vcf_col in ["#CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER"]:
+            tsv_col = self.config["VCF_COLUMNS"][vcf_col]
+            if not isinstance(tsv_col, str):
+                cols_to_init_now.append(vcf_col)
+            elif tsv_col == "":
+                cols_to_init_now.append(vcf_col)
             else:
-                col = config_col
-            cols.append(col)
-        print("main_cols:", cols)
-        return cols
+                vcf_col = tsv_col
+            main_cols.append(vcf_col)
+
+        # adding all missing columns at once to avoid a PerformanceWarning
+        self.input_df = pd.concat([self.input_df, pd.DataFrame(columns=cols_to_init_now)])
+        self.input_df[cols_to_init_now] = ["." for i in range(len(cols_to_init_now))]
+
+        return main_cols
 
     def convert(self, tsv, output_path):
         """
@@ -314,7 +327,7 @@ class VcfFromAnnotsv(AbstractConverter):
         because it only contains Decon annotations and they're useless.
         TODO: make an option to keep the "INFO" field in the annotations dictionary
         """
-        log.info("Converting to vcf from tsv using config: " + self.config_filepath)
+        log.debug("Converting to vcf from tsv using config: " + self.config_filepath)
 
         self.filepath = tsv
         helper = HelperFunctions(self.config)

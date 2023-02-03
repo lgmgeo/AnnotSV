@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import division
-from __future__ import print_function
-
 import logging as log
 import os
 import pandas as pd
@@ -68,7 +65,7 @@ class VcfFromBreakpoints(AbstractConverter):
         return id_dic
 
     def convert(self, tsv, output_path):
-        log.info("Converting to vcf from annotSV using config: " + self.config_filepath)
+        log.debug("Converting to vcf from annotSV using config: " + self.config_filepath)
 
         self.filepath = tsv
         self.output_path = output_path

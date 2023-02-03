@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import division
-from __future__ import print_function
-
 import logging as log
 import numpy
 import os
@@ -14,7 +11,7 @@ import time
 from converters.abstract_converter import AbstractConverter
 
 sys.path.append("..")
-from commons import clean_string, rename_duplicates_in_list, varank_to_vcf_coords
+from commons import clean_string, is_helper_func, rename_duplicates_in_list, varank_to_vcf_coords
 from helper_functions import HelperFunctions
 
 
@@ -41,12 +38,13 @@ class VcfFromVarank(AbstractConverter):
         self.df.columns = rename_duplicates_in_list(self.df.columns)
 
         # convert french commas to dot in floats
-        for col in self.config["COLUMNS_DESCRIPTION"]:
-            if self.config["COLUMNS_DESCRIPTION"][col]["Type"] == "Float":
-                if col in self.df.columns:
-                    self.df[col] = self.df.apply(
-                        lambda row: self.french_commas_to_dots(row[col]), axis=1
-                    )
+        for field in ["INFO", "FORMAT"]:
+            for col in self.config["COLUMNS_DESCRIPTION"][field]:
+                if self.config["COLUMNS_DESCRIPTION"][field][col]["Type"] == "Float":
+                    if col in self.df.columns:
+                        self.df[col] = self.df.apply(
+                            lambda row: self.french_commas_to_dots(row[col]), axis=1
+                        )
 
         # request from Jean: remove the transcript part in cNomen columns
         if "cNomen" in self.df.columns:
@@ -64,12 +62,12 @@ class VcfFromVarank(AbstractConverter):
         log.debug(self.df)
 
     def remove_percent(self, val):
-        if not isinstance(val, float): #dirty way to check if value is not nan
+        if not isinstance(val, float):  # dirty way to check if value is not nan
             if val.endswith("%"):
                 return val.split("%")[0]
 
     def remove_transcript_from_cnomen(self, val):
-        if not isinstance(val, float): #dirty way to check if value is not nan
+        if not isinstance(val, float):  # dirty way to check if value is not nan
             if ":" in val:
                 return val.split(":")[1]
 
@@ -106,9 +104,7 @@ class VcfFromVarank(AbstractConverter):
         for end in self.config["GENERAL"]["varank_filename_ends"]:
             if name.endswith(end):
                 return name.split(end)[0]
-        raise ValueError(
-            "Couldn't determine sample name from varank filename:" + varank_tsv
-        )
+        raise ValueError("Couldn't determine sample name from varank filename:" + varank_tsv)
 
     def set_coord_conversion_file(self, coord_conversion_file):
         self.coord_conversion_file = coord_conversion_file
@@ -118,20 +114,30 @@ class VcfFromVarank(AbstractConverter):
         TODO: load self.config[VCF_COLUMNS] instead and flatten it with https://stackoverflow.com/a/31439438
         """
         known = ["chr", "start", "end", "ref", "alt"]
-        known.append("QUALphread")  # QUAL
+        known.append("QUALphred")  # QUAL
         known.append("zygosity")  # GT
-        known.append("totalRead")  # DP
-        known.append("varReadDepth")  # AD[1] ; AD[0] = DP - AD[1]
+        known.append("totalReadDepth")  # DP
+        known.append("varReadDepth")  # AD[1] (AD[0] computed through a HELPER_FUNCTION)
         known.append("varReadPercent")  # VAF
         known.append("gene_mut_counts")  # GMC ; see add_gene_counts_to_df(self)
+
+        # Optionak STARK annotations not to be included
+        known.append("FindByPipelines")
+        known.append("BARCODE_2")  # Pool barcode
+        known.append("POOL_F_base_counts")
+        known.append("POOL_F_Depth")
+        known.append("POOL_M_base_counts")
+        known.append("POOL_M_Depth")
+        known.append("trio_variant_type")
         # No GQ, no PL, and apparently no multi allelic variants
         return known
 
     def convert(self, varank_tsv, output_path):
-        log.info("Converting to vcf from varank using config: " + self.config_filepath)
+        log.debug("Converting to vcf from varank using config: " + self.config_filepath)
         id_to_coords = varank_to_vcf_coords(self.coord_conversion_file)
         self.sample_name = self.get_sample_name(varank_tsv)
         self._init_dataframe(varank_tsv)
+        helper = HelperFunctions(self.config)
 
         with open(output_path, "w") as vcf:
             vcf_header = self.create_vcf_header()
@@ -149,6 +155,7 @@ class VcfFromVarank(AbstractConverter):
                 line += data[self.config["VCF_COLUMNS"]["QUAL"]][i] + "\t"
                 line += "PASS\t"
 
+                # INFO
                 info_field = []
                 for key in data.keys():
                     if key not in self.get_known_columns():
@@ -157,26 +164,26 @@ class VcfFromVarank(AbstractConverter):
                         info_field.append(s)
                 line += ";".join(info_field) + "\t"
 
-                line += "GT:DP:AD:VAF:GMC\t"
-                gt_dic = {"hom": "1/1", "het": "0/1"}
-                sample_field = (
-                    gt_dic[data[self.config["VCF_COLUMNS"]["FORMAT"]["GT"]][i]] + ":"
-                )
-                sample_field += (
-                    data[self.config["VCF_COLUMNS"]["FORMAT"]["DP"]][i] + ":"
-                )
-                sample_field += (
-                    str(int(data["totalReadDepth"][i]) - int(data["varReadDepth"][i]))
-                    + ","
-                    + data["varReadDepth"][i]
-                    + ":"
-                )
-                vaf = data[self.config["VCF_COLUMNS"]["FORMAT"]["VAF"]][i]
-                if vaf != ".":
-                    vaf = str(float(vaf) / 100)
-                sample_field += vaf + ":"
-                sample_field += str(data["gene_mut_counts"][i])
-                line += sample_field
+                # FORMAT
+                vcf_format_fields = []
+                tsv_format_fields = []
+                for vcf_col, tsv_col in self.config["VCF_COLUMNS"]["FORMAT"].items():
+                    vcf_format_fields.append(vcf_col)
+                    tsv_format_fields.append(tsv_col)
+                line += ":".join(vcf_format_fields) + "\t"
+
+                # Sample (Varank files are assumed to be monosample)
+                sample_field = []
+                for vcf_col, tsv_col in self.config["VCF_COLUMNS"]["FORMAT"].items():
+                    if is_helper_func(tsv_col):
+                        func = helper.get(tsv_col[1])
+                        args = [data[c][i] for c in tsv_col[2:]]
+                        sample_field.append(func(*args))
+                    elif vcf_col == "GMC" and tsv_col == "":
+                        sample_field.append(str(data["gene_mut_counts"][i]))
+                    else:
+                        sample_field.append(data[tsv_col][i])
+                line += ":".join(sample_field)
 
                 vcf.write(line + "\n")
 
@@ -193,53 +200,41 @@ class VcfFromVarank(AbstractConverter):
         # FILTER is not present in Varank, so all variants are set to PASS
         header.append('##FILTER=<ID=PASS,Description="Passed filter">')
 
-        # INFO contains all columns that are not used anywhere specific
-        # log.debug(dict(self.df.dtypes))
-        for key in self.df.columns:
-            if key in self.get_known_columns():
-                continue
-            if str(self.df[key].dtypes) in ("object", "O", "bool"):
-                info_type = "String"
-            elif str(self.df[key].dtypes) == "float64":
-                info_type = "Float"
-            elif str(self.df[key].dtypes) in ("int64", "Int64"):
-                info_type = "Integer"
-            else:
-                raise ValueError(
-                    "Unrecognized type in Varank dataframe. Column causing issue: "
-                    + key
+        # INFO
+        for key in self.config["COLUMNS_DESCRIPTION"]["INFO"]:
+            if key in self.df.columns or key in self.config["VCF_COLUMNS"]:
+                number = "1"  # TODO: update config to include number
+                description = self.config["COLUMNS_DESCRIPTION"]["INFO"][key]["Description"]
+                info_type = self.config["COLUMNS_DESCRIPTION"]["INFO"][key]["Type"]
+                header.append(
+                    f'##INFO=<ID={key},Number={number},Type={info_type},Description="{description}">'
                 )
 
-            if key in self.config["COLUMNS_DESCRIPTION"]:
-                description = self.config["COLUMNS_DESCRIPTION"][key]["Description"]
-                info_type = self.config["COLUMNS_DESCRIPTION"][key]["Type"]
-            else:
+        # Undefined TSV fields also go to INFO field
+        for key in self.df.columns:
+            if (
+                key not in self.get_known_columns()
+                and key not in self.config["COLUMNS_DESCRIPTION"]["INFO"]
+                and key not in self.config["COLUMNS_DESCRIPTION"]["FORMAT"]
+            ):
+                number = "1"  # TODO: length inference
                 description = "Extracted from " + self.config["GENERAL"]["origin"]
-                info_type = "String"  # ugly fix of that bug where bcftools change POOL_ columns to Float (--> cutevariant crash)
-            header.append(
-                "##INFO=<ID="
-                + key
-                + ",Number=1,Type="
-                + info_type
-                + ',Description="'
-                + description
-                + '">'
-            )
+                info_type = "String"  # No type inference is safer. Add known int/float annotations in config instead
+                header.append(
+                    f'##INFO=<ID={key},Number={number},Type={info_type},Description="{description}">'
+                )
+
         # FORMAT
-        header.append(
-            '##FORMAT=<ID=AD,Number=R,Type=Integer,Description="Allelic depths for the ref and alt alleles in the order listed">'
-        )
-        header.append(
-            '##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Approximate read depth (reads with MQ=255 or with bad mates are filtered)">'
-        )
-        header.append('##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">')
-        header.append(
-            '##FORMAT=<ID=VAF,Number=1,Type=Float,Description="VAF Variant Frequency">'
-        )
-        header.append(
-            '##FORMAT=<ID=GMC,Number=1,Type=String,Description="Gene Mutations count: number of variants occuring in the same gene based on <genes> column. Computed when Varank files are converted to VCF">'
-        )
-        # genome stuff
+        for key in self.config["COLUMNS_DESCRIPTION"]["FORMAT"]:
+            if key in self.df.columns or key in self.config["VCF_COLUMNS"]["FORMAT"]:
+                number = self.config["COLUMNS_DESCRIPTION"]["FORMAT"][key]["Number"]
+                description = self.config["COLUMNS_DESCRIPTION"]["FORMAT"][key]["Description"]
+                format_type = self.config["COLUMNS_DESCRIPTION"]["FORMAT"][key]["Type"]
+                header.append(
+                    f'##FORMAT=<ID={key},Number={number},Type={format_type},Description="{description}">'
+                )
+
+        # GENOME
         header += self.config["GENOME"]["vcf_header"]
         header.append(
             "\t".join(
@@ -258,7 +253,3 @@ class VcfFromVarank(AbstractConverter):
             )
         )
         return header
-
-
-if __name__ == "__main__":
-    pass
