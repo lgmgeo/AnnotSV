@@ -26,6 +26,9 @@
 #    - ENC*.bed
 #  
 ## - Check and create if necessary the 'date'_boundariesTAD.sorted.bed file
+##   Header:
+##   Chrom_boundary  Start_boundary  End_boundary  ENCODE_experiment  TAD_coordinates
+##
 proc checkTADfiles {} {
 
     global g_AnnotSV
@@ -34,7 +37,7 @@ proc checkTADfiles {} {
     ## Check if TAD files has been downloaded then formatted
     #######################################################
     set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)"
-    set TADfilesDownloaded [glob -nocomplain "$extannDir/FtIncludedInSV/TAD/$g_AnnotSV(genomeBuild)/ENC*.bed"]
+    set TADfilesDownloaded [glob -nocomplain "$extannDir/FtIncludedInSV/TAD/$g_AnnotSV(genomeBuild)/ENC*.bed.gz"]
     set boundariesTADfileFormatted [glob -nocomplain "$extannDir/FtIncludedInSV/TAD/$g_AnnotSV(genomeBuild)/*_boundariesTAD.sorted.bed"] 
 
     if {$TADfilesDownloaded eq "" && $boundariesTADfileFormatted eq ""} {
@@ -72,10 +75,11 @@ proc checkTADfiles {} {
 	puts "\t\t...creation of $boundariesTADfileFormatted"
 	puts "\t\t   (done only once during the first boundaries TAD annotation)"
 
-	foreach TADfile [glob -nocomplain "$extannDir/FtIncludedInSV/TAD/$g_AnnotSV(genomeBuild)/ENC*.bed"] {
+	foreach TADfile [glob -nocomplain "$extannDir/FtIncludedInSV/TAD/$g_AnnotSV(genomeBuild)/ENC*.bed.gz"] {
 	    regsub -nocase ".bed$" $TADfile "" ENCODEexperiment
 	    regsub ".*/" $ENCODEexperiment "" ENCODEexperiment
-	    foreach L [LinesFromFile $TADfile] {
+	    foreach L [LinesFromGZFile $TADfile] {
+		if {[regexp "^#" $L]} {continue}
 		regsub "chr" [lindex $L 0] "" chrom
 		set TADstart [lindex $L 1]
 		set TADend [lindex $L 2]
@@ -88,6 +92,9 @@ proc checkTADfiles {} {
 		    set TADstart $boundarieStart
 		    set TADend [expr $TADend+40000]
 		}
+		# BED format: chromStart - The first base in a chromosome is numbered 0.
+		if {$boundarieStart < 0} {set boundarieStart 0}
+		if {$boundariesEnd <= $boundarieStart} {continue}
 		lappend experiment($chrom\t$boundarieStart\t$boundariesEnd) "$ENCODEexperiment"
 		lappend TAD($chrom\t$boundarieStart\t$boundariesEnd) "$chrom:$TADstart-$TADend"
 		lappend L_allLines($chrom) "$boundarieStart\t$boundariesEnd"
@@ -100,6 +107,7 @@ proc checkTADfiles {} {
 		WriteTextInFile "$chrom\t$bounds\t[join [lsort -unique $experiment($chrom\t$bounds)] ","]\t[join [lsort -unique $TAD($chrom\t$bounds)] ","]" $boundariesTADfileFormatted.tmp
 	    }
 	}
+
 	# Sorting of the bedfile:
 	# Intersection with very large files can cause trouble with excessive memory usage.
 	# A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm. 
@@ -116,6 +124,7 @@ proc checkTADfiles {} {
 	    puts "Exit with error"
 	    exit 2
 	}
+
 	file delete -force $sortTmpFile 
 	file delete -force $boundariesTADfileFormatted.tmp
 
