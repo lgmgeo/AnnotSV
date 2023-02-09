@@ -34,7 +34,7 @@ proc checkVariantconvertConfigfile {} {
 	
         set g_AnnotSV(pythonDir) "$g_AnnotSV(installDir)/share/python3"
         set variantconvertDIR "$g_AnnotSV(pythonDir)/variantconvert"
-
+	
 	# - Check if the reference fasta file in the variantconvert bed configfiles has the good path
         #############################################################################################
 
@@ -75,25 +75,24 @@ proc checkVariantconvertConfigfile {} {
 		ReplaceTextInFile [join $L_Lines "\n"] $localconfigfile
 	    }
 	}
-    }
 	
-    # - Check if the "pip install -e ." command was already run
-    ###########################################################
-    if {![file exists $variantconvertDIR/pipinstall.flag]} {
-        set currentDir [pwd]
-        cd $variantconvertDIR
-        if {[catch {exec pip3 install -e .}]} {
-            if {[catch {exec pip install -e .} Message]} {
-                WriteTextInFile "$Message" $variantconvertDIR/pipinstall.flag
+        # - Check if the "pip install -e ." command was already run
+        ###########################################################
+        if {![file exists $variantconvertDIR/pipinstall.flag]} {
+            set currentDir [pwd]
+            cd $variantconvertDIR
+            if {[catch {exec pip3 install -e .}]} {
+                if {[catch {exec pip install -e .} Message]} {
+                    WriteTextInFile "$Message" $variantconvertDIR/pipinstall.flag
+                } else {
+                    WriteTextInFile "Done" $variantconvertDIR/pipinstall.flag
+                }
             } else {
-                 WriteTextInFile "Done" $variantconvertDIR/pipinstall.flag
+                WriteTextInFile "Done" $variantconvertDIR/pipinstall.flag
             }
-        } else {
-            WriteTextInFile "Done" $variantconvertDIR/pipinstall.flag
+            cd $currentDir
         }
-        cd $currentDir
     }
-
 }
 
 
