@@ -1,0 +1,20 @@
+.pdm.toml                               
+
+# tests
+etc/AnnotSV/configfile.minAnnotation
+etc/AnnotSV/application.properties.2007 
+etc/AnnotSV/application.properties.1902
+
+# Annotations
+share/AnnotSV/Annotations_Human/        
+share/AnnotSV/Annotations_Mouse/
+share/AnnotSV/Annotations_Exomiser/
+
+# Python
+share/python3/annotsv/
+src/
+tests/
+share/python3/variantconvert/configs/config_annotsv3_from_bed_*.local.json
+share/python3/variantconvert/variantconvert/__pycache__/*.pyc
+share/python3/variantconvert/variantconvert/converters/__pycache__/*.pyc
+share/python3/variantconvert/pipinstall.flag
