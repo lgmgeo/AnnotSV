@@ -23,6 +23,49 @@
 
 
 
+proc switchCoordinatesFromBEDtoVCF {BEDcoord} {
+    set liste [split $BEDcoord ":|-"]
+    if {[llength $liste] ne 3} {
+	return $BEDcoord
+    } else {
+        set VCFcoord "[lindex $liste 0]:[expr {[lindex $liste 1]+1}]-[lindex $liste 2]"
+	return $VCFcoord
+    }
+}
+
+proc switchAllCoordinatesFromBEDtoVCFinLine {lineCompleted} {
+    # lineCompleted: AnnotSV_ID   chrom   SV_start   ...
+
+    # Formate "AnnotSV_ID" and "SV_start"
+    regexp "\[^\t\]+\t\[^\t\]+\t(\[0-9\]+)" $lineCompleted match SVstart
+    set formatedSVstart [expr {$SVstart+1}]; # Switch SV start coordinate from BED to VCF format
+    set i 0
+    if {[regexp -start $i -indices "$SVstart" $lineCompleted match_indices]} {
+	set i_start [lindex $match_indices 0]
+        set i_end   [lindex $match_indices 1]
+	set lineCompleted [string replace $lineCompleted $i_start $i_end $formatedSVstart]
+        set i [expr {$i_end+1}]
+    }
+    if {[regexp -start $i -indices "$SVstart" $lineCompleted match_indices]} {
+        set i_start [lindex $match_indices 0]
+        set i_end   [lindex $match_indices 1]
+        set lineCompleted [string replace $lineCompleted $i_start $i_end $formatedSVstart]
+        set i [expr {$i_end+1}]
+    }
+ 
+    # Formate all genomic coordinates (e.g.: 2:1235-62531)
+    set i 0
+    while {[regexp -start $i -indices "\[0-9XYMT\]+:\[0-9\]+-\[0-9\]+" $lineCompleted match_indices]} {
+	set i_start [lindex $match_indices 0]
+	set i_end   [lindex $match_indices 1]
+	set BEDcoord [string range $lineCompleted $i_start $i_end]
+	set lineCompleted [string replace $lineCompleted $i_start $i_end [switchCoordinatesFromBEDtoVCF $BEDcoord]]
+        set i [expr {$i_end+1}]
+    }
+    return $lineCompleted           
+}
+
+
 proc OrganizeAnnotation {} {
 
     global g_AnnotSV
@@ -46,7 +89,7 @@ proc OrganizeAnnotation {} {
     #########################################################################################
     ################### Writing of the header (first line of the output) ####################
     #########################################################################################
-    set headerOutput "AnnotSV_ID\tSV_chrom\tSV_start\tSV_end\tSV_length"
+    set headerOutput "AnnotSV_ID\tSV_chrom\tSV_start\tSV_end\tSV_length" ;# "AnnotSV_ID" and "SV_start" indices used in the switchAllCoordinatesFromBEDtoVCFinLine procedure
     if {[info exist VCFheader]} {
 	# SVinputFile = VCF
 	append headerOutput "\t$VCFheader"
@@ -476,6 +519,7 @@ proc OrganizeAnnotation {} {
 	set SVchrom   [lindex $Ls 0]
 	set SVleft    [lindex $Ls 1]
 	set SVright   [lindex $Ls 2]
+
 	set AnnotationMode   [lindex $Ls end]                 ;# full or split
 	if {$g_AnnotSV(svtBEDcol) ne -1} { 
 	    set SVtype [lindex $Ls "$g_AnnotSV(svtBEDcol)"]                     ;# DEL, DUP, <CN0>...
@@ -792,7 +836,7 @@ proc OrganizeAnnotation {} {
 	if {$g_AnnotSV(organism) eq "Human"} {
 	    if {$AnnotationMode eq "split"} {
 	        set benignText "[benignSVannotation $SVchrom $intersectStart $intersectEnd]"
-	    } else {
+ 	    } else {
 	        set benignText "[benignSVannotation $SVchrom $SVleft $SVright]"
 	    }
 	} 
@@ -1072,13 +1116,30 @@ proc OrganizeAnnotation {} {
 	if {[info exists g_SVLEN($AnnotSV_ID)]} {
 	    set SVlength $g_SVLEN($AnnotSV_ID)
 	} else {
-	    if {[regexp "DEL" [normalizeSVtype $SVtype]]} { ;# DEL
-		set SVlength [expr {$SVstart-$SVend}]
-	    } elseif {[regexp "DUP|INV" [normalizeSVtype $SVtype]]} { ;# DUP or INV
-		set SVlength [expr {$SVend-$SVstart}]
-	    } else {set SVlength ""}
+	    set svtypenorm [normalizeSVtype $SVtype]
+            if {![info exist VCFheader]} {
+	        # SVinputFile = BED
+                if {[regexp "DEL" $svtypenorm]} { ;# DEL
+                    set SVlength [expr {$SVstart-$SVend+1}]
+                } elseif {[regexp "DUP|INV" $svtypenorm]} { ;# DUP or INV
+                    set SVlength [expr {$SVend-$SVstart-1}]
+                } elseif {[regexp "TRA" $svtypenorm]} { ;# TRA
+                    set SVlength 0
+                    set g_SVLEN($AnnotSV_ID) 0
+                } else {set SVlength ""}
+	    } else {
+                # SVinputFile = VCF
+	        if {[regexp "DEL" $svtypenorm]} { ;# DEL
+		    set SVlength [expr {$SVstart-$SVend}]
+	        } elseif {[regexp "DUP|INV" $svtypenorm]} { ;# DUP or INV
+		    set SVlength [expr {$SVend-$SVstart}]
+	        } elseif {[regexp "TRA" $svtypenorm]} { ;# TRA
+                    set SVlength 0
+		    set g_SVLEN($AnnotSV_ID) 0
+                } else {set SVlength ""}
+	    }
 	}
-	
+
 	####### "Exomiser annotation"
 	if {$g_AnnotSV(hpo) ne ""} {
 	    if {$AnnotationMode eq "split"} {
@@ -1366,7 +1427,7 @@ proc OrganizeAnnotation {} {
 		if {$doNotDisplay} {continue}
 	    }
 	    
-	    lappend L_lineCompleted "$lineCompleted"
+	    lappend L_lineCompleted [switchAllCoordinatesFromBEDtoVCFinLine "$lineCompleted"]
 
 	    # To avoid a segmentation fault
 	    incr i

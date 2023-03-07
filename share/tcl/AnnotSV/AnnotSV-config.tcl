@@ -142,11 +142,6 @@ proc configureAnnotSV {argv} {
 	incr j 2
     }
     
-    # If g_AnnotSV(outputColHeader) doesn't contain "Samples_ID", this column should not be displayed
-    if {[lsearch -exact $g_AnnotSV(outputColHeader) "Samples_ID"] eq "-1"} {
-	set g_AnnotSV(samplesidBEDcol) "-1"
-    }
-
     ########################################
     ## Checking of the configuration options
     ########################################
@@ -488,9 +483,11 @@ proc configureAnnotSV {argv} {
 	set g_AnnotSV(organism) "Mouse"
     } 
 
-    # Some annotation columns are essential for the ranking: can not be removed by the user
+
+    # - Some annotation columns are essential for the ranking: can not be removed by the user
+    # - "Samples_ID" is essential for variantconvert (VCF output) and for the SV database : can not be removed by the user
     set g_AnnotSV(genesBasedAnn) 1
-    foreach col "Annotation_mode Gene_name Gene_Count RE_gene B_gain_source B_gain_coord B_loss_source B_loss_coord P_gain_phen P_gain_hpo P_gain_source P_gain_coord P_loss_phen P_loss_hpo P_loss_source P_loss_coord P_snvindel_nb HI TS Gnomad_pLI LOEUF_bin DDD_HI_percent Exomiser_gene_pheno_score OMIM_morbid Location Location2 Overlapped_CDS_percent Frameshift Exon_count" {
+    foreach col "Samples_ID Annotation_mode Gene_name Gene_Count RE_gene B_gain_source B_gain_coord B_loss_source B_loss_coord P_gain_phen P_gain_hpo P_gain_source P_gain_coord P_loss_phen P_loss_hpo P_loss_source P_loss_coord P_snvindel_nb HI TS Gnomad_pLI LOEUF_bin DDD_HI_percent Exomiser_gene_pheno_score OMIM_morbid Location Location2 Overlapped_CDS_percent Frameshift Exon_count" {
 	if {[lsearch -exact "$g_AnnotSV(outputColHeader)" $col] eq -1} {
 	    lappend g_AnnotSV(outputColHeader) $col
 	}

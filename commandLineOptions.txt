@@ -97,6 +97,7 @@ OPTIONS
                                 Values: 1 (default) or 0
 
 -SVminSize:                     SV minimum size (in bp)
+                                AnnotSV does not annotate small deletion, insertion and duplication from a VCF input file 
                                 Default = 50
 
 -svtBEDcol:                     Number of the column describing the SV type (DEL, DUP) if the input SV file is a BED
