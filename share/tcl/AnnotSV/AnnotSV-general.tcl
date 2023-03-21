@@ -124,10 +124,28 @@ proc settingOfTheAnnotSVID {deb ref alt} {
 	set g_deb(${deb}_$i) "1"
 	set g_ID($deb,$ref,$alt) "${deb}_$i"
     }
+
     return $g_ID($deb,$ref,$alt)
 }
 
 
+proc replaceREFwithNinALT {alt} {
+    # Used for square-bracketed SV only.
+    # Examples:
+    # INS: T TAAAA[13:5000[ => N NAAAA[13:5000[
+    # INS: T ]13:5000]AAAAT => N ]13:5000]AAAAN
+    # DEL: T ]22:3000]A => N ]22:3000]N
+    if {[regexp "(\[ACGTN\]*)(\\\[|\\\])(\[^:\]+):(\[0-9\]+)(\\\[|\\\])(\[ACGTN\]*)" $alt match baseLeft bracketLeft bracketChrom bracketStart bracketRight baseRight]} {
+        if {[string length $baseLeft] > [string length $baseRight]} {
+            set baseLeft "N[string range $baseLeft 1 end]"
+        } else {
+            set baseRight "[string range $baseRight 0 end-1]N"
+        }
+        set alt "$baseLeft$bracketLeft${bracketChrom}:$bracketStart$bracketRight$baseRight"
+    }
+    
+    return $alt   
+}
 
 ##############################################################################
 #                          WORKING WITH rsID
@@ -218,6 +236,8 @@ proc normalizeSVtype {SVtype} {
 	set SVtype "INV"
     } elseif {[regexp -nocase "ins|MEI|alu|line|sva" $SVtype]} { ;# "DEL_ALU" is set to "DEL", OK!
 	set SVtype "INS"
+    } elseif {[regexp -nocase "TRA|TRN" $SVtype ]} {
+	set SVtype "TRA"	
     } else {
 	set SVtype "None"
     }

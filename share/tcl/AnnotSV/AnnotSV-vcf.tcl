@@ -329,7 +329,9 @@ proc VCFsToBED {SV_VCFfiles} {
     global g_AnnotSV
     global VCFheader
     global g_SVLEN
-   
+    global g_ID
+    global g_deb
+
     
     ## BED: 0-based, non-inclusive-end [startFromBED, endFromBED[
     ## VCF: 1-based, inclusive-end [startFromBED+1, endFromBED]
@@ -353,6 +355,9 @@ proc VCFsToBED {SV_VCFfiles} {
     
     foreach VCFfile $SV_VCFfiles {
 	set L_TextToWrite {}
+
+	# TextToWrite_rescue($SV_ID)
+	set L_squBrack_SV_ID_Written {}
 	
 	if {[regexp ".gz$" $VCFfile]} {
 	    set f [open "| gzip -cd $VCFfile"]	 
@@ -365,7 +370,8 @@ proc VCFsToBED {SV_VCFfiles} {
 	
 	# Check if the GT feature is present for at least 1 variant
 	set GTabsent 1
-	
+
+	set VCFlineNumber 0	
 	while {![eof $f]} {
 	    
 	    if {$i eq "500000"} {
@@ -373,10 +379,10 @@ proc VCFsToBED {SV_VCFfiles} {
 		set L_TextToWrite {}	    
 		set i 0
 	    }
-	    
+	   
 	    set L [gets $f]
 	    set Ls [split $L "\t"]
-	    
+	    incr VCFlineNumber
 	    if {[string index $L 0] eq "#" || $L eq ""} {
 		if {[regexp "^#CHROM" $L]} {
 		    set VCFheaderNotPresent 0
@@ -406,22 +412,28 @@ proc VCFsToBED {SV_VCFfiles} {
 	    # - Type2: alt="<INS>", "<DEL>", ...
 	    # - Type3: squared-bracketed SV notation: alt="G]17:1584563]" or alt="G]chr17:1584563]" (length > 50bp)
 	    #          (developed with the assistance and guidance of Rodrigo Martin, BSC, Spain)
+            set BNDrescue 0 ;# The ALT of a rescue BND is not square-bracketed anymore
+	    set TRArescue 0
+	    set SquareBracketedSV 0
 	    set chrom [lindex $Ls 0]
 	    regsub -nocase "chr" $chrom "" chrom
             set posVCF [lindex $Ls 1]
 	    set pos [expr {$posVCF-1}]; # VCF: 1-based ==> BED: 0-based
 	    regsub "chr" [lindex $Ls 3] "" ref ; # for alt like: "alt="G]chr17:1584563]"
 	    regsub "chr" [lindex $Ls 4] "" alt
-	    set altVCF $alt ;# To use with settingOfTheAnnotSVID 
+	    set altVCF $alt ;# To use with the proc "settingOfTheAnnotSVID" (because alt is modified if it is a square-bracketed notation)
+            set refVCF $ref
 	    regsub "CHR2=chr" $Ls "CHR2=" Ls
 	    regsub -all "\"" [lindex $Ls 7] "" INFOcol
-	    set svlen ""; set end ""; set svtype ""; set cipos ""; set ciend ""; set chr2 ""
+	    set svlen ""; set end ""; set svtype ""; set cipos ""; set ciend ""; set chr2 ""; set cipos95 ""; set ciend95 ""
             if {[regexp "SVLEN=(\[0-9-\]+)" $INFOcol match SVLEN]} {set svlen $SVLEN} 
 	    if {[regexp ";END=(\[0-9\]+)" $INFOcol match END] || [regexp "^END=(\[0-9\]+)" $INFOcol match END]} {set end $END} 
 	    if {[regexp "SVTYPE=(\[^;\]+)" $INFOcol match SVTYPE]} {set svtype $SVTYPE} 
 	    if {[regexp "CIPOS=(\[^;\]+)" $INFOcol match CIPOS]} {set cipos $CIPOS} 
 	    if {[regexp "CIEND=(\[^;\]+)" $INFOcol match CIEND]} {set ciend $CIEND} 
             if {[regexp "CHR2=(\[^;\]+)" $INFOcol match CHR2]} {set chr2 $CHR2} ;# Translocation
+            if {[regexp "CIPOS95=(\[^;\]+)" $INFOcol match CIPOS95]} {set cipos95 $CIPOS95}
+            if {[regexp "CIEND95=(\[^;\]+)" $INFOcol match CIEND95]} {set ciend95 $CIEND95}
 	    if {[regexp "^<" $alt]} {
 		# Type2: angle-bracketed notation <...>
 
@@ -462,8 +474,7 @@ proc VCFsToBED {SV_VCFfiles} {
                 if {$svlen ne "" && ($svtype eq "DUP" || $svtype eq "DEL" || $svtype eq "INS")} {
                     if {[expr {abs($svlen)}]<$g_AnnotSV(SVminSize)} {
                         # it is a small variant
-                        set AnnotSV_ID [settingOfTheAnnotSVID "${chrom}_${posVCF}_${end}_${svtype}" "$ref" "$altVCF"]
-                        WriteTextInFile "$AnnotSV_ID: variantLength ($svlen) < SVminSize ($g_AnnotSV(SVminSize))" $unannotatedOutputFile
+                        WriteTextInFile "${chrom}_${posVCF}_${end}_${svtype}_${ref}_${altVCF}: variantLength ($svlen) < SVminSize ($g_AnnotSV(SVminSize)) (line $VCFlineNumber)" $unannotatedOutputFile
                         continue
                     }	
 		}
@@ -476,84 +487,157 @@ proc VCFsToBED {SV_VCFfiles} {
 		# => It corresponds to only 1 line in the BED file, except for translocation (where both breakends are annotated)
 		# 
 		# Rules applied here:
-		# - DUP, DEL, INS and INV: We only look at the lines whith pos_POS < pos_ALT. 
+		# - DUP, DEL, INS and INV: We look first at the lines whith pos_POS < pos_ALT. 
+		#                          The other lines (pos_POS > pos_ALT) are only used for BND rescue
 		# - TRA: We look at the 2 breakpoints lines.
+
+                # The ALT of a recovered BND is not square-bracketed anymore but angle-bracketed
+                # The REF is set to "N"
+                set SquareBracketedSV 1
+
 		if {$chrom != $bracketChrom} {
                     # TRA (chrom_#CHROM != chrom_ALT)
                     #################################
                     # Example:
                     # 17      198982  trn_no_mateid_a A       A]2:321681]	=> Line analysed by AnnotSV
                     # 2       321681  trn_no_mateid_b G       G]17:198982]	=> Line analysed by AnnotSV
-		    set alt "<TRA>"
+		    # (INFO: Can not have a translocation on the same chrom. A translocation on the same chrom is always represented with another thing: DUP, INV or DEL)
+		    #        Can not rescue the orientation of the square-brackets from one BND to the paired BND ("]" or "[") => for the rescue: ALT = <TRA>
+		    set ref "N"
+                    set alt "<TRA>"
                     set end $posVCF
 		    set svtype "TRA"
 		    set svlen 0
-		} elseif {$posVCF > $bracketStart} {
-	 	    # DUP, DEL, INS and INV: We only look at the lines whith pos_POS < pos_ALT.
-                    continue
-                } elseif {[string length $baseLeft] > 1 || [string length $baseRight] > 1} {
-                    # INS ("first mapped base" is followed by the inserted sequence)
-                    ################################################################
-                    # Example:
-                    # 13      53040041        ins_by_gridss   T       TATATATATACACAC[13:53040042[	=> Line analysed by AnnotSV
-                    # 13      53040042        ins_by_gridss   A       ]13:53040041]ATATATATACACACA	=> Line NOT analysed by AnnotSV
-		    set svlen [expr {[string length $baseLeft]-1}]	
-		    set svtype "INS"
-                    set end $posVCF
-		    set alt "<INS>"
-                    if {$svlen<$g_AnnotSV(SVminSize)} {
-                        # it is an indel
-                        set AnnotSV_ID [settingOfTheAnnotSVID "${chrom}_${posVCF}_${end}_${svtype}" "$ref" "$altVCF"]
-                        WriteTextInFile "$AnnotSV_ID: variantLength ($svlen) < SVminSize ($g_AnnotSV(SVminSize))" $unannotatedOutputFile
-                        continue
-                    }
-		} elseif {$bracketRight eq "]" && $baseRight ne ""} {
-                    # DUP ("first mapped base" is NOT contained in the bracket: "N[" or "]N"; REF is after the brackets
-		    ###################################################################################################
-		    # Example:
-		    # 2       3000    breakend_dup_a  T       ]2:5000]T  	=> Line analysed by AnnotSV
-		    # 2       5000    breakend_dup_b  T       T[2:3000[ 	=> Line NOT analysed by AnnotSV
-		    set svlen [expr {$bracketStart-$posVCF}] 
-		    set svtype "DUP"
-		    set end $bracketStart
-		    set alt "<DUP>"
-                    if {$svlen<$g_AnnotSV(SVminSize)} {
-                        # it is an indel
-                        set AnnotSV_ID [settingOfTheAnnotSVID "${chrom}_${posVCF}_${end}_${svtype}" "$ref" "$altVCF"]
-                        WriteTextInFile "$AnnotSV_ID: variantLength ($svlen) < SVminSize ($g_AnnotSV(SVminSize))" $unannotatedOutputFile
-                        continue
-                    }
-                } elseif {($bracketRight eq "]" && $baseLeft ne "") || ($bracketRight eq "\[" && $baseRight ne "")} {
-		    # INV ("first mapped base" is contained in the bracket: "N]" or "[N")
-		    #####################################################################
-		    # Example 1:
-		    # 3       2999    breakend_inv_1_a        T       T]3:5000]  	=> Line analysed by AnnotSV
-		    # 3       5000    breakend_inv_1_b        T       [3:2999[T  	=> Line NOT analysed by AnnotSV
-		    # Example 2:
-		    # 3       3000    breakend_inv_2_a        T       [3:5001[T  	=> Line analysed by AnnotSV
-		    # 3       5001    breakend_inv_2_b        T       T]3:3000] 	=> Line NOT analysed by AnnotSV
-		    set svlen [expr {$bracketStart-$posVCF}]
-                    set svtype "INV"
-                    set end $bracketStart
-                    set alt "<INV>"
-                } elseif {$bracketRight eq "\[" && $baseLeft ne ""} {
-		    # DEL ("first mapped base" is NOT contained in the bracket: "N[" or "]N"; "first mapped base" is before the brackets
-		    ####################################################################################################################
-		    # Example:
-		    # 12      3000    breakend_del_1_a        T       T[12:5000[ 	=> Line analysed by AnnotSV
-		    # 12      5000    breakend_del_1_b        T       ]12:3000]T  	=> Line NOT analysed by AnnotSV
-                    set svlen [expr {$posVCF-$bracketStart}];# negative value for del
-                    set svtype "DEL"
-                    set end $bracketStart
-                    set alt "<DEL>"
-                    if {[expr {abs($svlen)}]<$g_AnnotSV(SVminSize)} {
-                        # it is an indel
-                        set AnnotSV_ID [settingOfTheAnnotSVID "${chrom}_${posVCF}_${end}_${svtype}" "$ref" "$altVCF"]
-                        WriteTextInFile "$AnnotSV_ID: variantLength ([expr {abs($svlen)}])< SVminSize ($g_AnnotSV(SVminSize))" $unannotatedOutputFile
-                        continue
-                    }
-		}
 
+		    set TRArescue 1
+		    set altVCF2 "<TRA>"
+		    set chrom2 $bracketChrom
+                    set pos2 [expr {$bracketStart-1}]; # VCF: 1-based ==> BED: 0-based
+		    set posVCF2 $bracketStart
+		    set end2 $bracketStart
+                    set INFOcol2 "$INFOcol;BNDrescue"
+
+                    # #CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  sample1  sample2
+                    set L2 "$chrom2\t$bracketStart\t[lindex $Ls 2]\t$ref\t$altVCF2\t[join [lrange $Ls 5 6] "\t"]\t$INFOcol2\t[join [lrange $Ls 8 end] "\t"]"
+                    set L2s [split $L2 "\t"]
+		    regsub -all "\\\\" $L2s "" L2s
+
+		} else {
+		    if {$posVCF > $bracketStart} {
+			# Lines only used for BND rescue
+
+	 	    	# DUP, DEL, INS and INV: We first look at the lines whith pos_POS < pos_ALT
+		    	# => Else, search for the reciprocal breakend in case of rescue needed 
+		    	# With one breakend, you can always infer the other. Indeed, the only thing that could be different from the mate breakend is 
+		    	# its CIPOS INFO field (but it should be provided in the CIEND field of the other breakend). 
+	 	    	# Regarding GT, both breakends must have the same GT because they represent the same thing. 
+		    	# The CIEND/CIPOS relationship is that you can use the CIEND info from the breakend you already have to set the CIPOS field of the new "inferred" breakend.
+
+			set BNDrescue 1; # The other BND from this BND pair can be recovered here
+
+		    	set remember $posVCF
+		    	set posVCF $bracketStart
+		    	set bracketStart $remember
+		    	set pos [expr {$posVCF-1}]; # VCF: 1-based ==> BED: 0-based
+
+			# Modif in $INFOcol: Correction of the CIPOS, CIEND...
+			#                    Add "BNDrescue"
+		   	set remember $cipos
+		    	set cipos $ciend
+		    	set ciend $remember
+			regsub "CIPOS=\[^;\]+" $INFOcol "CIPOS=$cipos" INFOcol
+                        regsub "CIEND=\[^;\]+" $INFOcol "CIEND=$ciend" INFOcol
+                    	set remember $cipos95
+                    	set cipos95 $ciend95
+                    	set ciend95 $remember
+                        regsub "CIPOS95=\[^;\]+" $INFOcol "CIPOS95=$cipos95" INFOcol
+                        regsub "CIEND95=\[^;\]+" $INFOcol "CIEND95=$ciend95" INFOcol			
+			append INFOcol ";BNDrescue"
+
+                        set ref "N"
+                        if {[string length $baseLeft] > 1} {
+			    set baseLeft "[string range $baseLeft 1 end]N"
+			} elseif {[string length $baseRight] > 1} {
+ 			    set baseRight "N[string range $baseRight 0 end-1]"
+			}
+                        set remember $baseLeft
+                        set baseLeft $baseRight
+                        set baseRight $remember
+			if {$bracketLeft == "\["} {
+			    set bracketLeft "\]"
+                            set bracketRight "\]"
+			} else {
+                            set bracketLeft "\["
+                            set bracketRight "\["
+			}
+			set alt "$baseLeft$bracketLeft${bracketChrom}:$bracketStart$bracketRight$baseRight"
+			set altVCF $alt
+
+			# #CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  sample1  sample2
+			set L "$chrom\t$posVCF\t[lindex $Ls 2]\t$ref\t$altVCF\t[join [lrange $Ls 5 6] "\t"]\t$INFOcol\t[join [lrange $Ls 8 end] "\t"]"
+			set Ls [split $L "\t"]
+		    }
+		    
+               	    if {[string length $baseLeft] > 1 || [string length $baseRight] > 1} {
+			# INS ("first mapped base" is followed by the inserted sequence)
+			################################################################
+			# Example:
+			# 13      53040041        ins_by_gridss   T       TATATATATACACAC[13:53040042[	=> Line analysed by AnnotSV
+			# 13      53040042        ins_by_gridss   A       ]13:53040041]ATATATATACACACA	=> Line NOT reported by AnnotSV (if the previous BND has already been analysed)
+			set svlen [expr {[string length $baseLeft]-1}]	
+			set svtype "INS"
+			set end $posVCF
+			set alt "<INS>"
+			if {$svlen<$g_AnnotSV(SVminSize)} {
+			    # it is an indel
+			    WriteTextInFile "${chrom}_${posVCF}_${end}_${svtype}_${ref}_${altVCF}: variantLength ($svlen) < SVminSize ($g_AnnotSV(SVminSize)) (line $VCFlineNumber)" $unannotatedOutputFile
+			    continue
+			}
+		    } elseif {$bracketRight eq "]" && $baseRight ne ""} { 
+			# DUP ("first mapped base" is NOT contained in the bracket: "N[" or "]N"; REF is after the brackets
+			###################################################################################################
+			# Example:
+			# 2       3000    breakend_dup_a  T       ]2:5000]T  	=> Line analysed by AnnotSV
+			# 2       5000    breakend_dup_b  T       T[2:3000[ 	=> Line NOT reported by AnnotSV (if the previous BND has already been analysed)
+			set svlen [expr {$bracketStart-$posVCF}] 
+			set svtype "DUP"
+			set end $bracketStart
+			set alt "<DUP>"
+			if {$svlen<$g_AnnotSV(SVminSize)} {
+			    # it is an indel
+			    WriteTextInFile "${chrom}_${posVCF}_${end}_${svtype}_${ref}_${altVCF}: variantLength ($svlen) < SVminSize ($g_AnnotSV(SVminSize)) (line $VCFlineNumber)" $unannotatedOutputFile
+			    continue
+			}
+		    } elseif {($bracketRight eq "]" && $baseLeft ne "") || ($bracketRight eq "\[" && $baseRight ne "")} { 
+			# INV ("first mapped base" is contained in the bracket: "N]" or "[N")
+			#####################################################################
+			# Example 1:
+			# 3       2999    breakend_inv_1_a        T       T]3:5000]  	=> Line analysed by AnnotSV
+			# 3       5000    breakend_inv_1_b        T       [3:2999[T  	=> Line NOT reported by AnnotSV (if the previous BND has already been analysed)
+			# Example 2:
+			# 3       3000    breakend_inv_2_a        T       [3:5001[T  	=> Line analysed by AnnotSV
+			# 3       5001    breakend_inv_2_b        T       T]3:3000] 	=> Line NOT reported by AnnotSV (if the previous BND has already been analysed)
+			set svlen [expr {$bracketStart-$posVCF}]
+			set svtype "INV"
+			set end $bracketStart
+                        set alt "<INV>"
+		    } elseif {$bracketRight eq "\[" && $baseLeft ne ""} {
+			# DEL ("first mapped base" is NOT contained in the bracket: "N[" or "]N"; "first mapped base" is before the brackets
+			####################################################################################################################
+			# Example:
+			# 12      3000    breakend_del_1_a        T       T[12:5000[ 	=> Line analysed by AnnotSV
+			# 12      5000    breakend_del_1_b        T       ]12:3000]T  	=> Line NOT reported by AnnotSV (if the previous BND has already been analysed)
+			set svlen [expr {$posVCF-$bracketStart}];# negative value for del
+			set svtype "DEL"
+			set end $bracketStart
+			set alt "<DEL>"
+			if {[expr {abs($svlen)}]<$g_AnnotSV(SVminSize)} {
+			    # it is an indel
+			    WriteTextInFile "${chrom}_${posVCF}_${end}_${svtype}_${ref}_${altVCF}: variantLength ([expr {abs($svlen)}])< SVminSize ($g_AnnotSV(SVminSize)) (line $VCFlineNumber)" $unannotatedOutputFile
+			    continue
+			}
+		    }
+		}
 	    } elseif {[regexp -nocase "^\[ACGTN.*\]+$" $ref$alt]} {
 		# Type1
 		regsub -all "\[*.\]" $ref "" refbis ;# cf GRIDSS comment, just below
@@ -569,8 +653,7 @@ proc VCFsToBED {SV_VCFfiles} {
 		    # deletion
                     if {[expr {abs($variantLengthType1)}]<$g_AnnotSV(SVminSize)} {
                         # it is a small deletion (indel)
-                        set AnnotSV_ID [settingOfTheAnnotSVID "${chrom}_${pos}_${end}_${svtype}" "$ref" "$altVCF"]
-                        WriteTextInFile "$AnnotSV_ID: variantLength ([expr {abs($variantLengthType1)}]) < SVminSize ($g_AnnotSV(SVminSize))" $unannotatedOutputFile
+                        WriteTextInFile "${chrom}_${posVCF}_${end}_${svtype}_${ref}_${altVCF}: variantLength ([expr {abs($variantLengthType1)}]) < SVminSize ($g_AnnotSV(SVminSize)) (line $VCFlineNumber)" $unannotatedOutputFile
                         continue
                     }
 		    if {$end eq ""} {set end [expr $pos-$variantLengthType1]}
@@ -595,8 +678,7 @@ proc VCFsToBED {SV_VCFfiles} {
 		}
 		if {$svlen eq ""} {set svlen $variantLengthType1}
 	    } else {
-		set AnnotSV_ID [settingOfTheAnnotSVID "${chrom}_${pos}_${end}_${svtype}" "$ref" "$alt"]
-		WriteTextInFile "$AnnotSV_ID: not a known SV format" $unannotatedOutputFile
+		WriteTextInFile "${chrom}_${posVCF}_${end}_${svtype}_${ref}_${altVCF}: not a known SV format (line $VCFlineNumber)" $unannotatedOutputFile
 		continue
 	    }
 
@@ -619,22 +701,39 @@ proc VCFsToBED {SV_VCFfiles} {
 		}
 	    }
 
-	    set AnnotSV_ID [settingOfTheAnnotSVID "${chrom}_${pos}_${end}_${svtype}" "$ref" "$altVCF"]
-		
 	    # chrUn_KN707671v1_decoy 
             set L_orderedChrom {1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y M MT}
 	    if {[lsearch -exact "$L_orderedChrom" $chrom] eq -1} {
-		WriteTextInFile "$AnnotSV_ID: chromosome \"$chrom\" unknown" $unannotatedOutputFile
+		WriteTextInFile "${chrom}_${posVCF}_${end}_${svtype}_${ref}_${altVCF}: chromosome \"$chrom\" unknown (line $VCFlineNumber)" $unannotatedOutputFile
 		continue
 	    }
-
+	    # END of the SV not defined
 	    if {$end eq ""} {
-		WriteTextInFile "$AnnotSV_ID: END of the SV not defined" $unannotatedOutputFile
+		WriteTextInFile "${chrom}_${posVCF}_${end}_${svtype}_${ref}_${altVCF}: END of the SV not defined (line $VCFlineNumber)" $unannotatedOutputFile
 		continue
 	    }
 
-	    if {$svtype eq "CNV" || $svtype eq ""} {set svtype $alt}
-	
+	    # ALT with square-bracketed notation (For duplication, inversion, deletion and insertion. Not for translocation)
+	    # If both BND (in a SV pair) are presents and ordered, we don't use the line with the 2d BND of the pair.
+            if {$BNDrescue} {
+		set idWithN "${chrom}_${posVCF}_${end}_${svtype}_${ref}_[replaceREFwithNinALT ${altVCF}]"
+		if {[lsearch -exact $L_squBrack_SV_ID_Written "$idWithN"] ne -1} {
+                    WriteTextInFile "$idWithN: reciprocal breakend (line $VCFlineNumber)" $unannotatedOutputFile
+	            continue
+		}
+            }
+
+
+    	    if {$SquareBracketedSV} {
+		if {$svtype eq "TRA"} {
+            	    # If both BND (in a TRA pair) are presents: the rescue of the 2d BND is already listed in $L_squBrack_SV_ID_Written
+	            set idTRArescue "${chrom2}_${posVCF2}_${end2}_${svtype}_${ref}_<TRA>"
+        	    if {[lsearch -exact $L_squBrack_SV_ID_Written "$idTRArescue"] ne -1} {
+                       set TRArescue 0
+                    }
+		}                    
+	    }
+
 	    # Set up for the Samples_ID value
 	    set i_gt [lsearch -exact [split [lindex $Ls 8] ":"] "GT"]
 	    if {$i_gt eq -1} {
@@ -651,21 +750,101 @@ proc VCFsToBED {SV_VCFfiles} {
 		}
 	    }
 
-	    # Text to write
+	    # Text to write + Text to possibly rescue
+	    #
+	    # AnnotSV_ID is required to set the "g_SVLEN($AnnotSV_ID)" variable
+	    # - For the setting of AnnotSV_ID, we use the "ref" and "alt" written in the BED file!
+	    # - At the end, we unset the global variables "g_ID" and "g_deb"
+
 	    if {$g_AnnotSV(SVinputInfo)} {
-	        lappend L_TextToWrite "$chrom\t$pos\t$end\t$svtype\t[join $L_samplesid ","]\t[join [lrange $Ls 2 end] "\t"]"
+		if {$BNDrescue} {
+		    # With the BND recovery, the REF and ALT fields have an undefined NT ("N")
+            	    # #CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  sample1  sample2
+                    set idWithN "${chrom}_${posVCF}_${end}_${svtype}_${ref}_[replaceREFwithNinALT ${altVCF}]"
+                    regsub -all "\\\]|\\\[" "$idWithN" ";" idWithN
+                    set TextToWrite_rescue($idWithN) "$chrom\t$pos\t$end\t$svtype\t[join $L_samplesid ","]\t[lindex $Ls 2]\t$ref\t$alt\t[join [lrange $Ls 5 end] "\t"]"
+		    set VCFline_rescue($idWithN) $VCFlineNumber
+		    set AnnotSV_ID [settingOfTheAnnotSVID "${chrom}_${pos}_${end}_${svtype}" "$ref" "$alt"]
+	    	} else {
+	            lappend L_TextToWrite "$chrom\t$pos\t$end\t$svtype\t[join $L_samplesid ","]\t[join [lrange $Ls 2 end] "\t"]"
+            	    if {$SquareBracketedSV} {
+                	if {$svtype eq "TRA"} {
+                    	    set idTRA "${chrom}_${posVCF}_${end}_${svtype}_${ref}_<TRA>"
+                    	    lappend L_squBrack_SV_ID_Written "$idTRA"
+                        } else {
+                    	    # lappend add "\" before "]" => we remove all []
+                    	    regsub -all "\\\]|\\\[" "${chrom}_${posVCF}_${end}_${svtype}_${refVCF}_${altVCF}" ";" idWithoutN
+                    	    lappend L_squBrack_SV_ID_Written "$idWithoutN"
+                    	    regsub -all "\\\]|\\\[" "${chrom}_${posVCF}_${end}_${svtype}_N_[replaceREFwithNinALT ${altVCF}]" ";" idWithN
+                    	    lappend L_squBrack_SV_ID_Written "$idWithN"
+                        }
+                    }
+		    set AnnotSV_ID [settingOfTheAnnotSVID "${chrom}_${pos}_${end}_${svtype}" "$refVCF" "$altVCF"]
+	        }
+		if {$TRArescue} {
+		    set idTRA "${chrom2}_${posVCF2}_${end2}_${svtype}_${ref}_<TRA>"
+		    set TextToWrite_rescue($idTRA) "$chrom2\t$pos2\t$end2\t$svtype\t[join $L_samplesid ","]\t[lindex $L2s 2]\t$ref\t$alt\t[join [lrange $L2s 5 end] "\t"]"
+                    set VCFline_rescue($idTRA) $VCFlineNumber
+                    set AnnotSV_ID2 [settingOfTheAnnotSVID "${chrom2}_${pos2}_${end2}_${svtype}" "$ref" "$alt"]
+		}
 	    } else {
-	        lappend L_TextToWrite "$chrom\t$pos\t$end\t$svtype\t[join $L_samplesid ","]\t$ref\t$alt\t[join [lrange $Ls 8 end] "\t"]"
+                if {$BNDrescue} {
+                    set idWithN "${chrom}_${posVCF}_${end}_${svtype}_${ref}_[replaceREFwithNinALT ${altVCF}]"
+                    regsub -all "\\\]|\\\[" "$idWithN" ";" idWithN
+		    set TextToWrite_rescue($idWithN) "$chrom\t$pos\t$end\t$svtype\t[join $L_samplesid ","]\t$ref\t$alt\t[join [lrange $Ls 8 end] "\t"]"
+                    set VCFline_rescue($idWithN) $VCFlineNumber
+                    set AnnotSV_ID [settingOfTheAnnotSVID "${chrom}_${pos}_${end}_${svtype}" "$ref" "$altVCF"]
+		} else {
+	            lappend L_TextToWrite "$chrom\t$pos\t$end\t$svtype\t[join $L_samplesid ","]\t$refVCF\t$altVCF\t[join [lrange $Ls 8 end] "\t"]"
+                    if {$SquareBracketedSV} {
+                        if {$svtype eq "TRA"} {
+                            set idTRA "${chrom}_${posVCF}_${end}_${svtype}_${ref}_<TRA>"
+                            lappend L_squBrack_SV_ID_Written "$idTRA"
+                        } else {
+                            # lappend add "\" before "]" => we remove all []
+                            regsub -all "\\\]|\\\[" "${chrom}_${posVCF}_${end}_${svtype}_${refVCF}_${altVCF}" ";" idWithoutN
+                            lappend L_squBrack_SV_ID_Written "$idWithoutN"
+                            regsub -all "\\\]|\\\[" "${chrom}_${posVCF}_${end}_${svtype}_N_[replaceREFwithNinALT ${altVCF}]" ";" idWithN
+                            lappend L_squBrack_SV_ID_Written "$idWithN"
+                        }
+                    }
+                    set AnnotSV_ID [settingOfTheAnnotSVID "${chrom}_${pos}_${end}_${svtype}" "$refVCF" "$altVCF"]
+		}
+                if {$TRArescue} {
+                    set idTRA "${chrom2}_${posVCF2}_${end2}_${svtype}_${ref}_<TRA>"
+                    set TextToWrite_rescue($idTRA) "$chrom2\t$pos2\t$end2\t$svtype\t[join $L_samplesid ","]\t$ref\t$alt\t[join [lrange $L2s 8 end] "\t"]"
+                    set VCFline_rescue($idTRA) $VCFlineNumber
+                    set AnnotSV_ID2 [settingOfTheAnnotSVID "${chrom2}_${pos2}_${end2}_${svtype}" "$ref" "$alt"]
+                }
 	    }
-	    
-	    # Definition of g_SVLEN:
-	    # (If not defined here, the variant length can be calculated in AnnotSV-write.tcl for some type of SV)
-	    if {$svlen ne ""} {
-		set g_SVLEN($AnnotSV_ID) $svlen
-	    }
+
+            # Definition of g_SVLEN:
+            # (If not defined here, the variant length can be calculated in AnnotSV-write.tcl for some type of SV)
+            if {$svlen ne ""} {
+                set g_SVLEN($AnnotSV_ID) $svlen
+                if {$TRArescue} {
+                    set g_SVLEN($AnnotSV_ID2) 0
+		}
+            }
 	}
 	if {![regexp ".gz$" $VCFfile]} {close $f}
-	
+
+
+
+	# Writing of the BED file	
+	#########################
+	WriteTextInFile [join $L_TextToWrite "\n"] $SV_BEDfile
+
+	# Writing of the BND rescue lines (if needed)
+	#############################################
+	set L_TextToWrite {}
+	foreach SV_ID [array names TextToWrite_rescue] {
+	    if {[lsearch -exact $L_squBrack_SV_ID_Written "$SV_ID"] eq -1} {
+                lappend L_TextToWrite $TextToWrite_rescue($SV_ID)
+	    } else {
+                WriteTextInFile "$SV_ID: reciprocal breakend (line $VCFline_rescue($SV_ID))" $unannotatedOutputFile
+	    }
+	}
 	WriteTextInFile [join $L_TextToWrite "\n"] $SV_BEDfile
 
 	if {$g_AnnotSV(candidateSnvIndelFiles) ne "" && $GTabsent} {
@@ -699,6 +878,10 @@ proc VCFsToBED {SV_VCFfiles} {
 	puts "############################################################################"
 	exit 0
     }
+
+    # Unset the global variables "g_ID" and "g_deb" before to set the AnnotSV_ID variables in AnnotSV-write.tcl
+    unset g_ID
+    unset g_deb
 
     return "$SV_BEDfile"
 }

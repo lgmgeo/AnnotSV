@@ -1339,6 +1339,7 @@ proc OrganizeAnnotation {} {
     set i_Annotation_mode [lsearch -exact [split $headerOutput "\t"] "Annotation_mode"]
     set i_genename        [lsearch -exact [split $headerOutput "\t"] "Gene_name"]
     set i 0
+
     foreach AnnotSV_ID $L_AnnotSV_ID {
 	set AnnotSV_ID [lindex $AnnotSV_ID 0]
 	foreach fullOrSplitLine $L_TextToWrite($AnnotSV_ID) {

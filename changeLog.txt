@@ -10,6 +10,18 @@
 
 For more details, please see the README file.
 
+
+March, , 2023, AnnotSV version 3.3
+	- Add bugfix regarding genomic start coordinates. TSV and VCF output files are now both 1-based, with inclusive-end (whatever the input file format)
+	- Interpret the square-bracketed SV breakend notations within the VCF. This new module relies on the homogenization rules provided within the variant-extractor tool developed by Rodrigo Martín.
+	- Reformat of the unannotated.tsv file
+	- Add of the .gitignore file
+	- Add of the "Samples_ID" column in ALL outputs (required by variantconvert)
+	- VCF format handling update. According to the VCF 4.4 specification the SVTYPE has now been deprecated. The SV type is now extracted first from the ALT column, then from the SVTYPE field in the INFO column if available.
+	  (The SVTYPE field has been deprecated due to redundancy with ALT in VCF4.4 specification)
+	- Add bugfix for the TAD annotations update process
+	- Automation of the variantconvert module installaton
+
 January, 31, 2023, AnnotSV version 3.2.3
 	- "Samples_ID" field is now always reported in the output (default, sample = NA)
 	- Add the creation of a VCF output file from a "BED" SV input file. The "-vcf" and "-svtBEDcol" options are required.
