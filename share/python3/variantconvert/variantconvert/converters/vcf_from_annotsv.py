@@ -10,7 +10,14 @@ from natsort import index_natsorted
 from converters.abstract_converter import AbstractConverter
 
 sys.path.append("..")
-from commons import create_vcf_header, is_helper_func, remove_decimal_or_strip
+from commons import (
+    create_vcf_header,
+    info_string_to_dict,
+    is_helper_func,
+    is_int,
+    is_float,
+    remove_decimal_or_strip,
+)
 from helper_functions import HelperFunctions
 
 
@@ -83,12 +90,27 @@ class VcfFromAnnotsv(AbstractConverter):
         columns_to_drop += [v for v in self.main_vcf_cols]
         columns_to_drop.append(self.config["VCF_COLUMNS"]["SAMPLE"])
         columns_to_drop.append(self.config["VCF_COLUMNS"]["FORMAT"])
+
+        if self.config["GENERAL"].get("keep_info", False) in ("true", "True"):
+            log.debug(
+                f"config['GENERAL']['keep_info'] was set to string:'{self.config['GENERAL']['keep_info']}' instead of a boolean. Converting value to True"
+            )
+            self.config["GENERAL"]["keep_info"] = True
+        if self.config["GENERAL"].get("keep_info", False) == True:
+            self.original_info_col = self.input_df[self.config["VCF_COLUMNS"]["INFO"]["INFO"]]
         columns_to_drop.append(self.config["VCF_COLUMNS"]["INFO"]["INFO"])
         for col in columns_to_drop:
             try:
                 df = self.input_df.drop([col], axis=1)
             except KeyError:
                 log.debug(f"Failed to drop column: {col}")
+
+        # if self.config["GENERAL"].get("keep_info", False) == True:
+        #     cols_without_info = df.columns.difference(["INFO"])
+        #     df[cols_without_info] = df[cols_without_info].replace(
+        #         ";", ",", regex=True
+        #     )  # any ';' in annots will ruin the vcf INFO field
+        # else:
         df = df.replace(";", ",", regex=True)  # any ';' in annots will ruin the vcf INFO field
 
         # TODO: check if CHROM col is in compliance with config ref genome (chrX or X)
@@ -187,10 +209,84 @@ class VcfFromAnnotsv(AbstractConverter):
         input_annot_df = self._build_input_annot_df()
         annots_dic = {}
         id_col = self.config["VCF_COLUMNS"]["INFO"]["AnnotSV_ID"]
+        supplemental_info_fields = []
+
         for variant_id, df_variant in input_annot_df.groupby(id_col):
             merged_annots = self._merge_full_and_split(df_variant)
             annots_dic[variant_id] = merged_annots
+
+            if self.config["GENERAL"].get("keep_info", False) == True:
+                info_dict = info_string_to_dict(
+                    self.original_info_col.iloc[df_variant.index].iloc[0]
+                )
+                log.debug(f"info_dict before adding INFO: {info_dict}")
+                for annot in info_dict:
+                    if annot not in annots_dic[variant_id]:
+                        annots_dic[variant_id][annot] = info_dict[annot]
+                        if annot not in supplemental_info_fields:
+                            supplemental_info_fields.append(annot)
+
+                log.debug(f"info_dict after: {info_dict}")
+
+        if self.config["GENERAL"].get("keep_info", False) == True:
+            self.supplemental_header = self._build_supplemental_header(
+                annots_dic, supplemental_info_fields
+            )
+        else:
+            self.supplemental_header = []
+
         return annots_dic
+
+    def _build_supplemental_header(self, annots_dic, additional_info_fields):
+        """
+        Create header strings for each value in additional_info_fields
+        Types are inferred from the values in annots_dic
+
+        Args:
+            annots_dic (dict): has the following structure:
+                                {
+                                    variant1: {key1: val1, key2: val2},
+                                    variant2: {key1: val1, key2: val2}
+                                }
+            additional_info_fields (set[str]): new info fields who need to be added to header
+
+        Returns:
+            list[str]: header strings, one for each additional_info_fields.
+            Doesn't include newlines, as expected by commons.create_vcf_header(args)
+        """
+        supplemental_header = []
+        default_description = "Imported from original VCF before AnnotSV annotation"
+
+        for field in additional_info_fields:
+            # infer type
+            if all([is_int(v.get(field, None)) for v in annots_dic.values()]):
+                field_type = "Integer"
+            elif all([is_float(v.get(field, None)) for v in annots_dic.values()]):
+                field_type = "Float"
+            else:
+                field_type = "String"
+
+            # infer number
+            for info in annots_dic.values():
+                if field in info:
+                    if info[field] == None:
+                        number = 0
+                        field_type = "Flag"
+                    else:
+                        number = info[field].count(",") + 1
+
+            supplemental_header.append(
+                "##INFO=<ID="
+                + field
+                + ",Number="
+                + str(number)
+                + ",Type="
+                + field_type
+                + ',Description="'
+                + default_description
+                + '">'
+            )
+        return supplemental_header
 
     # TODO: merge this with the other create_vcf_header method if possible
     # Making this method static is an attempt at making it possible to kick it out of the class
@@ -344,7 +440,12 @@ class VcfFromAnnotsv(AbstractConverter):
 
         # create the vcf
         with open(output_path, "w") as vcf:
-            vcf_header = create_vcf_header(tsv, self.config, self.sample_list)
+            vcf_header = create_vcf_header(
+                tsv,
+                self.config,
+                self.sample_list,
+                supplemental_header=self.supplemental_header,
+            )
             for l in vcf_header:
                 vcf.write(l + "\n")
 
@@ -373,7 +474,14 @@ class VcfFromAnnotsv(AbstractConverter):
 
                 main_cols = "\t".join(df_variant[self.main_vcf_cols].iloc[0].to_list())
                 vcf.write(main_cols + "\t")
-                vcf.write(";".join([k + "=" + v for k, v in info_dic[variant_id].items()]) + "\t")
+
+                info_list = []
+                for k, v in info_dic[variant_id].items():
+                    if v != None:
+                        info_list.append(k + "=" + v)
+                    else:
+                        info_list.append(k)  # deal with INFO flags
+                vcf.write(";".join(info_list) + "\t")
 
                 if self.config["VCF_COLUMNS"]["FORMAT"] != "":
                     sample_cols = "\t".join(
@@ -382,6 +490,8 @@ class VcfFromAnnotsv(AbstractConverter):
                         .to_list()
                     )
                 else:
-                    sample_cols = "GT\t" + self.config["GENERAL"]["default_genotype"]
+                    sample_cols = "GT"
+                    for i in range(len(self.sample_list)):
+                        sample_cols += f"\t{self.config['GENERAL']['default_genotype']}"
                 vcf.write(sample_cols)
                 vcf.write("\n")

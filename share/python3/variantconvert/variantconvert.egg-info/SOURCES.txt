@@ -3,9 +3,12 @@ README.md
 pyproject.toml
 setup.cfg
 setup.py
+tests/test_config.py
+tests/test_main.py
 variantconvert/__init__.py
 variantconvert/__main__.py
 variantconvert/commons.py
+variantconvert/config.py
 variantconvert/converter_factory.py
 variantconvert/helper_functions.py
 variantconvert/varank_batch.py

@@ -42,25 +42,14 @@ proc checkVariantconvertConfigfile {} {
 	## (no need to have a reference fasta file from a VCF SVinputfile)
 	if {[regexp "\\.bed$" $g_AnnotSV(SVinputFile)]} {
 
-	    if {$g_AnnotSV(genomeBuild) == "GRCh37"} {
-                set configfile "$variantconvertDIR/configs/config_annotsv3_from_bed_GRCh37.json"
-                set localconfigfile "$variantconvertDIR/configs/config_annotsv3_from_bed_GRCh37.local.json"
+            set configfile "$variantconvertDIR/configs/$g_AnnotSV(genomeBuild)/annotsv3_from_bed.json"
+            set localconfigfile "$variantconvertDIR/configs/$g_AnnotSV(genomeBuild)/annotsv3_from_bed.local.json"
 
-		set distributedPathLine "\"path\": \"human_g1k_v37.fasta\""
-		set newPathLine         "\"path\": \"$env(ANNOTSV)/share/AnnotSV/Annotations_Human/BreakpointsAnnotations/GCcontent/GRCh37/GRCh37_chromFa.fasta\""
-		set distributedRefLine  "##reference=file:human_g1k_v37.fasta"
-		set newRefLine          "##reference=file:$env(ANNOTSV)/share/AnnotSV/Annotations_Human/BreakpointsAnnotations/GCcontent/GRCh37/GRCh37_chromFa.fasta"
+	    set distributedPathLine "\"path\": \".*\","
+	    set newPathLine         "\"path\": \"$env(ANNOTSV)/share/AnnotSV/Annotations_Human/BreakpointsAnnotations/GCcontent/GRCh37/GRCh37_chromFa.fasta\","
+	    set distributedRefLine  "\"##reference=file:.*\""
+	    set newRefLine          "\"##reference=file:$env(ANNOTSV)/share/AnnotSV/Annotations_Human/BreakpointsAnnotations/GCcontent/GRCh37/GRCh37_chromFa.fasta\""
 
-            } elseif {$g_AnnotSV(genomeBuild) == "GRCh38"} {
-                set configfile "$variantconvertDIR/configs/config_annotsv3_from_bed_GRCh38.json"
-                set localconfigfile "$variantconvertDIR/configs/config_annotsv3_from_bed_GRCh38.local.json"
-		
-		set distributedPathLine "\"path\": \"Homo_sapiens_assembly38.fasta\""
-                set newPathLine "\"path\": \"$env(ANNOTSV)/share/AnnotSV/Annotations_Human/BreakpointsAnnotations/GCcontent/GRCh38/GRCh38_chromFa.fasta\""
-		set distributedRefLine  "##reference=file:Homo_sapiens_assembly38.fasta"
-		set newRefLine          "##reference=file:$env(ANNOTSV)/share/AnnotSV/Annotations_Human/BreakpointsAnnotations/GCcontent/GRCh38/GRCh38_chromFa.fasta"
-            }
-	    
 	    if {![file exists $localconfigfile]} {
 		set L_Lines {}
 		foreach L [LinesFromFile $configfile] {

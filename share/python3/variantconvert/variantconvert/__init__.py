@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 @Author: Samuel Nicaise
-@Version: v1.0.0
+@Version: v1.2.1
 """
 
 __all__ = [
@@ -13,4 +13,4 @@ __all__ = [
     "varank_batch",
 ]
 
-__version__ = "1.0.0"
+__version__ = "1.2.1"

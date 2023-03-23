@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 @Author: Samuel Nicaise
-@Version: v1.0.0
+@Version: v1.2.1
 """
 
 from commons import get_genome
@@ -48,6 +48,10 @@ class HelperFunctions:
             "get_gt_from_varank": self.get_gt_from_varank,
             "get_ad_from_varank": self.get_ad_from_varank,
             "get_vaf_from_varank": self.get_vaf_from_varank,
+            "get_chr_from_bedpe": self.get_chr_from_bedpe,
+            "get_pos_from_bedpe": self.get_pos_from_bedpe,
+            "get_ref_from_bedpe": self.get_ref_from_bedpe,
+            "get_alt_from_bedpe": self.get_alt_from_bedpe,
         }
 
     def get(self, func_name):
@@ -230,3 +234,33 @@ class HelperFunctions:
         if var_read_percent == ".":
             return var_read_percent
         return str(float(var_read_percent) / 100)
+
+    @staticmethod
+    def get_chr_from_bedpe(chr1, chr2):
+        return (chr1, chr2)
+
+    @staticmethod
+    def get_pos_from_bedpe(end1, end2):
+        return (end1, end2)
+
+    def get_ref_from_bedpe(self, chr1, end1, chr2, end2):
+        f = get_genome(self.config["GENOME"]["path"])
+
+        return (
+            f[chr1][int(end1) - 1].seq,
+            f[chr2][int(end2) - 1].seq,
+        )
+
+    def get_alt_from_bedpe(self, chr1, end1, strand1, chr2, end2, strand2):
+        ref1, ref2 = self.get_ref_from_bedpe(chr1, end1, chr2, end2)
+
+        return self.get_alt_with_breakpoints(
+            chr1,
+            end1,
+            strand1,
+            ref1,
+            chr2,
+            end2,
+            strand2,
+            ref2,
+        )

@@ -50,6 +50,7 @@ dependencies:
       - pathspec==0.10.3
       - platformdirs==2.6.2
       - pluggy==1.0.0
+      - polars==0.16.5
       - pyfaidx==0.7.1
       - pytest==7.2.1
       - tomli==2.0.1

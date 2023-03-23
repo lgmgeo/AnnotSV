@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import logging as log
+import natsort
 import os
 import pandas as pd
 import sys
@@ -47,7 +48,10 @@ class VcfFromBreakpoints(AbstractConverter):
                 sample_list.append(sample)
             return sample_list
         else:
-            return [os.path.basename(self.output_path)]
+            default_name = os.path.basename(self.output_path)
+            if default_name.endswith(".vcf"):
+                default_name = default_name[:-4]
+            return [default_name]
 
     def _get_unique_variant_id(self, row):
         variant_id = []
@@ -85,6 +89,7 @@ class VcfFromBreakpoints(AbstractConverter):
             already_seen_variants = set()
             unique_id_to_index_list = self._get_unique_id_to_index_list(data)
 
+            final_variants_list = []
             for i in range(len(data[self.unique_variant_id_column])):
                 if data[self.unique_variant_id_column][i] in already_seen_variants:
                     continue
@@ -171,7 +176,7 @@ class VcfFromBreakpoints(AbstractConverter):
                     sample_field = []
                     for key, val in self.config["VCF_COLUMNS"]["FORMAT"].items():
                         if key == "GT" and val == "":
-                            sample_field.append("0/1")
+                            sample_field.append(self.config["GENERAL"]["default_genotype"])
                             continue
                         sample_field.append(data[val][index])
                     lines[0].append(":".join(sample_field))
@@ -184,7 +189,7 @@ class VcfFromBreakpoints(AbstractConverter):
                         sample_field = []
                         for key, val in self.config["VCF_COLUMNS"]["FORMAT"].items():
                             if key == "GT" and val == "":
-                                sample_field.append("0/1")
+                                sample_field.append(self.config["GENERAL"]["default_genotype"])
                                 continue
                             sample_field.append(data[val][index])
                         sample_field_dic[
@@ -212,7 +217,10 @@ class VcfFromBreakpoints(AbstractConverter):
                             lines[1].append(empty)
                     already_seen_variants.add(data[self.unique_variant_id_column][i])
 
-                # sort by chr/pos
-                lines = sorted(lines, key=lambda x: (x[0], int(x[1])))
                 for line in lines:
-                    vcf.write("\t".join(line) + "\n")
+                    final_variants_list.append(line)
+
+            # finally, sort variants by chr/pos
+            final_variants_list = natsort.natsorted(final_variants_list)
+            for line in final_variants_list:
+                vcf.write("\t".join(line) + "\n")

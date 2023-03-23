@@ -3,7 +3,7 @@
 @Goal: Expand Celine Besnard's script with infinite conversion abilities between vcf and various other formats
 @Author: Samuel Nicaise
 @Date: 23/11/2021
-@Version: v1.0.0
+@Version: v1.2.1
 
 Prerequisites: pandas, pyfaidx (https://github.com/mdshw5/pyfaidx))
 
@@ -40,13 +40,14 @@ If you need a place to store variables unrelated to the vcf file (e.g number of 
 """
 
 import argparse
+import logging as log
 import os
+import variantconvert
 import sys
-
-from os.path import join as osj
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "."))
 from commons import set_log_level
+from config import main_config
 from converter_factory import ConverterFactory
 from varank_batch import main_varank_batch
 
@@ -75,10 +76,17 @@ def main_convert(args):
 
 def main():
     parser = argparse.ArgumentParser(prog="variantconvert")
-    subparsers = parser.add_subparsers(help="sub-command help")
-    parser_convert = subparsers.add_parser(
-        "convert", help="convert a file containing genomic variants to an other format"
+    parser.add_argument(
+        "--version", action="version", version=f"{parser.prog} {variantconvert.__version__}"
     )
+    subparsers = parser.add_subparsers(help="sub-command help")
+
+    parser_convert = subparsers.add_parser(
+        "convert",
+        help="Convert a file containing genomic variants to an other format",
+        formatter_class=argparse.MetavarTypeHelpFormatter,
+    )
+    parser_convert.set_defaults(subparser="convert")
     parser_convert.add_argument("-i", "--inputFile", type=str, required=True, help="Input file")
     parser_convert.add_argument("-o", "--outputFile", type=str, required=True, help="Output file")
     parser_convert.add_argument(
@@ -103,8 +111,11 @@ def main():
     )
 
     parser_batch = subparsers.add_parser(
-        "varankBatch", help="convert an entire folder of Varank files"
+        "varankBatch",
+        help="Convert an entire folder of Varank files",
+        formatter_class=argparse.MetavarTypeHelpFormatter,
     )
+    parser_batch.set_defaults(subparser="varankBatch")
     parser_batch.add_argument(
         "-i",
         "--inputVarankDir",
@@ -157,27 +168,58 @@ def main():
     )
 
     parser_config = subparsers.add_parser(
-        "config", help="change variables in config files [under construction]"
+        "config",
+        help="Change variables in config files",
+        formatter_class=argparse.MetavarTypeHelpFormatter,
     )
-    parser_config.add_argument("-g", "--genome", type=str, help="genome path")
     parser_config.add_argument(
         "-c",
-        "--configFile",
+        "--configFiles",
         type=str,
-        required=True,
-        help="JSON config file describing columns. See script's docstring.",
+        default="<script_dir>/configs/*",
+        help="Config file(s) on which changes are applied. Add simple quotes around if you use wildcards. [default: '<script_dir>/configs/*']",
+        nargs="*",
+    )
+    parser_config.set_defaults(subparser="config")
+    parser_config.add_argument(
+        "-s",
+        "--set",
+        type=str,
+        help="List of variables to set. Example: --set GENOME.assembly=hg19 GENOME.path=/path/hg19.fa",
+        nargs="*",
+    )
+    parser_config.add_argument(
+        "--fill_genome_header",
+        action="store_true",
+        help="Fill the GENOME['vcf_header'] field based on GENOME['path']",
     )
 
     for myparser in (parser_convert, parser_batch, parser_config):
         myparser.add_argument("-v", "--verbosity", type=str, default="info", help="Verbosity level")
 
     args = parser.parse_args()
-    if "verbosity" not in args:
+
+    if not hasattr(args, "subparser"):
         parser.print_help()
-    elif "inputVarankDir" in args:
-        main_varank_batch(args)
     else:
-        main_convert(args)
+        set_log_level(args.verbosity)
+        log.debug(f"Args: {str(args)}")
+        if args.subparser == "convert":
+            log.info(f"running variantconvert {variantconvert.__version__}")
+            main_convert(args)
+            log.info("variantconvert finished.")
+
+        elif args.subparser == "varankBatch":
+            log.info(f"running variantconvert {variantconvert.__version__} (batch mode)")
+            main_varank_batch(args)
+            log.info("variantconvert finished.")
+
+        elif args.subparser == "config":
+            if not (args.set or args.fill_genome_header):
+                raise parser_config.error(
+                    "the following arguments are required: either --set or --fill_genome_header"
+                )
+            main_config(args)
 
 
 if __name__ == "__main__":

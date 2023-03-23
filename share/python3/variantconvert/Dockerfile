@@ -19,6 +19,7 @@ RUN conda create -n common python=3.10 pandas
 RUN /usr/local/lib/miniconda3/envs/common/bin/pip install pyfaidx
 RUN /usr/local/lib/miniconda3/envs/common/bin/pip install natsort
 RUN /usr/local/lib/miniconda3/envs/common/bin/pip install tqdm
+RUN /usr/local/lib/miniconda3/envs/common/bin/pip install polars
 
 #bcftools
 ENV BCFTOOLS_INSTALL_DIR=/opt/bcftools
