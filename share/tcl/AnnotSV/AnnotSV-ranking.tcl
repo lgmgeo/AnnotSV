@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.2.3                                                                                            #
+# AnnotSV 3.3                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -355,6 +355,9 @@ proc achieveSVrankingLoss {AnnotSV_ID} {
     # Add the higher score of the section 2:
     # - Evaluate scores from the higher (positive value) to the lower (negative value); stop the evaluation at the first match (only the higher match is reported)
     #   (the "0" scores are evaluated in a second time)
+    
+    # 40: Skip to section 5 if either your CNV overlapped with a pathogenic Loss SV in section 2
+ 
     if {[info exists g_rankingExplanations($AnnotSV_ID,2A)]} {
 	# 2A
 	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+1.00}]
