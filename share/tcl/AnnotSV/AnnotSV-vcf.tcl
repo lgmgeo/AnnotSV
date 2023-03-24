@@ -644,18 +644,18 @@ proc VCFsToBED {SV_VCFfiles} {
 		regsub -all "\[*.\]" $alt "" altbis
 
 		set variantLengthType1 [expr {[string length $altbis]-[string length $refbis]}]
+                if {[expr {abs($variantLengthType1)}] < $g_AnnotSV(SVminSize)} {
+                    # it is a small insertion or deletion (indel)
+                    WriteTextInFile "${chrom}_${posVCF}_${end}_${svtype}_${ref}_${altVCF}: variantLength ([expr {abs($variantLengthType1)}]) < SVminSize ($g_AnnotSV(SVminSize)) (line $VCFlineNumber)" $unannotatedOutputFile
+                    continue
+                }
 
 		if {$variantLengthType1>0} {
-		    # insertion (no use of SVminSize for insertion)
+		    # insertion
 		    if {$end eq ""} {set end $posVCF} 
 		    if {$svtype eq ""} {set svtype "INS"}
 		} else {
 		    # deletion
-                    if {[expr {abs($variantLengthType1)}]<$g_AnnotSV(SVminSize)} {
-                        # it is a small deletion (indel)
-                        WriteTextInFile "${chrom}_${posVCF}_${end}_${svtype}_${ref}_${altVCF}: variantLength ([expr {abs($variantLengthType1)}]) < SVminSize ($g_AnnotSV(SVminSize)) (line $VCFlineNumber)" $unannotatedOutputFile
-                        continue
-                    }
 		    if {$end eq ""} {set end [expr $pos-$variantLengthType1]}
 		    if {$svtype eq ""} {set svtype "DEL"}
 		}
