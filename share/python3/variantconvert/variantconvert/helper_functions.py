@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 @Author: Samuel Nicaise
-@Version: v1.2.1
+@Version: v1.2.2
 """
 
 from commons import get_genome

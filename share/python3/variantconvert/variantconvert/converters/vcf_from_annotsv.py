@@ -142,7 +142,11 @@ class VcfFromAnnotsv(AbstractConverter):
         # Do not keep 'base vcf col' in info field
         df = df.loc[
             :,
-            [cols for cols in df.columns if cols not in ["ID", "REF", "ALT", "QUAL", "FILTER"]],
+            [
+                cols
+                for cols in df.columns
+                if cols not in ["ID", "REF", "ALT", "QUAL", "FILTER"] + self.sample_list
+            ],
         ]
 
         annots = {}
@@ -248,16 +252,33 @@ class VcfFromAnnotsv(AbstractConverter):
                                     variant1: {key1: val1, key2: val2},
                                     variant2: {key1: val1, key2: val2}
                                 }
-            additional_info_fields (set[str]): new info fields who need to be added to header
+            additional_info_fields (set[str]): new info fields who need to be added to header.
+                                            This list will be automatically completed with columns that
+                                            are in annots_dic but not defined in config["COLUMNS_DESCRIPTION]
 
         Returns:
             list[str]: header strings, one for each additional_info_fields.
             Doesn't include newlines, as expected by commons.create_vcf_header(args)
         """
         supplemental_header = []
-        default_description = "Imported from original VCF before AnnotSV annotation"
+        default_description = "Imported from AnnotSV"
+        known_descriptions = set(self.config["COLUMNS_DESCRIPTION"]["INFO"].keys())
+        missing_annots = []
 
-        for field in additional_info_fields:
+        # this function was originally made to rebuild the lost header of VCF annotations in "INFO" column in VCF>AnnotSV>VCF conversions.
+        # at this point, we check if all INFO fields were defined in config.
+        # if not, add a default header for them too.
+        for variant, dic in annots_dic.items():
+            for annot in dic:
+                if annot not in known_descriptions and annot not in missing_annots:
+                    missing_annots.append(annot)
+
+        missing_annots = additional_info_fields + [
+            v for v in missing_annots if v not in additional_info_fields
+        ]
+        log.debug(f"known desc:{missing_annots}")
+
+        for field in missing_annots:
             # infer type
             if all([is_int(v.get(field, None)) for v in annots_dic.values()]):
                 field_type = "Integer"
@@ -275,6 +296,13 @@ class VcfFromAnnotsv(AbstractConverter):
                     else:
                         number = info[field].count(",") + 1
 
+            if field in additional_info_fields:
+                description = (
+                    "Imported from the INFO field of the original VCF before AnnotSV annotation"
+                )
+            else:
+                description = "Imported from AnnotSV"
+
             supplemental_header.append(
                 "##INFO=<ID="
                 + field
@@ -283,7 +311,7 @@ class VcfFromAnnotsv(AbstractConverter):
                 + ",Type="
                 + field_type
                 + ',Description="'
-                + default_description
+                + description
                 + '">'
             )
         return supplemental_header

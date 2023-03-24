@@ -3,7 +3,7 @@
 @Goal: Expand Celine Besnard's script with infinite conversion abilities between vcf and various other formats
 @Author: Samuel Nicaise
 @Date: 23/11/2021
-@Version: v1.2.1
+@Version: v1.2.2
 
 Prerequisites: pandas, pyfaidx (https://github.com/mdshw5/pyfaidx))
 

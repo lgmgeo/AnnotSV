@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 @Author: Samuel Nicaise
-@Version: v1.2.1
+@Version: v1.2.2
 """
 
 import logging as log
@@ -145,11 +145,13 @@ def create_vcf_header(input_path, config, sample_list, breakpoints=False, supple
             if "SVTYPE" not in info_dic.keys():
                 info_dic["SVTYPE"] = {
                     "Type": "String",
+                    "Number": "1",
                     "Description": "Type of structural variant",
                 }
             if "MATEDID" not in info_dic.keys():
                 info_dic["MATEID"] = {
                     "Type": "String",
+                    "Number": "1",
                     "Description": "ID of mate breakends",
                 }
 
@@ -157,7 +159,9 @@ def create_vcf_header(input_path, config, sample_list, breakpoints=False, supple
             header.append(
                 "##INFO=<ID="
                 + key
-                + ",Number=1,Type="
+                + ",Number="
+                + dic["Number"]
+                + ",Type="
                 + dic["Type"]
                 + ',Description="'
                 + dic["Description"]

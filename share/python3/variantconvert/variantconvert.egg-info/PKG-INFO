@@ -1,7 +1,7 @@
 Metadata-Version: 2.1
 Name: variantconvert
-Version: 1.2.1
-Summary: Script to convert genetic variants between various formats
+Version: 1.2.2
+Summary: Script to convert genetic variants between various file formats
 Home-page: https://github.com/SamuelNicaise/variantconvert
 Author: Samuel Nicaise
 Keywords: bioinformatics,VCF,converter
@@ -10,7 +10,10 @@ Classifier: Intended Audience :: Science/Research
 Classifier: Intended Audience :: Healthcare Industry
 Classifier: Programming Language :: Python :: 3
 Classifier: Programming Language :: Python :: 3.8
-Classifier: License :: OSI Approved :: GNU  Affero General Public License v3 (AGPL-3.0)
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: License :: OSI Approved :: GNU  Affero General Public License v3
 Requires-Python: >=3.8
 Description-Content-Type: text/markdown
 Provides-Extra: dev
