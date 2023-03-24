@@ -958,11 +958,12 @@ proc OrganizeAnnotation {} {
 				lappend L_AnnotFound "$AnnotFound"		
 			    }
 			    set tutu [MergeAnnotation $L_AnnotFound $nbColumns($F)]
-
 			    # Second (for full lines), we doesn't keep the annotation of all genes (value is set to empty), 
-			    # except for "decimal" scores and percentages where we keep the max value
-			    # (in order not to have value such "1.5/////-0.2////")
-			    # and except for OMIM number where we keep all the numbers
+			    # except:
+			    # -  for "decimal" scores and percentages where we keep the max value
+			    #    (in order not to have value such "1.5/////-0.2////")
+			    # - for OMIM number where we keep all the numbers
+		 	    # - For LOEUF value where we keep the min value
 			    set L_newGeneBasedText ""
 			    if {$tutu eq ""} {lappend L_geneBasedText ""} ; #if {$tutu eq ""} => doesn't enter in the foreach
 			    foreach valueByColumn [split $tutu "\t"] { 
@@ -987,6 +988,11 @@ proc OrganizeAnnotation {} {
 					    if {$valueByGene ne ""} {if {$max eq "-1000"} {set max "$valueByGene"} else {append max ";$valueByGene"}}
 					} elseif {[regexp "morbid" $F]} {
 					    if {[regexp "yes" $valueByGene]} {set max "yes"}
+					} elseif {[regexp "gnomAD.LOEUF.pLI.annotations.tsv" $F] && [regexp "^\[0-9\]$" $valueByGene]} {
+					    # Only for the loeuf values: 0, 1, 2, 3, 4, 5, 6, 7, 8 or 9 
+					    # -	Low LOEUF scores (e.g. 0) indicate strong selection against predicted loss-of-function (pLoF) variation in a given gene
+				            # - High LOEUF scores (e.g. 9) suggest a relatively higher tolerance to inactivation
+					    if {$valueByGene ne "" && ($max eq "-1000" || $valueByGene < $max)} {set max $valueByGene}
 					} else {
 					    # Only for the values like "0.5", "-25.3", "9.3e-01", "9.3e+01"
 					    if {[regexp "^(-)?\[0-9\]+\\.\[0-9\]+(e\[-+\]\[0-9\]+)?$" $valueByGene]} { 
@@ -1006,6 +1012,7 @@ proc OrganizeAnnotation {} {
 					lappend L_newGeneBasedText $max
 				    } else {
 					lappend L_newGeneBasedText ""
+
 				    }
 				} else {
 				    lappend L_newGeneBasedText ""

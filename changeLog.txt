@@ -12,6 +12,7 @@ For more details, please see the README file.
 
 March, 24, 2023, AnnotSV version 3.3.1
 	- Add bugfix with the use of the SVminSize option
+	- Report the minimal LOEUF value (among all overlapped genes) in the SV full length annotation
 
 March, 23, 2023, AnnotSV version 3.3
 	- Add bugfix regarding genomic start coordinates. TSV and VCF output files are now both 1-based, with inclusive-end (whatever the input file format)
