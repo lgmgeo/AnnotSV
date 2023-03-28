@@ -1127,28 +1127,21 @@ proc benignSVannotation {SVchrom SVstart SVend} {
 }
 
 
-# Return the PARTIALLY overlapped (po) SV annotation 
+# Return the PARTIALLY overlapped (po) benign SV annotation for the full lines 
+# (nothing done for the split lines)
+# headerOutput: po_B_gain_allG_source po_B_gain_allG_coord po_B_gain_someG_source po_B_gain_someG_coord
+#               po_B_gain_loss_source po_B_loss_allG_coord po_B_loss_someG_source po_B_loss_someG_coord
 proc poBenignSVannotation {SVchrom SVstart SVend L_GenesSVtoAnnotate} {
 
     global g_AnnotSV
-    global poBenignText
+    global poBenignIntersectDone
     global L_genes
 
+
+    set SVtoAnn "$SVchrom,$SVstart,$SVend"
     set benignDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/SVincludedInFt/BenignSV/$g_AnnotSV(genomeBuild)"
-    
-    if {![info exists poBenignText(DONE)]} {
-	# headerOutput "po_B_gain_source po_B_gain_coord po_B_gain_sup_genes 
-	#               po_B_loss_source po_B_loss_coord po_B_loss_sup_genes"
-	# + (if user selected) po_B_ins_source po_B_ins_coord po_B_ins_sup_genes 
-	#                      po_B_inv_source po_B_inv_coord po_B_inv_sup_genes
-	
-	set L_poBenignText(Empty) {}
-	foreach svtype {"gain" "loss"} {
-	    # Keep only the user requested columns (defined in the configfile)
-	    if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^po_B_${svtype}_"] eq -1} { continue }
-	    lappend L_poBenignText(Empty) {*}{"" "" "" ""}
-	}
-	set poBenignText(Empty) "[join $L_poBenignText(Empty) "\t"]"
+
+    if {![info exists poBenignIntersectDone]} {
 	
 	foreach svtype {"Gain" "Loss"} {
 	    # Keep only the user requested columns (defined in the configfile)
@@ -1167,98 +1160,95 @@ proc poBenignSVannotation {SVchrom SVstart SVend L_GenesSVtoAnnotate} {
 	    regsub -nocase "(.formatted)?.bed$" $g_AnnotSV(bedFile) ".intersect.po_benign-$svtype" tmpFile
 	    set tmpFile "$g_AnnotSV(outputDir)/[file tail $tmpFile]"
 	    file delete -force $tmpFile
-	    if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(fullAndSplitBedFile) -b $benignBEDfile -wa -wb > $tmpFile} Message]} {
-		if {[catch {exec $g_AnnotSV(bedtools) intersect -a $g_AnnotSV(fullAndSplitBedFile) -b $benignBEDfile -wa -wb > $tmpFile} Message]} {
+	    if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(bedFile) -b $benignBEDfile -wa -wb > $tmpFile} Message]} {
+		if {[catch {exec $g_AnnotSV(bedtools) intersect -a $g_AnnotSV(bedFile) -b $benignBEDfile -wa -wb > $tmpFile} Message]} {
 		    puts "-- benignSVAnnotation, $svtype --"
-		    puts "$g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(fullAndSplitBedFile) -b $benignBEDfile -wa -wb > $tmpFile"
+		    puts "$g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(bedFile) -b $benignBEDfile -wa -wb > $tmpFile"
 		    puts "$Message"
 		    puts "Exit with error"
 		    exit 2
 		}
 	    }
-	    
-	    # Parse
-	    set f [open $tmpFile]
-	    while {![eof $f]} {
-		set L [gets $f]
-		if {$L eq ""} {continue}
-		set Ls [split $L "\t"]
+  	}
+        set poBenignIntersectDone 1
+    }
+
+    # Parse
+    foreach svtype {"Gain" "Loss"} {
+
+        # Keep only the user requested columns (defined in the configfile)
+        if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^po_B_[string tolower ${svtype}]_"] eq -1} { continue }
+
+        set benignBEDfile [glob -nocomplain "$benignDir/benign_${svtype}_SV_$g_AnnotSV(genomeBuild).sorted.bed"]
+        regsub -nocase "(.formatted)?.bed$" $g_AnnotSV(bedFile) ".intersect.po_benign-$svtype" tmpFile
+        set tmpFile "$g_AnnotSV(outputDir)/[file tail $tmpFile]"
+
+	set f [open $tmpFile]
+	while {![eof $f]} {
+	    set L [gets $f]
+	    if {$L eq ""} {continue}
+	    set Ls [split $L "\t"]
+
+	    # We are searching the annotation only for "SVchrom SVstart SVend"
+            set SVtoAnn_chrom [lindex $Ls 0]
+            set SVtoAnn_start [lindex $Ls 1]
+            set SVtoAnn_end   [lindex $Ls 2]
+	    if {$SVtoAnn_chrom ne $SVchrom || $SVtoAnn_start ne $SVstart || $SVtoAnn_end ne $SVend} {continue}
 		
-		set SVtoAnn_chrom [lindex $Ls 0]
-		set SVtoAnn_start [lindex $Ls 1]
-		set SVtoAnn_end   [lindex $Ls 2]
+	    # An SV is considered benign if its allele frequency > $g_AnnotSV(benignAF)
+	    # (default 0.01)
+            set benign_AF [lindex $Ls end]
+	    if {[string is double $benign_AF] && $benign_AF < $g_AnnotSV(benignAF)} {continue}
+	
+	
+	    set benign_coord [lindex $Ls end-1] ;# e.g. 16:47182577-47188882
+	    set benign_source [lindex $Ls end-2]
 		
-		set benign_AF [lindex $Ls end]
-		# An SV is considered benign if its allele frequency > $g_AnnotSV(benignAF)
-		# (default 0.01)
-		if {[string is double $benign_AF] && $benign_AF < $g_AnnotSV(benignAF)} {continue}
-		
-		set benign_coord [lindex $Ls end-1] ;# e.g. 16:47182577-47188882
-		set benign_source [lindex $Ls end-2]
-		
-		set SVtoAnn "$SVtoAnn_chrom,$SVtoAnn_start,$SVtoAnn_end"
-		lappend L_allSVtoAnn $SVtoAnn ;# redundancy here
-		
-		if {[info exists L_genes($benign_coord)]} {
-		    set allG 1
-		    foreach gN [split $L_GenesSVtoAnnotate ";"] {
-			if {![regexp $gN [split $L_genes($benign_coord) ";"]]} {
-			    set allG 0
-			    break
-			}
+	    if {[info exists L_genes($benign_coord)]} {
+		set allG 1
+		foreach gN [split $L_GenesSVtoAnnotate ";"] {
+		    if {![regexp $gN [split $L_genes($benign_coord) ";"]]} {
+			set allG 0
+			break
 		    }
-		    if {$allG} {
+		}
+         	if {$allG} {
 			lappend L_benign_coord($SVtoAnn,$svtype,allG) $benign_coord
 			lappend L_benign_source($SVtoAnn,$svtype,allG) $benign_source
-		    } else {
+		} else {
 			lappend L_benign_coord($SVtoAnn,$svtype,someG) $benign_coord
 			lappend L_benign_source($SVtoAnn,$svtype,someG) $benign_source
-		    }
-		} else {
+		}
+	    } else {
 		    lappend L_benign_coord($SVtoAnn,$svtype,someG) $benign_coord
 		    lappend L_benign_source($SVtoAnn,$svtype,someG) $benign_source
-		}
 	    }
-	    file delete -force $tmpFile
-	}
-	  
-	# Loading benign final annotation for each SV
-	if {[info exists L_allSVtoAnn]} {
-	    foreach SVtoAnn [lsort -unique $L_allSVtoAnn] {
-		
-		foreach svtype {"Gain" "Loss"} {
-		    
-		    # Keep only the user requested columns (defined in the configfile)
-		    # Needed for the ranking!!!
-		    #if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^po_B_[string tolower ${svtype}]_"] eq -1} { continue }
-		    
-		    if {[info exists L_benign_coord($SVtoAnn,$svtype,allG)]} {
+	} 
+
+        # Loading benign final annotation for each SV
+	if {[info exists L_benign_coord($SVtoAnn,$svtype,allG)]} {
 			lappend L_poBenignText($SVtoAnn) "[join $L_benign_source($SVtoAnn,$svtype,allG) ";"]"
 			lappend L_poBenignText($SVtoAnn) "[join $L_benign_coord($SVtoAnn,$svtype,allG) ";"]"
-		    } else {
+	} else {
 			lappend L_poBenignText($SVtoAnn) ""
 			lappend L_poBenignText($SVtoAnn) ""
-		    }
-                    if {[info exists L_benign_coord($SVtoAnn,$svtype,someG)]} {
+	}
+        if {[info exists L_benign_coord($SVtoAnn,$svtype,someG)]} {
                         lappend L_poBenignText($SVtoAnn) "[join $L_benign_source($SVtoAnn,$svtype,someG) ";"]"
                         lappend L_poBenignText($SVtoAnn) "[join $L_benign_coord($SVtoAnn,$svtype,someG) ";"]"
-                    } else {
+        } else {
                         lappend L_poBenignText($SVtoAnn) ""
                         lappend L_poBenignText($SVtoAnn) ""
-                    }
-		    
-		}
-		set poBenignText($SVtoAnn) [join $L_poBenignText($SVtoAnn) "\t"]
-	    }
-	}
-	set poBenignText(DONE) 1	
+        }
     }
     
-    if {[info exist poBenignText($SVchrom,$SVstart,$SVend)]} {
-	return $poBenignText($SVchrom,$SVstart,$SVend)
+    if {[info exist L_poBenignText($SVtoAnn)]} {
+    	set poBenignText($SVtoAnn) [join $L_poBenignText($SVtoAnn) "\t"]
     } else {
-	return $poBenignText(Empty)
+	set poBenignText($SVtoAnn) ""
     }
+
+    return $poBenignText($SVchrom,$SVstart,$SVend)
 }
 
 

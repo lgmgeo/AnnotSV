@@ -10,9 +10,12 @@
 
 For more details, please see the README file.
 
+March, 28, 2023,AnnotSV version 3.3.2
+	- Add bugfix for SV partially overlapping with an established benign region. Ranking Impact
+
 March, 24, 2023, AnnotSV version 3.3.1
 	- Add bugfix with the use of the SVminSize option
-	- Report the minimal LOEUF value ((among those of all overlapped genes) in the SV full length annotation
+	- Report the minimal LOEUF value (among those of all overlapped genes) in the SV full length annotation
 	- Update of the variantconvert distribution (1.2.2 installed)
 
 March, 23, 2023, AnnotSV version 3.3

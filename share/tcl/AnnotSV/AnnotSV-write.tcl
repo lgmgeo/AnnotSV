@@ -1470,6 +1470,13 @@ proc OrganizeAnnotation {} {
     if {[info exist g_AnnotSV(NAbedFile)]} {
 	file delete -force $g_AnnotSV(NAbedFile)
     }
+    set benignDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/SVincludedInFt/BenignSV/$g_AnnotSV(genomeBuild)"
+    foreach svtype {"Gain" "Loss"} {
+        set benignBEDfile [glob -nocomplain "$benignDir/benign_${svtype}_SV_$g_AnnotSV(genomeBuild).sorted.bed"]
+        regsub -nocase "(.formatted)?.bed$" $g_AnnotSV(bedFile) ".intersect.po_benign-$svtype" tmpFile
+        set tmpFile "$g_AnnotSV(outputDir)/[file tail $tmpFile]"
+	file delete -force $tmpFile
+    }
 
     ################################################
     ################### Display ####################
