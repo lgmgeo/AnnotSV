@@ -131,7 +131,10 @@ proc SVrankingLoss {L_annotations} {
 	    set g_rankingExplanations($AnnotSV_ID) "1A (cf Gene_count, RE_gene, +0.00);"
 	}
 	
-	## Section 2: Overlap with established/predicted haploinsufficiency (HI) or established benign genes/genomic regions
+	## Section 2: Overlap with:
+	## 		- established/predicted haploinsufficiency (HI) 
+	## 		- known pathogenic Loss SV
+	## 		- established benign genes/genomic regions
 	##            (Skip to section 3 if your copy-number loss DOES NOT overlap these types of genes/regions)
 	#####################################################################################################################
 	if {$Ploss ne ""} {
@@ -212,10 +215,13 @@ proc SVrankingLoss {L_annotations} {
 
 	# In case of SV redundancy in the input file
 	if {[info exists g_i(splitDone,$AnnotSV_ID)]} {return}
-	
-	## Section 2: Overlap with established/predicted haploinsufficiency (HI) or established benign genes/genomic regions
-	##            (Skip to section 3 if your copy-number loss DOES NOT overlap these types of genes/regions)
-	#####################################################################################################################
+
+        ## Section 2: Overlap with:
+        ##              - established/predicted haploinsufficiency (HI)
+        ##              - known pathogenic Loss SV
+        ##              - established benign genes/genomic regions
+        ##            (Skip to section 3 if your copy-number loss DOES NOT overlap these types of genes/regions)
+        #####################################################################################################################
 	set HI     [lindex $Ls $g_i(HI)]
 	set morbid [lindex $Ls $g_i(morbid)]
 	set gene   [lindex $Ls $g_i(gene)]
@@ -247,11 +253,9 @@ proc SVrankingLoss {L_annotations} {
 		    lappend g_rankingExplanations($AnnotSV_ID,2D-1) "$gene"		    
 		} elseif {$location eq "exon${NbExons}-txEnd" && $Psnvindel ne ""} {
 		    # 2D-2. …and only the last exon is involved. Other established pathogenic snv/indel have been reported in the SV (+0.90)
-		    # Vero to improve: Other established pathogenic snv/indel have been reported in this exon
 		    lappend g_rankingExplanations($AnnotSV_ID,2D-2) "$gene"
 		} elseif {$location eq "exon${NbExons}-txEnd"} {
 		    # 2D-3. …and only the last exon is involved. No other established pathogenic snv/indel have been reported in the SV (+0.30)
-		    # Vero to improve: No other established pathogenic snv/indel have been reported in this exon
 		    lappend g_rankingExplanations($AnnotSV_ID,2D-3) "$gene"
 		} elseif {$location ne "exon${NbExons}-txEnd" && $location ne "intron[expr {${NbExons}-1}]-txEnd"} {	    
 		    # 2D-4. …and it includes other exons in addition to the last exon. Nonsense-mediated decay is expected to occur (+0.90)
@@ -447,11 +451,23 @@ proc achieveSVrankingLoss {AnnotSV_ID} {
     ##             caused by loss of function [LOF] or copy-number loss)
     ####################################################################################################################
 
-    # Add the higher score of the section 4
+    # Add the higher score of the section 4 (only if no positive score has been attributed in section 2)
     if {[info exists g_rankingExplanations($AnnotSV_ID,40)]} {
         # 4O
-        set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)-1.00}]
-        append g_rankingExplanations($AnnotSV_ID) "$g_rankingExplanations($AnnotSV_ID,40)"
+	if {![info exists g_rankingExplanations($AnnotSV_ID,2A)] && \
+	    ![info exists g_rankingExplanations($AnnotSV_ID,2F)] && \
+            ![info exists g_rankingExplanations($AnnotSV_ID,2C-1)] && \
+            ![info exists g_rankingExplanations($AnnotSV_ID,2D-2)] && \
+            ![info exists g_rankingExplanations($AnnotSV_ID,2D-3)] && \
+            ![info exists g_rankingExplanations($AnnotSV_ID,2D-4)] && \
+            ![info exists g_rankingExplanations($AnnotSV_ID,2E-1)] && \
+            ![info exists g_rankingExplanations($AnnotSV_ID,2E-2)] && \
+            ![info exists g_rankingExplanations($AnnotSV_ID,2E-3)] && \
+            ![info exists g_rankingExplanations($AnnotSV_ID,2E-4)] && \
+            ![info exists g_rankingExplanations($AnnotSV_ID,2EH)]} {
+        	set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)-1.00}]
+        	append g_rankingExplanations($AnnotSV_ID) "$g_rankingExplanations($AnnotSV_ID,40)"
+	}
     } 
 
     ## Section 5: Evaluation of inheritance pattern/family history for patient being studied			

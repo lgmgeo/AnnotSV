@@ -12,6 +12,8 @@ For more details, please see the README file.
 
 March, 28, 2023,AnnotSV version 3.3.2
 	- Add bugfix for SV partially overlapping with an established benign region. Ranking Impact
+	- Improve the 40 criteria (Loss) in the SV ranking
+	- Restrict the number of "po_B_*_someG_*" features to 20
 
 March, 24, 2023, AnnotSV version 3.3.1
 	- Add bugfix with the use of the SVminSize option
