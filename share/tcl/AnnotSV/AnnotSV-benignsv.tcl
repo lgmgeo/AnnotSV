@@ -1224,6 +1224,7 @@ proc poBenignSVannotation {SVchrom SVstart SVend L_GenesSVtoAnnotate} {
 		    lappend L_benign_source($SVtoAnn,$svtype,someG) $benign_source
 	    }
 	} 
+	close $f
 
         # Loading benign final annotation for each SV
 	# (AnnotSV restrict the number of overlapping reported features to 20)
