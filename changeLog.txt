@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.3.2                                                                                            #
+# AnnotSV 3.3.3                                                                                            #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
@@ -9,6 +9,13 @@
 
 
 For more details, please see the README file.
+
+April,  , 2023,AnnotSV version 3.3.4
+	- Among the “po_P_*_*” features, redundancy is now removed only from “po_P_*_phen” and “po_P_*_hpo”.
+	So AnnotSV keeps now the correspondence between “po_P_*_source”, “po_P_*_coord” and “po_P_*_percent” features.
+
+March, 30, 2023,AnnotSV version 3.3.3
+	- Add bugfix for large input file
 
 March, 28, 2023,AnnotSV version 3.3.2
 	- Add bugfix for SV partially overlapping with an established benign region. Ranking Impact

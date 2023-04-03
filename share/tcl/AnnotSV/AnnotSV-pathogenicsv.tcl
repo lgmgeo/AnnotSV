@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.3.2                                                                                            #
+# AnnotSV 3.3.3                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -73,7 +73,8 @@ proc checkPathogenicFiles {} {
 		    close $id_file1
 		    close $id_file2
 		}
-		# sort
+		# Sort:
+		# -> Creation of $pathogenicFile_Tmp.formatted.bed
 		if {[catch {checkBed $pathogenicFile_Tmp $pathogenicDir} Message]} {
 		    puts "-- checkPathogenicFiles --"
 		    puts $Message
@@ -671,6 +672,8 @@ proc poPathogenicSVannotation {SVchrom SVstart SVend} {
 	    if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^po_P_[string tolower ${svtype}]_"] eq -1} { continue }
 	    
 	    # Intersect
+	    # Header:
+	    #   chrom  start  end  phenotype  hpo  id  coord 
 	    set pathogenicBEDfile [glob -nocomplain "$pathogenicDir/pathogenic_${svtype}_SV_$g_AnnotSV(genomeBuild).sorted.bed"]
 	    regsub -nocase "(.formatted)?.bed$" $g_AnnotSV(bedFile) ".intersect.po_pathogenic-$svtype" tmpFile
 	    set tmpFile "$g_AnnotSV(outputDir)/[file tail $tmpFile]"
@@ -702,7 +705,6 @@ proc poPathogenicSVannotation {SVchrom SVstart SVend} {
 		set SVtoAnn_end   [lindex $Ls 9]
 
 		if {[regexp "\[0-9\]+:(\[0-9\]+)-(\[0-9\]+)" $po_pathogenic_coord match startP endP]} {
-
 		    # Keep only the pathogenic SV > $g_AnnotSV(SVminSize) (50 by default)
 		    # WARNING: some dbVar SV have the same start and end locations (e.g. dbVar:nssv17171884)
 		    if {[expr {$endP-$startP}] < $g_AnnotSV(SVminSize)} {continue}
@@ -728,13 +730,13 @@ proc poPathogenicSVannotation {SVchrom SVstart SVend} {
 	    }
 	    file delete -force $tmpFile
 	}
-	    
+
 	# Loading pathogenic final annotation for each SV
 	if {[info exists L_allSVtoAnn]} {
 	    foreach SVtoAnn [lsort -unique $L_allSVtoAnn] {
 		
 		foreach svtype {"Gain" "Loss"} {
-		    
+		   
 		    # Keep only the user requested columns (defined in the configfile)
 		    if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^P_[string tolower ${svtype}]_"] eq -1} { continue }
 			
@@ -749,9 +751,10 @@ proc poPathogenicSVannotation {SVchrom SVstart SVend} {
 			} else {
 			    lappend L_poPathogenicText($SVtoAnn) ""
 			}
-			lappend L_poPathogenicText($SVtoAnn) "[join [lsort -unique $L_po_pathogenic_source($SVtoAnn,$svtype)] ";"]"
-			lappend L_poPathogenicText($SVtoAnn) "[join [lsort -unique $L_po_pathogenic_coord($SVtoAnn,$svtype)] ";"]"
-			lappend L_poPathogenicText($SVtoAnn) "[join [lsort -unique $L_po_pathogenic_percent($SVtoAnn,$svtype)] ";"]"
+			# No use of a "lsort -unique" command below, to keep the correspondance between the 3 following features:
+			lappend L_poPathogenicText($SVtoAnn) "[join $L_po_pathogenic_source($SVtoAnn,$svtype) ";"]"
+			lappend L_poPathogenicText($SVtoAnn) "[join $L_po_pathogenic_coord($SVtoAnn,$svtype) ";"]"
+			lappend L_poPathogenicText($SVtoAnn) "[join $L_po_pathogenic_percent($SVtoAnn,$svtype) ";"]"
 		    } else {
 			lappend L_poPathogenicText($SVtoAnn) {*}{"" "" "" "" ""}
 		    }
