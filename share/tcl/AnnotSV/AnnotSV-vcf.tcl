@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.3.2                                                                                            #
+# AnnotSV 3.3.3                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -355,7 +355,6 @@ proc VCFsToBED {SV_VCFfiles} {
     
     foreach VCFfile $SV_VCFfiles {
 	set L_TextToWrite {}
-
 	# TextToWrite_rescue($SV_ID)
 	set L_squBrack_SV_ID_Written {}
 	
@@ -385,6 +384,16 @@ proc VCFsToBED {SV_VCFfiles} {
 	    incr VCFlineNumber
 	    if {[string index $L 0] eq "#" || $L eq ""} {
 		if {[regexp "^#CHROM" $L]} {
+		    # Check if this header is complete
+		    foreach classicValue {#CHROM POS ID REF ALT QUAL FILTER INFO FORMAT} {
+			if {[lsearch -exact $Ls $classicValue] eq -1} {
+			    puts "VCF header file badly formatted:"
+			    puts $L
+			    puts "($classicValue not present)"
+			    puts "Exit with error"
+			    exit 2
+			}
+		    }
 		    set VCFheaderNotPresent 0
 		    #CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  HG00096
 		    if {$g_AnnotSV(SVinputInfo)} {
