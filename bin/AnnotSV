@@ -1,7 +1,7 @@
 #!/usr/bin/env tclsh
 
 ############################################################################################################
-# AnnotSV 3.3.2                                                                                            #
+# AnnotSV 3.3.3                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -35,24 +35,16 @@ proc getScriptDirectory {} {
     return $scriptDir
 }
 
-## Checking for environment variables needed (if all are defined).
-if {![info exists env(ANNOTSV)]} {
-    puts "\"ANNOTSV\" environment variable not specified. Please defined it before running AnnotSV. Exit with error"; exit 2
-} else {
-    regsub "/$" $env(ANNOTSV) "" env(ANNOTSV)
-}
+#if {[info exists env(ANNOTSV)]} {
+#    regsub "/$" $env(ANNOTSV) "" env(ANNOTSV)
+#}
+#set ANNOTSVinstallDir [file normalize "$env(ANNOTSV)"]
 
-## Checking if the application name is the same that the path of the ANNOTSV environment variable
-set binDirFromScript [getScriptDirectory]
-set binDirFromANNOTSV [file normalize "$env(ANNOTSV)/bin"]
-if {$binDirFromScript ne $binDirFromANNOTSV} {
-    puts "WARNING:"
-    puts "The application path ([file dirname $binDirFromScript]) is different from the \"ANNOTSV\" environment variable ([file dirname $binDirFromANNOTSV])."
-    puts "Check your \"ANNOTSV\" environment variable. Exit with error"; exit 2
-}
 
 # Setting of g_AnnotSV(installDir), g_AnnotSV(etcDir), g_AnnotSV(docDir), g_AnnotSV(tclDir) and g_AnnotSV(bashDir):
-set g_AnnotSV(installDir) "$env(ANNOTSV)"
+set binDirFromScript [getScriptDirectory]
+regsub "/bin$" $binDirFromScript "" binDirFromScript
+set g_AnnotSV(installDir) "$binDirFromScript"
 set g_AnnotSV(etcDir)     "$g_AnnotSV(installDir)/etc/AnnotSV"
 set g_AnnotSV(docDir)     "$g_AnnotSV(installDir)/share/doc/AnnotSV"
 set tclVersion [info tclversion]
@@ -124,8 +116,8 @@ puts "email: veronique.geoffroy@inserm.fr"
 puts ""
 puts "Tcl/Tk version: $tclVersion"
 puts ""
-puts "Application name used (defined with the \"ANNOTSV\" environment variable):"
-puts "$env(ANNOTSV)\n\n"
+puts "Application name used:"
+puts "$g_AnnotSV(installDir)\n\n"
 
 set tclVersion [split $tclVersion "."]
 if {[lindex $tclVersion 0] < 8 || ([lindex $tclVersion 0] eq 8 && [lindex $tclVersion 1] < 5)} {
@@ -167,7 +159,7 @@ checkVariantconvertConfigfile
 ## Genes annotations:
 #####################
 
-puts "...checking the annotation data sources"
+puts "...checking the annotation data sources ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 
 # Annotation of genes depending of the transcripts (RefSeq or ENSEMBL) ?
 if {$g_AnnotSV(tx) eq "RefSeq"} {

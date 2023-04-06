@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.3.2                                                                                            #
+# AnnotSV 3.3.3                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -27,7 +27,6 @@
 proc checkVariantconvertConfigfile {} {
 
     global g_AnnotSV
-    global env 
 
     # Use of variantconvert to create a vcf output
     if {$g_AnnotSV(vcf)} {
@@ -46,9 +45,9 @@ proc checkVariantconvertConfigfile {} {
             set localconfigfile "$variantconvertDIR/configs/$g_AnnotSV(genomeBuild)/annotsv3_from_bed.local.json"
 
 	    set distributedPathLine "\"path\": \".*\","
-	    set newPathLine         "\"path\": \"$env(ANNOTSV)/share/AnnotSV/Annotations_Human/BreakpointsAnnotations/GCcontent/GRCh37/GRCh37_chromFa.fasta\","
+	    set newPathLine         "\"path\": \"$g_AnnotSV(installDir)/share/AnnotSV/Annotations_Human/BreakpointsAnnotations/GCcontent/GRCh37/GRCh37_chromFa.fasta\","
 	    set distributedRefLine  "\"##reference=file:.*\""
-	    set newRefLine          "\"##reference=file:$env(ANNOTSV)/share/AnnotSV/Annotations_Human/BreakpointsAnnotations/GCcontent/GRCh37/GRCh37_chromFa.fasta\""
+	    set newRefLine          "\"##reference=file:$g_AnnotSV(installDir)/share/AnnotSV/Annotations_Human/BreakpointsAnnotations/GCcontent/GRCh37/GRCh37_chromFa.fasta\""
 
 	    if {![file exists $localconfigfile]} {
 		set L_Lines {}
