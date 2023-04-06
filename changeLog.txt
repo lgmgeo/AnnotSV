@@ -15,6 +15,7 @@ April,  , 2023,AnnotSV version 3.3.4
 	=> AnnotSV keeps now the correspondence between “po_P_*_source”, “po_P_*_coord” and “po_P_*_percent” features.
 	- Improvment of the running time (code part: SV partially overlapping with an established benign region)
 	- Remove requirement for ANNOTSV environment variable
+	- Add of the "INSTALL" file (for a basic manual installation)
 	- Add a check of the "#CHROM" header line
 
 March, 30, 2023,AnnotSV version 3.3.3
