@@ -11,8 +11,9 @@
 For more details, please see the README file.
 
 April,  , 2023,AnnotSV version 3.3.4
-	- Among the “po_P_*_*” features, redundancy is now removed only from “po_P_*_phen” and “po_P_*_hpo”.
-	So AnnotSV keeps now the correspondence between “po_P_*_source”, “po_P_*_coord” and “po_P_*_percent” features.
+	- Among the “po_P_*_*” features, redundancy is now removed ONLY from “po_P_*_phen” and “po_P_*_hpo”.
+	=> AnnotSV keeps now the correspondence between “po_P_*_source”, “po_P_*_coord” and “po_P_*_percent” features.
+	- Improvment of the running time (code part: SV partially overlapping with an established benign region)
 	- Add a check of the "#CHROM" header line
 
 March, 30, 2023,AnnotSV version 3.3.3

@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.3.2                                                                                            #
+# AnnotSV 3.3.3                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -1136,6 +1136,7 @@ proc poBenignSVannotation {SVchrom SVstart SVend L_GenesSVtoAnnotate} {
     global g_AnnotSV
     global poBenignIntersectDone
     global L_genes
+    global benignCoordSource
 
 
     set SVtoAnn "$SVchrom,$SVstart,$SVend"
@@ -1169,62 +1170,63 @@ proc poBenignSVannotation {SVchrom SVstart SVend L_GenesSVtoAnnotate} {
 		    exit 2
 		}
 	    }
+
+	    # Parse intersect file
+            set f [open $tmpFile]
+            while {![eof $f]} {
+                set L [gets $f]
+                if {$L eq ""} {continue}
+                set Ls [split $L "\t"]
+
+                set SVtoAnn_chrom [lindex $Ls 0]
+                set SVtoAnn_start [lindex $Ls 1]
+                set SVtoAnn_end   [lindex $Ls 2]
+
+                # An SV is considered benign if its allele frequency > $g_AnnotSV(benignAF)
+                # (default 0.01)
+                set benign_AF [lindex $Ls end]
+                if {[string is double $benign_AF] && $benign_AF < $g_AnnotSV(benignAF)} {continue}
+
+                set benign_coord [lindex $Ls end-1] ;# e.g. 16:47182577-47188882
+                set benign_source [lindex $Ls end-2]
+
+		lappend benignCoordSource($SVtoAnn_chrom,$SVtoAnn_start,$SVtoAnn_end,$svtype) "$benign_coord $benign_source"
+            }
+            close $f
   	}
         set poBenignIntersectDone 1
     }
 
-    # Parse
+    # Annotations
     foreach svtype {"Gain" "Loss"} {
 
         # Keep only the user requested columns (defined in the configfile)
         if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^po_B_[string tolower ${svtype}]_"] eq -1} { continue }
 
-        set benignBEDfile [glob -nocomplain "$benignDir/benign_${svtype}_SV_$g_AnnotSV(genomeBuild).sorted.bed"]
-        regsub -nocase "(.formatted)?.bed$" $g_AnnotSV(bedFile) ".intersect.po_benign-$svtype" tmpFile
-        set tmpFile "$g_AnnotSV(outputDir)/[file tail $tmpFile]"
-
-	set f [open $tmpFile]
-	while {![eof $f]} {
-	    set L [gets $f]
-	    if {$L eq ""} {continue}
-	    set Ls [split $L "\t"]
-
-	    # We are searching the annotation only for "SVchrom SVstart SVend"
-            set SVtoAnn_chrom [lindex $Ls 0]
-            set SVtoAnn_start [lindex $Ls 1]
-            set SVtoAnn_end   [lindex $Ls 2]
-	    if {$SVtoAnn_chrom ne $SVchrom || $SVtoAnn_start ne $SVstart || $SVtoAnn_end ne $SVend} {continue}
-		
-	    # An SV is considered benign if its allele frequency > $g_AnnotSV(benignAF)
-	    # (default 0.01)
-            set benign_AF [lindex $Ls end]
-	    if {[string is double $benign_AF] && $benign_AF < $g_AnnotSV(benignAF)} {continue}
-	
-	
-	    set benign_coord [lindex $Ls end-1] ;# e.g. 16:47182577-47188882
-	    set benign_source [lindex $Ls end-2]
-		
-	    if {[info exists L_genes($benign_coord)]} {
-		set allG 1
-		foreach gN [split $L_GenesSVtoAnnotate ";"] {
-		    if {![regexp $gN [split $L_genes($benign_coord) ";"]]} {
-			set allG 0
-			break
+	if {[info exists benignCoordSource($SVtoAnn,$svtype)]} {
+	    foreach {benign_coord benign_source} $benignCoordSource($SVtoAnn,$svtype) {
+	    	# benign_coord: 16:47182577-47188882
+	    	if {[info exists L_genes($benign_coord)]} {
+		    set allG 1
+		    foreach gN [split $L_GenesSVtoAnnotate ";"] {
+		    	if {![regexp $gN [split $L_genes($benign_coord) ";"]]} {
+			    set allG 0
+			    break
+		        }
 		    }
-		}
-         	if {$allG} {
+         	    if {$allG} {
 			lappend L_benign_coord($SVtoAnn,$svtype,allG) $benign_coord
 			lappend L_benign_source($SVtoAnn,$svtype,allG) $benign_source
-		} else {
+		    } else {
 			lappend L_benign_coord($SVtoAnn,$svtype,someG) $benign_coord
 			lappend L_benign_source($SVtoAnn,$svtype,someG) $benign_source
-		}
-	    } else {
+		    }   
+	        } else {
 		    lappend L_benign_coord($SVtoAnn,$svtype,someG) $benign_coord
 		    lappend L_benign_source($SVtoAnn,$svtype,someG) $benign_source
+	        }
 	    }
 	} 
-	close $f
 
         # Loading benign final annotation for each SV
 	# (AnnotSV restrict the number of overlapping reported features to 20)
