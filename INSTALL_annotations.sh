@@ -1,21 +1,13 @@
+#!/bin/bash
+
 ##########################################
 # Basic manual install in local directory
 ##########################################
-
-
-# Code download
-###############
-
-# Warning: don't follow the FHS standards
-git clone https://github.com/lgmgeo/AnnotSV.git
-
-
 
 # Annotations download
 ######################
 
 # To be used with the "-annotationsDir" option
-
 
 # Installation of human annotation
 mkdir ./AnnotSV_annotations
@@ -33,9 +25,5 @@ tar -xf 2202_hg19.tar.gz -C ./Annotations_Exomiser/2202
 unzip 2202_phenotype.zip -d ./Annotations_Exomiser/2202
 rm -rf 2202_phenotype.zip
 rm -rf 2202_hg19.tar.gz
-
-
-
-
 
 
