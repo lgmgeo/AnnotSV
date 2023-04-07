@@ -108,6 +108,9 @@ OPTIONS
 
 -txFile:                        Path of a file containing a list of preferred genes transcripts to be used in priority during the annotation (Preferred genes transcripts names should be tab or space separated)
 
+-variantconvertDir:             Path of the variantconvert directory
+				(by default, the variantconvert tool distributed by annotSV is used)
+
 -vcf: 				Creation of a VCF output file format (-svtBEDcol needs to be defined too)
 				Values: 0 (default) or 1
 

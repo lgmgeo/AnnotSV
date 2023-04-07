@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.3.2                                                                                            #
+# AnnotSV 3.3.3                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -79,13 +79,14 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(svtTSVcol)                "-1"  ;# not given in parameter
     set g_AnnotSV(tx)                       "RefSeq"
     set g_AnnotSV(txFile)                   ""
+    set g_AnnotSV(variantconvertDir)        ""
     set g_AnnotSV(vcf)                      "0"
 
     
     ###########################
     ## Load config file options
     ###########################
-    set lOptionsOk "annotationsDir annotationMode bcftools bedtools benignAF candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo includeCI metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering reciprocal REreport REselect1 REselect2 samplesidBEDcol snvIndelFiles snvIndelPASS snvIndelSamples SVinputFile SVinputInfo SVminSize svtBEDcol tx txFile vcf"
+    set lOptionsOk "annotationsDir annotationMode bcftools bedtools benignAF candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo includeCI metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering reciprocal REreport REselect1 REselect2 samplesidBEDcol snvIndelFiles snvIndelPASS snvIndelSamples SVinputFile SVinputInfo SVminSize svtBEDcol tx txFile variantconvertDir vcf"
     set configFile "$g_AnnotSV(etcDir)/configfile"
     if {[file exists "[file dirname $g_AnnotSV(SVinputFile)]/configfile"]} {
 	set configFile "[file dirname $g_AnnotSV(SVinputFile)]/configfile"
@@ -147,7 +148,7 @@ proc configureAnnotSV {argv} {
     ########################################
     puts "\t...checking all these configuration data\n"
 
-    ## annotationsDir: It must be an existing directory (or "" for the default)
+    ## annotationsDir, variantconvertDir: It must be existing directories (or "" for the default)
     if {$g_AnnotSV(annotationsDir) eq ""} {
 	set g_AnnotSV(annotationsDir) "$g_AnnotSV(installDir)/share/AnnotSV"
     } else {
@@ -156,6 +157,15 @@ proc configureAnnotSV {argv} {
 	    puts "AnnotSV needs in argument an existing path of the annotations directory (-annotationsDir = \"$g_AnnotSV(annotationsDir)\") - Exit with error."
 	    exit 2
 	}
+    }
+    if {$g_AnnotSV(variantconvertDir) eq ""} {
+        set g_AnnotSV(variantconvertDir) "$g_AnnotSV(installDir)/share/python3/variantconvert/"
+    } else {
+        regsub "/+$" $g_AnnotSV(variantconvertDir) "" g_AnnotSV(variantconvertDir)
+        if {![file isdirectory $g_AnnotSV(variantconvertDir)]} {
+            puts "AnnotSV needs in argument an existing path of the variantconvert directory (-variantconvertDir = \"$g_AnnotSV(variantconvertDir)\") - Exit with error."
+            exit 2
+        }
     }
 
     ## SVinputFile: We should have a bed or VCF input file

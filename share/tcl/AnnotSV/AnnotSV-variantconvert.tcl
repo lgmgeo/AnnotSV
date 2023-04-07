@@ -31,9 +31,6 @@ proc checkVariantconvertConfigfile {} {
     # Use of variantconvert to create a vcf output
     if {$g_AnnotSV(vcf)} {
 	
-        set g_AnnotSV(pythonDir) "$g_AnnotSV(installDir)/share/python3"
-        set variantconvertDIR "$g_AnnotSV(pythonDir)/variantconvert"
-	
 	# - Check if the reference fasta file in the variantconvert bed configfiles has the good path
         #############################################################################################
 
@@ -41,8 +38,8 @@ proc checkVariantconvertConfigfile {} {
 	## (no need to have a reference fasta file from a VCF SVinputfile)
 	if {[regexp "\\.bed$" $g_AnnotSV(SVinputFile)]} {
 
-            set configfile "$variantconvertDIR/configs/$g_AnnotSV(genomeBuild)/annotsv3_from_bed.json"
-            set localconfigfile "$variantconvertDIR/configs/$g_AnnotSV(genomeBuild)/annotsv3_from_bed.local.json"
+            set configfile "$g_AnnotSV(variantconvertDir)/configs/$g_AnnotSV(genomeBuild)/annotsv3_from_bed.json"
+            set localconfigfile "$g_AnnotSV(variantconvertDir)/configs/$g_AnnotSV(genomeBuild)/annotsv3_from_bed.local.json"
 
 	    set distributedPathLine "\"path\": \".*\","
 	    set newPathLine         "\"path\": \"$g_AnnotSV(installDir)/share/AnnotSV/Annotations_Human/BreakpointsAnnotations/GCcontent/GRCh37/GRCh37_chromFa.fasta\","
@@ -66,17 +63,17 @@ proc checkVariantconvertConfigfile {} {
 	
         # - Check if the "pip install -e ." command was already run
         ###########################################################
-        if {![file exists $variantconvertDIR/pipinstall.flag]} {
+        if {![file exists $g_AnnotSV(variantconvertDir)/pipinstall.flag]} {
             set currentDir [pwd]
-            cd $variantconvertDIR
+            cd $g_AnnotSV(variantconvertDir)
             if {[catch {exec pip3 install -e .}]} {
                 if {[catch {exec pip install -e .} Message]} {
-                    WriteTextInFile "$Message" $variantconvertDIR/pipinstall.flag
+                    WriteTextInFile "$Message" $g_AnnotSV(variantconvertDir)/pipinstall.flag
                 } else {
-                    WriteTextInFile "Done" $variantconvertDIR/pipinstall.flag
+                    WriteTextInFile "Done" $g_AnnotSV(variantconvertDir)/pipinstall.flag
                 }
             } else {
-                WriteTextInFile "Done" $variantconvertDIR/pipinstall.flag
+                WriteTextInFile "Done" $g_AnnotSV(variantconvertDir)/pipinstall.flag
             }
             cd $currentDir
         }

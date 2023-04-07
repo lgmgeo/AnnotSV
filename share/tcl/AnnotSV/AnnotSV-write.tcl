@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.3.2                                                                                            #
+# AnnotSV 3.3.3                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -502,6 +502,7 @@ proc OrganizeAnnotation {} {
     file delete -force $newFullAndSplitBedFile
     unset L_UsersText
 
+
     
     
     ########################################################################
@@ -884,6 +885,8 @@ proc OrganizeAnnotation {} {
 	# User FtIncludedInSV BED annotations. 
 	set L_FtIncludedInSVtext {}
    	foreach formattedUserBEDfile [glob -nocomplain $usersDir/FtIncludedInSV/*.formatted.sorted.bed] {
+# Very slow with COSMIC data, to check
+# puts "$formattedUserBEDfile ([clock format [clock seconds] -format "%H:%M"])"
 	    if {$AnnotationMode eq "split"} {
 		lappend L_FtIncludedInSVtext "[userBEDannotation $formattedUserBEDfile $SVchrom $intersectStart $intersectEnd]"
 	    } else {
@@ -1491,11 +1494,9 @@ proc OrganizeAnnotation {} {
     ################################################
     if {$g_AnnotSV(vcf)} {
 		
-	set g_AnnotSV(pythonDir) "$g_AnnotSV(installDir)/share/python3"
-	set variantconvertDIR "$g_AnnotSV(pythonDir)/variantconvert"
 	regsub ".tsv" $outputFile ".vcf" VCFoutputFile
 	
-	catch {exec python3 $variantconvertDIR/variantconvert --version} Message
+	catch {exec python3 $g_AnnotSV(variantconvertDir)/variantconvert --version} Message
 	if {[regexp "variantconvert (\[0-9\]+\\.\[0-9\]+\\.\[0-9\]+)" $Message match version]} {	
 	    set version "v$version "
 	} else {
@@ -1510,7 +1511,7 @@ proc OrganizeAnnotation {} {
 
 	if {[regexp "\\.vcf(.gz)?$" $g_AnnotSV(SVinputFile)]} {
 	    ## SVinputfile is a VCF	  
-	    set command "python3 $variantconvertDIR/variantconvert convert -i $outputFile -o $VCFoutputFile -fi annotsv -fo vcf -c $variantconvertDIR/configs/$g_AnnotSV(genomeBuild)/annotsv3_from_vcf.json"
+	    set command "python3 $g_AnnotSV(variantconvertDir)/variantconvert convert -i $outputFile -o $VCFoutputFile -fi annotsv -fo vcf -c $g_AnnotSV(variantconvertDir)/configs/$g_AnnotSV(genomeBuild)/annotsv3_from_vcf.json"
 	} else {
 	    ## SVinputfile is a BED)	    
 	    if {$g_AnnotSV(svtBEDcol) == -1 } {
@@ -1519,7 +1520,7 @@ proc OrganizeAnnotation {} {
 		if {$g_AnnotSV(svtBEDcol) == -1}       {puts "               -svtBEDcol $g_AnnotSV(svtBEDcol)"}
 		return
 	    } else {
-	        set command "python3 $variantconvertDIR/variantconvert convert -i $outputFile -o $VCFoutputFile -fi annotsv -fo vcf -c $variantconvertDIR/configs/$g_AnnotSV(genomeBuild)/annotsv3_from_bed.local.json"
+	        set command "python3 $g_AnnotSV(variantconvertDir)/variantconvert convert -i $outputFile -o $VCFoutputFile -fi annotsv -fo vcf -c $g_AnnotSV(variantconvertDir)/configs/$g_AnnotSV(genomeBuild)/annotsv3_from_bed.local.json"
 	    }
 	}
 

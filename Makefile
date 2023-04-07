@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.3.2                                                                                            #
+# AnnotSV 3.3.3                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -36,6 +36,8 @@ BASHDIR              := $(SHAREDIR)/bash
 TCLVERSION           := tcl$(shell echo 'puts $${tcl_version};exit 0' | tclsh)
 TCLDIRDISTRIBUTED    := share/tcl
 TCLDIR               := $(SHAREDIR)/$(TCLVERSION)
+PYTHONDIRDISTRIBUTED := share/python3
+PYTHONDIR            := $(SHAREDIR)/python3
 ANNOTSV              := AnnotSV
 VERSION              := 3.3.2
 RM                   := /bin/rm
@@ -57,8 +59,8 @@ all: install-display install-documentationlight install-done
 install: install-display install-documentationlight install-done
 install-exomiser: install-exomiser-1 install-exomiser-3
 else
-all: install-display install-configfile install-makefile install-executable install-tcl-toolbox install-bash-toolbox install-doc install-others-doc install-done
-install: install-display install-configfile install-makefile install-executable install-tcl-toolbox install-bash-toolbox install-doc install-others-doc install-done
+all: install-display install-configfile install-makefile install-executable install-tcl-toolbox install-python-toolbox install-bash-toolbox install-doc install-others-doc install-done
+install: install-display install-configfile install-makefile install-executable install-tcl-toolbox install-python-toolbox install-bash-toolbox install-doc install-others-doc install-done
 install-exomiser: install-exomiser-1 install-exomiser-2 install-exomiser-3
 endif
 
@@ -74,6 +76,7 @@ install-documentationlight: $(DOCUMENTATIONS)
 	@echo ""
 	$(MV) $^ $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
 	$(MV) $(TCLDIRDISTRIBUTED) $(TCLDIR)
+	$(MV) $(PYTHONDIRDISTRIBUTED) $(PYTHONDIR)
 
 install-configfile: $(CONFIGFILE)
 	@echo ""
@@ -101,6 +104,13 @@ install-tcl-toolbox:
 	@echo "------------------------"
 	$(MKDIR) $(DESTDIR)$(TCLDIR)/$(ANNOTSV)
 	cd share/tcl ; tar cf - $(ANNOTSV) | tar xf - -C $(DESTDIR)$(TCLDIR)/
+
+install-python-toolbox:
+	@echo ""
+	@echo "Python scripts installation"
+	@echo "---------------------------"
+	$(MKDIR) $(DESTDIR)$(PYTHONDIR)/variantconvert
+	cd share/python3 ; tar cf - variantconvert | tar xf - -C $(DESTDIR)$(PYTHONDIR)/
 
 install-bash-toolbox: $(BASH_SCRIPTS)
 	@echo ""
@@ -200,6 +210,7 @@ uninstall1:
 	@echo "------------------------"
 	$(RM) -f $(DESTDIR)$(BINDIR)/$(ANNOTSV)
 	$(RM) -rf $(DESTDIR)$(TCLDIR)/$(ANNOTSV)
+	$(RM) -rf $(DESTDIR)$(PYTHONDIR)/$(ANNOTSV)
 	$(RM) -rf $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
 	$(RM) -rf $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)
 	$(RM) -rf $(DESTDIR)$(SHAREDIR)/bash
@@ -210,7 +221,7 @@ uninstall1:
 	$(RM) -rf $(DESTDIR)$(PREFIX)/.git
 
 uninstall2:
-	$(RMDIR) --ignore-fail-on-non-empty $(DESTDIR)$(BINDIR) $(DESTDIR)$(TCLDIR) $(DESTDIR)$(DOCDIR) $(DESTDIR)$(SHAREDIR) $(DESTDIR)$(ETCDIR)
+	$(RMDIR) --ignore-fail-on-non-empty $(DESTDIR)$(BINDIR) $(DESTDIR)$(TCLDIR) $(DESTDIR)$(PYTHONDIR) $(DESTDIR)$(DOCDIR) $(DESTDIR)$(SHAREDIR) $(DESTDIR)$(ETCDIR)
 
 uninstall3:
 	$(RMDIR) --ignore-fail-on-non-empty $(DESTDIR)$(PREFIX)
