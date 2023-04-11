@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.3.3                                                                                            #
+# AnnotSV 3.3.4                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -354,6 +354,7 @@ proc VCFsToBED {SV_VCFfiles} {
     file delete -force $unannotatedOutputFile
     
     foreach VCFfile $SV_VCFfiles {
+	puts "...VCF to BED ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])\n"
 	set L_TextToWrite {}
 	# TextToWrite_rescue($SV_ID)
 	set L_squBrack_SV_ID_Written {}
@@ -626,6 +627,10 @@ proc VCFsToBED {SV_VCFfiles} {
 			# Example 2:
 			# 3       3000    breakend_inv_2_a        T       [3:5001[T  	=> Line analysed by AnnotSV
 			# 3       5001    breakend_inv_2_b        T       T]3:3000] 	=> Line NOT reported by AnnotSV (if the previous BND has already been analysed)
+			# Exemple3 does not work. To improve.
+                        # Example 3:
+                        # 3       3000    breakend_inv_3_a        T       [3:5001[T     => Line analysed by AnnotSV
+                        # 3       5001    breakend_inv_3_b        T       [3:3000[T     => Line NOT reported by AnnotSV (if the previous BND has already been analysed)
 			set svlen [expr {$bracketStart-$posVCF}]
 			set svtype "INV"
 			set end $bracketStart
