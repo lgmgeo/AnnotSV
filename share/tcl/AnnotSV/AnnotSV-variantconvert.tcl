@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.3.3                                                                                            #
+# AnnotSV 3.3.4                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -46,7 +46,10 @@ proc checkVariantconvertConfigfile {} {
 	    set distributedRefLine  "\"##reference=file:.*\""
 	    set newRefLine          "\"##reference=file:$g_AnnotSV(installDir)/share/AnnotSV/Annotations_Human/BreakpointsAnnotations/GCcontent/GRCh37/GRCh37_chromFa.fasta\""
 
-	    if {![file exists $localconfigfile]} {
+	    # 1 - AnnotSV install with the root user
+	    # 2 - AnnotSV run with non-root user
+	    # => The $localconfigfile can not be created by a non-root user. This file should exists with 777 permissions
+	    if {[file size $localconfigfile] eq 0} {
 		set L_Lines {}
 		foreach L [LinesFromFile $configfile] {
 		    if {[regexp "$distributedPathLine" $L]} {
@@ -63,20 +66,24 @@ proc checkVariantconvertConfigfile {} {
 	
         # - Check if the "pip install -e ." command was already run
         ###########################################################
-        if {![file exists $g_AnnotSV(variantconvertDir)/pipinstall.flag]} {
-            set currentDir [pwd]
-            cd $g_AnnotSV(variantconvertDir)
-            if {[catch {exec pip3 install -e .}]} {
-                if {[catch {exec pip install -e .} Message]} {
-                    WriteTextInFile "$Message" $g_AnnotSV(variantconvertDir)/pipinstall.flag
+
+        # => Can be done during the installation with the Makefile (if the python environment is OK)
+        set currentDir [pwd]
+        catch {
+            if {![file exists $g_AnnotSV(variantconvertDir)/pipinstall.flag]} {
+                cd $g_AnnotSV(variantconvertDir)
+                if {[catch {exec pip3 install -e .}]} {
+                    if {[catch {exec pip install -e .} Message]} {
+                        WriteTextInFile "$Message" $g_AnnotSV(variantconvertDir)/pipinstall.flag
+                    } else {
+                        WriteTextInFile "Done" $g_AnnotSV(variantconvertDir)/pipinstall.flag
+                    }
                 } else {
                     WriteTextInFile "Done" $g_AnnotSV(variantconvertDir)/pipinstall.flag
                 }
-            } else {
-                WriteTextInFile "Done" $g_AnnotSV(variantconvertDir)/pipinstall.flag
             }
-            cd $currentDir
-        }
+       }
+       cd $currentDir
     }
 }
 

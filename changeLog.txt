@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.3.3                                                                                            #
+# AnnotSV 3.3.4                                                                                            #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
@@ -10,19 +10,20 @@
 
 For more details, please see the README file.
 
-April,  , 2023,AnnotSV version 3.3.4
+April, 07, 2023, AnnotSV version 3.3.4
 	- Among the “po_P_*_*” features, redundancy is now removed ONLY from “po_P_*_phen” and “po_P_*_hpo”.
 	=> AnnotSV keeps now the correspondence between “po_P_*_source”, “po_P_*_coord” and “po_P_*_percent” features.
 	- Improvment of the running time (code part: SV partially overlapping with an established benign region)
+	- Update of the Makefile (variantconvert install)
 	- Remove requirement for ANNOTSV environment variable
 	- Add of the "INSTALL_code.sh" and "INSTALL_annotations.sh" bash files (for a basic manual installation)
 	- Add a check of the "#CHROM" header line
 	- Add of the "-variantconvertDir" option (path of the variantconvert directory). By default, the variantconvert tool distributed by annotSV is used.
 
-March, 30, 2023,AnnotSV version 3.3.3
+March, 30, 2023, AnnotSV version 3.3.3
 	- Add bugfix for large input file
 
-March, 28, 2023,AnnotSV version 3.3.2
+March, 28, 2023, AnnotSV version 3.3.2
 	- Add bugfix for SV partially overlapping with an established benign region. Ranking Impact
 	- Improve the 40 criteria (Loss) in the SV ranking
 	- Restrict the number of "po_B_*_someG_*" features to 20

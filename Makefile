@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.3.3                                                                                            #
+# AnnotSV 3.3.4                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -39,13 +39,14 @@ TCLDIR               := $(SHAREDIR)/$(TCLVERSION)
 PYTHONDIRDISTRIBUTED := share/python3
 PYTHONDIR            := $(SHAREDIR)/python3
 ANNOTSV              := AnnotSV
-VERSION              := 3.3.2
+VERSION              := 3.3.4
 RM                   := /bin/rm
 RMDIR                := /bin/rmdir
 MKDIR                := install -d
 MV                   := /bin/mv
 CP                   := install -p -m 0644
 CPDIR                := /bin/cp -r
+CHMOD                := /bin/chmod -R 777
 CONFIGFILE           := etc/$(ANNOTSV)/configfile
 MAKEFILE             := Makefile
 PROPERTIES           := etc/$(ANNOTSV)/application.properties
@@ -76,7 +77,6 @@ install-documentationlight: $(DOCUMENTATIONS)
 	@echo ""
 	$(MV) $^ $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
 	$(MV) $(TCLDIRDISTRIBUTED) $(TCLDIR)
-	$(MV) $(PYTHONDIRDISTRIBUTED) $(PYTHONDIR)
 
 install-configfile: $(CONFIGFILE)
 	@echo ""
@@ -107,11 +107,18 @@ install-tcl-toolbox:
 
 install-python-toolbox:
 	@echo ""
-	@echo "Python scripts installation"
+	@echo "variantconvert installation"
 	@echo "---------------------------"
 	$(MKDIR) $(DESTDIR)$(PYTHONDIR)/variantconvert
 	cd share/python3 ; tar cf - variantconvert | tar xf - -C $(DESTDIR)$(PYTHONDIR)/
-
+	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/pipinstall.flag
+	chmod 777 $(DESTDIR)$(PYTHONDIR)/variantconvert/pipinstall.flag
+	pip3 install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. || pip install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. || rm -f $(DESTDIR)$(PYTHONDIR)/variantconvert/pipinstall.flag
+	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/configs/GRCh37/annotsv3_from_bed.local.json
+	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/configs/GRCh38/annotsv3_from_bed.local.json
+	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/configs/GRCh37/annotsv3_from_bed.local.json
+	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/configs/GRCh38/annotsv3_from_bed.local.json
+	
 install-bash-toolbox: $(BASH_SCRIPTS)
 	@echo ""
 	@echo "Bash scripts installation"
@@ -148,6 +155,7 @@ install-human-annotation: Annotations_Human_$(VERSION).tar.gz install-exomiser
 	@echo ""
 	tar -xf Annotations_Human_$(VERSION).tar.gz -C $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/
 	$(RM) -rf Annotations_Human_$(VERSION).tar.gz
+	$(CHMOD) $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_*
 	@echo ""
 	@echo "--> Human annotation installed"
 
@@ -209,19 +217,23 @@ uninstall1:
 	@echo "Uninstalling of $(ANNOTSV)"
 	@echo "------------------------"
 	$(RM) -f $(DESTDIR)$(BINDIR)/$(ANNOTSV)
+	$(RM) -f $(DESTDIR)$(BINDIR)/INSTALL_annotations.sh
+	$(RM) -f $(DESTDIR)$(BINDIR)/INSTALL_code.sh
 	$(RM) -rf $(DESTDIR)$(TCLDIR)/$(ANNOTSV)
 	$(RM) -rf $(DESTDIR)$(PYTHONDIR)/$(ANNOTSV)
+	$(RM) -rf $(DESTDIR)$(PYTHONDIR)/variantconvert
 	$(RM) -rf $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
 	$(RM) -rf $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)
-	$(RM) -rf $(DESTDIR)$(SHAREDIR)/bash
+	$(RM) -rf $(DESTDIR)$(BASHDIR)/$(ANNOTSV)
 	$(RM) -rf $(DESTDIR)$(ETCDIR)/$(ANNOTSV)
 	$(RM) -rf $(DESTDIR)$(PREFIX)/Makefile
 	$(RM) -rf $(DESTDIR)$(PREFIX)/README.md
 	$(RM) -rf $(DESTDIR)$(PREFIX)/Scoring_Criteria_AnnotSV_*.xlsx
 	$(RM) -rf $(DESTDIR)$(PREFIX)/.git
+	$(RM) -rf $(DESTDIR)$(PREFIX)/.gitignore
 
 uninstall2:
-	$(RMDIR) --ignore-fail-on-non-empty $(DESTDIR)$(BINDIR) $(DESTDIR)$(TCLDIR) $(DESTDIR)$(PYTHONDIR) $(DESTDIR)$(DOCDIR) $(DESTDIR)$(SHAREDIR) $(DESTDIR)$(ETCDIR)
+	$(RMDIR) --ignore-fail-on-non-empty $(DESTDIR)$(BINDIR) $(DESTDIR)$(BASHDIR) $(DESTDIR)$(TCLDIR) $(DESTDIR)$(PYTHONDIR) $(DESTDIR)$(DOCDIR) $(DESTDIR)$(SHAREDIR) $(DESTDIR)$(ETCDIR)
 
 uninstall3:
 	$(RMDIR) --ignore-fail-on-non-empty $(DESTDIR)$(PREFIX)
