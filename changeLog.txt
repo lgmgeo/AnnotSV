@@ -11,6 +11,7 @@
 For more details, please see the README file.
 
 April, 14, 2023, AnnotSV version 3.3.5
+	- Add documentation on the "-includeCI" option
 	- Add bugfix for variantconvert use in GRCh38 (when setting the REF in the VCF output file)
 	- Add bugfix during the install (depending on the environment)
 

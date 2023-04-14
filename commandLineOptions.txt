@@ -39,6 +39,7 @@ OPTIONS
                                 Default = "" (e.g.: "HP:0001156,HP:0001363,HP:0011304")
 
 -includeCI:                     To expand the "start" and "end" SV positions with the VCF confidence intervals (CIPOS, CIEND) around the breakpoints
+				AnnotSV keeps the CIPOS and CIEND information that comes first in the INFO column (even if the fields are CIPOS95, CIEND95 or tool_CIPOS, tool_CIEND).
                                 Values: 1 (default) or 0
 
 -metrics:                       Changing numerical values from frequencies to us or fr metrics (e.g. 0.2 or 0,2)
