@@ -12,9 +12,9 @@
 # Installation of human annotation
 mkdir ./AnnotSV_annotations
 cd ./AnnotSV_annotations
-curl -C - -LO https://www.lbgi.fr/~geoffroy/Annotations/Annotations_Human_3.3.4.tar.gz
-tar -xf Annotations_Human_3.3.4.tar.gz -C .
-rm -rf Annotations_Human_3.3.4.tar.gz
+curl -C - -LO https://www.lbgi.fr/~geoffroy/Annotations/Annotations_Human_3.3.5.tar.gz
+tar -xf Annotations_Human_3.3.5.tar.gz -C .
+rm -rf Annotations_Human_3.3.5.tar.gz
 
 
 # Installation of Exomiser data:
