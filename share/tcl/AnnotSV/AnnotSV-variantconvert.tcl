@@ -35,21 +35,27 @@ proc checkVariantconvertConfigfile {} {
         #############################################################################################
 
 	## SVinputfile is a BED
-	## (no need to have a reference fasta file from a VCF SVinputfile)
+	## (useful only with a BED input file, because there is no need to have a reference fasta file from a VCF SVinputfile)
 	if {[regexp "\\.bed$" $g_AnnotSV(SVinputFile)]} {
 
             set configfile "$g_AnnotSV(variantconvertDir)/configs/$g_AnnotSV(genomeBuild)/annotsv3_from_bed.json"
             set localconfigfile "$g_AnnotSV(variantconvertDir)/configs/$g_AnnotSV(genomeBuild)/annotsv3_from_bed.local.json"
 
+	    if {$g_AnnotSV(annotationsDir) ne ""} {
+		set pathDir "$g_AnnotSV(annotationsDir)"
+	    } else {
+		set pathDir "$g_AnnotSV(installDir)/share/AnnotSV/"
+	    }
+
 	    set distributedPathLine "\"path\": \".*\","
-	    set newPathLine         "\"path\": \"$g_AnnotSV(installDir)/share/AnnotSV/Annotations_Human/BreakpointsAnnotations/GCcontent/GRCh37/GRCh37_chromFa.fasta\","
+	    set newPathLine         "\"path\": \"$pathDir/Annotations_Human/BreakpointsAnnotations/GCcontent/$g_AnnotSV(genomeBuild)/$g_AnnotSV(genomeBuild)_chromFa.fasta\","
 	    set distributedRefLine  "\"##reference=file:.*\""
-	    set newRefLine          "\"##reference=file:$g_AnnotSV(installDir)/share/AnnotSV/Annotations_Human/BreakpointsAnnotations/GCcontent/GRCh37/GRCh37_chromFa.fasta\""
+	    set newRefLine          "\"##reference=file:$pathDir/Annotations_Human/BreakpointsAnnotations/GCcontent/$g_AnnotSV(genomeBuild)/$g_AnnotSV(genomeBuild)_chromFa.fasta\""
 
 	    # 1 - AnnotSV install with the root user
 	    # 2 - AnnotSV run with non-root user
 	    # => The $localconfigfile can not be created by a non-root user. This file should exists with 777 permissions
-	    if {[file size $localconfigfile] eq 0} {
+	    if {![file exists $localconfigfile] || [file size $localconfigfile] eq 0} {
 		set L_Lines {}
 		foreach L [LinesFromFile $configfile] {
 		    if {[regexp "$distributedPathLine" $L]} {

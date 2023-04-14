@@ -56,12 +56,12 @@ DOCUMENTATIONS       := $(shell find License.txt changeLog.txt commandLineOption
 # make install
 .PHONY: install
 ifeq ('$(INSTALLDIR1)' , '$(INSTALLDIR2)')
-all: install-display install-documentationlight install-done
-install: install-display install-documentationlight install-done
+all: install-display install-documentationlight install-variantconvert install-done
+install: install-display install-documentationlight install-variantconvert install-done
 install-exomiser: install-exomiser-1 install-exomiser-3
 else
-all: install-display install-configfile install-makefile install-executable install-tcl-toolbox install-python-toolbox install-bash-toolbox install-doc install-others-doc install-done
-install: install-display install-configfile install-makefile install-executable install-tcl-toolbox install-python-toolbox install-bash-toolbox install-doc install-others-doc install-done
+all: install-display install-configfile install-makefile install-executable install-tcl-toolbox install-python-toolbox install-bash-toolbox install-doc install-others-doc install-variantconvert install-done
+install: install-display install-configfile install-makefile install-executable install-tcl-toolbox install-python-toolbox install-bash-toolbox install-doc install-others-doc install-variantconvert install-done
 install-exomiser: install-exomiser-1 install-exomiser-2 install-exomiser-3
 endif
 
@@ -107,18 +107,24 @@ install-tcl-toolbox:
 
 install-python-toolbox:
 	@echo ""
-	@echo "variantconvert installation"
+	@echo "Python scripts installation"
 	@echo "---------------------------"
 	$(MKDIR) $(DESTDIR)$(PYTHONDIR)/variantconvert
 	cd share/python3 ; tar cf - variantconvert | tar xf - -C $(DESTDIR)$(PYTHONDIR)/
+
+install-variantconvert:
+	@echo ""
+	@echo "variantconvert installation"
+	@echo "---------------------------"
 	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/pipinstall.flag
 	chmod 777 $(DESTDIR)$(PYTHONDIR)/variantconvert/pipinstall.flag
 	pip3 install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. || pip install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. || rm -f $(DESTDIR)$(PYTHONDIR)/variantconvert/pipinstall.flag
+	@echo ""
 	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/configs/GRCh37/annotsv3_from_bed.local.json
 	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/configs/GRCh38/annotsv3_from_bed.local.json
 	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/configs/GRCh37/annotsv3_from_bed.local.json
 	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/configs/GRCh38/annotsv3_from_bed.local.json
-	
+
 install-bash-toolbox: $(BASH_SCRIPTS)
 	@echo ""
 	@echo "Bash scripts installation"

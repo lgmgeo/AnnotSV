@@ -10,6 +10,10 @@
 
 For more details, please see the README file.
 
+April, 14, 2023, AnnotSV version 3.3.5
+	- Add bugfix for variantconvert use in GRCh38 (when setting the REF in the VCF output file)
+	- Add bugfix during the install (depending on the environment)
+
 April, 07, 2023, AnnotSV version 3.3.4
 	- Among the “po_P_*_*” features, redundancy is now removed ONLY from “po_P_*_phen” and “po_P_*_hpo”.
 	=> AnnotSV keeps now the correspondence between “po_P_*_source”, “po_P_*_coord” and “po_P_*_percent” features.
