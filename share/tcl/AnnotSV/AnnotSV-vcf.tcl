@@ -489,7 +489,7 @@ proc VCFsToBED {SV_VCFfiles} {
                     }	
 		}
  
-	    } elseif {[regexp "(\[ACGTN\]*)(\\\[|\\\])(\[^:\]+):(\[0-9\]+)(\\\[|\\\])(\[ACGTN\]*)" $alt match baseLeft bracketLeft bracketChrom bracketStart bracketRight baseRight]} {
+	    } elseif {[regexp "(\[acgtnACGTN\]*)(\\\[|\\\])(\[^:\]+):(\[0-9\]+)(\\\[|\\\])(\[acgtnACGTN\]*)" $alt match baseLeft bracketLeft bracketChrom bracketStart bracketRight baseRight]} {
 		# Type3: square-bracketed notation ]...] 	
 		# => Developed with the assistance and guidance of Rodrigo Martin, BSC, Spain
 		
@@ -652,7 +652,7 @@ proc VCFsToBED {SV_VCFfiles} {
 			}
 		    }
 		}
-	    } elseif {[regexp -nocase "^\[ACGTN.*\]+$" $ref$alt]} {
+	    } elseif {[regexp -nocase "^\[acgtnACGTN.*\]+$" $ref$alt]} {
 		# Type1
 		regsub -all "\[*.\]" $ref "" refbis ;# cf GRIDSS comment, just below
 		regsub -all "\[*.\]" $alt "" altbis

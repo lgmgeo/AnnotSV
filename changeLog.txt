@@ -10,6 +10,12 @@
 
 For more details, please see the README file.
 
+	- Allow description of REF/ALT values in SV input files with lowercase ACGT
+	- Update of the .gitignore file 
+	- Add bug fix to report only a subset of the annotation columns provided by AnnotSV 
+	- Add of warning messages for the ranking (in case of missing required annotations)
+	- Update the display of the default command line
+
 April, 14, 2023, AnnotSV version 3.3.5
 	- Add documentation on the "-includeCI" option
 	- Add bugfix for variantconvert use in GRCh38 (when setting the REF in the VCF output file)

@@ -135,7 +135,7 @@ proc replaceREFwithNinALT {alt} {
     # INS: T TAAAA[13:5000[ => N NAAAA[13:5000[
     # INS: T ]13:5000]AAAAT => N ]13:5000]AAAAN
     # DEL: T ]22:3000]A => N ]22:3000]N
-    if {[regexp "(\[ACGTN\]*)(\\\[|\\\])(\[^:\]+):(\[0-9\]+)(\\\[|\\\])(\[ACGTN\]*)" $alt match baseLeft bracketLeft bracketChrom bracketStart bracketRight baseRight]} {
+    if {[regexp "(\[acgtnACGTN\]*)(\\\[|\\\])(\[^:\]+):(\[0-9\]+)(\\\[|\\\])(\[acgtnACGTN\]*)" $alt match baseLeft bracketLeft bracketChrom bracketStart bracketRight baseRight]} {
         if {[string length $baseLeft] > [string length $baseRight]} {
             set baseLeft "N[string range $baseLeft 1 end]"
         } else {
