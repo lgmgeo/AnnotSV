@@ -57,15 +57,17 @@ Samples_ID                      *
 Annotation_mode                 *
 
 # Genes annotations:
+CytoBand			
 Gene_name                       *
 Gene_count                      *
 Tx                              *
 Tx_start                        *
 Tx_end                          *
-Exon_count
 Overlapped_tx_length            *
 Overlapped_CDS_length           *
+Overlapped_CDS_percent		*
 Frameshift                      *
+Exon_count                      *
 Location                        *
 Location2                       *
 Dist_nearest_SS                 *
@@ -89,26 +91,24 @@ B_ins_AFmax
 B_inv_source                    
 B_inv_coord
 B_inv_AFmax
-po_B_gain_allG_source                   
-po_B_gain_allG_coord                    
-po_B_gain_someG_source
-po_B_gain_someG_coord
-po_B_loss_allG_source
-po_B_loss_allG_coord
-po_B_loss_someG_source
-po_B_loss_someG_coord
-po_B_loss_source                   
-po_B_loss_coord                    
+po_B_gain_allG_source           *       
+po_B_gain_allG_coord            *       
+po_B_gain_someG_source		*
+po_B_gain_someG_coord		*
+po_B_loss_allG_source		*
+po_B_loss_allG_coord		*
+po_B_loss_someG_source		*
+po_B_loss_someG_coord		*
 
 # Annotations with pathogenic genes or genomic regions:
-P_gain_phen 
-P_gain_hpo 
-P_gain_source 
-P_gain_coord 
-P_loss_phen 
-P_loss_hpo 
-P_loss_source 
-P_loss_coord
+P_gain_phen 			*
+P_gain_hpo 			*
+P_gain_source 			*
+P_gain_coord 			*
+P_loss_phen 			*
+P_loss_hpo 			*
+P_loss_source 			*
+P_loss_coord			*
 P_ins_phen
 P_ins_hpo
 P_ins_source
@@ -117,24 +117,24 @@ P_inv_phen
 P_inv_hpo
 P_inv_source
 P_inv_coord
-po_P_gain_phen
-po_P_gain_hpo
-po_P_gain_source
-po_P_gain_coord
-po_P_gain_percent
-po_P_loss_phen
-po_P_loss_hpo
-po_P_loss_source
-po_P_loss_coord
-po_P_loss_percent
+po_P_gain_phen			*
+po_P_gain_hpo			*
+po_P_gain_source		*
+po_P_gain_coord			*
+po_P_gain_percent		*
+po_P_loss_phen			*
+po_P_loss_hpo			*
+po_P_loss_source		*
+po_P_loss_coord			*
+po_P_loss_percent		*
 
 # Annotations with pathogenic snv/indel:
-P_snvindel_nb
-P_snvindel_phen
+P_snvindel_nb			*
+P_snvindel_phen			*
 
 # Cancer
-Cosmic_ID
-Cosmic_mut_typ
+Cosmic_ID			*
+Cosmic_mut_typ			*
 
 # Breakpoints annotations
 TAD_coordinate
@@ -167,21 +167,22 @@ DDD_mode
 DDD_consequence
 DDD_disease
 DDD_pmid
-DDD_HI_percent
+DDD_HI_percent			*
 ExAC_synZ
 ExAC_misZ
 ExAC_delZ
 ExAC_dupZ
 ExAC_cnvZ
-LOEUF_bin
+LOEUF_bin			*
 ExAC_pLI                        
 GnomAD_pLI                      *
 OMIM_morbid                     *
-OMIM_morbid_candidate           *
+OMIM_morbid_candidate           
 OMIM_ID
 OMIM_phenotype
 OMIM_inheritance
-Exomiser_gene_pheno_score
+GnomAD_pLI			*
+Exomiser_gene_pheno_scorea	*
 Human_pheno_evidence
 Mouse_pheno_evidence
 Fish_pheno_evidence

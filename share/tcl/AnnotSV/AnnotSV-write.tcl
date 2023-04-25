@@ -146,7 +146,11 @@ proc OrganizeAnnotation {} {
     }
     append headerOutput "\tAnnotation_mode"
     if {$g_AnnotSV(cytoband)} {
-	append headerOutput "\tCytoBand"
+	if {[lsearch -exact "$g_AnnotSV(outputColHeader)" "CytoBand"] eq -1} {
+            set g_AnnotSV(cytoband) 0
+ 	} else {
+	    append headerOutput "\tCytoBand"
+	}
     }
     append headerOutput "\tGene_name\tGene_count\tTx\tTx_start\tTx_end\tOverlapped_tx_length\tOverlapped_CDS_length\tOverlapped_CDS_percent\tFrameshift\tExon_count\tLocation\tLocation2\tDist_nearest_SS\tNearest_SS_type\tIntersect_start\tIntersect_end\tRE_gene"
 
@@ -159,7 +163,7 @@ proc OrganizeAnnotation {} {
     ####### "Pathogenic SV header"
     if {$g_AnnotSV(organism) eq "Human"} {
 	foreach svtype "gain loss ins inv" {
-	    if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^P_[string tolower ${svtype}]_"] eq -1} { continue }
+	    if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^P_${svtype}_"] eq -1} { continue }
 	    append headerOutput "\tP_${svtype}_phen\tP_${svtype}_hpo\tP_${svtype}_source\tP_${svtype}_coord"
 	}
     }
@@ -167,7 +171,7 @@ proc OrganizeAnnotation {} {
     ####### "Partially overlapped pathogenic SV header"
     if {$g_AnnotSV(organism) eq "Human"} {
 	foreach svtype "gain loss" {
-	    if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^P_[string tolower ${svtype}]_"] eq -1} { continue }
+	    if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^po_P_${svtype}_"] eq -1} { continue }
 	    append headerOutput "\tpo_P_${svtype}_phen\tpo_P_${svtype}_hpo\tpo_P_${svtype}_source\tpo_P_${svtype}_coord\tpo_P_${svtype}_percent"
 	}
     }
@@ -182,7 +186,7 @@ proc OrganizeAnnotation {} {
     ####### "Benign SV header"
     if {$g_AnnotSV(organism) eq "Human"} {
 	foreach svtype "gain loss ins inv" {
-	    if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^B_[string tolower ${svtype}]_"] eq -1} { continue }
+	    if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^B_${svtype}_"] eq -1} { continue }
 	    append headerOutput "\tB_${svtype}_source\tB_${svtype}_coord\tB_${svtype}_AFmax"
 	}
     }
@@ -190,8 +194,7 @@ proc OrganizeAnnotation {} {
     ####### "Partially overlapping benign SV header"
     if {$g_AnnotSV(organism) eq "Human"} {
         foreach svtype "gain loss" {
-	    # Needed for the ranking
-            #if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^B_[string tolower ${svtype}]_"] eq -1} { continue }
+            if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^po_B_${svtype}_"] eq -1} { continue }
             append headerOutput "\tpo_B_${svtype}_allG_source\tpo_B_${svtype}_allG_coord"
 	    append headerOutput "\tpo_B_${svtype}_someG_source\tpo_B_${svtype}_someG_coord"
         }
@@ -305,7 +308,7 @@ proc OrganizeAnnotation {} {
 
     # Preparation for the ranking (from benign to pathogenic)
     SVprepareRanking $headerOutput    ; # svtTSVcol (for VCF input file) is defined there
-    
+
     ####### "Ranking header"
     if {$g_AnnotSV(organism) eq "Human"} {
 	if {$g_AnnotSV(svtTSVcol) eq -1} { ; # SV_type is required for the ranking of human SV
@@ -335,7 +338,7 @@ proc OrganizeAnnotation {} {
 
 
     ##################################################################################
-    ################### Display of the annotations to be realize #####################
+    ################### Display of the annotations to be realized ####################
     ##################################################################################
     puts "...listing of the annotations to be realized ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
     if {$g_AnnotSV(cytoband)} {

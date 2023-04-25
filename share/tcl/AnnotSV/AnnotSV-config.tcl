@@ -82,11 +82,25 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(variantconvertDir)        ""
     set g_AnnotSV(vcf)                      "0"
 
-    
+
     ###########################
     ## Load config file options
     ###########################
     set lOptionsOk "annotationsDir annotationMode bcftools bedtools benignAF candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo includeCI metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering reciprocal REreport REselect1 REselect2 samplesidBEDcol snvIndelFiles snvIndelPASS snvIndelSamples SVinputFile SVinputInfo SVminSize svtBEDcol tx txFile variantconvertDir vcf"
+
+    # Setting of $g_AnnotSV(SVinputFile) from the command line
+    set i 0
+    set j 1
+    while {$j < [llength $argv]} {
+        set optionName [lindex $argv $i]
+        regsub "^-|:\[ \t\]" $optionName "" optionName
+        if {$optionName eq "SVinputFile"} {
+            set g_AnnotSV(SVinputFile) [lindex $argv $j]
+        }
+        incr i 2
+        incr j 2
+    }
+
     set configFile "$g_AnnotSV(etcDir)/configfile"
     if {[file exists "[file dirname $g_AnnotSV(SVinputFile)]/configfile"]} {
 	set configFile "[file dirname $g_AnnotSV(SVinputFile)]/configfile"
@@ -97,8 +111,8 @@ proc configureAnnotSV {argv} {
 	if {[regexp "^# AnnotSV Output columns:" $L]} {set testColumnNames 1} 
 	if {[regexp "^#" $L]} {continue}
 	if {$L eq ""} {continue}
-	#Reading the config file 
 	if { ! $testColumnNames} {
+	    # Reading the configfile options (not the column names)
 	    regsub -all "^-|:\[ \t\]" $L "" L
 	    set optionName  [lindex $L 0]
 	    set optionValue [lindex $L 1]
@@ -114,6 +128,9 @@ proc configureAnnotSV {argv} {
 		exit 2
 	    }
 	} else {
+	    # Reading the configfile column names (not the options)
+            # - Users can select only a subset of the annotation columns provided by AnnotSV
+	    # - Essential annotations are added below (at the end of the proc)
 	    regsub "( |\t|\\*)+$" $L "" L
 	    lappend g_AnnotSV(outputColHeader) $L
 	}
@@ -494,10 +511,21 @@ proc configureAnnotSV {argv} {
     } 
 
 
-    # - Some annotation columns are essential for the ranking: can not be removed by the user
-    # - "Samples_ID" is essential for variantconvert (VCF output) and for the SV database : can not be removed by the user
+    # Some annotation columns can not be removed by the user:
+    # - Annotations which identify the SV:                     AnnotSV_ID SV_chrom SV_start SV_end SV_length SV_type
+    # - Annotations essential for the ranking:                 Annotation_mode Gene_name Gene_Count Overlapped_CDS_percent Frameshift Location Location2 RE_gene Overlapped_CDS_length Exon_count
+    #                                                          P_gain_coord P_loss_coord P_snvindel_nb B_gain_coord B_loss_coord
+    #                                                          po_P_gain_coord po_P_loss_coord po_B_gain_allG_coord po_B_gain_someG_coord po_B_loss_allG_coord po_B_loss_someG_coord
+    #                                                          HI TS GnomAD_pLI LOEUF_bin DDD_HI_percent Exomiser_gene_pheno_score OMIM_morbid
+    # - Annotations essential for variantconvert (VCF output): Samples_ID
+    # - Ranking annotations:                                   AnnotSV_ranking_score AnnotSV_ranking_criteria ACMG_class
+    # - Annotations linked to the previous essential annotations: Tx Tx_start Tx_end Overlapped_tx_length Dist_nearest_SS Nearest_SS_type Intersect_start Intersect_end 
+    #   (to be improved with the python reimplementation)         P_gain_phen P_gain_hpo P_gain_source P_loss_phen P_loss_hpo P_loss_source 
+    #                                                             po_P_gain_phen po_P_gain_hpo po_P_gain_source po_P_gain_percent po_P_loss_phen po_P_loss_hpo po_P_loss_source po_P_loss_percent
+    #                                                             P_snvindel_phen B_gain_source B_gain_AFmax B_loss_source B_loss_AFmax
+    #                                                             po_B_gain_allG_source po_B_gain_someG_source po_B_gain_someG_coord po_B_loss_allG_source po_B_loss_someG_source
     set g_AnnotSV(genesBasedAnn) 1
-    foreach col "Samples_ID Annotation_mode Gene_name Gene_Count RE_gene B_gain_source B_gain_coord B_loss_source B_loss_coord P_gain_phen P_gain_hpo P_gain_source P_gain_coord P_loss_phen P_loss_hpo P_loss_source P_loss_coord P_snvindel_nb HI TS Gnomad_pLI LOEUF_bin DDD_HI_percent Exomiser_gene_pheno_score OMIM_morbid Location Location2 Overlapped_CDS_percent Frameshift Exon_count" {
+    foreach col "SV_chrom SV_start SV_end SV_length SV_type Annotation_mode Gene_name Gene_Count RE_gene P_gain_coord P_loss_coord P_snvindel_nb B_gain_coord B_loss_coord po_P_gain_coord po_P_loss_coord po_B_gain_allG_coord po_B_loss_allG_coord po_B_loss_someG_coord HI TS GnomAD_pLI LOEUF_bin DDD_HI_percent Exomiser_gene_pheno_score OMIM_morbid Location Location2 Overlapped_CDS_percent Frameshift Exon_count Samples_ID" {
 	if {[lsearch -exact "$g_AnnotSV(outputColHeader)" $col] eq -1} {
 	    lappend g_AnnotSV(outputColHeader) $col
 	}
