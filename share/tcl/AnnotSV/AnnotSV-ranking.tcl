@@ -21,6 +21,15 @@
 # along with this program; If not, see <http://www.gnu.org/licenses/>.                                     #
 ############################################################################################################
 
+proc warningRankingMessage {L_header field} {
+    puts "WARNING: \"$field\" annotation is missing:"
+    puts "******************************************"
+    puts "$L_header"        
+    puts "******************************************"
+    puts "         => No ranking provided\n"
+}
+
+
 
 ## Define the position of some columns in an AnnotSV output line (columns requested for the ranking) 
 proc SVprepareRanking {L_header} {
@@ -41,46 +50,45 @@ proc SVprepareRanking {L_header} {
     }
 
     # "SV_type" is compulsory for the ranking
-    if {$g_AnnotSV(svtTSVcol) eq -1} {return}
+    if {$g_AnnotSV(svtTSVcol) eq -1} {warningRankingMessage $L_header "SV_type"; return}
 
     # Check if we have all the needed information for ranking
     # unset g_i <=> no SV ranking  
-    set g_i(gene)     [lsearch -regexp $Ls "Gene_name"];      if {$g_i(gene) == -1} {unset g_i; return}  
-    set g_i(NbGenes)  [lsearch -regexp $Ls "Gene_count"]; if {$g_i(NbGenes) == -1} {unset g_i; return}  
-    set g_i(full)     [lsearch -regexp $Ls "Annotation_mode"];   if {$g_i(full) == -1} {unset g_i; return}        
+    set g_i(gene)     [lsearch -regexp $Ls "Gene_name"];      if {$g_i(gene) == -1} {unset g_i; warningRankingMessage $L_header "Gene_name"; return}  
+    set g_i(NbGenes)  [lsearch -regexp $Ls "Gene_count"]; if {$g_i(NbGenes) == -1} {unset g_i; warningRankingMessage $L_header "Gene_count"; return}  
+    set g_i(full)     [lsearch -regexp $Ls "Annotation_mode"];   if {$g_i(full) == -1} {unset g_i; warningRankingMessage $L_header "Annotation_mode"; return}        
 
-    set g_i(REgene)   [lsearch -regexp $Ls "RE_gene"]; if {$g_i(REgene) == -1} {unset g_i; return}
+    set g_i(REgene)   [lsearch -regexp $Ls "RE_gene"]; if {$g_i(REgene) == -1} {unset g_i; warningRankingMessage $L_header "RE_gene"; return}
     
-    set g_i(Ploss)      [lsearch -regexp $Ls "P_loss_coord"];  if {$g_i(Ploss) == -1} {unset g_i; return}  
-    set g_i(Pgain)      [lsearch -regexp $Ls "P_gain_coord"];  if {$g_i(Pgain) == -1} {unset g_i; return}  
-    set g_i(Bloss)      [lsearch -regexp $Ls "B_loss_coord"];  if {$g_i(Bloss) == -1} {unset g_i; return}  
-    set g_i(Bgain)      [lsearch -regexp $Ls "B_gain_coord"];  if {$g_i(Bgain) == -1} {unset g_i; return}  
-    set g_i(Psnvindel)  [lsearch -regexp $Ls "P_snvindel_nb"]; if {$g_i(Psnvindel) == -1} {unset g_i; return}
+    set g_i(Ploss)      [lsearch -regexp $Ls "P_loss_coord"];  if {$g_i(Ploss) == -1} {unset g_i; warningRankingMessage $L_header "P_loss_coord"; return}  
+    set g_i(Pgain)      [lsearch -regexp $Ls "P_gain_coord"];  if {$g_i(Pgain) == -1} {unset g_i; warningRankingMessage $L_header "P_gain_coord"; return}  
+    set g_i(Bloss)      [lsearch -regexp $Ls "B_loss_coord"];  if {$g_i(Bloss) == -1} {unset g_i; warningRankingMessage $L_header "B_loss_coord"; return}  
+    set g_i(Bgain)      [lsearch -regexp $Ls "B_gain_coord"];  if {$g_i(Bgain) == -1} {unset g_i; warningRankingMessage $L_header "B_gain_coord"; return}  
+    set g_i(Psnvindel)  [lsearch -regexp $Ls "P_snvindel_nb"]; if {$g_i(Psnvindel) == -1} {unset g_i; warningRankingMessage $L_header "P_snvindel_nb"; return}
     
-    set g_i(poPloss)    [lsearch -regexp $Ls "po_P_loss_coord"];  if {$g_i(poPloss) == -1} {unset g_i; return}  
-    set g_i(poBlossAllG)   [lsearch -regexp $Ls "po_B_loss_allG_coord"];  if {$g_i(poBlossAllG) == -1} {unset g_i; return}
-    set g_i(poBlossSomeG)  [lsearch -regexp $Ls "po_B_loss_someG_coord"]; if {$g_i(poBlossSomeG) == -1} {unset g_i; return}
-    set g_i(poPgain)    [lsearch -regexp $Ls "po_P_gain_coord"];  if {$g_i(poPgain) == -1} {unset g_i; return}
-    set g_i(poBgainAllG)   [lsearch -regexp $Ls "po_B_gain_allG_coord"];  if {$g_i(poBgainAllG) == -1} {unset g_i; return}
-    set g_i(poBgainSomeG)  [lsearch -regexp $Ls "po_B_gain_someG_coord"]; if {$g_i(poBgainSomeG) == -1} {unset g_i; return}
+    set g_i(poPloss)    [lsearch -regexp $Ls "po_P_loss_coord"];  if {$g_i(poPloss) == -1} {unset g_i; warningRankingMessage $L_header "po_P_loss_coord"; return}  
+    set g_i(poPgain)    [lsearch -regexp $Ls "po_P_gain_coord"];  if {$g_i(poPgain) == -1} {unset g_i; warningRankingMessage $L_header "po_P_gain_coord"; return}
+    set g_i(poBlossAllG)   [lsearch -regexp $Ls "po_B_loss_allG_coord"];  if {$g_i(poBlossAllG) == -1} {unset g_i; warningRankingMessage $L_header "po_B_loss_allG_coord"; return}
+    set g_i(poBlossSomeG)  [lsearch -regexp $Ls "po_B_loss_someG_coord"]; if {$g_i(poBlossSomeG) == -1} {unset g_i; warningRankingMessage $L_header "po_B_loss_someG_coord"; return}
+    set g_i(poBgainAllG)   [lsearch -regexp $Ls "po_B_gain_allG_coord"];  if {$g_i(poBgainAllG) == -1} {unset g_i; warningRankingMessage $L_header "po_B_gain_allG_coord"; return}
+    set g_i(poBgainSomeG)  [lsearch -regexp $Ls "po_B_gain_someG_coord"]; if {$g_i(poBgainSomeG) == -1} {unset g_i; warningRankingMessage $L_header "po_B_gain_someG_coord"; return}
 
-    set g_i(HI) [lsearch -regexp $Ls "HI"];     if {$g_i(HI) == -1} {unset g_i; return}  
-    set g_i(TS) [lsearch -regexp $Ls "TS"];     if {$g_i(TS) == -1} {unset g_i; return}  
-
-    set g_i(pLI)       [lsearch -regexp $Ls "GnomAD_pLI"];    if {$g_i(pLI) == -1} {unset g_i; return}  
-    set g_i(loeuf)     [lsearch -regexp $Ls "LOEUF_bin"];     if {$g_i(loeuf) == -1} {unset g_i; return}  
-    set g_i(HIpercent) [lsearch -regexp $Ls "DDD_HI_percent"]; if {$g_i(HIpercent) == -1} {unset g_i; return}  
+    set g_i(HI) [lsearch -regexp $Ls "HI"];     if {$g_i(HI) == -1} {unset g_i; warningRankingMessage $L_header "HI"; return}  
+    set g_i(TS) [lsearch -regexp $Ls "TS"];     if {$g_i(TS) == -1} {unset g_i; warningRankingMessage $L_header "TS"; return}  
+    set g_i(pLI)       [lsearch -regexp $Ls "GnomAD_pLI"];    if {$g_i(pLI) == -1} {unset g_i; warningRankingMessage $L_header "GnomAD_pLI"; return}  
+    set g_i(loeuf)     [lsearch -regexp $Ls "LOEUF_bin"];     if {$g_i(loeuf) == -1} {unset g_i; warningRankingMessage $L_header "LOEUF_bin"; return}  
+    set g_i(HIpercent) [lsearch -regexp $Ls "DDD_HI_percent"]; if {$g_i(HIpercent) == -1} {unset g_i; warningRankingMessage $L_header "DDD_HI_percent"; return}  
    
     set g_i(exomiser)  [lsearch -regexp $Ls "Exomiser_gene_pheno_score"];  
 
-    set g_i(morbid)    [lsearch -regexp $Ls "OMIM_morbid"]; if {$g_i(morbid) == -1} {unset g_i; return}   
+    set g_i(morbid)    [lsearch -regexp $Ls "OMIM_morbid"]; if {$g_i(morbid) == -1} {unset g_i; warningRankingMessage $L_header "OMIM_morbid"; return}   
 
-    set g_i(location)    [lsearch -regexp $Ls "Location"];               if {$g_i(location) == -1} {unset g_i; return}  
-    set g_i(location2)   [lsearch -regexp $Ls "Location2"];              if {$g_i(location2) == -1} {unset g_i; return} 
-    set g_i(CDSlength)   [lsearch -regexp $Ls "Overlapped_CDS_length"];  if {$g_i(CDSlength) == -1} {unset g_i; return}
-    set g_i(CDSpercent)  [lsearch -regexp $Ls "Overlapped_CDS_percent"]; if {$g_i(CDSpercent) == -1} {unset g_i; return} 
-    set g_i(frameshift)  [lsearch -regexp $Ls "Frameshift"];             if {$g_i(frameshift) == -1} {unset g_i; return} 
-    set g_i(NbExons)     [lsearch -regexp $Ls "Exon_count"];        if {$g_i(NbExons) == -1} {unset g_i; return} 
+    set g_i(location)    [lsearch -regexp $Ls "Location"];               if {$g_i(location) == -1} {unset g_i; warningRankingMessage $L_header "Location"; return}  
+    set g_i(location2)   [lsearch -regexp $Ls "Location2"];              if {$g_i(location2) == -1} {unset g_i; warningRankingMessage $L_header "Location2"; return} 
+    set g_i(CDSlength)   [lsearch -regexp $Ls "Overlapped_CDS_length"];  if {$g_i(CDSlength) == -1} {unset g_i; warningRankingMessage $L_header "Overlapped_CDS_length"; return}
+    set g_i(CDSpercent)  [lsearch -regexp $Ls "Overlapped_CDS_percent"]; if {$g_i(CDSpercent) == -1} {unset g_i; warningRankingMessage $L_header "Overlapped_CDS_percent"; return} 
+    set g_i(frameshift)  [lsearch -regexp $Ls "Frameshift"];             if {$g_i(frameshift) == -1} {unset g_i; warningRankingMessage $L_header "Frameshift"; return} 
+    set g_i(NbExons)     [lsearch -regexp $Ls "Exon_count"];        if {$g_i(NbExons) == -1} {unset g_i; warningRankingMessage $L_header "Exon_count"; return} 
 
     # If we have all the needed information, ranking will be done
     set g_AnnotSV(ranking) 1
