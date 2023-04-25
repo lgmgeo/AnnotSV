@@ -1,9 +1,0 @@
-pandas
-pyfaidx
-natsort
-tqdm
-polars
-
-[dev]
-black
-pytest

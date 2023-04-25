@@ -10,11 +10,18 @@ share/AnnotSV/Annotations_Human/
 share/AnnotSV/Annotations_Mouse/
 share/AnnotSV/Annotations_Exomiser/
 
-# Python
+# Python reimplementation of AnnotSV
 share/python3/annotsv/
 src/
+
+# Data tests
 tests/
-share/python3/variantconvert/configs/config_annotsv3_from_bed_*.local.json
-share/python3/variantconvert/variantconvert/__pycache__/*.pyc
-share/python3/variantconvert/variantconvert/converters/__pycache__/*.pyc
+
+# VariantConvert
 share/python3/variantconvert/pipinstall.flag
+share/python3/variantconvert/configs/*/annotsv3_from_bed.local.json
+share/python3/variantconvert/variantconvert/__pycache__/
+share/python3/variantconvert/variantconvert/__pycache__/*.pyc
+share/python3/variantconvert/variantconvert/converters/__pycache__/
+share/python3/variantconvert/variantconvert/converters/__pycache__/*.pyc
+share/python3/variantconvert/variantconvert.egg-info/
