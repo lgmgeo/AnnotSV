@@ -61,14 +61,14 @@ OPTIONS
 -promoterSize:                  Number of bases upstream from the transcription start site
                                 Default = 500
 
--rankFiltering:                 To select the SV of a user-defined specific class (from 1 to 5)
+-rankFiltering:                 To select the SV of a user-defined specific class (from 1 to 5; or NA)
                                 Values: use comma separated class values, or use a dash to denote a range of values
-                                (e.g.: "3,4,5" or "3-5"), default = "1-5"
+                                (e.g.: "3,4,5" or "3-5"), default = "1-5,NA"
 
 -reciprocal:                    Use of a reciprocal overlap between SV and user features (only for annotations with features overlapping the SV)
                                 Values: 0 (default) or 1
 
--REreport:                     Create a report to link the annotated SV and the overlapped regulatory elements (coordinates and sources)
+-REreport:                      Create a report to link the annotated SV and the overlapped regulatory elements (coordinates and sources)
                                 Values: 0 (default) or 1
 
 -REselect1:                     To report only the morbid, HI, TS, candidate and phenotype matched genes 
