@@ -95,4 +95,48 @@ proc checkVariantconvertConfigfile {} {
 
 
 
+proc runVariantconvert {outputFile} {
 
+    global g_AnnotSV
+
+    regsub ".tsv" $outputFile ".vcf" VCFoutputFile
+
+    catch {exec python3 $g_AnnotSV(variantconvertDir)/variantconvert --version} Message
+    if {[regexp "variantconvert (\[0-9\]+\\.\[0-9\]+\\.\[0-9\]+)" $Message match version]} {
+        set version "v$version "
+    } else {
+        set version ""
+    }
+
+    puts "...creation of the VCF output file: $VCFoutputFile"
+    puts "   AnnotSV relies on the variantconvert tool ${version}(https://github.com/SamuelNicaise/variantconvert)."
+    puts "   A minimal Python 3.8 installation is required, as well as the natsort, panda and pyfaidx Python modules."
+
+    regsub ".vcf$" $VCFoutputFile ".variantconvert.log" LogFile
+
+    if {[regexp "\\.vcf(.gz)?$" $g_AnnotSV(SVinputFile)]} {
+        ## SVinputfile is a VCF
+        set command "python3 $g_AnnotSV(variantconvertDir)/variantconvert convert -i $outputFile -o $VCFoutputFile -fi annotsv -fo vcf -c $g_AnnotSV(variantconvertDir)/configs/$g_AnnotSV(genomeBuild)/annotsv3_from_vcf.json"
+    } else {
+        ## SVinputfile is a BED)
+        if {$g_AnnotSV(svtBEDcol) == -1 } {
+            puts "   WARNING: With a \"BED\" SV input file, the user has to define the -svtBEDcol option."
+            puts "            => could not create the VCF output file:"
+            if {$g_AnnotSV(svtBEDcol) == -1}       {puts "               -svtBEDcol $g_AnnotSV(svtBEDcol)"}
+            return
+        } else {
+            set command "python3 $g_AnnotSV(variantconvertDir)/variantconvert convert -i $outputFile -o $VCFoutputFile -fi annotsv -fo vcf -c $g_AnnotSV(variantconvertDir)/configs/$g_AnnotSV(genomeBuild)/annotsv3_from_bed.local.json"
+        }
+    }
+
+    # variantconvert output
+
+    catch {eval exec $command} Message
+    if {[regexp -nocase "error" $Message]} {
+        puts "Error:"
+    }
+    ReplaceTextInFile "$command\n\n$Message" $LogFile
+    puts "   => cf $LogFile"
+
+    return
+}

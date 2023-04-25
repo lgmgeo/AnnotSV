@@ -10,6 +10,7 @@
 
 For more details, please see the README file.
 
+	- Refactor variantconvert code
 	- Allow description of REF/ALT values in SV input files with lowercase ACGT
 	- Update of the .gitignore file 
 	- Add bug fix to report only a subset of the annotation columns provided by AnnotSV 
