@@ -129,19 +129,46 @@ proc settingOfTheAnnotSVID {deb ref alt} {
 }
 
 
-proc replaceREFwithNinALT {alt} {
+proc replaceREFwithNinALT {alt {svtype ""}} {
     # Used for square-bracketed SV only.
     # Examples:
     # INS: T TAAAA[13:5000[ => N NAAAA[13:5000[
     # INS: T ]13:5000]AAAAT => N ]13:5000]AAAAN
     # DEL: T ]22:3000]A => N ]22:3000]N
-    if {[regexp "(\[acgtnACGTN\]*)(\\\[|\\\])(\[^:\]+):(\[0-9\]+)(\\\[|\\\])(\[acgtnACGTN\]*)" $alt match baseLeft bracketLeft bracketChrom bracketStart bracketRight baseRight]} {
-        if {[string length $baseLeft] > [string length $baseRight]} {
+    if {[regexp "(\[acgtnACGTN\]*)(\\\[|\\\])(\[^:\]+):(\[0-9\]+)(\\\[|\\\])(\[acgtnACGTN\]*)" $alt match baseLeft bracketLeft inBracketChrom inBracketStart bracketRight baseRight]} {
+        if {$svtype eq "inv"} {
+	    # INV
+	    # For inversion, the brackets can stay the same ("[" or "]") between the both BND of a pair (or not stay the same):
+            # 3       3000    breakend_inv_3_a        T       [3:5001[T     
+            # 3       5001    breakend_inv_3_b        T       [3:3000[T  or  T]3:3000] 
+            if {$bracketLeft == "\["} {
+                set bracketLeft "\]"
+                set bracketRight "\]"
+            } else {
+                set bracketLeft "\["
+                set bracketRight "\["
+            }
+	    if {$baseRight eq ""} {
+		set baseRight "N"; set baseLeft ""
+	    } else {
+		set baseRight ""; set baseLeft "N"
+	    }
+        } elseif {[string length $baseLeft] > [string length $baseRight]} {
+	    # INS
             set baseLeft "N[string range $baseLeft 1 end]"
-        } else {
+        } elseif {[string length $baseLeft] < [string length $baseRight]} {
+ 	    # INS
             set baseRight "[string range $baseRight 0 end-1]N"
-        }
-        set alt "$baseLeft$bracketLeft${bracketChrom}:$bracketStart$bracketRight$baseRight"
+        } else {
+	   # DEL, DUP, TRA
+            if {$baseLeft ne ""} {
+                set baseLeft "N"
+            } else {
+                set baseRight "N"
+            }
+ 
+	}
+        set alt "$baseLeft$bracketLeft${inBracketChrom}:$inBracketStart$bracketRight$baseRight"
     }
     
     return $alt   

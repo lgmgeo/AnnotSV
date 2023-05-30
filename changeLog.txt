@@ -10,6 +10,7 @@
 
 For more details, please see the README file.
 
+	- Add bug fix concerning some INV bracketed. The second breakend notation (which is just the reciprocal of the first) is now always identified as the mate breakend.
 	- Sample IDs with missing alleles in the GT fields ("./." or ".|.") are now reported in the "Samples_ID" output field
 	- Refactor variantconvert code
 	- Allow description of REF/ALT values in SV input files with lowercase ACGT
