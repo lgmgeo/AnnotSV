@@ -10,6 +10,7 @@
 
 For more details, please see the README file.
 
+	- Sample IDs with missing alleles in the GT fields ("./." or ".|.") are now reported in the "Samples_ID" output field
 	- Refactor variantconvert code
 	- Allow description of REF/ALT values in SV input files with lowercase ACGT
 	- Update of the .gitignore file 

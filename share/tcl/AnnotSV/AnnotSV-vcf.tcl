@@ -354,7 +354,7 @@ proc VCFsToBED {SV_VCFfiles} {
     file delete -force $unannotatedOutputFile
     
     foreach VCFfile $SV_VCFfiles {
-	puts "...VCF to BED ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])\n"
+	puts "...VCF to BED ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 	set L_TextToWrite {}
 	# TextToWrite_rescue($SV_ID)
 	set L_squBrack_SV_ID_Written {}
@@ -369,9 +369,21 @@ proc VCFsToBED {SV_VCFfiles} {
 	set VCFheaderNotPresent 1
 	
 	# Check if the GT feature is present for at least 1 variant
-	set GTabsent 1
+	# 
+	# GT info:
+	# - 0/1 and 1/0 functionally mean the same thing (that the individual is a heterozygote) - since the genotype is unphased, the alleles aren't ordered. 
+	#   The / symbol tells you the genotype is unphased.
+	#   The convention is to write the GT field in ascending order, so 0/1 rather than 1/0
+	# - 0|1 and 1|0 do mean something different, since the pipe symbol "|" tell us the order of the alleles matters
+	# - ”.” must be specified for each missing allele in the GT field (for example ./.) (=> if a call cannot be made for a sample at a given locus)
+	# 
+	# In the code: 
+	# - Sample ID with GT "./." or ".|." (unknown GT) are reported in the "Samples_ID" output column
+	set GTabsent 1; #To check if the “GT” field is indicated in the FORMAT column
 
-	set VCFlineNumber 0	
+	set VCFlineNumber 0
+        set nUnknownGT 0; # Number of Samples with unknown GT for an SV 
+
 	while {![eof $f]} {
 	    
 	    if {$i eq "500000"} {
@@ -749,17 +761,19 @@ proc VCFsToBED {SV_VCFfiles} {
 	    }
 
 	    # Set up for the Samples_ID value
+	    # nUnknownGT = Number of Samples with unknown GT for an SV
 	    set i_gt [lsearch -exact [split [lindex $Ls 8] ":"] "GT"]
 	    if {$i_gt eq -1} {
 		# If the GT is not given, AnnotSV considers that the SV is present in all the samples
 		set L_samplesid "$L_allSamples"
 	    } else {
-		set GTabsent 0
+		set GTabsent 0; # => the “GT” field is indicated in the FORMAT column
 		set L_samplesid {}
 		set isample 0
 		foreach sampleValue [lrange $Ls 9 end] {
 		    set gt [lindex [split $sampleValue ":"] $i_gt]
-		    if {[regexp "1|2|3|4|5|6|7|8|9" $gt]} {lappend L_samplesid [lindex $L_allSamples $isample]}
+		    if {$gt ne "0/0" && $gt ne "0\|0"} {lappend L_samplesid [lindex $L_allSamples $isample]}; # AnnotSV reports the sample_id with unknown GT ("./." and ".|.")
+                    if {$gt eq "./." || $gt eq ".\|."} {incr nUnknownGT}
 		    incr isample
 		}
 	    }
@@ -844,6 +858,13 @@ proc VCFsToBED {SV_VCFfiles} {
 	if {![regexp ".gz$" $VCFfile]} {close $f}
 
 
+	# Warning for the unknown GT
+	############################
+	if {$nUnknownGT > 1} {
+	    puts "\t...WARNING: $nUnknownGT sample IDs with missing alleles in the GT field (./. or .\|.) have been reported in the \"Samples_ID\" output field\n"
+	} elseif {$nUnknownGT eq 1} {
+            puts "\t...WARNING: 1 sample ID with missing alleles in the GT field (./. or .\|.) has been reported in the \"Samples_ID\" output field\n"
+        } else {puts "\n"}
 
 	# Writing of the BED file	
 	#########################
