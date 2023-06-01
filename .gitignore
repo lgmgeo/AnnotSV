@@ -16,6 +16,7 @@ src/
 
 # Data tests
 tests/
+tests/data/test_37_bracketedToAngularNotation/Rodrigo_tests_ignore
 
 # VariantConvert
 share/python3/variantconvert/pipinstall.flag

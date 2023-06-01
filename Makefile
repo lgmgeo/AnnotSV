@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.3.5                                                                                            #
+# AnnotSV 3.3.6                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -39,7 +39,7 @@ TCLDIR               := $(SHAREDIR)/$(TCLVERSION)
 PYTHONDIRDISTRIBUTED := share/python3
 PYTHONDIR            := $(SHAREDIR)/python3
 ANNOTSV              := AnnotSV
-VERSION              := 3.3.5
+VERSION              := 3.3.6
 RM                   := /bin/rm
 RMDIR                := /bin/rmdir
 MKDIR                := install -d

@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.3.5                                                                                            #
+# AnnotSV 3.3.6                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -496,7 +496,7 @@ proc VCFsToBED {SV_VCFfiles} {
                 if {$svlen ne "" && ($svtype eq "DUP" || $svtype eq "DEL" || $svtype eq "INS")} {
                     if {[expr {abs($svlen)}]<$g_AnnotSV(SVminSize)} {
                         # it is a small variant
-                        WriteTextInFile "${chrom}_${posVCF}_${end}_${svtype}_${ref}_${altVCF}: variantLength ($svlen) < SVminSize ($g_AnnotSV(SVminSize)) (line $VCFlineNumber)" $unannotatedOutputFile
+                        WriteTextInFile "${chrom}_${posVCF}_${end}_${svtype}_${ref}_${altVCF}: variantLength ([expr {abs($svlen)}]) < SVminSize ($g_AnnotSV(SVminSize)) (line $VCFlineNumber)" $unannotatedOutputFile
                         continue
                     }	
 		}
@@ -658,7 +658,7 @@ proc VCFsToBED {SV_VCFfiles} {
 			set alt "<DEL>"
 			if {[expr {abs($svlen)}]<$g_AnnotSV(SVminSize)} {
 			    # it is an indel
-			    WriteTextInFile "${chrom}_${posVCF}_${end}_${svtype}_${ref}_${altVCF}: variantLength ([expr {abs($svlen)}])< SVminSize ($g_AnnotSV(SVminSize)) (line $VCFlineNumber)" $unannotatedOutputFile
+			    WriteTextInFile "${chrom}_${posVCF}_${end}_${svtype}_${ref}_${altVCF}: variantLength ([expr {abs($svlen)}]) < SVminSize ($g_AnnotSV(SVminSize)) (line $VCFlineNumber)" $unannotatedOutputFile
 			    continue
 			}
 		    }
