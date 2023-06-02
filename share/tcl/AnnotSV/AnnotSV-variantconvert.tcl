@@ -99,7 +99,7 @@ proc runVariantconvert {outputFile} {
 
     global g_AnnotSV
 
-    regsub ".tsv" $outputFile ".vcf" VCFoutputFile
+    regsub "\.tsv$" $outputFile ".vcf" VCFoutputFile
 
     catch {exec python3 $g_AnnotSV(variantconvertDir)/variantconvert --version} Message
     if {[regexp "variantconvert (\[0-9\]+\\.\[0-9\]+\\.\[0-9\]+)" $Message match version]} {
@@ -112,7 +112,7 @@ proc runVariantconvert {outputFile} {
     puts "   AnnotSV relies on the variantconvert tool ${version}(https://github.com/SamuelNicaise/variantconvert)."
     puts "   A minimal Python 3.8 installation is required, as well as the natsort, panda and pyfaidx Python modules."
 
-    regsub ".vcf$" $VCFoutputFile ".variantconvert.log" LogFile
+    regsub "\.vcf$" $VCFoutputFile ".variantconvert.log" LogFile
 
     if {[regexp "\\.vcf(.gz)?$" $g_AnnotSV(SVinputFile)]} {
         ## SVinputfile is a VCF
