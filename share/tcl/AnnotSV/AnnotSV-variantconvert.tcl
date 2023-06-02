@@ -99,7 +99,7 @@ proc runVariantconvert {outputFile} {
 
     global g_AnnotSV
 
-    regsub ".tsv" $outputFile ".vcf" VCFoutputFile
+    regsub ".tsv$" $outputFile ".vcf" VCFoutputFile
 
     catch {exec python3 $g_AnnotSV(variantconvertDir)/variantconvert --version} Message
     if {[regexp "variantconvert (\[0-9\]+\\.\[0-9\]+\\.\[0-9\]+)" $Message match version]} {
