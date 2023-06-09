@@ -1,6 +1,23 @@
-# AnnotSV: An integrated tool for Structural Variations annotation and ranking 
+<p align="center">
+    <img src="docs/images/AnnotSV_logo.png" width="500">
 
-## QUICK INSTALLATION
+<br />
+
+# **AnnotSV: An integrated tool for Structural Variations annotation and ranking**
+
+<br />
+
+# Table of Contents
+
+- ## [AnnotSV standalone README](/README.AnnotSV_3.3.4.pdf)
+- ## [Webserver](docs/home.md)
+- ## [Downloads](docs/downloads.md)
+- ## [Ranking](docs/ranking.md)
+- ## [Annotations](docs/annotations.md)
+
+<br />
+
+# Quick Installation
 
 1. The sources can be cloned to any directory:
 ```
@@ -26,7 +43,7 @@ In bash:
 export ANNOTSV=/path/to/install/AnnotSV
 ```
 
-## TEST
+# TEST
 
 1. Change to the repo directory, and run the test
 ```
@@ -37,8 +54,9 @@ $ANNOTSV/bin/AnnotSV -SVinputFile test.bed -outputFile ./test.annotated.tsv -svt
 
 Happy exploring!
 
+<br />
 
-## COLLABORATIVE WORK
+# COLLABORATIVE WORK
 
 Anyone interested in implementing new annotations/features in AnnotSV?
 
