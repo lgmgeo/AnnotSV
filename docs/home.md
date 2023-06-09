@@ -1,12 +1,3 @@
-
-<p align="center">
-    <img src="images/AnnotSV_logo.png" width="500">
-
-
-# Annotation and Ranking of Human Structural Variations
-
-<br />
-
 # Aim
 **AnnotSV is a standalone program designed for annotating and ranking Structural Variations (SV).** This tool is implemented in Tcl, with a ready to start installation, and run in command line on all platforms.
 
