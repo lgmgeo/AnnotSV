@@ -3,34 +3,34 @@
     <img src="images/AnnotSV_logo.png" width="500"><br>
 </p>
 <div align="center">
-    <h1 style="font-weight: bold">An integrated tool for Structural Variations annotation and ranking</h1>
+    <h2 style="font-weight: bold">An integrated tool for Structural Variations annotation and ranking</h2>
 </div>
-<br>
+<br><br>
 
-# Webserver overview
-AnnotSV is an annotation engine designed for annotating and ranking Structural Variations (SV). <br>
-<br />
+
 To run AnnotSV online, a user-friendly web server interface is freely available [here](https://lbgi.fr/AnnotSV/runjob).
 
-<br />
-
+# Webserver overview
+The AnnotSV webserver is separated into the annotation part (AnnotSV engine) and the analysis and visualization part:
 
 ![](images/AnnotSV_overview.jpg)
 
-<br />
-
 ## Input
-
-AnnotSV supports as well the [VCF](https://samtools.github.io/hts-specs/VCFv4.3.pdf) (Variant Call Format) or the commonly used [BED](https://genome.ucsc.edu/FAQ/FAQformat.html#format1) (Browser Extensible Data) input format to describe the SV to annotate (SV type and coordinates). It allows the program to be easily integrated into any bioinformatics pipeline dedicated to NGS analysis.
+Multiple input formats are supported by the AnnotSV webserver corresponding to different usages. One can query directly the server using SV coordinates (format is Chromosome:Begin-End SVType) as an easy and fast way to gather annotations and classification for a single SV. Alternatively and if one requires a larger analysis (multiple SV), a [BED](https://genome.ucsc.edu/FAQ/FAQformat.html#format1) (browser extensible data) file or a [VCF](https://samtools.github.io/hts-specs/VCFv4.3.pdf) (Variant Call Format) file can be submitted.
+<br>
+The user can add optional sample related information such as the HPO terms to help prioritization or SNV/indels (additional VCF) to help identify false positive deletion. 
 
 ## Annotations
 AnnotSV compiles functionally, regulatory and clinically **relevant information** and aims at providing annotations useful to i) **interpret SV potential pathogenicity and ii) filter out SV potential false positives.**
 <br />
 These **relevant annotations** are detailed in the [README](README.AnnotSV_3.3.6.pdf).
 
+## Phenotype-driven prioritization
+To link the patient's phenotypic data to the already available knowledge for each gene, AnnotSV provide a phenotype driven prioritization module based on the [HPO (Human Phenotype Ontology) dataset](https://pubmed.ncbi.nlm.nih.gov/30476213/) and [Exomiser](https://www.nature.com/articles/nprot.2015.124) to score each SV (from 0 to 1.0). We generally recommend a score above 0.7 for a known disease gene and 0.5 for a gene not yet related to a disease.
+
 ## Ranking
 In addition, AnnotSV provides on top of the annotations **a ranking score** to assess SV pathogenicity.
-This score is an adaptation of the work provided by the joint consensus recommendation of ACMG and ClinGen (Riggs et al., 2020). We especially took attention in scoring as much as possible recessive SV observed in various dataset (NGS, array based...).<br />
+This score is an adaptation of the work provided by [the joint consensus recommendation of ACMG and ClinGen](https://pubmed.ncbi.nlm.nih.gov/31690835/). We especially took attention in scoring as much as possible recessive SV observed in various dataset (NGS, array based...).<br />
 **The SV classification is detailed [here](ranking.md).**
 
 ## Output
