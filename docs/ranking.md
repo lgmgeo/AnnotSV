@@ -16,4 +16,4 @@ In order to assist the clinical interpretation of SV, AnnotSV provides on top of
 
 # Method
 
-The comprehensive and detailed scoring guidelines are available in the [Scoring_Criteria_AnnotSV_latest.xlsx](../Scoring_Criteria_AnnotSV_v3.3.xlsx) file (see Table1 for loss SV and Table2 for gain SV).
+The comprehensive and detailed scoring guidelines are available in the [Scoring_Criteria_AnnotSV](../Scoring_Criteria_AnnotSV_latest.xlsx) file (see Table1 for loss SV and Table2 for gain SV).

@@ -12,13 +12,12 @@
 # Table of contents
 
 - ## AnnotSV Annotations Engine
-    - ### [README](README.AnnotSV_3.3.6.pdf)
+    - ### [README](README.AnnotSV_latest.pdf)
     - ### [Getting Started](docs/quickstart.md)
-    - ### [Downloads](docs/downloads.md)
     - ### [Ranking](docs/ranking.md)
     - ### [Annotations](docs/annotations.md)
 - ## AnnotSV Webserver
-    - ### [Overview](docs/home.md)
+    - ### [Overview](docs/webserver_overview.md)
 <br />
 
 # Collaborative work
