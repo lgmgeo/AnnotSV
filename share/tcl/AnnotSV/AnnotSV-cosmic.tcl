@@ -46,20 +46,30 @@ proc checkCOSMICfile {} {
 	    set Ls [split $L "\t"]	    
 	    incr i
 	    if {[expr {$i%10000000}] eq 0} {puts "\t$i lines read"}
-	    if {[regexp "^CNV_ID" $L]} {
-		set i_id [lsearch -exact $Ls "CNV_ID"]
+	    if {[regexp "^COSMIC_CNV_ID|CNV_ID" $L]} {
+		set i_id [lsearch -regexp $Ls "^COSMIC_CNV_ID|CNV_ID"]
 		set i_type [lsearch -exact $Ls "MUT_TYPE"]
-		set i_coord [lsearch -regexp $Ls "Chromosome:G_"]
+		set i_coord [lsearch -regexp $Ls "Chromosome:G_Start"] ;# Old raw data version (before 2023)
+		set i_chrom [lsearch -regexp $Ls "CHROMOSOME"]    ;# New raw data version 
+                set i_start [lsearch -regexp $Ls "GENOME_START"]  ;# New raw data version
+                set i_end [lsearch -regexp $Ls "GENOME_STOP"]     ;# New raw data version
 		set L_texteToWrite(Header) "#Chrom\tstart\tend\tCOSMIC_ID\tCOSMIC_MUT_TYP"
 		continue
 	    }
 	    if {$L eq ""} {continue}
 	    
 	    set id [lindex $Ls $i_id]
-	    set coord [lindex $Ls $i_coord]
 	    set cnvtype [lindex $Ls $i_type]
 	    
-	    regexp "^(\[0-9\]+):(\[0-9\]+)\\.\\.(\[0-9\]+)$" $coord match chrom start end
+            if {$i_coord ne -1} {
+		set coord [lindex $Ls $i_coord]
+    	        regexp "^(\[0-9\]+):(\[0-9\]+)\\.\\.(\[0-9\]+)$" $coord match chrom start end
+	    } else {
+                set chrom [lindex $Ls $i_chrom]
+                set start [lindex $Ls $i_start]
+                set end   [lindex $Ls $i_end]
+            }
+
 	    lappend L_texteToWrite($chrom) "$chrom\t$start\t$end\t$id\t$cnvtype"
 	}
 	
