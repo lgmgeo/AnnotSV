@@ -1,6 +1,8 @@
 
 # Quick Installation
 
+Requirements are fully explained in the [README](../README.AnnotSV_latest.pdf) file.
+
 1. The sources can be cloned to any directory:
 ```
 cd /path/to/install/
