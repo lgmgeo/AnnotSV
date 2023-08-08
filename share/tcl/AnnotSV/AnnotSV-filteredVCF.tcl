@@ -36,7 +36,7 @@ proc filteredVCFannotation {GENEchrom GENEstart GENEend Line headerOutput} {
     global L_htzPos
     global L_samplesFromTheHeader
 
-    if {[regexp ".bed(.gz)?" $g_AnnotSV(SVinputFile)]} { ;# <=> SVinputFile is a BED
+    if {[regexp -nocase ".bed(.gz)?" $g_AnnotSV(SVinputFile)]} { ;# <=> SVinputFile is a BED
 	puts "\t...WARNING: The compound heterozygosity analysis is not available from a BED SV input file"
 	puts "\t            => That analysis won't be processed!\n"
 	set g_AnnotSV(candidateSnvIndelFiles)   ""
@@ -60,7 +60,7 @@ proc filteredVCFannotation {GENEchrom GENEstart GENEend Line headerOutput} {
 	# "eval glob" accept regular expression ("*.vcf) as well as a list of files ("sample1.vcf sample2.vcf.gz"):
 	foreach vcfF [eval glob -nocomplain $g_AnnotSV(candidateSnvIndelFiles)] {
 	    puts "\t...parse all positions from $vcfF ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])" 
-	    if {[regexp ".gz$" $vcfF]} {
+	    if {[regexp -nocase ".gz$" $vcfF]} {
 		set f [open "|gzip -cd $vcfF"]
 	    } else {
 		set f [open "$vcfF"]

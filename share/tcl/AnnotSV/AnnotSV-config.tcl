@@ -401,7 +401,7 @@ proc configureAnnotSV {argv} {
 	set L_correctSamples {}
 	set L_allSamplesFromVCF {}
 	foreach vcfF $g_AnnotSV(snvIndelFiles) {
-	    if {[regexp ".gz$" $vcfF]} {
+	    if {[regexp -nocase ".gz$" $vcfF]} {
 		set f [open "|gzip -cd $vcfF"]
 	    } else {
 		set f [open "$vcfF"]
@@ -452,7 +452,7 @@ proc configureAnnotSV {argv} {
 	set L_correctCandidateSamples ""
 	set L_allSamplesFromVCF {}
 	foreach vcfF $g_AnnotSV(candidateSnvIndelFiles) {
-	    if {[regexp ".gz$" $vcfF]} {
+	    if {[regexp -nocase ".gz$" $vcfF]} {
 		set f [open "|gzip -cd $vcfF"]
 	    } else {
 		set f [open "$vcfF"]
@@ -545,7 +545,7 @@ proc createBEDinputHeaderFile {} {
     ## SVinputfile is a BED
     regsub -nocase ".bed$" $g_AnnotSV(bedFile) ".header.tsv" BEDinputHeaderFile
     set BEDinputHeaderFile "$g_AnnotSV(outputDir)/[file tail $BEDinputHeaderFile]"
-
+   
     ## Creation of the header file 
     set f [open $g_AnnotSV(bedFile)]
     while {![eof $f]} {
@@ -610,7 +610,7 @@ proc addNAinSamplesIDbedCol {} {
 	set L_toWrite {}
 	set i 0
 	set f [open $g_AnnotSV(bedFile)]
-	regsub ".bed" $g_AnnotSV(bedFile) ".NA.bed" g_AnnotSV(NAbedFile)
+	regsub -nocase ".bed" $g_AnnotSV(bedFile) ".NA.bed" g_AnnotSV(NAbedFile)
 	file delete -force "$g_AnnotSV(NAbedFile)"
 	while {![eof $f]} {
 	    set L [gets $f]

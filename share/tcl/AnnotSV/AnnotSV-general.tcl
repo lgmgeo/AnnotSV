@@ -444,7 +444,7 @@ proc isAnEmptyFile {bedOrVCFfile} {
     if {![regexp -nocase "\\.(bed|vcf(.gz)?)$" $bedOrVCFfile]} {return 1}
 
     # After filtering lines beginning with "#", at least 1 line should be still present
-    if {[regexp ".gz$" $bedOrVCFfile]} {
+    if {[regexp -nocase ".gz$" $bedOrVCFfile]} {
 	set f [open "|gzip -cd $bedOrVCFfile"] 
     } else {
 	set f [open "$bedOrVCFfile"]

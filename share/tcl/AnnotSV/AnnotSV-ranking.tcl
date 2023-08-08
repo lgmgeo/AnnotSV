@@ -44,7 +44,7 @@ proc SVprepareRanking {L_header} {
     set Ls [split $L_header "\t"]
 
     # The user is using a VCF SV input file: the svtTSVcol ("SV_type") is necessarily the 6th in the corresponding output annotated file.tsv
-    if {[regexp ".vcf$|.vcf.gz$" $g_AnnotSV(SVinputFile)]} {
+    if {[regexp -nocase ".vcf$|.vcf.gz$" $g_AnnotSV(SVinputFile)]} {
 	set g_AnnotSV(svtTSVcol) 5
 	set g_AnnotSV(svtBEDcol) 3
     }

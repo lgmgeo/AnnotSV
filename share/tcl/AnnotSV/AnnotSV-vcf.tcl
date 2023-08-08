@@ -83,7 +83,7 @@ proc VCFannotation {SVchrom SVstart SVend SVtype} {
 		    if {[regexp -nocase "error|fail" $line]} {puts "\t   $line"}
 		}
 		puts "\t   => No multiallelic treatment done."
-		if {[regexp ".gz$" $vcfF]} {
+		if {[regexp -nocase ".gz$" $vcfF]} {
 		    file copy -force $vcfF $tmpVCFgz1 
 		} else {
 		    catch {eval exec cat $vcfF | gzip > $tmpVCFgz1} Message 
@@ -96,7 +96,7 @@ proc VCFannotation {SVchrom SVstart SVend SVtype} {
 		    if {[regexp -nocase "error|fail" $line]} {puts "\t   $line"}
 		}
 		puts "\t   => No multiallelic treatment done."
-		if {[regexp ".gz$" $vcfF]} {
+		if {[regexp -nocase ".gz$" $vcfF]} {
 		    file copy -force $vcfF $tmpVCFgz1 
 		} else {
 		    catch {eval exec cat $vcfF | gzip > $tmpVCFgz1} Message 
@@ -359,7 +359,7 @@ proc VCFsToBED {SV_VCFfiles} {
 	# TextToWrite_rescue($SV_ID)
 	set L_squBrack_SV_ID_Written {}
 	
-	if {[regexp ".gz$" $VCFfile]} {
+	if {[regexp -nocase ".gz$" $VCFfile]} {
 	    set f [open "| gzip -cd $VCFfile"]	 
 	} else {		
 	    set f [open "$VCFfile"]
@@ -872,7 +872,7 @@ proc VCFsToBED {SV_VCFfiles} {
 		}
             }
 	}
-	if {![regexp ".gz$" $VCFfile]} {close $f}
+	if {![regexp -nocase ".gz$" $VCFfile]} {close $f}
 
 
 	# Warning for the unknown GT
