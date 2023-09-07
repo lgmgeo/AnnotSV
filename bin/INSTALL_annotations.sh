@@ -1,29 +1,28 @@
 #!/bin/bash
 
-##########################################
-# Basic manual install in local directory
-##########################################
+############################################################
+# Installing AnnotSV human annotations in a local directory
+############################################################
 
-# Annotations download
-######################
-
+# AIM:
+######
 # To be used with the "-annotationsDir" option
 
-# Installation of human annotation
-mkdir ./AnnotSV_annotations
-cd ./AnnotSV_annotations
-curl -C - -LO https://www.lbgi.fr/~geoffroy/Annotations/Annotations_Human_3.3.6.tar.gz
-tar -xf Annotations_Human_3.3.6.tar.gz -C .
-rm -rf Annotations_Human_3.3.6.tar.gz
+# CONTEXT:
+##########
+# To work with bioconda/docker/singularity, AnnotSV couldn't contain the annotations in the recipe (that would make the recipe very large, which is a bad practice in bioconda)
+# Users need to download the annotation files once and pass the directory to AnnotSV at runtime with the "-annotationsDir" option.
 
 
-# Installation of Exomiser data:
-curl -C - -LO https://www.lbgi.fr/~geoffroy/Annotations/2202_hg19.tar.gz
-curl -C - -LO https://data.monarchinitiative.org/exomiser/data/2202_phenotype.zip
-mkdir -p ./Annotations_Exomiser/2202
-tar -xf 2202_hg19.tar.gz -C ./Annotations_Exomiser/2202
-unzip 2202_phenotype.zip -d ./Annotations_Exomiser/2202
-rm -rf 2202_phenotype.zip
-rm -rf 2202_hg19.tar.gz
-
+# cd /path/to/install/annotsv/annotations
+mkdir AnnotSV_annotations
+cd AnnotSV_annotations
+git clone https://github.com/lgmgeo/AnnotSV.git
+cd AnnotSV
+make PREFIX=. install
+make PREFIX=. install-human-annotation
+mv share/AnnotSV/Annotations_Exomiser ..
+mv share/AnnotSV/Annotations_Human ..
+cd ..
+rm -r AnnotSV
 
