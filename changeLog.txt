@@ -10,6 +10,13 @@
 
 For more details, please see the README file.
 
+	- Optimize access to the exomiser application properties file for use with singularity/bioconda
+	- Allow uppercase file extensions (".VCF", ".BED" or ".VCF.GZ") 
+	- Use the new format of the COSMIC data source 
+	- Update of the documentation in $ANNOTSV/docs/ 
+	- Update of the documentation to install AnnotSV human annotations in a local directory (INSTALL_annotations.sh) 
+	- Optimize a regexp
+	- Fix variantconvert file name
 	- Add bug fix concerning some INV bracketed. The second breakend notation (which is just the reciprocal of the first) is now always identified as the mate breakend.
 	- Sample IDs with missing alleles in the GT fields ("./." or ".|.") are now reported in the "Samples_ID" output field
 	- Refactor variantconvert code

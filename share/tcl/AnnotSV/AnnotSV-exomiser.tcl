@@ -105,8 +105,16 @@ proc checkExomiserInstallation {} {
 	puts "...$NCBIgeneDir/results.txt doesn't exist"
 	set g_AnnotSV(hpo) ""
     }
-    
-    ## Checked if the Exomiser data files exist
+   
+    ## Check the existence of the application properties file
+    if {![file exist $g_AnnotSV(etcDir)/application.properties] && ![file exist $g_AnnotSV(annotationsDir)/Annotations_Exomiser/$hpoVersion/application.properties]} {
+        puts "\nWARNING: No Exomiser application properties file available"
+	puts "...$g_AnnotSV(etcDir)/application.properties doesn't exist\n"
+        puts "...$g_AnnotSV(annotationsDir)/Annotations_Exomiser/$hpoVersion/application.properties doesn't exist\n"
+        set g_AnnotSV(hpo) ""
+    }
+ 
+    ## Check if the Exomiser data files exist
     ## + HPO citation
     set L_hpoDir [glob -nocomplain $g_AnnotSV(annotationsDir)/Annotations_Exomiser/*]
     set L_hpoDir_ok {}
@@ -203,7 +211,11 @@ proc runExomiser {L_Genes L_HPO} {
     puts "\t...on port $port"
 
     set applicationPropertiesTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_exomiser_application.properties"
-    set infos [ContentFromFile $g_AnnotSV(etcDir)/application.properties]
+    if {[file exist $g_AnnotSV(etcDir)/application.properties]} {
+	set infos [ContentFromFile $g_AnnotSV(etcDir)/application.properties]
+    } elseif {[file exist $g_AnnotSV(annotationsDir)/Annotations_Exomiser/$hpoVersion/application.properties]} {
+	set infos [ContentFromFile $g_AnnotSV(annotationsDir)/Annotations_Exomiser/$hpoVersion/application.properties]
+    }
     regsub "XXXX" $infos "$port" infos
     regsub "YYYY" $infos "$g_AnnotSV(annotationsDir)/Annotations_Exomiser/$hpoVersion" infos
     WriteTextInFile $infos $applicationPropertiesTmpFile
