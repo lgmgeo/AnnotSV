@@ -60,6 +60,7 @@ proc checkBenignFiles {} {
 	checkClinVar_benignFile $genomeBuild
 	checkIMH_benignFile $genomeBuild
 	checkCMRI_benignFile $genomeBuild
+	checkFGR_benignFile $genomeBuild
 	catch {unset g_AnnotSV(benignText)}
 
 	# Creation of *.tmp.formatted.bed
@@ -1007,6 +1008,69 @@ proc checkCMRI_benignFile {genomeBuild} {
     return
 }
 
+proc checkFGR_benignFile {genomeBuild} {
+
+    global g_AnnotSV
+
+    ## Check if FGR file has been downloaded
+    ########################################
+    set benignDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/SVincludedInFt/BenignSV/$genomeBuild"
+    set FGRfileDownloaded [glob -nocomplain "$benignDir/FGR_benign_*_SV_$genomeBuild.bed"]
+
+
+    ## Writing
+    ##########
+    if {$FGRfileDownloaded ne ""} {
+        # We have some FGR annotations to add in $benign*File
+        if {[info exists g_AnnotSV(benignText)]} {
+            puts $g_AnnotSV(benignText)
+            unset g_AnnotSV(benignText)
+        }
+        puts "\t   >>> $genomeBuild FGR parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+
+        set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
+        set benignGainFile_Tmp "$benignDir/benign_Gain_SV_$genomeBuild.tmp.bed"
+        set benignInsFile_Tmp "$benignDir/benign_Ins_SV_$genomeBuild.tmp.bed"
+        set benignInvFile_Tmp "$benignDir/benign_Inv_SV_$genomeBuild.tmp.bed"
+	
+	if {[file exist "$benignDir/FGR_benign_Gain_SV_$genomeBuild.bed"]} {
+	    set L_toWriteGain [LinesFromFile "$benignDir/FGR_benign_Gain_SV_$genomeBuild.bed"]
+	    set nGain [llength $L_toWriteGain]
+	    WriteTextInFile [join $L_toWriteGain "\n"] $benignGainFile_Tmp
+	}
+        if {[file exist "$benignDir/FGR_benign_Loss_SV_$genomeBuild.bed"]} {
+            set L_toWriteLoss [LinesFromFile "$benignDir/FGR_benign_Loss_SV_$genomeBuild.bed"]
+            set nLoss [llength $L_toWriteLoss]
+            WriteTextInFile [join $L_toWriteLoss "\n"] $benignLossFile_Tmp
+        }
+        if {[file exist "$benignDir/FGR_benign_Ins_SV_$genomeBuild.bed"]} {
+	    set L_toWriteIns [LinesFromFile "$benignDir/FGR_benign_Ins_SV_$genomeBuild.bed"]
+            set nIns [llength $L_toWriteIns]
+            WriteTextInFile [join $L_toWriteIns "\n"] $benignInsFile_Tmp
+        }
+        if {[file exist "$benignDir/FGR_benign_Inv_SV_$genomeBuild.bed"]} {
+	    set L_toWriteInv [LinesFromFile "$benignDir/FGR_benign_Inv_SV_$genomeBuild.bed"]
+            set nInv [llength $L_toWriteInv]
+            WriteTextInFile [join $L_toWriteInv "\n"] $benignInvFile_Tmp
+        }
+
+        puts "\t       ($nLoss SV Loss + $nGain SV Gain)"
+        puts "\t       ($nIns INS + $nInv INV)"
+
+        # Clean:
+        ########
+        foreach f $FGRfileDownloaded {
+            file delete -force $f
+        }
+
+    }
+
+    return
+}
+
+#########################################################################################################################################################################
+#########################################################################################################################################################################
+#########################################################################################################################################################################
 
 
 
