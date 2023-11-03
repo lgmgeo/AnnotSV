@@ -610,7 +610,7 @@ proc addNAinSamplesIDbedCol {} {
 	set L_toWrite {}
 	set i 0
 	set f [open $g_AnnotSV(bedFile)]
-	regsub -nocase ".bed" $g_AnnotSV(bedFile) ".NA.bed" g_AnnotSV(NAbedFile)
+	regsub -nocase ".bed$" $g_AnnotSV(bedFile) ".NA.bed" g_AnnotSV(NAbedFile)
 	file delete -force "$g_AnnotSV(NAbedFile)"
 	while {![eof $f]} {
 	    set L [gets $f]
