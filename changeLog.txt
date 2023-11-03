@@ -10,8 +10,10 @@
 
 For more details, please see the README file.
 
-	- Include FranceGenRef benign SV annotation (856 WGS with ancestries in different regions of France)
-	WARNING: not supplied as part of the AnnotSV sources. Users need to request the FranceGenRef data dedicated to AnnotSV
+
+	- Fix a domain error (issue 199)
+	- Include code to allow FranceGenRef benign SV annotation (856 WGS with ancestries in different regions of France)
+	WARNING: not supplied as part of the AnnotSV sources. 
 	- Optimize access to the exomiser application properties file for use with singularity/bioconda
 	- Allow uppercase file extensions (".VCF", ".BED" or ".VCF.GZ") 
 	- Use the new format of the COSMIC data source 

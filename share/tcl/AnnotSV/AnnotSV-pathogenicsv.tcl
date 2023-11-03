@@ -710,8 +710,11 @@ proc poPathogenicSVannotation {SVchrom SVstart SVend} {
 		    if {[expr {$endP-$startP}] < $g_AnnotSV(SVminSize)} {continue}
 
 		    if {$SVtoAnn_end > $endP} {set po_end $endP} else {set po_end $SVtoAnn_end}
-		    if {$SVtoAnn_start > $startP} {set po_start $SVtoAnn_start} else {set po_start $startP}		    
-		    set percent [format "%.2f" [expr {($po_end-$po_start)*100.0/($endP-$startP)}]]
+		    if {$SVtoAnn_start > $startP} {set po_start $SVtoAnn_start} else {set po_start $startP}
+		    # Some pathogenic variant from dbvar (e.g. nssv17172411) are described with "$endP = $startP" (region size = 1)
+		    set length_endP_startP [expr {($endP-$startP)}]
+		    if {$length_endP_startP eq 0} {set length_endP_startP 1}
+		    set percent [format "%.2f" [expr {($po_end-$po_start)*100.0/$length_endP_startP}]]
 
 		    if {$percent == 100} {continue}
 		    
