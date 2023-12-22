@@ -1,0 +1,12 @@
+Rodrigo:
+I have attached two VCF files named "test" and "test_difficult". 
+Both are valid VCF files and contain the same variants. 
+However, the "test_difficult" does not have the correct output in AnnotSV. 
+I don't want to split hairs here, so the only one that I find troublesome is the TRA because it is missing the other breakend annotation.
+
+
+Véro:
+Regarding your test_difficile.vcf, my feeling is different and undecided. 
+I'm not sure it's a good idea to add a missing breakend, because in some cases the features of each breakend are different for an SV, especially the GT.
+
+

@@ -1,0 +1,122 @@
+##fileformat=VCFv4.2
+##ALT=<ID=INV,Description="Inversion">
+##FILTER=<ID=ASSEMBLY_ONLY,Description="Variant is supported only by assembly evidence.">
+##FILTER=<ID=ASSEMBLY_TOO_FEW_READ,Description="Not enough reads contribute to this assembly as specified by 'assembly.minReads'">
+##FILTER=<ID=ASSEMBLY_TOO_SHORT,Description="This assembly is shorter than a read length">
+##FILTER=<ID=INSUFFICIENT_SUPPORT,Description="Does not reach the required threshold quality for calling as specified by 'variantcalling.minScore'">
+##FILTER=<ID=LOW_QUAL,Description="Low quality call as specified by 'variantcalling.lowQuality'">
+##FILTER=<ID=NO_ASSEMBLY,Description="No assembly supporting this variant could be found.">
+##FILTER=<ID=REF,Description="Breakpoint corresponds to reference allele">
+##FILTER=<ID=SINGLE_ASSEMBLY,Description="Only one side of the breakpoint could be assembled.">
+##FILTER=<ID=SINGLE_SUPPORT,Description="Supported by fewer than 'variantcalling.minReads' fragments">
+##FILTER=<ID=SMALL_EVENT,Description="Event size is smaller than the minimum reportable size specified by 'variantcalling.minSize'">
+##FORMAT=<ID=ASQ,Number=1,Type=Float,Description="Pro-rata quality score contribution of assemblies supporting breakpoint">
+##FORMAT=<ID=ASRP,Number=1,Type=Integer,Description="Count of read pairs incorporated into any breakpoint assembly">
+##FORMAT=<ID=ASSR,Number=1,Type=Integer,Description="Count of split, soft clipped or indel-containing reads incorporated into any breakpoint assemblies">
+##FORMAT=<ID=BANRP,Number=1,Type=Integer,Description="Count of read pairs at this breakend assembled into a contig that does not support the breakpoint.">
+##FORMAT=<ID=BANRPQ,Number=1,Type=Integer,Description="Quality score of read pairs at this breakend assembled into a contig that does not support the breakpoint.">
+##FORMAT=<ID=BANSR,Number=1,Type=Integer,Description="Count of split reads at this breakend assembled into a contig that does not support the breakpoint.">
+##FORMAT=<ID=BANSRQ,Number=1,Type=Integer,Description="Quality score of split reads at this breakend assembled into a contig that does not support the breakpoint.">
+##FORMAT=<ID=BAQ,Number=1,Type=Float,Description="Pro-rata quality score contribution of assemblies supporting just local breakend">
+##FORMAT=<ID=BASRP,Number=1,Type=Integer,Description="Count of read pairs incorporated into any breakend assembly">
+##FORMAT=<ID=BASSR,Number=1,Type=Integer,Description="Count of split, soft clipped or indel-containing reads incorporated into any breakend assemblies">
+##FORMAT=<ID=BQ,Number=1,Type=Float,Description="Quality score of breakend evidence after evidence reallocation">
+##FORMAT=<ID=BSC,Number=1,Type=Integer,Description="Count of soft clips supporting just local breakend per category">
+##FORMAT=<ID=BSCQ,Number=1,Type=Float,Description="Quality score of soft clips supporting just local breakend per category">
+##FORMAT=<ID=BUM,Number=1,Type=Integer,Description="Count of read pairs (with one read unmapped) supporting just local breakend per category">
+##FORMAT=<ID=BUMQ,Number=1,Type=Float,Description="Quality score of read pairs (with one read unmapped) supporting just local breakend per category">
+##FORMAT=<ID=BVF,Number=1,Type=Integer,Description="Count of fragments providing breakend for the variant allele.">
+##FORMAT=<ID=CASQ,Number=1,Type=Float,Description="Pro-rata quality score of complex compound breakpoint assemblies supporting breakpoint from elsewhere">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=IC,Number=1,Type=Integer,Description="Count of read indels supporting breakpoint per category">
+##FORMAT=<ID=IQ,Number=1,Type=Float,Description="Quality score of read indels supporting breakpoint per category">
+##FORMAT=<ID=QUAL,Number=1,Type=Float,Description="Quality score of breakend evidence after evidence reallocation">
+##FORMAT=<ID=RASQ,Number=1,Type=Float,Description="Pro-rata quality score contribution of assemblies supporting breakpoint from remote breakend">
+##FORMAT=<ID=REF,Number=1,Type=Integer,Description="Count of reads mapping across this breakend">
+##FORMAT=<ID=REFPAIR,Number=1,Type=Integer,Description="Count of reference read pairs spanning this breakpoint supporting the reference allele">
+##FORMAT=<ID=RF,Number=1,Type=Integer,Description="Reference fragments. Count of fragments suspporting the reference allele and not the variant allele.">
+##FORMAT=<ID=RP,Number=1,Type=Integer,Description="Count of read pairs supporting breakpoint per category">
+##FORMAT=<ID=RPQ,Number=1,Type=Float,Description="Quality score of read pairs supporting breakpoint per category">
+##FORMAT=<ID=SR,Number=1,Type=Integer,Description="Count of split reads supporting breakpoint per category">
+##FORMAT=<ID=SRQ,Number=1,Type=Float,Description="Quality score of split reads supporting breakpoint per category">
+##FORMAT=<ID=VF,Number=1,Type=Integer,Description="Count of fragments suspporting the variant breakpoint allele and not the reference allele.">
+##INFO=<ID=AS,Number=1,Type=Integer,Description="Count of assemblies supporting breakpoint">
+##INFO=<ID=ASQ,Number=1,Type=Float,Description="Quality score of assemblies supporting breakpoint">
+##INFO=<ID=ASRP,Number=1,Type=Integer,Description="Count of read pairs incorporated into any breakpoint assembly">
+##INFO=<ID=ASSR,Number=1,Type=Integer,Description="Count of split, soft clipped or indel-containing reads incorporated into any breakpoint assemblies">
+##INFO=<ID=BA,Number=1,Type=Integer,Description="Count of assemblies supporting just local breakend">
+##INFO=<ID=BANRP,Number=1,Type=Integer,Description="Count of read pairs at this breakend assembled into a contig that does not support the breakpoint.">
+##INFO=<ID=BANRPQ,Number=1,Type=Integer,Description="Quality score of read pairs at this breakend assembled into a contig that does not support the breakpoint.">
+##INFO=<ID=BANSR,Number=1,Type=Integer,Description="Count of split reads at this breakend assembled into a contig that does not support the breakpoint.">
+##INFO=<ID=BANSRQ,Number=1,Type=Integer,Description="Quality score of split reads at this breakend assembled into a contig that does not support the breakpoint.">
+##INFO=<ID=BAQ,Number=1,Type=Float,Description="Quality score of assemblies supporting just local breakend">
+##INFO=<ID=BASRP,Number=1,Type=Integer,Description="Count of read pairs incorporated into any breakend assembly">
+##INFO=<ID=BASSR,Number=1,Type=Integer,Description="Count of split, soft clipped or indel-containing reads incorporated into any breakend assemblies">
+##INFO=<ID=BEALN,Number=.,Type=String,Description="Potential alignment locations of breakend sequence in the format chr:start|strand|cigar|mapq. Depending on the alignment information available, strand and mapq may be empty.">
+##INFO=<ID=BEID,Number=.,Type=String,Description="Identifiers of assemblies supporting the variant.">
+##INFO=<ID=BEIDH,Number=.,Type=Integer,Description="Remote chimeric alignment offset of corresponding BEID assembly.">
+##INFO=<ID=BEIDL,Number=.,Type=Integer,Description="Local chimeric alignment offset of corresponding BEID assembly. ">
+##INFO=<ID=BQ,Number=1,Type=Float,Description="Quality score of breakend evidence">
+##INFO=<ID=BSC,Number=1,Type=Integer,Description="Count of soft clips supporting just local breakend">
+##INFO=<ID=BSCQ,Number=1,Type=Float,Description="Quality score of soft clips supporting just local breakend">
+##INFO=<ID=BUM,Number=1,Type=Integer,Description="Count of read pairs (with one read unmapped) supporting just local breakend">
+##INFO=<ID=BUMQ,Number=1,Type=Float,Description="Quality score of read pairs (with one read unmapped) supporting just local breakend">
+##INFO=<ID=BVF,Number=1,Type=Integer,Description="Count of fragments providing breakend for the variant allele.">
+##INFO=<ID=CAS,Number=1,Type=Integer,Description="Count of complex compound breakpoint assemblies supporting breakpoint from elsewhere">
+##INFO=<ID=CASQ,Number=1,Type=Float,Description="Quality score of complex compound breakpoint assemblies supporting breakpoint from elsewhere">
+##INFO=<ID=CIEND,Number=2,Type=Integer,Description="Confidence interval around END for imprecise variants">
+##INFO=<ID=CIPOS,Number=2,Type=Integer,Description="Confidence interval around POS for imprecise variants">
+##INFO=<ID=CIRPOS,Number=2,Type=Integer,Description="Confidence interval around remote breakend POS for imprecise variants">
+##INFO=<ID=CQ,Number=1,Type=Float,Description="Breakpoint quality score before evidence reallocation">
+##INFO=<ID=END,Number=1,Type=Integer,Description="Stop position of the interval">
+##INFO=<ID=EVENT,Number=1,Type=String,Description="ID of event associated to breakend">
+##INFO=<ID=HOMLEN,Number=.,Type=Integer,Description="Length of base pair identical micro-homology at event breakpoints">
+##INFO=<ID=HOMSEQ,Number=.,Type=String,Description="Sequence of base pair identical micro-homology at event breakpoints">
+##INFO=<ID=IC,Number=1,Type=Integer,Description="Count of read indels supporting breakpoint">
+##INFO=<ID=IHOMPOS,Number=2,Type=Integer,Description="Position of inexact homology">
+##INFO=<ID=IMPRECISE,Number=0,Type=Flag,Description="Imprecise structural variation">
+##INFO=<ID=IQ,Number=1,Type=Float,Description="Quality score of read indels supporting breakpoint">
+##INFO=<ID=PARID,Number=1,Type=String,Description="ID of partner breakend">
+##INFO=<ID=RAS,Number=1,Type=Integer,Description="Count of assemblies supporting breakpoint from remote breakend">
+##INFO=<ID=RASQ,Number=1,Type=Float,Description="Quality score of assemblies supporting breakpoint from remote breakend">
+##INFO=<ID=REF,Number=1,Type=Integer,Description="Count of reads mapping across this breakend">
+##INFO=<ID=REFPAIR,Number=1,Type=Integer,Description="Count of reference read pairs spanning this breakpoint supporting the reference allele">
+##INFO=<ID=RF,Number=1,Type=Integer,Description="Reference fragments. Count of fragments suspporting the reference allele and not the variant allele.">
+##INFO=<ID=RP,Number=1,Type=Integer,Description="Count of read pairs supporting breakpoint">
+##INFO=<ID=RPQ,Number=1,Type=Float,Description="Quality score of read pairs supporting breakpoint">
+##INFO=<ID=RSI,Number=.,Type=Integer,Description="Support interval offsets of partner breakend.">
+##INFO=<ID=SB,Number=1,Type=Float,Description="Strand bias of the reads supporting the variant.1 indicates that reads would be aligned to the positive strand if the reference was changed to the variant allele. 0 indicates that reads bases would be aligned to the negative strand if the reference was changed to the variant allele. Strand bias is calculated purely from supporting reads and exclude read pair support since these are 100% strand bias. Note that reads both directly supporting the variant, and supporting via assembly will be double-counted. Both breakpoint and breakend supporting reads are included.">
+##INFO=<ID=SC,Number=1,Type=String,Description="CIGAR for displaying anchoring alignment of any contributing evidence and microhomologies.">
+##INFO=<ID=SELF,Number=0,Type=Flag,Description="Indicates a breakpoint is self-intersecting">
+##INFO=<ID=SI,Number=.,Type=Integer,Description="Support interval offsets from breakend position in which at least one supporting read/read pair/assembly is mapped.">
+##INFO=<ID=SR,Number=1,Type=Integer,Description="Count of split reads supporting breakpoint">
+##INFO=<ID=SRQ,Number=1,Type=Float,Description="Quality score of split reads supporting breakpoint">
+##INFO=<ID=SVLEN,Number=.,Type=Integer,Description="Difference in length between REF and ALT alleles">
+##INFO=<ID=SVTYPE,Number=1,Type=String,Description="Type of structural variant">
+##INFO=<ID=VF,Number=1,Type=Integer,Description="Count of fragments suspporting the variant breakpoint allele and not the reference allele.">
+##contig=<ID=1,length=249250621>
+##contig=<ID=2,length=243199373>
+##contig=<ID=3,length=198022430>
+##contig=<ID=4,length=191154276>
+##contig=<ID=5,length=180915260>
+##contig=<ID=6,length=171115067>
+##contig=<ID=7,length=159138663>
+##contig=<ID=8,length=146364022>
+##contig=<ID=9,length=141213431>
+##contig=<ID=10,length=135534747>
+##contig=<ID=11,length=135006516>
+##contig=<ID=12,length=133851895>
+##contig=<ID=13,length=115169878>
+##contig=<ID=14,length=107349540>
+##contig=<ID=15,length=102531392>
+##contig=<ID=16,length=90354753>
+##contig=<ID=17,length=81195210>
+##contig=<ID=18,length=78077248>
+##contig=<ID=19,length=59128983>
+##contig=<ID=20,length=63025520>
+##contig=<ID=21,length=48129895>
+##contig=<ID=22,length=51304566>
+##contig=<ID=X,length=155270560>
+##contig=<ID=Y,length=59373566>
+##contig=<ID=MT,length=16569>
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	sample_id

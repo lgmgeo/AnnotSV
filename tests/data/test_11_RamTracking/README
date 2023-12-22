@@ -1,0 +1,50 @@
+#####################################
+## RAM tracking while running AnnotSV
+#####################################
+
+# Input files:
+##############
+-rw-r--r-- 1 geoffroy lgm 1937148 Mar 20  2018 HG00096.chr1.phase3_shapeit2_mvncall_integrated_v5_extra_anno.20130502.genotypes.withoutSV.filtered.vcf
+-rw-r--r-- 1 geoffroy lgm  136400 Mar 12  2018 HG00096.wgs.mergedSV.v8.20130502.svs.genotypes.bed
+
+
+# Command line:
+###############
+command_Tcl.tcl >& command_Tcl.log
+=> Look at the logfile (no error message?) and report the RAM in this readme
+
+
+
+#########
+## BILAN:
+#########
+
+## AnnotSV v1.2 utilise :
+- 615 Mb en écrivant les lignes 1 par 1 dans l'output
+- 619 Mb en écrivant l'output à la fin
+
+## AnnotSV v2.1 (2019/04/05)
+- 651 Mb
+
+## AnnotSV v2.2 (2019/07/08)
+- 664 Mb
+
+## AnnotSV v2.3 (2019-12-20)
+- 679 Mb
+
+## AnnotSV v2.4 (2020/07/30)
+- 679 Mb
+
+## AnnotSV v2.5 (2020/10/12)
+- 680 Mb
+
+## AnnotSV 3.0 (2020/12/18)
+- 152804
+
+## AnnotSV 3.1 (2021/10/26)
+- 179724
+
+##AnnotSV 3.2 (2022/12/13)
+- 283884 Ko
+
+

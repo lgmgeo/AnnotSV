@@ -1,0 +1,3 @@
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NORMAL	TUMOR
+22	5000	breakend_del_unordered_b	T	]22:3000]T	.	PASS	SVTYPE=BND;EXTRA=DEL_PAIRED;MATEID=breakend_del_unordered_a	GT	0/0	0/1
+22	3000	breakend_del_unordered_a	T	T[22:5000[	.	PASS	SVTYPE=BND;EXTRA=DEL_PAIRED;MATEID=breakend_del_unordered_b	GT	0/0	0/1

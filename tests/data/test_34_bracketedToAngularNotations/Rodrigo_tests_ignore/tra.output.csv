@@ -1,0 +1,3 @@
+id,start_chrom,start,end_chrom,end,ref,alt,length,brackets,type_inferred
+tra_a,2,321682,13,123456,T,]13:123456]T,0,]]N,TRA
+tra_b,2,321682,13,123456,N,]13:123456]N,0,]]N,TRA

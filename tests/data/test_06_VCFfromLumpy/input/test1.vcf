@@ -1,0 +1,50 @@
+##fileformat=VCFv4.2
+##source=LUMPY
+##INFO=<ID=SVTYPE,Number=1,Type=String,Description="Type of structural variant">
+##INFO=<ID=SVLEN,Number=.,Type=Integer,Description="Difference in length between REF and ALT alleles">
+##INFO=<ID=END,Number=1,Type=Integer,Description="End position of the variant described in this record">
+##INFO=<ID=STRANDS,Number=.,Type=String,Description="Strand orientation of the adjacency in BEDPE format (DEL:+-, DUP:-+, INV:++/--)">
+##INFO=<ID=IMPRECISE,Number=0,Type=Flag,Description="Imprecise structural variation">
+##INFO=<ID=CIPOS,Number=2,Type=Integer,Description="Confidence interval around POS for imprecise variants">
+##INFO=<ID=CIEND,Number=2,Type=Integer,Description="Confidence interval around END for imprecise variants">
+##INFO=<ID=CIPOS95,Number=2,Type=Integer,Description="Confidence interval (95%) around POS for imprecise variants">
+##INFO=<ID=CIEND95,Number=2,Type=Integer,Description="Confidence interval (95%) around END for imprecise variants">
+##INFO=<ID=MATEID,Number=.,Type=String,Description="ID of mate breakends">
+##INFO=<ID=EVENT,Number=1,Type=String,Description="ID of event associated to breakend">
+##INFO=<ID=SECONDARY,Number=0,Type=Flag,Description="Secondary breakend in a multi-line variants">
+##INFO=<ID=SU,Number=.,Type=Integer,Description="Number of pieces of evidence supporting the variant across all samples">
+##INFO=<ID=PE,Number=.,Type=Integer,Description="Number of paired-end reads supporting the variant across all samples">
+##INFO=<ID=SR,Number=.,Type=Integer,Description="Number of split reads supporting the variant across all samples">
+##INFO=<ID=BD,Number=.,Type=Integer,Description="Amount of BED evidence supporting the variant across all samples">
+##INFO=<ID=EV,Number=.,Type=String,Description="Type of LUMPY evidence contributing to the variant call">
+##INFO=<ID=PRPOS,Number=.,Type=String,Description="LUMPY probability curve of the POS breakend">
+##INFO=<ID=PREND,Number=.,Type=String,Description="LUMPY probability curve of the END breakend">
+##ALT=<ID=DEL,Description="Deletion">
+##ALT=<ID=DUP,Description="Duplication">
+##ALT=<ID=INV,Description="Inversion">
+##ALT=<ID=DUP:TANDEM,Description="Tandem duplication">
+##ALT=<ID=INS,Description="Insertion of novel sequence">
+##ALT=<ID=CNV,Description="Copy number variable region">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=SU,Number=1,Type=Integer,Description="Number of pieces of evidence supporting the variant">
+##FORMAT=<ID=PE,Number=1,Type=Integer,Description="Number of paired-end reads supporting the variant">
+##FORMAT=<ID=SR,Number=1,Type=Integer,Description="Number of split reads supporting the variant">
+##FORMAT=<ID=BD,Number=1,Type=Integer,Description="Amount of BED evidence supporting the variant">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	sample1	sample2
+1	67452229	166_1	N	[1:67452635[N	353.30	.	SVTYPE=BND;STRANDS=--:33;CIPOS=-2,0;CIEND=-10,9;CIPOS95=0,0;CIEND95=0,0;MATEID=166_2;EVENT=166;SU=33;PE=17;SR=16	GT:SU:PE:SR:GQ:SQ:GL:DP:RO:AO:QR:QA:RS:AS:ASC:RP:AP:AB	1/1:9:5:4:87:0.00:-11,-20,-82:102:93:8:92:7:51:3:0:41:4:0.071	0/1:24:12:12:200:353.30:-44,-9,-59:105:81:23:80:22:41:11:0:39:11:0.22
+1	67452635	166_2	N	N]1:67452229]	353.30	.	SVTYPE=BND;STRANDS=--:33;CIPOS=-10,9;CIEND=-2,0;CIPOS95=0,0;CIEND95=0,0;MATEID=166_1;EVENT=166;SECONDARY;SU=33;PE=17;SR=16	GT:SU:PE:SR:GQ:SQ:GL:DP:RO:AO:QR:QA:RS:AS:ASC:RP:AP:AB	0/0:9:5:4:87:0.00:-11,-20,-82:102:93:8:92:7:51:3:0:41:4:0.071	0/1:24:12:12:200:353.30:-44,-9,-59:105:81:23:80:22:41:11:0:39:11:0.22
+1	118091051	275	N	<DEL>	311.66	.	SVTYPE=DEL;SVLEN=-207;END=118091258;STRANDS=+-:13;CIPOS=-10,9;CIEND=-10,9;CIPOS95=0,0;CIEND95=0,0;SU=13;PE=0;SR=13	GT:SU:PE:SR:GQ:SQ:GL:DP:RO:AO:QR:QA:RS:AS:ASC:RP:AP:AB	1/0:4:0:4:33:0.00:-10,-13,-57:74:66:7:65:6:37:3:1:28:1:0.085	0/0:9:0:9:178:311.66:-33,-2,-20:49:32:16:31:15:11:8:1:20:5:0.33
+1	182884306	367	N	<DEL>	149.85	.	SVTYPE=DEL;SVLEN=-14;END=182884320;STRANDS=+-:7;CIPOS=-5,4;CIEND=-5,4;CIPOS95=0,0;CIEND95=0,0;SU=7;PE=0;SR=7	GT:SU:PE:SR:GQ:SQ:GL:DP:RO:AO:QR:QA:RS:AS:ASC:RP:AP:AB	0/0:6:0:6:45:0.00:-0,-5,-15:15:15:0:15:0:15:0:0:0:0:0	0/1:1:0:1:72:149.85:-16,-1,-8:21:13:7:13:7:13:0:6:0:0:0.35
+1	186826187	370_1	N	[1:186826404[N	98.88	.	SVTYPE=BND;STRANDS=++:8;CIPOS=-10,9;CIEND=-10,9;CIPOS95=0,0;CIEND95=0,0;MATEID=370_2;EVENT=370;SU=8;PE=0;SR=8	GT:SU:PE:SR:GQ:SQ:GL:DP:RO:AO:QR:QA:RS:AS:ASC:RP:AP:AB	0/0:3:0:3:48:0.00:-5,-10,-39:47:43:3:43:3:43:3:0:0:0:0.065	0/1:5:0:5:71:98.88:-11,-1,-8:18:12:5:12:5:12:5:0:0:0:0.29
+1	186826404	370_2	N	N]1:186826187]	98.88	.	SVTYPE=BND;STRANDS=++:8;CIPOS=-10,9;CIEND=-10,9;CIPOS95=0,0;CIEND95=0,0;MATEID=370_1;EVENT=370;SECONDARY;SU=8;PE=0;SR=8	GT:SU:PE:SR:GQ:SQ:GL:DP:RO:AO:QR:QA:RS:AS:ASC:RP:AP:AB	0/0:3:0:3:48:0.00:-5,-10,-39:47:43:3:43:3:43:3:0:0:0:0.065	0/1:5:0:5:71:98.88:-11,-1,-8:18:12:5:12:5:12:5:0:0:0:0.29
+2	27313898	606	N	<DEL>	59.61	.	SVTYPE=DEL;SVLEN=-127;END=27314025;STRANDS=+-:6;CIPOS=-6,5;CIEND=-6,5;CIPOS95=0,0;CIEND95=0,0;SU=6;PE=0;SR=6	GT:SU:PE:SR:GQ:SQ:GL:DP:RO:AO:QR:QA:RS:AS:ASC:RP:AP:AB	0/0:2:0:2:117:0.00:-4,-16,-61:70:66:3:66:3:66:1:1:0:0:0.043	0/1:4:0:4:59:59.61:-15,-9,-43:61:52:8:52:8:52:6:2:0:0:0.13
+2	35576937	649	N	<DEL>	68.88	.	SVTYPE=DEL;SVLEN=-27;END=35576964;STRANDS=+-:8;CIPOS=-10,9;CIEND=-9,9;CIPOS95=0,0;CIEND95=0,0;SU=8;PE=0;SR=8	GT:SU:PE:SR:GQ:SQ:GL:DP:RO:AO:QR:QA:RS:AS:ASC:RP:AP:AB	0/0:5:0:5:78:0.00:-0,-8,-26:26:26:0:26:0:26:0:0:0:0:0	0/1:3:0:3:68:68.88:-9,-2,-10:18:13:4:13:4:13:0:3:0:0:0.24
+2	88429841	756	N	<DEL>	296.20	.	SVTYPE=DEL;SVLEN=-311;END=88430152;STRANDS=+-:15;CIPOS=-10,9;CIEND=-10,9;CIPOS95=0,0;CIEND95=0,0;SU=15;PE=0;SR=15	GT:SU:PE:SR:GQ:SQ:GL:DP:RO:AO:QR:QA:RS:AS:ASC:RP:AP:AB	0/0:6:0:6:0:2.70:-17,-17,-77:103:91:11:90:10:46:7:1:44:2:0.1	0/1:9:0:9:200:293.50:-35,-6,-40:75:56:18:55:17:24:9:3:31:4:0.24
+2	129550225	855	N	<DEL>	4.68	.	SVTYPE=DEL;SVLEN=-28;END=129550253;STRANDS=+-:6;CIPOS=-6,5;CIEND=-6,5;CIPOS95=0,0;CIEND95=0,0;SU=6;PE=0;SR=6	GT:SU:PE:SR:GQ:SQ:GL:DP:RO:AO:QR:QA:RS:AS:ASC:RP:AP:AB	0/0:4:0:4:96:0.00:-3,-13,-47:53:50:2:50:2:50:1:0:0:0:0.038	0/1:2:0:2:2:4.68:-4,-3,-15:20:17:2:17:2:17:1:0:0:0:0.11
+2	224699787	1036	N	<DEL>	53.85	.	SVTYPE=DEL;SVLEN=-10;END=224699797;STRANDS=+-:16;CIPOS=-2,1;CIEND=-2,1;CIPOS95=0,0;CIEND95=0,0;SU=16;PE=0;SR=16	GT:SU:PE:SR:GQ:SQ:GL:DP:RO:AO:QR:QA:RS:AS:ASC:RP:AP:AB	0/0:13:0:13:42:0.00:-0,-4,-14:14:14:0:14:0:14:0:0:0:0:0	0/1:3:0:3:53:53.85:-8,-3,-14:23:18:4:18:4:18:0:3:0:0:0.18
+2	236378717	1068	N	<DEL>	99.30	.	SVTYPE=DEL;SVLEN=-26;END=236378743;STRANDS=+-:8;CIPOS=-10,9;CIEND=-10,9;CIPOS95=0,0;CIEND95=0,0;SU=8;PE=0;SR=8	GT:SU:PE:SR:GQ:SQ:GL:DP:RO:AO:QR:QA:RS:AS:ASC:RP:AP:AB	0/0:6:0:6:27:0.01:-0,-3,-9:9:9:0:9:0:9:0:0:0:0:0	0/1:2:0:2:10:99.29:-10,-1,-2:8:3:4:3:4:3:0:3:0:0:0.57
+2	241726086	1097	N	<DEL>	26.62	.	SVTYPE=DEL;SVLEN=-33;END=241726119;STRANDS=+-:8;CIPOS=-10,9;CIEND=-1,7;CIPOS95=0,0;CIEND95=0,0;SU=8;PE=0;SR=8	GT:SU:PE:SR:GQ:SQ:GL:DP:RO:AO:QR:QA:RS:AS:ASC:RP:AP:AB	0/0:6:0:6:102:0.00:-15,-26,-110:135:124:10:124:10:124:5:4:0:0:0.075	0/1:2:0:2:26:26.62:-12,-10,-46:62:54:7:54:7:54:1:5:0:0:0.11
+2	242411342	1105	N	<DEL>	137.63	.	SVTYPE=DEL;SVLEN=-180;END=242411522;STRANDS=+-:5;CIPOS=-10,9;CIEND=-10,9;CIPOS95=0,0;CIEND95=0,0;SU=5;PE=0;SR=5	GT:SU:PE:SR:GQ:SQ:GL:DP:RO:AO:QR:QA:RS:AS:ASC:RP:AP:AB	0/0:1:0:1:66:0.00:-6,-13,-52:63:58:4:58:4:58:0:3:0:0:0.065	0/1:4:0:4:137:137.63:-20,-6,-34:55:44:10:44:10:44:3:6:0:0:0.19
+3	6162950	1125	N	<DEL>	260.82	.	SVTYPE=DEL;SVLEN=-91;END=6163041;STRANDS=+-:8;CIPOS=-10,8;CIEND=-10,9;CIPOS95=0,0;CIEND95=0,0;SU=8;PE=0;SR=8	GT:SU:PE:SR:GQ:SQ:GL:DP:RO:AO:QR:QA:RS:AS:ASC:RP:AP:AB	0/0:1:0:1:39:0.00:-3,-7,-28:34:31:2:31:2:31:0:1:0:0:0.061	0/1:7:0:7:55:260.82:-27,-1,-6:24:12:11:12:11:12:6:4:0:0:0.48
+3	7905948	1132	N	<DEL>	362.44	.	SVTYPE=DEL;SVLEN=-202;END=7906150;STRANDS=+-:9;CIPOS=-4,3;CIEND=-4,3;CIPOS95=0,0;CIEND95=0,0;SU=9;PE=0;SR=9	GT:SU:PE:SR:GQ:SQ:GL:DP:RO:AO:QR:QA:RS:AS:ASC:RP:AP:AB	0/0:2:0:2:114:0.00:-4,-16,-60:71:66:4:65:3:35:1:0:30:1:0.044	0/1:7:0:7:200:362.44:-42,-5,-41:82:60:21:59:20:29:6:5:30:8:0.25
+3	26450970	1166	N	<DEL>	563.52	.	SVTYPE=DEL;SVLEN=-1328;END=26452298;STRANDS=+-:29;CIPOS=-2,1;CIEND=-10,9;CIPOS95=0,0;CIEND95=0,0;SU=29;PE=14;SR=15	GT:SU:PE:SR:GQ:SQ:GL:DP:RO:AO:QR:QA:RS:AS:ASC:RP:AP:AB	0/0:4:2:2:123:0.00:-4,-17,-63:74:69:4:68:3:39:1:0:29:1:0.042	0/1:25:12:13:194:563.52:-58,-1,-21:65:38:26:37:25:19:12:1:18:11:0.4

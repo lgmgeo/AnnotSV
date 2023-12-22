@@ -1,0 +1,152 @@
+AnnotSV 3.3.6
+
+Copyright (C) 2017-2023 GEOFFROY Veronique
+
+Please feel free to contact me for any suggestions or bug reports
+email: veronique.geoffroy@inserm.fr
+
+Tcl/Tk version: 8.6
+
+Application name used:
+/gstock/LGM/analysisOfSV/AnnotSV/AnnotSV_3.3.4
+
+
+...downloading the configuration data (December 22 2023 - 15:30)
+	...configuration data by default
+	...configuration data from /gstock/LGM/analysisOfSV/AnnotSV/AnnotSV_3.3.4/etc/AnnotSV/configfile
+	...configuration data given in arguments
+	...checking all these configuration data
+
+...checking the annotation data sources (December 22 2023 - 15:30)
+
+...listing arguments
+	******************************************
+	AnnotSV has been run with these arguments:
+	******************************************
+	-REreport 0
+	-REselect1 1
+	-REselect2 1
+	-SVinputFile ../test_02_HG00096/input/HG00096.wgs.mergedSV.v8.20130502.svs.genotypes.bed
+	-SVinputInfo 1
+	-SVminSize 50
+	-annotationMode both
+	-annotationsDir /gstock/LGM/analysisOfSV/AnnotSV/AnnotSV_3.3.4/share/AnnotSV
+	-bcftools bcftools
+	-bedtools bedtools
+	-benignAF 0.01
+	-candidateGenesFiltering 0
+	-cytoband 1
+	-genomeBuild GRCh37
+	-includeCI 1
+	-metrics us
+	-miRNAann 1
+	-minTotalNumber 500
+	-organism Human
+	-outputDir ./output
+	-outputFile HG00096.SV_tcl.annotated.tsv
+	-overlap 100
+	-overwrite 1
+	-promoterSize 500
+	-rankFiltering 1 2 3 4 5 NA
+	-reciprocal 0
+	-samplesidBEDcol 5
+	-snvIndelFiles ./input/HG00096.chr1.phase3_shapeit2_mvncall_integrated_v5_extra_anno.20130502.genotypes.withoutSV.filtered.vcf.gz
+	-snvIndelPASS 0
+	-snvIndelSamples HG00096
+	-svtBEDcol -1
+	-tx RefSeq
+	-variantconvertDir /gstock/LGM/analysisOfSV/AnnotSV/AnnotSV_3.3.4/share/python3/variantconvert/
+	-vcf 0
+	******************************************
+
+...searching for SV overlaps with a gene or a regulatory elements
+	...1436 genes overlapped with an SV
+	...5303 genes regulated by a regulatory element which is overlapped with an SV
+
+WARNING: "SV_type" annotation is missing:
+******************************************
+AnnotSV_ID	SV_chrom	SV_start	SV_end	SV_length	user#1	Samples_ID	Annotation_mode	CytoBand	Gene_name	Gene_count	Tx	Tx_start	Tx_end	Overlapped_tx_length	Overlapped_CDS_length	Overlapped_CDS_percent	Frameshift	Exon_count	Location	Location2	Dist_nearest_SS	Nearest_SS_type	Intersect_start	Intersect_end	RE_gene	P_gain_phen	P_gain_hpo	P_gain_source	P_gain_coord	P_loss_phen	P_loss_hpo	P_loss_source	P_loss_coord	P_ins_phen	P_ins_hpo	P_ins_source	P_ins_coord	po_P_gain_phen	po_P_gain_hpo	po_P_gain_source	po_P_gain_coord	po_P_gain_percent	po_P_loss_phen	po_P_loss_hpo	po_P_loss_source	po_P_loss_coord	po_P_loss_percent	P_snvindel_nb	P_snvindel_phen	B_gain_source	B_gain_coord	B_gain_AFmax	B_loss_source	B_loss_coord	B_loss_AFmax	B_ins_source	B_ins_coord	B_ins_AFmax	B_inv_source	B_inv_coord	B_inv_AFmax	po_B_gain_allG_source	po_B_gain_allG_coord	po_B_gain_someG_source	po_B_gain_someG_coord	po_B_loss_allG_source	po_B_loss_allG_coord	po_B_loss_someG_source	po_B_loss_someG_coord	Count_hom(HG00096)	Count_htz(HG00096)	Count_htz/allHom(HG00096)	Count_htz/total(cohort)	Count_total(cohort)	Cosmic_ID	Cosmic_mut_typ	GC_content_left	GC_content_right	Repeat_coord_left	Repeat_type_left	Repeat_coord_right	Repeat_type_right	Gap_left	Gap_right	SegDup_left	SegDup_right	ENCODE_blacklist_left	ENCODE_blacklist_characteristics_left	ENCODE_blacklist_right	ENCODE_blacklist_characteristics_right	ACMG	HI	TS	DDD_HI_percent	ExAC_delZ	ExAC_dupZ	ExAC_cnvZ	ExAC_synZ	ExAC_misZ	GenCC_disease	GenCC_moi	GenCC_classification	GenCC_pmid	OMIM_ID	OMIM_phenotype	OMIM_inheritance	OMIM_morbid	OMIM_morbid_candidate	LOEUF_bin	GnomAD_pLI	ExAC_pLI
+******************************************
+         => No ranking provided
+
+
+WARNING: AnnotSV requires the SV type (duplication, deletion...) to classify the SV
+         Not provided (svtBEDcol = -1)
+         => No SV ranking (ACMG_class feature will be set to "NA")
+
+...listing of the annotations to be realized (December 22 2023 - 15:31)
+	...CytoBand annotation
+	...Genes annotation
+		...RefSeq annotation
+	...Regulatory elements annotations
+		...Promoter annotations
+		...EnhancerAtlas annotations
+		...GeneHancer annotations
+	...Annotations with pathogenic genes or genomic regions
+		...dbVar annotation
+		...ClinVar annotation
+		...ClinGen annotation
+	...Annotations with pathogenic snv/indel
+	...Annotations with benign genes or genomic regions
+		...gnomAD annotation
+		...ClinVar annotation
+		...ClinGen annotation
+		...DGV annotation
+		...DDD annotation
+		...1000g annotation
+		...Ira M. Hall's lab annotation
+		...Children’s Mercy Research Institute
+	...Annotations with features overlapped with the SV (100 %)
+		...CosmicCompleteCNA_GRCh37.sorted.formatted.sorted.bed
+		(2 annotations columns: Cosmic_ID, Cosmic_mut_typ)
+	...Annotations with features sharing any overlap with the SV
+	...Breakpoints annotations
+		...GC content annotation
+		...Repeat annotation
+		...Gap annotation
+		...Segmental duplication annotation
+		...ENCODE blacklist annotation
+	...Gene-based annotations
+		...20220617_ACMG.tsv
+		(78 gene identifiers and 1 annotations columns: ACMG)
+		...20220906_ClinGenAnnotations.tsv
+		(1480 gene identifiers and 2 annotations columns: HI, TS)
+		...20200713_HI.tsv.gz
+		(19124 gene identifiers and 1 annotations columns: DDD_HI_percent)
+		...20191219_ExAC.CNV-Zscore.annotations.tsv.gz
+		(15673 gene identifiers and 3 annotations columns: ExAC_delZ, ExAC_dupZ, ExAC_cnvZ)
+		...20201023_GeneIntolerance-Zscore.annotations.tsv.gz
+		(18241 gene identifiers and 2 annotations columns: ExAC_synZ, ExAC_misZ)
+		...20220902_GenCC.tsv
+		(4615 gene identifiers and 4 annotations columns: GenCC_disease, GenCC_moi, GenCC_classification, GenCC_pmid)
+		...20220905_OMIM-1-annotations.tsv.gz
+		(16250 gene identifiers and 1 annotations columns: OMIM_ID)
+		...20220905_OMIM-2-annotations.tsv.gz
+		(16250 gene identifiers and 2 annotations columns: OMIM_phenotype, OMIM_inheritance)
+		...20220905_morbid.tsv.gz
+		(12998 gene identifiers and 1 annotations columns: OMIM_morbid)
+		...20220905_morbidCandidate.tsv.gz
+		(3467 gene identifiers and 1 annotations columns: OMIM_morbid_candidate)
+		...20201106_gnomAD.LOEUF.pLI.annotations.tsv.gz
+		(19451 gene identifiers and 3 annotations columns: LOEUF_bin, GnomAD_pLI, ExAC_pLI)
+
+...annotation in progress (December 22 2023 - 15:31)
+
+
+...parsing of snvIndelFiles for "HG00096" (December 22 2023 - 15:32)
+	...split multiallelic sites into multiple rows for ./input/HG00096.chr1.phase3_shapeit2_mvncall_integrated_v5_extra_anno.20130502.genotypes.withoutSV.filtered.vcf.gz (December 22 2023 - 15:32)
+	   -- VCFannotation --
+	   bcftools norm -m -both ./input/HG00096.chr1.phase3_shapeit2_mvncall_integrated_v5_extra_anno.20130502.genotypes.withoutSV.filtered.vcf.gz > ./output/HG00096.chr1.phase3_shapeit2_mvncall_integrated_v5_extra_anno.20130502.genotypes.withoutSV.filtered.vcf.gz.1703255535.separate.vcf
+	   Error: wrong number of fields in INFO/DP at 1:15274, expected 2, found 1
+	   => No multiallelic treatment done.
+	...parsing of ./input/HG00096.chr1.phase3_shapeit2_mvncall_integrated_v5_extra_anno.20130502.genotypes.withoutSV.filtered.vcf.gz (December 22 2023 - 15:32)
+		-> 44 SNV/indel located in all the SV (potentially with redundancy depending on SV overlap)
+		-> 44 SNV/indel loaded
+
+...writing of ./output/HG00096.SV_tcl.annotated.tsv (December 22 2023 - 15:32)
+
+...output columns annotation (December 22 2023 - 15:32):
+	AnnotSV_ID;SV_chrom;SV_start;SV_end;SV_length;user#1;Samples_ID;Annotation_mode;CytoBand;Gene_name;Gene_count;Tx;Tx_start;Tx_end;Overlapped_tx_length;Overlapped_CDS_length;Overlapped_CDS_percent;Frameshift;Exon_count;Location;Location2;Dist_nearest_SS;Nearest_SS_type;Intersect_start;Intersect_end;RE_gene;P_gain_phen;P_gain_hpo;P_gain_source;P_gain_coord;P_loss_phen;P_loss_hpo;P_loss_source;P_loss_coord;P_ins_phen;P_ins_hpo;P_ins_source;P_ins_coord;po_P_gain_phen;po_P_gain_hpo;po_P_gain_source;po_P_gain_coord;po_P_gain_percent;po_P_loss_phen;po_P_loss_hpo;po_P_loss_source;po_P_loss_coord;po_P_loss_percent;P_snvindel_nb;P_snvindel_phen;B_gain_source;B_gain_coord;B_gain_AFmax;B_loss_source;B_loss_coord;B_loss_AFmax;B_ins_source;B_ins_coord;B_ins_AFmax;B_inv_source;B_inv_coord;B_inv_AFmax;po_B_gain_allG_source;po_B_gain_allG_coord;po_B_gain_someG_source;po_B_gain_someG_coord;po_B_loss_allG_source;po_B_loss_allG_coord;po_B_loss_someG_source;po_B_loss_someG_coord;Count_hom(HG00096);Count_htz(HG00096);Count_htz/allHom(HG00096);Count_htz/total(cohort);Count_total(cohort);Cosmic_ID;Cosmic_mut_typ;GC_content_left;GC_content_right;Repeat_coord_left;Repeat_type_left;Repeat_coord_right;Repeat_type_right;Gap_left;Gap_right;SegDup_left;SegDup_right;ENCODE_blacklist_left;ENCODE_blacklist_characteristics_left;ENCODE_blacklist_right;ENCODE_blacklist_characteristics_right;ACMG;HI;TS;DDD_HI_percent;ExAC_delZ;ExAC_dupZ;ExAC_cnvZ;ExAC_synZ;ExAC_misZ;GenCC_disease;GenCC_moi;GenCC_classification;GenCC_pmid;OMIM_ID;OMIM_phenotype;OMIM_inheritance;OMIM_morbid;OMIM_morbid_candidate;LOEUF_bin;GnomAD_pLI;ExAC_pLI;AnnotSV_ranking_score;AnnotSV_ranking_criteria;ACMG_class
+
+
+...AnnotSV is done with the analysis (December 22 2023 - 15:32)

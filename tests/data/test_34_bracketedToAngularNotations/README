@@ -1,0 +1,55 @@
+cd $ANNOTSV/tests/data/test_37_bracketedToAngularNotations/input/
+
+
+A same SV is described with different notations:
+- square-bracketed notation in VCF
+- angle-bracketed notation in VCF
+- BED format
+
+=> We should obtain equivalent results for each SV type
+
+
+# VCF with square-bracketed notation
+####################################
+
+ll input-square-bracketed-*vcf
+-rwx------ 1 geoffroy lgm  275 Mar 23 13:35 input-square-bracketed-del_1.vcf
+-rwx------ 1 geoffroy lgm  345 Mar 23 13:35 input-square-bracketed-del_partial_pass.vcf
+-rwx------ 1 geoffroy lgm  307 Mar 23 13:35 input-square-bracketed-del_unordered.vcf
+-rwx------ 1 geoffroy lgm  263 Mar 23 13:35 input-square-bracketed-dup.vcf
+-rwx------ 1 geoffroy lgm  273 Mar 23 13:35 input-square-bracketed-empty_del.vcf
+-rwx------ 1 geoffroy lgm  283 Mar 23 13:35 input-square-bracketed-ins_by_gridss.vcf
+-rwx------ 1 geoffroy lgm  271 Mar 23 13:35 input-square-bracketed-inv1.vcf
+-rw-r--r-- 1 geoffroy lgm  271 May 30 15:44 input-square-bracketed-inv2.vcf
+-rw-r--r-- 1 geoffroy lgm 3851 May 30 16:06 input-square-bracketed-inv3.vcf
+-rwxr-xr-x 1 geoffroy lgm 1845 Mar 23 13:35 input-square-bracketed-tra1.vcf
+-rwx------ 1 geoffroy lgm  263 Mar 23 13:35 input-square-bracketed-tra2.vcf
+
+
+# VCF with angle-bracketed notation
+###################################
+ll input-angle-bracketed-*vcf
+-rwx------ 1 geoffroy lgm 160 Mar 23 13:35 input-angle-bracketed-del_1.vcf
+-rwx------ 1 geoffroy lgm 195 Mar 23 13:35 input-angle-bracketed-del_partial_pass.vcf
+-rwx------ 1 geoffroy lgm 154 Mar 23 13:35 input-angle-bracketed-dup.vcf
+-rwx------ 1 geoffroy lgm 159 Mar 23 13:35 input-angle-bracketed-empty_del.vcf
+-rwx------ 1 geoffroy lgm 137 Mar 23 13:35 input-angle-bracketed-ins_by_gridss.vcf
+-rwx------ 1 geoffroy lgm 159 Mar 23 13:35 input-angle-bracketed-inv1.vcf
+-rwx------ 1 geoffroy lgm 159 Mar 23 13:35 input-angle-bracketed-inv2.vcf
+-rwxr-xr-x 1 geoffroy lgm 201 Mar 23 13:35 input-angle-bracketed-tra1.vcf
+-rwx------ 1 geoffroy lgm 250 Mar 23 13:35 input-angle-bracketed-tra2.vcf
+
+
+# BED with "DEL/DUP/INV..." notations
+#####################################
+ll *bed
+-rwx------ 1 geoffroy lgm 34 Mar 23 13:35 input-del_1.bed
+-rwx------ 1 geoffroy lgm 45 Mar 23 13:35 input-del_partial_pass.bed
+-rwx------ 1 geoffroy lgm 31 Mar 23 13:35 input-dup.bed
+-rwx------ 1 geoffroy lgm 37 Mar 23 13:35 input-empty_del.bed
+-rwx------ 1 geoffroy lgm 54 Mar 23 13:35 input-ins_by_gridss.bed
+-rwx------ 1 geoffroy lgm 33 Mar 23 13:35 input-inv1.bed
+-rwx------ 1 geoffroy lgm 33 Mar 23 13:35 input-inv2.bed
+-rwxr-xr-x 1 geoffroy lgm 53 Mar 23 13:35 input-tra1.bed
+
+

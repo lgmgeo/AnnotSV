@@ -26,7 +26,7 @@ OPTIONS
 -candidateSnvIndelFiles:        Path of the filtered VCF input file(s) with SNV/indel coordinates for compound heterozygotes report (optional)
                                 Gzipped VCF files are supported as well as regular expression
 
--candidateSnvIndelSamples:      To specifiy the sample names from the VCF files defined from the -candidateSnvIndelFiles option
+-candidateSnvIndelSamples:      To specifiy the sample names from the VCF files defined with the -candidateSnvIndelFiles option (sample names can be coma-separated or semicolon -separated)
                                 Default: use all samples from the filtered VCF files
 
 -genomeBuild:                   Genome build used
@@ -111,6 +111,8 @@ OPTIONS
 
 -variantconvertDir:             Path of the variantconvert directory
 				(by default, the variantconvert tool distributed by annotSV is used)
+
+-version:                       Version of the AnnotSV program
 
 -vcf: 				Creation of a VCF output file format (-svtBEDcol needs to be defined too)
 				Values: 0 (default) or 1

@@ -1,0 +1,36 @@
+# Bash environment
+##################
+
+# The "set -e" option instructs bash to immediately exit if any command has a non-zero exit status.
+set -eo pipefail
+
+
+
+# Checks only for 1 test directory 
+##################################
+
+=> Need to be run in each directory:
+command_Tcl.sh >& command_Tcl.log
+
+gr error command_Tcl.log
+
+gr "ok - Finished" command_Tcl.log
+tail -2 command_Tcl.log
+
+
+
+
+## Automation of all tests (to check)
+##################################### 
+
+./scripts/check_all_public_test_directory.sh >& ./check_all_public_test_directory.log &
+
+
+
+
+## There should no longer be a path in the VCF inputs 
+#####################################################
+
+grep [^\\.0-9+-]/[^\\.0-9+-]  test_*/input/*vcf
+
+

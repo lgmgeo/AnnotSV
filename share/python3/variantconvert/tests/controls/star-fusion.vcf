@@ -1,0 +1,58 @@
+##fileformat=VCFv4.3
+##fileDate=23/01/2023
+##source=star-fusion
+##InputFile=/home1/HUB/bin/variantconvert/current/tests/data/star-fusion.fusion_predictions.tsv
+##FILTER=<ID=PASS,Description="Passed filter">
+##INFO=<ID=FusionName,Number=1,Type=String,Description="Fusion name">
+##INFO=<ID=JunctionReadCount,Number=1,Type=Integer,Description="Number of RNA-Seq fragments containing a read that aligns as a split read at the site of the putative fusion junction">
+##INFO=<ID=SpanningFragCount,Number=1,Type=Integer,Description="Number of RNA-Seq fragments that encompass the fusion junction such that one read of the pair aligns to a different gene than the other paired-end read of that fragment">
+##INFO=<ID=est_J,Number=1,Type=Float,Description="Estimated read counts for junction reads, taking into account multiple-mappings and multiple candidate fusion isoforms where read evidence is shared among them (involving read-to-fusion-isoform mapping uncertainty). Fusion expression levels (FFPM) are based on est_J and est_S values">
+##INFO=<ID=est_S,Number=1,Type=Float,Description="Estimated read counts for split reads, taking into account multiple-mappings and multiple candidate fusion isoforms where read evidence is shared among them (involving read-to-fusion-isoform mapping uncertainty). Fusion expression levels (FFPM) are based on est_J and est_S values">
+##INFO=<ID=SpliceType,Number=1,Type=String,Description="Indicates whether the proposed breakpoint occurs at reference exon junctions as provided by the reference transcript structure annotations (ex. gencode)">
+##INFO=<ID=LeftGene,Number=1,Type=String,Description="Left gene name">
+##INFO=<ID=LeftBreakpoint,Number=1,Type=String,Description="Left breakpoint">
+##INFO=<ID=RightGene,Number=1,Type=String,Description="Right gene name">
+##INFO=<ID=RightBreakpoint,Number=1,Type=String,Description="Right breakpoint">
+##INFO=<ID=LargeAnchorSupport,Number=1,Type=String,Description=" Indicates whether there are split reads that provide 'long' (set to length of 25 bases) alignments on both sides of the putative breakpoint. Those fusions supported only by split reads (no spanning fragments) and lack LargeAnchorSupport are often highly suspicious and tend to be false positives. Those with LargeAnchorSupport are labeled as 'YES_LDAS' (where LDAS = long double anchor support)">
+##INFO=<ID=FFPM,Number=1,Type=Float,Description=" FFPM (fusion fragments per million total reads) are a normalized measure of the fusion-supporting rna-seq fragments. The number of fusion-supporting reads depends on the expression of the fusion transcript and the number of reads sequenced. The deeper the sequenced data set, the greater the number of artifactual fusions. The default filter, which tends to be effective at excluding artifacts, is 0.1 sum FFPM (meaning at least 1 fusion-supporting rna-seq fragment per 10M total reads).">
+##INFO=<ID=LeftBreakDinuc,Number=1,Type=String,Description="LeftBreakDinuc">
+##INFO=<ID=LeftBreakEntropy,Number=1,Type=Float,Description="Represents the Shannon entropy of the 15 exonic bases flanking the breakpoint. The maximum entropy is 2, representing highest complexity. The lowest would be zero (involving a 15 base mononucleotide run). Low entropy sites should generally be treated as less confident breakpoints.">
+##INFO=<ID=RightBreakDinuc,Number=1,Type=String,Description="RightBreakDinuc">
+##INFO=<ID=RightBreakEntropy,Number=1,Type=Float,Description="Represents the Shannon entropy of the 15 exonic bases flanking the breakpoint. The maximum entropy is 2, representing highest complexity. The lowest would be zero (involving a 15 base mononucleotide run). Low entropy sites should generally be treated as less confident breakpoints.">
+##INFO=<ID=Annots,Number=.,Type=String,Description="Provides a simplified annotation using FusionAnnotator and based on CTAT_HumanFusionLib, which includes many popular resources for annotating fusions known to be relevant to cancer. It also allows to filter out fusions based on known 'red herring' categories (described here: https://github.com/FusionAnnotator/CTAT_HumanFusionLib/wiki ) in addition to fusions involving mitochondrial genes or HLA loci (common artifacts).">
+##INFO=<ID=SVTYPE,Number=1,Type=String,Description="Type of structural variant">
+##INFO=<ID=MATEID,Number=1,Type=String,Description="ID of mate breakends">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##contig=<ID=chr1,length=249250621,assembly=hg19>
+##contig=<ID=chr2,length=243199373,assembly=hg19>
+##contig=<ID=chr3,length=198022430,assembly=hg19>
+##contig=<ID=chr4,length=191154276,assembly=hg19>
+##contig=<ID=chr5,length=180915260,assembly=hg19>
+##contig=<ID=chr6,length=171115067,assembly=hg19>
+##contig=<ID=chr7,length=159138663,assembly=hg19>
+##contig=<ID=chr8,length=146364022,assembly=hg19>
+##contig=<ID=chr9,length=141213431,assembly=hg19>
+##contig=<ID=chr10,length=135534747,assembly=hg19>
+##contig=<ID=chr11,length=135006516,assembly=hg19>
+##contig=<ID=chr12,length=133851895,assembly=hg19>
+##contig=<ID=chr13,length=115169878,assembly=hg19>
+##contig=<ID=chr14,length=107349540,assembly=hg19>
+##contig=<ID=chr15,length=102531392,assembly=hg19>
+##contig=<ID=chr16,length=90354753,assembly=hg19>
+##contig=<ID=chr17,length=81195210,assembly=hg19>
+##contig=<ID=chr18,length=78077248,assembly=hg19>
+##contig=<ID=chr19,length=59128983,assembly=hg19>
+##contig=<ID=chr20,length=63025520,assembly=hg19>
+##contig=<ID=chr21,length=48129895,assembly=hg19>
+##contig=<ID=chr22,length=51304566,assembly=hg19>
+##contig=<ID=chrM,length=16569,assembly=hg19>
+##contig=<ID=chrX,length=155270560,assembly=hg19>
+##contig=<ID=chrY,length=59373566,assembly=hg19>
+##reference=file:///home1/L_PROD/NGS/BAS/DOCKER_STARK_MAIN_FOLDER/data/users/nicaises/rnaseq/GRCh37_gencode_v19_CTAT_lib_Mar012021.plug-n-play/ctat_genome_lib_build_dir/ref_genome.fa
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	star-fusion
+chr10	21940697	664b08a	A	A[chr11:49805375[	.	PASS	SVTYPE=BND;MATEID=bf1d34e;FusionName=MLLT10--RP11-707M1.1;JunctionReadCount=2;SpanningFragCount=0;est_J=2.0;est_S=0.0;SpliceType=ONLY_REF_SPLICE;LeftGene=MLLT10^ENSG00000078403.12;LeftBreakpoint=chr10:21940697:+;RightGene=RP11-707M1.1^ENSG00000205035.4;RightBreakpoint=chr11:49805375:+;LargeAnchorSupport=YES_LDAS;FFPM=1365.1877;LeftBreakDinuc=GT;LeftBreakEntropy=1.7232;RightBreakDinuc=AG;RightBreakEntropy=1.7968;Annots=INTERCHROMOSOMAL[chr10--chr11]	GT	0/1
+chr10	21940697	61513c6	A	A[chr11:49715543[	.	PASS	SVTYPE=BND;MATEID=a8f0f00;FusionName=MLLT10--RP11-707M1.1;JunctionReadCount=6;SpanningFragCount=0;est_J=6.0;est_S=0.0;SpliceType=INCL_NON_REF_SPLICE;LeftGene=MLLT10^ENSG00000078403.12;LeftBreakpoint=chr10:21940697:+;RightGene=RP11-707M1.1^ENSG00000205035.4;RightBreakpoint=chr11:49715543:+;LargeAnchorSupport=YES_LDAS;FFPM=4095.5631;LeftBreakDinuc=GT;LeftBreakEntropy=1.7232;RightBreakDinuc=AG;RightBreakEntropy=1.8892;Annots=INTERCHROMOSOMAL[chr10--chr11]	GT	0/1
+chr10	21959378	8a09db1	A	]chr11:118353210]A	.	PASS	SVTYPE=BND;MATEID=da130ec;FusionName=KMT2A--MLLT10;JunctionReadCount=4;SpanningFragCount=0;est_J=4.0;est_S=0.0;SpliceType=ONLY_REF_SPLICE;LeftGene=KMT2A^ENSG00000118058.16;LeftBreakpoint=chr11:118353210:+;RightGene=MLLT10^ENSG00000078403.12;RightBreakpoint=chr10:21959378:+;LargeAnchorSupport=YES_LDAS;FFPM=2730.3754;LeftBreakDinuc=GT;LeftBreakEntropy=1.1033;RightBreakDinuc=AG;RightBreakEntropy=1.8062;Annots=Mitelman,ChimerKB,GUO2018CR_TCGA,DEEPEST2019,HGNC_GENEFAM,Cosmic,ChimerSeq,INTERCHROMOSOMAL[chr11--chr10]	GT	0/1
+chr11	49715543	a8f0f00	G	]chr10:21940697]G	.	PASS	SVTYPE=BND;MATEID=61513c6;FusionName=MLLT10--RP11-707M1.1;JunctionReadCount=6;SpanningFragCount=0;est_J=6.0;est_S=0.0;SpliceType=INCL_NON_REF_SPLICE;LeftGene=MLLT10^ENSG00000078403.12;LeftBreakpoint=chr10:21940697:+;RightGene=RP11-707M1.1^ENSG00000205035.4;RightBreakpoint=chr11:49715543:+;LargeAnchorSupport=YES_LDAS;FFPM=4095.5631;LeftBreakDinuc=GT;LeftBreakEntropy=1.7232;RightBreakDinuc=AG;RightBreakEntropy=1.8892;Annots=INTERCHROMOSOMAL[chr10--chr11]	GT	0/1
+chr11	49805375	bf1d34e	G	]chr10:21940697]G	.	PASS	SVTYPE=BND;MATEID=664b08a;FusionName=MLLT10--RP11-707M1.1;JunctionReadCount=2;SpanningFragCount=0;est_J=2.0;est_S=0.0;SpliceType=ONLY_REF_SPLICE;LeftGene=MLLT10^ENSG00000078403.12;LeftBreakpoint=chr10:21940697:+;RightGene=RP11-707M1.1^ENSG00000205035.4;RightBreakpoint=chr11:49805375:+;LargeAnchorSupport=YES_LDAS;FFPM=1365.1877;LeftBreakDinuc=GT;LeftBreakEntropy=1.7232;RightBreakDinuc=AG;RightBreakEntropy=1.7968;Annots=INTERCHROMOSOMAL[chr10--chr11]	GT	0/1
+chr11	118353210	da130ec	G	G[chr10:21959378[	.	PASS	SVTYPE=BND;MATEID=8a09db1;FusionName=KMT2A--MLLT10;JunctionReadCount=4;SpanningFragCount=0;est_J=4.0;est_S=0.0;SpliceType=ONLY_REF_SPLICE;LeftGene=KMT2A^ENSG00000118058.16;LeftBreakpoint=chr11:118353210:+;RightGene=MLLT10^ENSG00000078403.12;RightBreakpoint=chr10:21959378:+;LargeAnchorSupport=YES_LDAS;FFPM=2730.3754;LeftBreakDinuc=GT;LeftBreakEntropy=1.1033;RightBreakDinuc=AG;RightBreakEntropy=1.8062;Annots=Mitelman,ChimerKB,GUO2018CR_TCGA,DEEPEST2019,HGNC_GENEFAM,Cosmic,ChimerSeq,INTERCHROMOSOMAL[chr11--chr10]	GT	0/1

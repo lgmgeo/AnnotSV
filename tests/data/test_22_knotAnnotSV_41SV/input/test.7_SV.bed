@@ -1,0 +1,8 @@
+# chrom	Start	End	Variant_type	Biologist_annotation	Biologist_ranking
+1	149041933	149209289	DEL		Benign
+4	71552	9371067	DEL	4p- syndrom	Pathogenic
+5	723194	777000	DUP		Benign
+11	66287088	66288847	DEL	BBS1 internal frameshift	Pathogenic
+15	34735949	34806953	DEL		Benign
+16	1565629	1571297	DUP	IFT140 tandem duplication 	Pathogenic
+X	53250653	53856257	DUP	HUWE1	Pathogenic

@@ -1,0 +1,3 @@
+#Chrom	start	end	svtype	samplesNames
+13	19341426	19360783	DUP	sample1
+1	4204667	4204717	DEL	sample1,sampl2

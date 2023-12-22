@@ -13,9 +13,14 @@ share/AnnotSV/Annotations_Exomiser/
 # Python reimplementation of AnnotSV
 share/python3/annotsv/
 src/
+Python/
 
-# Data tests
-tests/
+# Unit tests
+tests/data/check_all_public_test_directory.log
+tests/data/privateTest_*
+tests/data/test_*/command_Tcl.log
+tests/data/test_*/output/
+tests/data/ToDo
 tests/data/test_37_bracketedToAngularNotation/Rodrigo_tests_ignore
 
 # VariantConvert

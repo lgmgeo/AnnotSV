@@ -1,0 +1,40 @@
+# This file is used to simplify the configuration of AnnotSV.
+# Anything behind a hashtag is considered as a comment
+# Please, feel free to change the AnnotSV options.
+
+#------------------
+# AnnotSV Options :
+#------------------
+
+
+-genomeBuild:           GRCh37
+
+-overlap:               70
+
+-promoterSize:          500
+
+-SVinputInfo:           1
+
+-SVminSize:             50
+
+-metrics:               "us"
+
+-minTotalNumber:        "500"
+
+-overwrite:             "1"
+
+-reciprocal:            "0"
+
+-annotationMode:        "both"
+
+-snvindelPASS:          "0"
+
+
+#------------------------
+# AnnotSV Output columns:
+#------------------------
+# Output column names are listed below.
+# In order to disable default annotations provided by AnnotSV, some column names (the ones that are not marked with an *) can be commented with a hash character ("#") by the user.
+del.score
+dup.score
+cnv.score

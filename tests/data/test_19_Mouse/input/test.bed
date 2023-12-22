@@ -1,0 +1,3 @@
+#chrom	start	end	SV type	score
+1	3038297	3156351	DEL	0.025
+1	94190001	95198035	DUP	0.001

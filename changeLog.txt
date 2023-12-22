@@ -11,9 +11,13 @@
 For more details, please see the README file.
 
 
+December, 22, 2023, AnnotSV version 3.3.8
+	- Add of 34 unit tests
+
+November, 03, 2023, AnnotSV version 3.3.7
 	- Fix a domain error (issue 199)
 	- Include code to allow FranceGenRef benign SV annotation (856 WGS with ancestries in different regions of France)
-	WARNING: not supplied as part of the AnnotSV sources. 
+	  WARNING: not supplied as part of the AnnotSV sources. 
 	- Optimize access to the exomiser application properties file for use with singularity/bioconda
 	- Allow uppercase file extensions (".VCF", ".BED" or ".VCF.GZ") 
 	- Use the new format of the COSMIC data source 
@@ -21,6 +25,8 @@ For more details, please see the README file.
 	- Update of the documentation to install AnnotSV human annotations in a local directory (INSTALL_annotations.sh) 
 	- Optimize a regexp
 	- Fix variantconvert file name
+
+June, 01, 2023, AnnotSV version 3.3.6
 	- Add bug fix concerning some INV bracketed. The second breakend notation (which is just the reciprocal of the first) is now always identified as the mate breakend.
 	- Sample IDs with missing alleles in the GT fields ("./." or ".|.") are now reported in the "Samples_ID" output field
 	- Refactor variantconvert code
@@ -37,7 +43,7 @@ April, 14, 2023, AnnotSV version 3.3.5
 
 April, 07, 2023, AnnotSV version 3.3.4
 	- Among the “po_P_*_*” features, redundancy is now removed ONLY from “po_P_*_phen” and “po_P_*_hpo”.
-	=> AnnotSV keeps now the correspondence between “po_P_*_source”, “po_P_*_coord” and “po_P_*_percent” features.
+	  => AnnotSV keeps now the correspondence between “po_P_*_source”, “po_P_*_coord” and “po_P_*_percent” features.
 	- Improvment of the running time (code part: SV partially overlapping with an established benign region)
 	- Update of the Makefile (variantconvert install)
 	- Remove requirement for ANNOTSV environment variable

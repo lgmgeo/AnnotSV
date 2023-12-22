@@ -1,0 +1,218 @@
+##############################################################################################
+# knotAnnotSV 1.1                                                                            #
+#                                                                                            #
+# knotAnnotSV: Creation of a customizable html file to visualize, filter                     # 
+#                   and analyze an AnnotSV output                                            #
+#                                                                                            #
+# Author: Thomas Guignard 2020                                                               #
+#                                                                                            #
+# Copyright (C) 2020-2021 Thomas Guignard (t-guignard@chu-montpellier.fr)                    #
+#                                                                                            #
+# This is part of knotAnnotSV source code.                                                   #
+#                                                                                            #
+# This program is free software; you can redistribute it and/or                              #
+# modify it under the terms of the GNU General Public License                                #
+# as published by the Free Software Foundation; either version 3                             #
+# of the License, or (at your option) any later version.                                     #
+#                                                                                            #
+# This program is distributed in the hope that it will be useful,                            #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of                             #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                              #
+# GNU General Public License for more details.                                               #
+#                                                                                            #
+# You should have received a copy of the GNU General Public License                          #
+# along with this program; If not, see <http://www.gnu.org/licenses/>.                       #
+##############################################################################################
+---
+#### General annotations on the SV
+##################################
+AnnotSV_ID:    #mandatory in first position
+    POSITION: 1
+    RENAME: "AnnotSV ID"
+ACMG_class:  # mandatory   
+    POSITION: 2
+    RENAME: "ACMG class"
+    HEADERTIPS: "SV ranking class (from 1 to 5) following the 2020 joint consensus recommendation of ACMG and ClinGen"
+    COMMENTLIST:
+        - AnnotSV_ranking_score
+        - AnnotSV_ranking_criteria
+SV_type:
+    POSITION: 3
+    RENAME: "SV type"
+    HEADERTIPS: "Type of the SV (DEL, DUP...)"
+    COMMENTLIST:
+        - SV_length
+        - Gene_count
+
+Annotation_mode: #mandatory
+    POSITION: 4 
+    RENAME: "Annotation mode"
+    HEADERTIPS: "Type of annotation lines generated:<br>
+- annotation on the SV full length (full)<br>
+- annotation on each gene overlapped by the SV (split)"
+
+### Gene annotations
+####################
+Gene_name:     # mandatory
+    POSITION: 5
+    RENAME: "Gene name"
+    HEADERTIPS: "Gene symbol"
+    COMMENTLIST:
+        - LOEUF_bin
+        - GnomAD_pLI
+        - ExAC_pLI
+        - HI
+        - TS
+        - DDD_HI_percent
+        - ACMG
+        - ExAC_cnvZ
+        - ExAC_delZ
+        - ExAC_dupZ
+        - ExAC_synZ
+        - ExAC_misZ
+        - DDD_status
+        - DDD_mode
+        - DDD_consequence
+        - DDD_disease
+        - DDD_pmid
+        - GenCC_disease
+        - GenCC_moi
+        - GenCC_classification
+        - GenCC_pmid
+Location:
+    POSITION: 6
+    RENAME: "Location"
+    HEADERTIPS: "Hover your mouse to highlight SV location annotations in the gene"
+    COMMENTLIST:
+        - CytoBand
+        - Location2
+        - Tx
+        - Tx_start
+        - Tx_end
+        - Exon_count
+        - Overlapped_tx_length
+        - Overlapped_CDS_length
+        - Overlapped_CDS_percent
+        - Frameshift
+        - Dist_nearest_SS
+        - Nearest_SS_type
+        - Intersect_start
+        - Intersect_end
+OMIM_ID:
+    POSITION: 7
+    RENAME: "OMIM ID"
+    HEADERTIPS: "Hover your mouse to highlight OMIM annotations"
+    COMMENTLIST:
+        - OMIM_phenotype
+        - OMIM_inheritance
+        - OMIM_morbid
+        - OMIM_morbid_candidate
+Exomiser_gene_pheno_score:
+    POSITION: 8
+    RENAME: "Exomiser score"
+    HEADERTIPS: "Show how close each overlapped gene is to the patient phenotype<br>
+    Highly specific and consistent phenotype: score > 0.7<br>
+    Consistent phenotype: score > 0.5"
+    COMMENTLIST:
+        - Human_pheno_evidence
+        - Mouse_pheno_evidence
+        - Fish_pheno_evidence
+
+### Annotations done with regulatory elements
+#############################################
+RE_gene:
+    POSITION: 9
+    RENAME: "Overlapped regulatory elements"
+    HEADERTIPS: "Report the name of the genes potentially badly regulated"
+
+### Annotations done with pathogenic SV
+#######################################
+P_gain_coord:
+    POSITION: 10
+    RENAME: "Pathogenic SV"
+    HEADERTIPS: "Known pathogenic genes or genomic regions (with the same SV type; from ClinVar, ClinGen, dbVar, OMIM) completely overlapped with the SV to annotate"
+    COMMENTLIST:
+        - P_gain_source
+        - P_gain_phen
+        - P_gain_hpo
+        - P_loss_coord
+        - P_loss_source
+        - P_loss_phen
+        - P_loss_hpo
+
+### Annotations done with pathogenic snv/indel
+##############################################
+P_snvindel_nb:
+    POSITION: 11
+    RENAME: "Number of pathogenic SNV/indel overlapped"
+    HEADERTIPS: "Pathogenic SNV/indel (from ClinVar) completely overlapped with the SV to annotate"
+    COMMENTLIST:
+        - P_snvindel_phen
+
+### Annotations done with benign SV
+###################################
+B_gain_source:
+    POSITION: 12
+    RENAME: "Benign SV"
+    HEADERTIPS: "Benign genomic regions (with the same SV type; from gnomAD, ClinVar, ClinGen, DGV, DDD, 1000g, IMH) completely overlapping the SV to annotate"
+    COMMENTLIST:
+        - B_gain_coord
+        - B_gain_AFmax
+        - B_loss_source
+        - B_loss_coord
+        - B_loss_AFmax
+
+### Annotations of the breakpoints
+##################################
+ENCODE_blacklist_characteristics_left:
+    POSITION: 13
+    RENAME: "Left breakpoint annotations"
+    HEADERTIPS: "Hover your mouse to highlight the left SV breakpoint (+/- 100bp) annotations"
+    COMMENTLIST:
+        - ENCODE_blacklist_left
+        - SegDup_left
+        - Repeat_coord_left
+        - Repeat_type_left
+        - Gap_left
+        - GC_content_left
+
+ENCODE_blacklist_characteristics_right:
+    POSITION: 14
+    RENAME: "Right breakpoint annotations"
+    HEADERTIPS: "Hover your mouse to highlight the right SV breakpoint (+/- 100bp) annotations"
+    COMMENTLIST:
+        - ENCODE_blacklist_right
+        - SegDup_right
+        - Repeat_coord_right
+        - Repeat_type_right
+        - Gap_right
+        - GC_content_right
+
+TAD_coordinate:
+    POSITION: 0
+ENCODE_experiment:
+    POSITION: 0
+Cosmic_ID:
+    POSITION: 0
+Cosmic_mut_typ:
+    POSITION: 0
+compound-htz(sample):
+    POSITION: 0
+Count_hom(sample):
+    POSITION: 0
+Count_htz(sample):
+    POSITION: 0
+Count_htz/allHom(sample):
+    POSITION: 0
+Count_htz/total(cohort):
+    POSITION: 0
+Count_total(cohort):
+    POSITION: 0
+
+
+Biologist_annotation: # additional user column
+    POSITION: 15
+
+Biologist_ranking: # additional user column
+    POSITION: 16
+
