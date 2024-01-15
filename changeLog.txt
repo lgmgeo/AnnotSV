@@ -1,15 +1,18 @@
 ############################################################################################################
-# AnnotSV 3.3.6                                                                                            #
+# AnnotSV 3.3.9                                                                                            #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
-# Copyright (C) 2017-2023 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
+# Copyright (C) 2017-2024 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
 #                                                                                                          #
 ############################################################################################################
 
 
 For more details, please see the README file.
 
+
+January, 15, 2024, AnnotSV version 3.3.9
+	- Fix a bug when setting the "hpoVersion" variable (issue 207)
 
 December, 22, 2023, AnnotSV version 3.3.8
 	- Add of 34 unit tests
