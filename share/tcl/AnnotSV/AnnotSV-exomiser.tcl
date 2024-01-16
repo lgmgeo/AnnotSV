@@ -108,21 +108,21 @@ proc checkExomiserInstallation {} {
 		puts "\nWARNING: No Exomiser annotations available."
 		puts "...$NCBIgeneDir/results.txt doesn't exist"
 		set g_AnnotSV(hpo) ""
-    } elseif {![file exists "$NCBIgeneDir/geneSymbol_NCBIgeneID.txt"]} {
-		# Checked if the "geneSymbol_NCBIgeneID.txt" file exists
-		set L_TextToWrite {"genes\tNCBI gene ID"}
+    } elseif {![file exists "$NCBIgeneDir/geneSymbol_NCBIgeneID.tsv"]} {
+		# Checked if the "geneSymbol_NCBIgeneID.tsv" file exists
+		set L_TextToWrite {"genes\tNCBI_gene_ID"}
 		foreach L [LinesFromFile "$NCBIgeneDir/results.txt"] {
 			set Ls [split $L "\t"]
 			set NCBIgeneID [lindex $Ls 3]
 			if {$NCBIgeneID eq "" || $NCBIgeneID eq "NCBI gene ID"} {continue}
 			set ApprovedSymbol [lindex $Ls 0]
-			if {$ApprovedSymbol ne ""} {lappend L_TextToWrite "$ApprovedSymbol\t$NCBIgeneID"}
+			if {$ApprovedSymbol ne "" && ![info exist tmp($ApprovedSymbol)]} {set tmp($ApprovedSymbol) 1; lappend L_TextToWrite "$ApprovedSymbol\t$NCBIgeneID"}
             set AliasSymbol [lindex $Ls 1]
-            if {$AliasSymbol ne ""} {lappend L_TextToWrite "$AliasSymbol\t$NCBIgeneID"}
+            if {$AliasSymbol ne "" && ![info exist tmp($AliasSymbol)]} {set tmp($AliasSymbol) 1; lappend L_TextToWrite "$AliasSymbol\t$NCBIgeneID"}
             set PreviousSymbol [lindex $Ls 2]
-            if {$PreviousSymbol ne ""} {lappend L_TextToWrite "$PreviousSymbol\t$NCBIgeneID"}
+            if {$PreviousSymbol ne "" && ![info exist tmp($PreviousSymbol)]} {set tmp($PreviousSymbol) 1; lappend L_TextToWrite "$PreviousSymbol\t$NCBIgeneID"}
 		}
-		WriteTextInFile [join $L_TextToWrite "\n"] "$NCBIgeneDir/geneSymbol_NCBIgeneID.txt"
+		WriteTextInFile [join $L_TextToWrite "\n"] "$NCBIgeneDir/geneSymbol_NCBIgeneID.tsv"
 	}
    
     ## Check if the Exomiser data files exist

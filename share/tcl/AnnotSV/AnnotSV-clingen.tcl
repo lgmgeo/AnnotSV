@@ -36,58 +36,58 @@ proc checkClinGenFile {} {
     set ClinGenFileFormattedGzip [glob -nocomplain "$clingenDir/*_ClinGenAnnotations.tsv.gz"]
 
     if {$ClinGenFileDownloaded eq "" && $ClinGenFileFormattedGzip eq ""} {
-	# No ClinGene annotation
-	return
+		# No ClinGene annotation
+		return
     }
 
     if {[llength $ClinGenFileFormattedGzip]>1} {
-	puts "Several ClinGen files exist:"
-	puts "$ClinGenFileFormattedGzip"
-	puts "Keep only one: [lindex $ClinGenFileFormattedGzip end]\n"
-	foreach ClinGenF [lrange $ClinGenFileFormattedGzip 0 end-1] {
-	    file rename -force $ClinGenF $ClinGenF.notused
-	}
-	return
+		puts "Several ClinGen files exist:"
+		puts "$ClinGenFileFormattedGzip"
+		puts "Keep only one: [lindex $ClinGenFileFormattedGzip end]\n"
+		foreach ClinGenF [lrange $ClinGenFileFormattedGzip 0 end-1] {
+		    file rename -force $ClinGenF $ClinGenF.notused
+		}
+		return
     }
     if {$ClinGenFileFormattedGzip eq ""} {
-	## - Create the 'date'_ClinGenAnnotations.tsv file.
-	##   Header: genes, HI and TS
+		## - Create the 'date'_ClinGenAnnotations.tsv file.
+		##   Header: genes, HI and TS
 
-	set ClinGenFileFormatted "$clingenDir/[clock format [clock seconds] -format "%Y%m%d"]_ClinGenAnnotations.tsv"
-	puts "...creation of $ClinGenFileFormatted.gz ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])\n"
-	ReplaceTextInFile "genes\tHI\tTS" $ClinGenFileFormatted
+		set ClinGenFileFormatted "$clingenDir/[clock format [clock seconds] -format "%Y%m%d"]_ClinGenAnnotations.tsv"
+		puts "...creation of $ClinGenFileFormatted.gz ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])\n"
+		ReplaceTextInFile "genes\tHI\tTS" $ClinGenFileFormatted
 
-	# Parsing of $ClinGenFileDownloaded
-	foreach L [LinesFromFile $ClinGenFileDownloaded] {
-	    set Ls [split $L "\t"]
+		# Parsing of $ClinGenFileDownloaded
+		foreach L [LinesFromFile $ClinGenFileDownloaded] {
+			set Ls [split $L "\t"]
+	
+		    if {[regexp "^#Gene Symbol" $L]} {
+				set i_gene [lsearch -exact $Ls "#Gene Symbol"];             if {$i_gene == -1} {puts "Bad header line syntax. Gene Symbol column not found - Exit with error"; exit 2}
+				set i_HI   [lsearch -exact $Ls "Haploinsufficiency Score"]; if {$i_HI == -1} {puts "Bad header line syntax. Haploinsufficiency Score column not found - Exit with error"; exit 2}
+				set i_TS   [lsearch -exact $Ls "Triplosensitivity Score"];  if {$i_TS == -1} {puts "Bad header line syntax. Triplosensitivity Score column not found - Exit with error"; exit 2}
+				continue
+		    }
+		    if {[regexp "^#" $L]} {continue}
 
-	    if {[regexp "^#Gene Symbol" $L]} {
-		set i_gene [lsearch -exact $Ls "#Gene Symbol"];             if {$i_gene == -1} {puts "Bad header line syntax. Gene Symbol column not found - Exit with error"; exit 2}
-		set i_HI   [lsearch -exact $Ls "Haploinsufficiency Score"]; if {$i_HI == -1} {puts "Bad header line syntax. Haploinsufficiency Score column not found - Exit with error"; exit 2}
-		set i_TS   [lsearch -exact $Ls "Triplosensitivity Score"];  if {$i_TS == -1} {puts "Bad header line syntax. Triplosensitivity Score column not found - Exit with error"; exit 2}
-		continue
-	    }
-	    if {[regexp "^#" $L]} {continue}
+		    set gene [lindex $Ls $i_gene]
+		    set HI [lindex $Ls $i_HI]
+		    set TS [lindex $Ls $i_TS]
 
-	    set gene [lindex $Ls $i_gene]
-	    set HI [lindex $Ls $i_HI]
-	    set TS [lindex $Ls $i_TS]
+		    if {$HI eq "Not yet evaluated"} {set HI ""}
+		    if {$TS eq "Not yet evaluated"} {set TS ""}
 
-	    if {$HI eq "Not yet evaluated"} {set HI ""}
-	    if {$TS eq "Not yet evaluated"} {set TS ""}
+		    lappend L_Texte "$gene\t$HI\t$TS"
+		}
+	
+		# creation of $ClinGenFileFormatted.gz
+		WriteTextInFile "[join $L_Texte "\n"]" $ClinGenFileFormatted
+		if {[catch {exec gzip $ClinGenFileFormatted} Message]} {
+		    puts "-- checkClinGenFile --"
+		    puts "gzip $ClinGenFileFormatted"
+		    puts "$Message\n"
+		}
 
-	    lappend L_Texte "$gene\t$HI\t$TS"
-	}
-
-	# creation of $ClinGenFileFormatted.gz
-	WriteTextInFile "[join $L_Texte "\n"]" $ClinGenFileFormatted
-	if {[catch {exec gzip $ClinGenFileFormatted} Message]} {
-	    puts "-- checkClinGenFile --"
-	    puts "gzip $ClinGenFileFormatted"
-	    puts "$Message\n"
-	}
-
-	file delete -force $ClinGenFileDownloaded
+		file delete -force $ClinGenFileDownloaded
     }
 }
 

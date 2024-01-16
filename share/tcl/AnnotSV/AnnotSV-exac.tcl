@@ -43,53 +43,53 @@ proc checkGeneIntoleranceFile {} {
     set GeneIntoleranceFileFormattedGzip [glob -nocomplain "$extannDir/ExAC/*_GeneIntolerance-Zscore.annotations.tsv.gz"]
 
     if {$GeneIntoleranceFileDownloaded eq "" && $GeneIntoleranceFileFormattedGzip eq ""} {
-	# No "Gene Intolerance" annotation
-	return
+		# No "Gene Intolerance" annotation
+		return
     }
 
     if {[llength $GeneIntoleranceFileFormattedGzip]>1} {
-	puts "Several Gene Intolerance files exist:"
-	puts "$GeneIntoleranceFileFormattedGzip"
-	puts "Keep only one: [lindex $GeneIntoleranceFileFormattedGzip end]\n"
-	foreach gi [lrange $GeneIntoleranceFileFormattedGzip 0 end-1] {
-	    file rename -force $gi $gi.notused
-	}
-	return
+		puts "Several Gene Intolerance files exist:"
+		puts "$GeneIntoleranceFileFormattedGzip"
+		puts "Keep only one: [lindex $GeneIntoleranceFileFormattedGzip end]\n"
+		foreach gi [lrange $GeneIntoleranceFileFormattedGzip 0 end-1] {
+		    file rename -force $gi $gi.notused
+		}
+		return
     }
 
     if {$GeneIntoleranceFileFormattedGzip eq ""} {
-	## Create : 'date'_GeneIntolerance-Zscore.annotations.tsv.gz   ; # Header: chr start end syn_z mis_z 
-	set GeneIntoleranceFileFormatted "$extannDir/ExAC/[clock format [clock seconds] -format "%Y%m%d"]_GeneIntolerance-Zscore.annotations.tsv"
+		## Create : 'date'_GeneIntolerance-Zscore.annotations.tsv.gz   ; # Header: chr start end syn_z mis_z 
+		set GeneIntoleranceFileFormatted "$extannDir/ExAC/[clock format [clock seconds] -format "%Y%m%d"]_GeneIntolerance-Zscore.annotations.tsv"
 
-	puts "\t...GeneIntolerance configuration for Z scores annotation from ExAC ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+		puts "\t...GeneIntolerance configuration for Z scores annotation from ExAC ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+	
+		puts "\t\t...creation of $GeneIntoleranceFileFormatted.gz"
+		puts "\t\t   (done only once during the first GeneIntolerance annotation)"
 
-	puts "\t\t...creation of $GeneIntoleranceFileFormatted.gz"
-	puts "\t\t   (done only once during the first GeneIntolerance annotation)"
+		set TexteToWrite {genes\tsynZ_ExAC\tmisZ_ExAC}
+		foreach L [LinesFromFile $GeneIntoleranceFileDownloaded] {
+			if {[regexp  "^transcript" $L]} {
+				set i_gene    [lsearch -regexp $L "^gene"]; if {$i_gene == -1} {puts "Bad syntax into $GeneIntoleranceFileDownloaded.\ngene field not found - Exit with error"; exit 2}
+				set i_synZ    [lsearch -regexp $L "^syn_z"]; if {$i_synZ == -1} {puts "Bad syntax into $GeneIntoleranceFileDownloaded.\nsyn_z field not found - Exit with error"; exit 2}
+				set i_misZ    [lsearch -regexp $L "^mis_z"]; if {$i_misZ == -1} {puts "Bad syntax into $GeneIntoleranceFileDownloaded.\nmis_z field not found - Exit with error"; exit 2}
+				continue
+			}
+			set Ls [split $L "\t"]
 
-	set TexteToWrite {genes\tsynZ_ExAC\tmisZ_ExAC}
-	foreach L [LinesFromFile $GeneIntoleranceFileDownloaded] {
-	    if {[regexp  "^transcript" $L]} {
-		set i_gene    [lsearch -regexp $L "^gene"]; if {$i_gene == -1} {puts "Bad syntax into $GeneIntoleranceFileDownloaded.\ngene field not found - Exit with error"; exit 2}
-		set i_synZ    [lsearch -regexp $L "^syn_z"]; if {$i_synZ == -1} {puts "Bad syntax into $GeneIntoleranceFileDownloaded.\nsyn_z field not found - Exit with error"; exit 2}
-		set i_misZ    [lsearch -regexp $L "^mis_z"]; if {$i_misZ == -1} {puts "Bad syntax into $GeneIntoleranceFileDownloaded.\nmis_z field not found - Exit with error"; exit 2}
-		continue
-	    }
-	    set Ls [split $L "\t"]
+			set gene [lindex $Ls $i_gene]
+			set synZ [lindex $Ls $i_synZ]
+			set misZ [lindex $Ls $i_misZ]
 
-	    set gene [lindex $Ls $i_gene]
-	    set synZ [lindex $Ls $i_synZ]
-	    set misZ [lindex $Ls $i_misZ]
+			lappend TexteToWrite "$gene\t$synZ\t$misZ"
+		}
+		WriteTextInFile [join $TexteToWrite "\n"] $GeneIntoleranceFileFormatted
+		if {[catch {exec gzip $GeneIntoleranceFileFormatted} Message]} {
+			puts "-- checkGeneIntoleranceFile --"
+			puts "gzip $GeneIntoleranceFileFormatted"
+			puts "$Message\n"
+		}
 
-	    lappend TexteToWrite "$gene\t$synZ\t$misZ"
-	}
-	WriteTextInFile [join $TexteToWrite "\n"] $GeneIntoleranceFileFormatted
-	if {[catch {exec gzip $GeneIntoleranceFileFormatted} Message]} {
-	    puts "-- checkGeneIntoleranceFile --"
-	    puts "gzip $GeneIntoleranceFileFormatted"
-	    puts "$Message\n"
-	}
-
-	file delete -force $GeneIntoleranceFileDownloaded
+		file delete -force $GeneIntoleranceFileDownloaded
     }
 }
 
@@ -136,73 +136,74 @@ proc checkCNVintoleranceFile {} {
     set CNVintoleranceFileFormattedGzip [glob -nocomplain "$extannDir/ExAC/*_ExAC.CNV-Zscore.annotations.tsv.gz"]
 
     if {$CNVintoleranceFileDownloaded eq "" && $CNVintoleranceFileFormattedGzip eq ""} {
-	# No "CNV Intolerance" annotation
-	return
+		# No "CNV Intolerance" annotation
+		return
     }
 
     if {[llength $CNVintoleranceFileFormattedGzip]>1} {
-	puts "Several CNV-Intolerant-Genes files exist:"
-	puts "$CNVintoleranceFileFormattedGzip"
-	puts "Keep only one: [lindex $CNVintoleranceFileFormattedGzip end]\n"
-	foreach ci [lrange $CNVintoleranceFileFormattedGzip 0 end-1] {
-	    file rename -force $ci $ci.notused
-	}
-	return
+		puts "Several CNV-Intolerant-Genes files exist:"
+		puts "$CNVintoleranceFileFormattedGzip"
+		puts "Keep only one: [lindex $CNVintoleranceFileFormattedGzip end]\n"
+		foreach ci [lrange $CNVintoleranceFileFormattedGzip 0 end-1] {
+		    file rename -force $ci $ci.notused
+		}
+		return
     }
 
     if {$CNVintoleranceFileFormattedGzip eq ""} {
-	## Create : 'date'_ExAC.CNV-Zscore.annotations.tsv.gz ; # Header: genes   delZ_ExAC       dupZ_ExAC       cnvZ_ExAC
+		## Create : 'date'_ExAC.CNV-Zscore.annotations.tsv.gz ; # Header: genes   delZ_ExAC       dupZ_ExAC       cnvZ_ExAC
 
-	set CNVintoleranceFileFormatted "$extannDir/ExAC/[clock format [clock seconds] -format "%Y%m%d"]_ExAC.CNV-Zscore.annotations.tsv"
+		set CNVintoleranceFileFormatted "$extannDir/ExAC/[clock format [clock seconds] -format "%Y%m%d"]_ExAC.CNV-Zscore.annotations.tsv"
 
-	puts "\t...ExAC CNV Intolerant Genes configuration ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+		puts "\t...ExAC CNV Intolerant Genes configuration ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+	
+		puts "\t\t...creation of $CNVintoleranceFileFormatted.gz"
+		puts "\t\t   (done only once during the first CNV Intolerant Genes  annotation)"
 
-	puts "\t\t...creation of $CNVintoleranceFileFormatted.gz"
-	puts "\t\t   (done only once during the first CNV Intolerant Genes  annotation)"
+		set TexteToWrite {genes\tdelZ_ExAC\tdupZ_ExAC\tcnvZ_ExAC}
+		foreach L [LinesFromFile $CNVintoleranceFileDownloaded] {
 
-	set TexteToWrite {genes\tdelZ_ExAC\tdupZ_ExAC\tcnvZ_ExAC}
-	foreach L [LinesFromFile $CNVintoleranceFileDownloaded] {
+			set Ls [split $L " "]
 
-	    set Ls [split $L " "]
+			if {[regexp  "^gene" $Ls]} {
+				set i_gene    [lsearch -regexp $Ls "^gene_symbol"]; if {$i_gene == -1} {puts "Bad syntax into $CNVintoleranceFileDownloaded.\ngene_symbol field not found - Exit with error"; exit 2}
+				set i_cnvZ    [lsearch -regexp $Ls "^cnv.score"];   if {$i_cnvZ == -1} {puts "Bad syntax into $CNVintoleranceFileDownloaded.\ncnv.score field not found - Exit with error"; exit 2}
+				set i_delZ    [lsearch -regexp $Ls "^del.score"];   if {$i_delZ == -1} {puts "Bad syntax into $CNVintoleranceFileDownloaded.\ndel.score field not found - Exit with error"; exit 2}
+				set i_dupZ    [lsearch -regexp $Ls "^dup.score"];   if {$i_dupZ == -1} {puts "Bad syntax into $CNVintoleranceFileDownloaded.\ndup.score field not found - Exit with error"; exit 2}
+				continue
+			}
 
-	    if {[regexp  "^gene" $Ls]} {
-		set i_gene    [lsearch -regexp $Ls "^gene_symbol"]; if {$i_gene == -1} {puts "Bad syntax into $CNVintoleranceFileDownloaded.\ngene_symbol field not found - Exit with error"; exit 2}
-		set i_cnvZ    [lsearch -regexp $Ls "^cnv.score"];   if {$i_cnvZ == -1} {puts "Bad syntax into $CNVintoleranceFileDownloaded.\ncnv.score field not found - Exit with error"; exit 2}
-		set i_delZ    [lsearch -regexp $Ls "^del.score"];   if {$i_delZ == -1} {puts "Bad syntax into $CNVintoleranceFileDownloaded.\ndel.score field not found - Exit with error"; exit 2}
-		set i_dupZ    [lsearch -regexp $Ls "^dup.score"];   if {$i_dupZ == -1} {puts "Bad syntax into $CNVintoleranceFileDownloaded.\ndup.score field not found - Exit with error"; exit 2}
-		continue
-	    }
+			set gene [lindex $Ls $i_gene]
+			set delZ [lindex $Ls $i_delZ]
+			set dupZ [lindex $Ls $i_dupZ]
+			set cnvZ [lindex $Ls $i_cnvZ]
 
-	    set gene [lindex $Ls $i_gene]
-	    set delZ [lindex $Ls $i_delZ]
-	    set dupZ [lindex $Ls $i_dupZ]
-	    set cnvZ [lindex $Ls $i_cnvZ]
+			if {![info exists del($gene)]} {
+				set del($gene) $delZ
+				set dup($gene) $dupZ
+				set cnv($gene) $cnvZ
+		    } else {
+				## The file has several entries for 63 genes (several "Gencode ID" for 1 "Gene symbo")
+				## We keep the highest value
+				if {$delZ > $del($gene)} {set del($gene) $delZ}
+				if {$dupZ > $dup($gene)} {set dup($gene) $dupZ}
+				if {$cnvZ > $cnv($gene)} {set cnv($gene) $cnvZ}
+			}
 
-	    if {![info exists del($gene)]} {
-		set del($gene) $delZ
-		set dup($gene) $dupZ
-		set cnv($gene) $cnvZ
-	    } else {
-		## The file has several entries for 63 genes (several "Gencode ID" for 1 "Gene symbo")
-		## We keep the highest value
-		if {$delZ > $del($gene)} {set del($gene) $delZ}
-		if {$dupZ > $dup($gene)} {set dup($gene) $dupZ}
-		if {$cnvZ > $cnv($gene)} {set cnv($gene) $cnvZ}
-	    }
+		}
 
-	}
+		foreach gene [array names del] {
+			lappend TexteToWrite "$gene\t$del($gene)\t$dup($gene)\t$cnv($gene)"
+		}
+		WriteTextInFile [join $TexteToWrite "\n"] $CNVintoleranceFileFormatted
 
-	foreach gene [array names del] {
-	    lappend TexteToWrite "$gene\t$del($gene)\t$dup($gene)\t$cnv($gene)"
-	}
-	WriteTextInFile [join $TexteToWrite "\n"] $CNVintoleranceFileFormatted
+		if {[catch {exec gzip $CNVintoleranceFileFormatted} Message]} {
+			puts "-- checkCNVintoleranceFile --"
+			puts "gzip $CNVintoleranceFileFormatted"
+			puts "$Message\n"
+		}
 
-	if {[catch {exec gzip $CNVintoleranceFileFormatted} Message]} {
-	    puts "-- checkCNVintoleranceFile --"
-	    puts "gzip $CNVintoleranceFileFormatted"
-	    puts "$Message\n"
-	}
-
-	file delete -force $CNVintoleranceFileDownloaded
+		file delete -force $CNVintoleranceFileDownloaded
     }
 }
+

@@ -10,6 +10,9 @@
 
 For more details, please see the README file.
 
+January,  , 2024, AnnotSV version 3.4
+	- Add "NCBI_gene_ID" annotation
+	- Update of the "contact" recommendations in output (from email to GitHub)
 
 January, 15, 2024, AnnotSV version 3.3.9
 	- Fix a bug when setting the "hpoVersion" variable (issue 207)

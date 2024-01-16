@@ -24,8 +24,11 @@
 
 proc ExternalAnnotations args {
 
-    # To add external annotation to a gene in particular
-    # All .../Annotations_$g_AnnotSV(organism)/*/*.tsv(.gz) files are used, as well as files given with the -externalGeneFiles option (defined in AnnotSV-main.tcl)
+    # To add external annotation to a gene in particular.
+	# Files used (defined in AnnotSV-main.tcl):
+    # - $g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Annotations_$g_AnnotSV(organism)/Gene-based/*/*.tsv(.gz)
+	# - $g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Users/*.tsv(.gz)
+	# - all files given with the -externalGeneFiles option
     #
     # Format is tab separated values, 1st line is a header, 1st "genes" column is the gene name, rest is free
     # Typical use would be a gene file containing specific annotations such as tranmission mode, disease, expression...
@@ -46,19 +49,19 @@ proc ExternalAnnotations args {
     if {[info exists g_ExtAnnotation($What)]} {return [set g_ExtAnnotation($What)]}
 
     if {[info exists g_AnnotSV(extann)] && $g_AnnotSV(extann) ne ""} {
-	set L_Files_Anno {}
-	foreach f [set g_AnnotSV(extann)] {
-	    if {[lsearch -exact $L_Files_Anno "$f"] eq -1} {
-		lappend L_Files_Anno $f
-	    }
-	}
+		set L_Files_Anno {}
+		foreach f [set g_AnnotSV(extann)] {
+		    if {[lsearch -exact $L_Files_Anno "$f"] eq -1} {
+				lappend L_Files_Anno $f
+		    }
+		}
     } else {return ""}
     
-    if {[file exists [lindex $args 0]]} {
-	set What [join $args ","]
-	set L_Files_Anno [lindex $args 0]
+	if {[file exists [lindex $args 0]]} {
+		set What [join $args ","]
+		set L_Files_Anno [lindex $args 0]
     } else {
-	set What [join [concat [list $L_Files_Anno] $args] ","]
+		set What [join [concat [list $L_Files_Anno] $args] ","]
     }
     
     #puts "--args $args"
@@ -67,68 +70,69 @@ proc ExternalAnnotations args {
 
     if {[info exists g_ExtAnnotation($What)]} {return [set g_ExtAnnotation($What)]}
     foreach File_Anno [lsort $L_Files_Anno] {
-	if {![info exists g_ExtAnnotation($File_Anno,Loaded)]} {
+		if {![info exists g_ExtAnnotation($File_Anno,Loaded)]} {
 	    
-	    if {![info exists g_ExtAnnotation(L_Files)]} {
-		set g_ExtAnnotation(L_Files) {}
-	    }
-	    lappend g_ExtAnnotation(L_Files) $File_Anno
+			if {![info exists g_ExtAnnotation(L_Files)]} {
+				set g_ExtAnnotation(L_Files) {}
+			}
+			lappend g_ExtAnnotation(L_Files) $File_Anno
 
-	    set First 1
+			set First 1
 	    
-	    set NbHeaderColumns 0
+			set NbHeaderColumns 0
+			
+			set g_ExtAnnotation($File_Anno,Loaded) 1
 	    
-	    set g_ExtAnnotation($File_Anno,Loaded) 1
+			lappend g_ExtAnnotation(display) "\t\t...[file tail $File_Anno]"
 	    
-	    lappend g_ExtAnnotation(display) "\t\t...[file tail $File_Anno]"
-	    
-	    if {![info exists g_ExtAnnotation($File_Anno,L_ID)]} {
-		set g_ExtAnnotation($File_Anno,L_ID) {}
-	    }
-	    if {[regexp ".gz$" $File_Anno]} {
-		set lLines [LinesFromGZFile $File_Anno]
-	    } else {
-		set lLines [LinesFromFile $File_Anno]
-	    }
-	    foreach L $lLines {
-		## Bug during WritingByGene if "{ or }" are presents.
-		## To be done here, inside each element of the list (not on "$lLines").
-		regsub -all "{" $L "(" L
-		regsub -all "}" $L ")" L
+			if {![info exists g_ExtAnnotation($File_Anno,L_ID)]} {
+				set g_ExtAnnotation($File_Anno,L_ID) {}
+			}
+			if {[regexp ".gz$" $File_Anno]} {
+				set lLines [LinesFromGZFile $File_Anno]
+			} else {
+				set lLines [LinesFromFile $File_Anno]
+			}
+			foreach L $lLines {
+				## Bug during WritingByGene if "{ or }" are presents.
+				## To be done here, inside each element of the list (not on "$lLines").
+				regsub -all "{" $L "(" L
+				regsub -all "}" $L ")" L
 		
-		if {! [regexp -nocase {[a-z0-9]+} $L] || [regexp -nocase {^[\#]} $L]} {continue}
+				if {! [regexp -nocase {[a-z0-9]+} $L] || [regexp -nocase {^[\#]} $L]} {continue}
 		
-		if {$First} {
-		    set First 0
-		    if {![regexp -nocase "gene" [lindex [split $L "\t"] 0]]} {
-			puts "\t\tReading $File_Anno:\n\tWARNING: Header is present ($L) but does not contain a \"gene\" named column."
-			set g_ExtAnnotation($File_Anno,Header) ""
-		    } else {
-			set g_ExtAnnotation($File_Anno,Header) $L
-			set NbHeaderColumns [llength [split $L "\t"]]
-		    }
-		    continue
+				if {$First} {
+					set First 0
+					if {![regexp -nocase "gene" [lindex [split $L "\t"] 0]]} {
+						puts "\t\tReading $File_Anno:\n\tWARNING: Header is present ($L) but does not contain a \"gene\" named column."
+						set g_ExtAnnotation($File_Anno,Header) ""
+				    } else {
+						set g_ExtAnnotation($File_Anno,Header) $L
+						set NbHeaderColumns [llength [split $L "\t"]]
+					}
+					continue
+				} 
+		
+				set Ls [split $L "\t"]
+				set ID [string trim [lindex $Ls 0]]
+		
+				if {[llength $Ls] ne $NbHeaderColumns} {puts "WARNING: $ID, format (nb columns) is not good [llength $L] vs $NbHeaderColumns columns"}
+			
+				if {![info exists g_ExtAnnotation($File_Anno,$ID)]} {
+					lappend g_ExtAnnotation($File_Anno,L_ID) $ID
+				} else {
+					puts "WARNING: Reading Annotation file [file tail $File_Anno] and $ID is seen multiple times."
+				}
+		
+				set g_ExtAnnotation($File_Anno,$ID) [join [lrange $Ls 1 end] "\t"]
+		
+			}
+	    
+			lappend g_ExtAnnotation(display) "\t\t([llength [set g_ExtAnnotation($File_Anno,L_ID)]] gene identifiers and [expr {[llength [split [set g_ExtAnnotation($File_Anno,Header)] "\t"]]-1}] annotations columns: [join [lrange [split [set g_ExtAnnotation($File_Anno,Header)] "\t"] 1 end] ", "])"
+	    
+			if {[info exists g_ExtAnnotation($What)]} {return [set g_ExtAnnotation($What)]}
 		} 
-		
-		set Ls [split $L "\t"]
-		set ID [string trim [lindex $Ls 0]]
-		
-		if {[llength $Ls] ne $NbHeaderColumns} {puts "WARNING: $ID, format (nb columns) is not good [llength $L] vs $NbHeaderColumns columns"}
-		
-		if {![info exists g_ExtAnnotation($File_Anno,$ID)]} {
-		    lappend g_ExtAnnotation($File_Anno,L_ID) $ID
-		} else {
-		    puts "WARNING: Reading Annotation file [file tail $File_Anno] and $ID is seen multiple times."
-		}
-		
-		set g_ExtAnnotation($File_Anno,$ID) [join [lrange $Ls 1 end] "\t"]
-		
-	    }
-	    
-	    lappend g_ExtAnnotation(display) "\t\t([llength [set g_ExtAnnotation($File_Anno,L_ID)]] gene identifiers and [expr {[llength [split [set g_ExtAnnotation($File_Anno,Header)] "\t"]]-1}] annotations columns: [join [lrange [split [set g_ExtAnnotation($File_Anno,Header)] "\t"] 1 end] ", "])"
-	    
-	    if {[info exists g_ExtAnnotation($What)]} {return [set g_ExtAnnotation($What)]}
-	} 
     }
     return ""
 }
+

@@ -26,27 +26,27 @@ proc isCandidate {gene} {
     global g_candidate
     
     if {![info exists g_candidate(DONE)]} {
-	set g_candidate(DONE) 1 
+		set g_candidate(DONE) 1 
 	
-        # List of the candidate genes (given by the user)
-	set L_Candidates ""
-        if {$g_AnnotSV(candidateGenesFile) ne ""} {
-	    set f [open $g_AnnotSV(candidateGenesFile)]
-	    while {![eof $f]} {
-	        set L [gets $f]
-	        lappend L_Candidates {*}[split $L " |\n|\t"]
-    	    }
-	    close $f
-        }
-	foreach g $L_Candidates {
-	    set g_candidate($g) 1
-	}
+		# List of the candidate genes (given by the user)
+		set L_Candidates ""
+		if {$g_AnnotSV(candidateGenesFile) ne ""} {
+		    set f [open $g_AnnotSV(candidateGenesFile)]
+		    while {![eof $f]} {
+		        set L [gets $f]
+		        lappend L_Candidates {*}[split $L " |\n|\t"]
+			}
+		    close $f
+		}
+		foreach g $L_Candidates {
+		    set g_candidate($g) 1
+		}
     }
     
     if {[info exists g_candidate($gene)]} {
-	return 1
+		return 1
     } else {
-	return 0
+		return 0
     } 
 }
 
