@@ -216,6 +216,7 @@ checkPromoterFile
 checkEAfiles
 checkGHfiles
 checkMiRTargetLinkFiles
+checkABCfiles
 # Annotation with TAD?
 checkTADfiles
 # Annotation with COSMIC?
