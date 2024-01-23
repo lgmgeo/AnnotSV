@@ -11,6 +11,7 @@
 For more details, please see the README file.
 
 January,  , 2024, AnnotSV version 3.4
+	- Add benign SV annotation from "gnomad v4" (GRCh38) (issue 201)
 	- Fix misleading OMIM annotation (issues 156, 132)
 	- Add "NCBI_gene_ID" annotation
 	- Update of the "contact" recommendations in output (from email to GitHub)
