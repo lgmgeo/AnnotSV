@@ -351,7 +351,10 @@ proc OrganizeAnnotation {} {
     puts "\t...Regulatory elements annotations"
     if {$g_AnnotSV(promAnn)} {puts "\t\t...Promoter annotations"}
     if {$g_AnnotSV(EAann)} {puts "\t\t...EnhancerAtlas annotations"}
-    if {$g_AnnotSV(GHAnn)} {puts "\t\t...GeneHancer annotations"}
+    if {$g_AnnotSV(GHann)} {puts "\t\t...GeneHancer annotations"}
+    if {$g_AnnotSV(miRNAann)} {puts "\t\t...MiRTargetLink annotations"}
+    if {$g_AnnotSV(ABCann)} {puts "\t\t...ABC annotations"}
+    if {$g_AnnotSV(MPRAann)} {puts "\t\t...MPRA annotations"}
     
     #######  Annotations with pathogenic genes or genomic regions (FtIncludedInSV)
     if {$g_AnnotSV(organism) eq "Human"} {

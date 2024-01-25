@@ -217,6 +217,7 @@ checkEAfiles
 checkGHfiles
 checkMiRTargetLinkFiles
 checkABCfiles
+checkMPRAfiles
 # Annotation with TAD?
 checkTADfiles
 # Annotation with COSMIC?

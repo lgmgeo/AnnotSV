@@ -321,14 +321,14 @@ proc checkGHfiles {} {
 
     ## Check if GH files has been formatted
     #######################################
-    set g_AnnotSV(GHAnn) 0
+    set g_AnnotSV(GHann) 0
     set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)"
     set regElementsDir "$extannDir/FtIncludedInSV/RegulatoryElements"
     set GHRefSeqFileFormatted  "$regElementsDir/$g_AnnotSV(genomeBuild)/GH_RefSeq_$g_AnnotSV(genomeBuild).sorted.bed"
     set GHENSEMBLfileFormatted "$regElementsDir/$g_AnnotSV(genomeBuild)/GH_ENSEMBL_$g_AnnotSV(genomeBuild).sorted.bed"
 
     if {[file exists $GHRefSeqFileFormatted] && [file exists $GHENSEMBLfileFormatted]} {
-		set g_AnnotSV(GHAnn) 1
+		set g_AnnotSV(GHann) 1
 		return
     }
 
@@ -493,7 +493,7 @@ proc checkGHfiles {} {
 		    file delete -force $GHfile
 		}
     } 
-    set g_AnnotSV(GHAnn) 1
+    set g_AnnotSV(GHann) 1
 }
 
 
@@ -853,6 +853,209 @@ proc checkABCfiles {} {
 
 
 
+##  MPRA
+#################
+## - Check if "MPRA_promoters.tsv" and "MPRA_enhancers.tsv" have been copy/paste
+##   (https://kircherlab.bihealth.org/satMutMPRA)
+##
+## - Check and create if necessary:
+##   - MPRA_RefSeq_GRCh37.sorted.bed
+##   - MPRA_ENSEMBL_GRCh37.sorted.bed
+##   - MPRA_RefSeq_GRCh38.sorted.bed
+##   - MPRA_ENSEMBL_GRCh38.sorted.bed
+proc checkMPRAfiles {} {
+
+    global g_AnnotSV
+
+
+    ## Check if MPRA files have been formatted
+    ########################################
+    set g_AnnotSV(MPRAann) 0
+    set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)"
+    set regElementsDir "$extannDir/FtIncludedInSV/RegulatoryElements"
+    set necessaryMPRAfile "$regElementsDir/$g_AnnotSV(genomeBuild)/MPRA_${g_AnnotSV(tx)}_$g_AnnotSV(genomeBuild).sorted.bed"
+    if {[file exists $necessaryMPRAfile]} {set g_AnnotSV(MPRAann) 1; return}
+
+    set MPRARefSeqFileFormattedGRCh37 "$regElementsDir/GRCh37/MPRA_RefSeq_GRCh37.sorted.bed" 
+    set MPRAENSEMBLfileFormattedGRCh37 "$regElementsDir/GRCh37/MPRA_ENSEMBL_GRCh37.sorted.bed"
+    set MPRARefSeqFileFormattedGRCh38 "$regElementsDir/GRCh38/MPRA_RefSeq_GRCh38.sorted.bed"
+    set MPRAENSEMBLfileFormattedGRCh38 "$regElementsDir/GRCh38/MPRA_ENSEMBL_GRCh38.sorted.bed"
+    if {[file exists $MPRARefSeqFileFormattedGRCh37] && [file exists $MPRAENSEMBLfileFormattedGRCh37] && [file exists $MPRARefSeqFileFormattedGRCh38] && [file exists $MPRAENSEMBLfileFormattedGRCh38]} {
+        return
+    }
+
+    ###############################################
+    ## No formatted MPRA file available at this step
+    ###############################################
+
+    ## Check if the MPRA files have been downloaded
+    ###############################################
+    set DownloadedMPRAfile_promoters "$regElementsDir/MPRA_promoters.tsv" ;# Distributed with GRCh37/GRCh38 coordinates in the same file
+    set DownloadedMPRAfile_enhancers "$regElementsDir/MPRA_enhancers.tsv" ;# Distributed with GRCh37/GRCh38 coordinates in the same file
+    if {![file exists $DownloadedMPRAfile_promoters] || ![file exists $DownloadedMPRAfile_enhancers]} {
+        return
+    }
+
+    ## Downloaded MPRA file is available
+    ###################################
+    ## MPRA_enhancers.tsv format:
+	#  Name    Genomic coordinates (GRCh37)    Genomic coordinates (GRCh38)    Transcript      Associated Phenotype    Luciferase vector       MPRA vector     Cell line	...
+	## MPRA_enhancers.tsv format:
+	#  Name    Genomic coordinates (GRCh37)    Genomic coordinates (GRCh38)    Associated Phenotype    Luciferase vector       MPRA vector     Cell line       Transf. time (hr)		...
+
+    puts "\t...MPRA configuration ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+
+    ## Creation of MPRA_*_*.sorted.bed
+    ##########################################
+    # Header: chr MPRAstart MPRAend MPRAtype MPRAgenes
+
+    puts "\t\t...creation of [file tail $MPRARefSeqFileFormattedGRCh37], [file tail $MPRAENSEMBLfileFormattedGRCh37], [file tail $MPRARefSeqFileFormattedGRCh38] and [file tail $MPRAENSEMBLfileFormattedGRCh38]"
+    puts "\t\t   (done only once)"
+
+    file delete -force $MPRARefSeqFileFormattedGRCh37
+    file delete -force $MPRAENSEMBLfileFormattedGRCh37
+    file delete -force $MPRARefSeqFileFormattedGRCh38
+    file delete -force $MPRAENSEMBLfileFormattedGRCh38
+
+    # Writings:
+    file delete -force $MPRARefSeqFileFormattedGRCh37.tmp
+    file delete -force $MPRAENSEMBLfileFormattedGRCh37.tmp
+    file delete -force $MPRARefSeqFileFormattedGRCh38.tmp
+    file delete -force $MPRAENSEMBLfileFormattedGRCh38.tmp
+
+	set L_toParse [LinesFromFile $DownloadedMPRAfile_promoters]
+	lappend L_toParse {*}[LinesFromFile $DownloadedMPRAfile_enhancers]
+
+	foreach L $L_toParse {
+        set Ls [split $L "\t"]
+        if {[regexp "^Name\t" $L]} {
+            set i_coord37 [lsearch -exact $Ls "Genomic coordinates (GRCh37)"] ; #e.g. "chrX:138,612,622-138,612,924"
+            set i_coord38 [lsearch -exact $Ls "Genomic coordinates (GRCh38)"]
+			if {[regexp "Transcript" $L]} {
+				set MPRAtype "MPRA_promoter"
+			} else {
+				set MPRAtype "MPRA_enhancer"
+			}
+            continue
+        }
+        regsub -all "," [lindex $Ls $i_coord37] "" coord37
+        regsub -all "," [lindex $Ls $i_coord38] "" coord38
+		if {![regexp "chr(\[0-9XYMT\]+):(\[0-9\]+)-(\[0-9\]+)" $coord37 match chrom37 start37 end37]} {
+			puts "Bad format in $DownloadedMPRAfile_promoters"
+			puts "$L"
+			puts "Check this format."
+		}
+        if {![regexp "chr(\[0-9XYMT\]+):(\[0-9\]+)-(\[0-9\]+)" $coord38 match chrom38 start38 end38]} {
+            puts "Bad format in $DownloadedMPRAfile_promoters"
+            puts "$L"
+            puts "Check this format."
+        }
+		set gene [lindex $Ls 0]
+		regsub " \\(.+|\\+.+" $gene "" gene
+
+        set type($chrom37\t$start37\t$end37) "$MPRAtype"
+        set type($chrom38\t$start38\t$end38) "$MPRAtype"
+        # RefSeq
+        if {[isARefSeqGeneName $gene]} {
+            lappend L_coordRefSeq37($chrom37) "$chrom37\t$start37\t$end37"
+            lappend L_genesRefSeq37($chrom37\t$start37\t$end37) "$gene"
+            lappend L_coordRefSeq38($chrom38) "$chrom38\t$start38\t$end38"
+            lappend L_genesRefSeq38($chrom38\t$start38\t$end38) "$gene"
+        }
+        # ENSEMBL
+        if {[isAnENSEMBLgeneName $gene]} {
+            lappend L_coordENSEMBL37($chrom37) "$chrom37\t$start37\t$end37"
+            lappend L_genesENSEMBL37($chrom37\t$start37\t$end37) "$gene"
+            lappend L_coordENSEMBL38($chrom38) "$chrom38\t$start38\t$end38"
+            lappend L_genesENSEMBL38($chrom38\t$start38\t$end38) "$gene"
+        }
+    }
+    foreach chrom {1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y M MT} {
+		foreach build {"37" "38"} {
+	        # RefSeq
+	        if {[info exists L_coordRefSeq[set build]($chrom)]} {
+	            set L_coordRefSeq[set build]($chrom) [lsort -command AscendingSortOnElement1 [lsort -command AscendingSortOnElement2 [lsort -unique [set L_coordRefSeq[set build]($chrom)]]]]
+	            set L_linesToWrite[set build] {}
+	            foreach coord [set L_coordRefSeq[set build]($chrom)] {
+	                set L_genesRefSeq[set build]($coord) [lsort -unique [set L_genesRefSeq[set build]($coord)]]
+	                lappend L_linesToWrite[set build] "$coord\t$type($coord)\t[join [set L_genesRefSeq[set build]($coord)] ";"]"
+	            }
+	            WriteTextInFile "[join [set L_linesToWrite[set build]] "\n"]" [set MPRARefSeqFileFormattedGRCh[set build]].tmp
+	        }
+	        # ENSEMBL
+	        if {[info exists L_coordENSEMBL[set build]($chrom)]} {
+	            set L_coordENSEMBL[set build]($chrom) [lsort -command AscendingSortOnElement1 [lsort -command AscendingSortOnElement2 [lsort -unique [set L_coordENSEMBL[set build]($chrom)]]]]
+	            set L_linesToWrite[set build] {}
+	            foreach coord [set L_coordENSEMBL[set build]($chrom)] {
+	                set L_genesENSEMBL[set build]($coord) [lsort -unique [set L_genesENSEMBL[set build]($coord)]]
+	                lappend L_linesToWrite[set build] "$coord\t$type($coord)\t[join [set L_genesENSEMBL[set build]($coord)] ";"]"
+	            }
+	            WriteTextInFile "[join [set L_linesToWrite[set build]] "\n"]" [set MPRAENSEMBLfileFormattedGRCh[set build]].tmp
+	        }
+		}
+	}
+
+
+	foreach build {"37" "38"} {
+		# Sorting of the bedfile:
+    	# Intersection with very large files can cause trouble with excessive memory usage.
+    	# A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm.
+    	# RefSeq
+    	set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.tmp.bash"
+    	ReplaceTextInFile "#!/bin/bash" $sortTmpFile
+    	WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $sortTmpFile
+    	WriteTextInFile "export LC_ALL=C" $sortTmpFile
+    	WriteTextInFile "sort -k1,1 -k2,2n [set MPRARefSeqFileFormattedGRCh[set build]].tmp >> [set MPRARefSeqFileFormattedGRCh[set build]]" $sortTmpFile
+    	file attributes $sortTmpFile -permissions 0755
+    	if {[catch {eval exec bash $sortTmpFile} Message]} {
+    	    puts "-- checkMPRAfiles --"
+    	    puts "sort -k1,1 -k2,2n [set MPRARefSeqFileFormattedGRCh[set build]].tmp >> [set MPRARefSeqFileFormattedGRCh[set build]]"
+    	    puts "$Message"
+    	    puts "Exit with error"
+    	    exit 2
+    	}
+    	file delete -force $sortTmpFile
+    	file delete -force [set MPRARefSeqFileFormattedGRCh[set build]].tmp
+    	# ENSEMBL
+    	set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.tmp.bash"
+    	ReplaceTextInFile "#!/bin/bash" $sortTmpFile
+    	WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $sortTmpFile
+    	WriteTextInFile "export LC_ALL=C" $sortTmpFile
+    	WriteTextInFile "sort -k1,1 -k2,2n [set MPRAENSEMBLfileFormattedGRCh[set build]].tmp >> [set MPRAENSEMBLfileFormattedGRCh[set build]]" $sortTmpFile
+    	file attributes $sortTmpFile -permissions 0755
+    	if {[catch {eval exec bash $sortTmpFile} Message]} {
+    	    puts "-- checkMPRAfiles --"
+    	    puts "sort -k1,1 -k2,2n [set MPRAENSEMBLfileFormattedGRCh[set build]].tmp >> [set MPRAENSEMBLfileFormattedGRCh[set build]]"
+    	    puts "$Message"
+    	    puts "Exit with error"
+    	    exit 2
+    	}
+    	file delete -force $sortTmpFile
+    	file delete -force [set MPRAENSEMBLfileFormattedGRCh[set build]].tmp
+	}
+
+
+    # Delete the downloaded files
+    if {[file exists $MPRARefSeqFileFormattedGRCh37] && [file exists $MPRAENSEMBLfileFormattedGRCh37] && [file exists $MPRARefSeqFileFormattedGRCh38] && [file exists $MPRAENSEMBLfileFormattedGRCh38]} {
+        file delete -force $DownloadedMPRAfile_promoters
+        file delete -force $DownloadedMPRAfile_enhancers
+    }
+
+    set necessaryMPRAfile "$regElementsDir/$g_AnnotSV(genomeBuild)/MPRA_${g_AnnotSV(tx)}_$g_AnnotSV(genomeBuild).sorted.bed"
+    if {[file exists $necessaryMPRAfile]} {set g_AnnotSV(MPRAann) 1}
+}
+
+
+
+
+
+##################################################################################################################
+##################################################################################################################
+##################################################################################################################
+
+
+
+
 ## Annotate the SV bedFile with the regulatory elements files
 ## Creation of the g_re global variable
 proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
@@ -877,15 +1080,17 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
     lappend L_REfiles "$regElementsDir/GH_${g_AnnotSV(tx)}_$g_AnnotSV(genomeBuild).sorted.bed"     ;#GeneHancer
     lappend L_REfiles "$regElementsDir/promoter_${g_AnnotSV(promoterSize)}bp_${g_AnnotSV(tx)}_$g_AnnotSV(genomeBuild).sorted.bed" ;# promoter
     lappend L_REfiles "$regElementsDir/miRTargetLink_${g_AnnotSV(tx)}_$g_AnnotSV(genomeBuild).sorted.bed"     ;#miRTargetLink
+	lappend L_REfiles "$regElementsDir/ABC_${g_AnnotSV(tx)}_$g_AnnotSV(genomeBuild).sorted.bed"; #Activity-by-Contact (ABC) Model data 
+    lappend L_REfiles "$regElementsDir/MPRA_${g_AnnotSV(tx)}_$g_AnnotSV(genomeBuild).sorted.bed"; #Massive parallel reporter assays (MPRA) data (Kircher lab)
     foreach reFile $L_REfiles {
 		if {![file exists $reFile]} {continue}
 		if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(bedFile) -b $reFile -wa -wb >> $SV_RE_intersectBEDfile} Message]} {
 		    if {[catch {exec $g_AnnotSV(bedtools) intersect -a $g_AnnotSV(bedFile) -b $reFile -wa -wb >> $SV_RE_intersectBEDfile} Message]} {
-			puts "-- regulatoryElementsAnnotation --"
-			puts "$g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(bedFile) -b $reFile -wa -wb >> $SV_RE_intersectBEDfile"
-			puts "$Message"
-			puts "Exit with error"
-			exit 2
+				puts "-- regulatoryElementsAnnotation --"
+				puts "$g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(bedFile) -b $reFile -wa -wb >> $SV_RE_intersectBEDfile"
+				puts "$Message"
+				puts "Exit with error"
+				exit 2
 		    }
 		}
     }
