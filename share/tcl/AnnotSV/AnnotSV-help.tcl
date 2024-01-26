@@ -22,16 +22,15 @@
 ############################################################################################################
 
 proc showHelp {} {
-
+    
     global g_AnnotSV
     
     if {[file exists $g_AnnotSV(installDir)/commandLineOptions.txt]} {
-	puts [ContentFromFile $g_AnnotSV(installDir)/commandLineOptions.txt]
+        puts [ContentFromFile $g_AnnotSV(installDir)/commandLineOptions.txt]
     } elseif {[file exists $g_AnnotSV(docDir)/commandLineOptions.txt]} {
-	puts [ContentFromFile $g_AnnotSV(docDir)/commandLineOptions.txt]
+        puts [ContentFromFile $g_AnnotSV(docDir)/commandLineOptions.txt]
     }
     
     return
 }
-
 

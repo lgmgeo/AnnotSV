@@ -11,6 +11,7 @@
 For more details, please see the README file.
 
 January,  , 2024, AnnotSV version 3.4
+	- Gene names are now sorted by genomic coordinates and no longer sorted alphabetically ("Gene_name" feature)
 	- Add new regulatory elements annotations:
 		- Activity-by-Contact (ABC) model annotations
 		- Massively Parallel Reporter assays (MPRA) annotations

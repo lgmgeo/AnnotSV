@@ -25,54 +25,54 @@
 # - Check if the reference fasta file in the variantconvert bed configfiles has the good path
 # - Check if the "pip install -e ." command was already run
 proc checkVariantconvertConfigfile {} {
-
+    
     global g_AnnotSV
-
+    
     # Use of variantconvert to create a vcf output
     if {$g_AnnotSV(vcf)} {
-	
-	# - Check if the reference fasta file in the variantconvert bed configfiles has the good path
+        
+        # - Check if the reference fasta file in the variantconvert bed configfiles has the good path
         #############################################################################################
-
-	## SVinputfile is a BED
-	## (useful only with a BED input file, because there is no need to have a reference fasta file from a VCF SVinputfile)
-	if {[regexp -nocase "\\.bed$" $g_AnnotSV(SVinputFile)]} {
-
+        
+        ## SVinputfile is a BED
+        ## (useful only with a BED input file, because there is no need to have a reference fasta file from a VCF SVinputfile)
+        if {[regexp -nocase "\\.bed$" $g_AnnotSV(SVinputFile)]} {
+            
             set configfile "$g_AnnotSV(variantconvertDir)/configs/$g_AnnotSV(genomeBuild)/annotsv3_from_bed.json"
             set localconfigfile "$g_AnnotSV(variantconvertDir)/configs/$g_AnnotSV(genomeBuild)/annotsv3_from_bed.local.json"
-
-	    if {$g_AnnotSV(annotationsDir) ne ""} {
-		set pathDir "$g_AnnotSV(annotationsDir)"
-	    } else {
-		set pathDir "$g_AnnotSV(installDir)/share/AnnotSV/"
-	    }
-
-	    set distributedPathLine "\"path\": \".*\","
-	    set newPathLine         "\"path\": \"$pathDir/Annotations_Human/BreakpointsAnnotations/GCcontent/$g_AnnotSV(genomeBuild)/$g_AnnotSV(genomeBuild)_chromFa.fasta\","
-	    set distributedRefLine  "\"##reference=file:.*\""
-	    set newRefLine          "\"##reference=file:$pathDir/Annotations_Human/BreakpointsAnnotations/GCcontent/$g_AnnotSV(genomeBuild)/$g_AnnotSV(genomeBuild)_chromFa.fasta\""
-
-	    # 1 - AnnotSV install with the root user
-	    # 2 - AnnotSV run with non-root user
-	    # => The $localconfigfile can not be created by a non-root user. This file should exists with 777 permissions
-	    if {![file exists $localconfigfile] || [file size $localconfigfile] eq 0} {
-		set L_Lines {}
-		foreach L [LinesFromFile $configfile] {
-		    if {[regexp "$distributedPathLine" $L]} {
-			regsub "$distributedPathLine" $L "$newPathLine" L
-		    }
-		    if {[regexp "$distributedRefLine" $L]} {
-			regsub "$distributedRefLine" $L "$newRefLine" L
-		    }
-		    lappend L_Lines $L
-		}
-		ReplaceTextInFile [join $L_Lines "\n"] $localconfigfile
-	    }
-	}
-	
+            
+            if {$g_AnnotSV(annotationsDir) ne ""} {
+                set pathDir "$g_AnnotSV(annotationsDir)"
+            } else {
+                set pathDir "$g_AnnotSV(installDir)/share/AnnotSV/"
+            }
+            
+            set distributedPathLine "\"path\": \".*\","
+            set newPathLine         "\"path\": \"$pathDir/Annotations_Human/BreakpointsAnnotations/GCcontent/$g_AnnotSV(genomeBuild)/$g_AnnotSV(genomeBuild)_chromFa.fasta\","
+            set distributedRefLine  "\"##reference=file:.*\""
+            set newRefLine          "\"##reference=file:$pathDir/Annotations_Human/BreakpointsAnnotations/GCcontent/$g_AnnotSV(genomeBuild)/$g_AnnotSV(genomeBuild)_chromFa.fasta\""
+            
+            # 1 - AnnotSV install with the root user
+            # 2 - AnnotSV run with non-root user
+            # => The $localconfigfile can not be created by a non-root user. This file should exists with 777 permissions
+            if {![file exists $localconfigfile] || [file size $localconfigfile] eq 0} {
+                set L_Lines {}
+                foreach L [LinesFromFile $configfile] {
+                    if {[regexp "$distributedPathLine" $L]} {
+                        regsub "$distributedPathLine" $L "$newPathLine" L
+                    }
+                    if {[regexp "$distributedRefLine" $L]} {
+                        regsub "$distributedRefLine" $L "$newRefLine" L
+                    }
+                    lappend L_Lines $L
+                }
+                ReplaceTextInFile [join $L_Lines "\n"] $localconfigfile
+            }
+        }
+        
         # - Check if the "pip install -e ." command was already run
         ###########################################################
-
+        
         # => Can be done during the installation with the Makefile (if the python environment is OK)
         set currentDir [pwd]
         catch {
@@ -88,32 +88,32 @@ proc checkVariantconvertConfigfile {} {
                     WriteTextInFile "Done" $g_AnnotSV(variantconvertDir)/pipinstall.flag
                 }
             }
-       }
-       cd $currentDir
+        }
+        cd $currentDir
     }
 }
 
 
 
 proc runVariantconvert {outputFile} {
-
+    
     global g_AnnotSV
-
+    
     regsub "\.tsv$" $outputFile ".vcf" VCFoutputFile
-
+    
     catch {exec python3 $g_AnnotSV(variantconvertDir)/variantconvert --version} Message
     if {[regexp "variantconvert (\[0-9\]+\\.\[0-9\]+\\.\[0-9\]+)" $Message match version]} {
         set version "v$version "
     } else {
         set version ""
     }
-
+    
     puts "...creation of the VCF output file: $VCFoutputFile"
     puts "   AnnotSV relies on the variantconvert tool ${version}(https://github.com/SamuelNicaise/variantconvert)."
     puts "   A minimal Python 3.8 installation is required, as well as the natsort, panda and pyfaidx Python modules."
-
+    
     regsub "\.vcf$" $VCFoutputFile ".variantconvert.log" LogFile
-
+    
     if {[regexp -nocase "\\.vcf(.gz)?$" $g_AnnotSV(SVinputFile)]} {
         ## SVinputfile is a VCF
         set command "python3 $g_AnnotSV(variantconvertDir)/variantconvert convert -i $outputFile -o $VCFoutputFile -fi annotsv -fo vcf -c $g_AnnotSV(variantconvertDir)/configs/$g_AnnotSV(genomeBuild)/annotsv3_from_vcf.json"
@@ -128,15 +128,16 @@ proc runVariantconvert {outputFile} {
             set command "python3 $g_AnnotSV(variantconvertDir)/variantconvert convert -i $outputFile -o $VCFoutputFile -fi annotsv -fo vcf -c $g_AnnotSV(variantconvertDir)/configs/$g_AnnotSV(genomeBuild)/annotsv3_from_bed.local.json"
         }
     }
-
+    
     # variantconvert output
-
+    
     catch {eval exec $command} Message
     if {[regexp -nocase "error" $Message]} {
         puts "Error:"
     }
     ReplaceTextInFile "$command\n\n$Message" $LogFile
     puts "   => cf $LogFile"
-
+    
     return
 }
+

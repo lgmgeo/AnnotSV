@@ -25,67 +25,67 @@
 
 ## - Check if the following HI file has been downloaded:
 #    - HI_Predictions_Version3.bed.gz
-#  
+#
 ## - Check and create if necessary the following file:
 #    - 'date'_HI.tsv.gz
 proc checkHIfile {} {
-
+    
     global g_AnnotSV
-
+    
     ## Check if the HI file has been downloaded then formatted
     #########################################################
     set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based"
- 
+    
     set HIfileDownloaded [glob -nocomplain "$extannDir/DDD/HI_Predictions_Version3.bed.gz"]
-    set HIfileFormattedGzip [glob -nocomplain "$extannDir/DDD/*_HI.tsv.gz"] 
-
+    set HIfileFormattedGzip [glob -nocomplain "$extannDir/DDD/*_HI.tsv.gz"]
+    
     if {$HIfileDownloaded eq "" && $HIfileFormattedGzip eq ""} {
-	# No "Haploinsufficiency" annotation
-	return
-    } 
-
+        # No "Haploinsufficiency" annotation
+        return
+    }
+    
     if {[llength $HIfileFormattedGzip]>1} {
-	puts "Several Haploinsufficiency files exist:"
-	puts "$HIfileFormattedGzip"
-	puts "Keep only one: [lindex $HIfileFormattedGzip end]\n"
-	foreach hi [lrange $HIfileFormattedGzip 0 end-1] {
-	    file rename -force $hi $hi.notused
-	}
-	return
-    } 
-
-    if {$HIfileFormattedGzip eq ""} {    
-	## Create : 'date'_HI.tsv     
-
-	set HIfileFormatted "$extannDir/DDD/[clock format [clock seconds] -format "%Y%m%d"]_HI.tsv"
-
-	puts "\t...HI configuration ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
-
-	puts "\t\t...creation of $HIfileFormatted.gz"
-	puts "\t\t   (done only once during the first HI annotation)"
-
-	set TexteToWrite {genes\tDDD_HI_percent}
-	foreach L [LinesFromGZFile $HIfileDownloaded] {
-	    if {[regexp  "^track name" $L]} {continue}
-	    set Ls [split $L "\t"]
-	    
-	    # Line example:
-	    # chrX    37850070        37850569        HYPM|0.000043663|100%   0.000043663     .       37850070        37850569        0,255,0
-	    set infos [split [lindex $Ls 3] "|"] 
-	    set gene [lindex $infos 0]   
-	    regsub "%" [lindex $infos end] "" percent  
-	    lappend TexteToWrite "$gene\t$percent"
-	} 
-
-	# Write outputfile
-	WriteTextInFile [join $TexteToWrite "\n"] $HIfileFormatted
-	if {[catch {exec gzip $HIfileFormatted} Message]} {
-	    puts "-- checkHIfile --"
-	    puts "gzip $HIfileFormatted"
-	    puts "$Message\n"
-	}
-
-	file delete -force $HIfileDownloaded
+        puts "Several Haploinsufficiency files exist:"
+        puts "$HIfileFormattedGzip"
+        puts "Keep only one: [lindex $HIfileFormattedGzip end]\n"
+        foreach hi [lrange $HIfileFormattedGzip 0 end-1] {
+            file rename -force $hi $hi.notused
+        }
+        return
+    }
+    
+    if {$HIfileFormattedGzip eq ""} {
+        ## Create : 'date'_HI.tsv
+        
+        set HIfileFormatted "$extannDir/DDD/[clock format [clock seconds] -format "%Y%m%d"]_HI.tsv"
+        
+        puts "\t...HI configuration ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+        
+        puts "\t\t...creation of $HIfileFormatted.gz"
+        puts "\t\t   (done only once during the first HI annotation)"
+        
+        set TexteToWrite {genes\tDDD_HI_percent}
+        foreach L [LinesFromGZFile $HIfileDownloaded] {
+            if {[regexp  "^track name" $L]} {continue}
+            set Ls [split $L "\t"]
+            
+            # Line example:
+            # chrX    37850070        37850569        HYPM|0.000043663|100%   0.000043663     .       37850070        37850569        0,255,0
+            set infos [split [lindex $Ls 3] "|"]
+            set gene [lindex $infos 0]
+            regsub "%" [lindex $infos end] "" percent
+            lappend TexteToWrite "$gene\t$percent"
+        }
+        
+        # Write outputfile
+        WriteTextInFile [join $TexteToWrite "\n"] $HIfileFormatted
+        if {[catch {exec gzip $HIfileFormatted} Message]} {
+            puts "-- checkHIfile --"
+            puts "gzip $HIfileFormatted"
+            puts "$Message\n"
+        }
+        
+        file delete -force $HIfileDownloaded
     }
 }
 
