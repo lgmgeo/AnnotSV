@@ -77,9 +77,11 @@ source $g_AnnotSV(tclDir)/AnnotSV-genes.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-haploinsufficiency.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-help.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-loeuf-pLI.tcl
+source $g_AnnotSV(tclDir)/AnnotSV-ncbi.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-omim.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-pathogenicsv.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-pathogenicsnvindel.tcl
+source $g_AnnotSV(tclDir)/AnnotSV-phenogenius.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-regulatoryelements.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-ranking.tcl
 source $g_AnnotSV(tclDir)/AnnotSV-repeat.tcl
@@ -176,7 +178,10 @@ checkHIfile
 # Annotation with ClinGen?
 checkClinGenFile
 # Annotation with Exomiser?
+checkNCBI
 checkExomiserInstallation
+# Annotation with PhenoGenius?
+checkPhenoGenius
 # Annotation with LOEUF
 checkLOEUFfile
 
@@ -264,7 +269,7 @@ puts "\tAnnotSV has been run with these arguments:"
 puts "\t******************************************"
 set lKey [array names g_AnnotSV]
 foreach key [lsort $lKey] {
-    if {[regexp "EAann|Ann|bashDir|bedFile|docDir|etcDir|extann|installDir|outputColHeader|ranking|genes|samplesidTSVcol|svtTSVcol|tclDir|userDir|Version$" $key]} {continue}
+    if {[regexp "ABCann|GHann|MPRAann|EAann|Ann|bashDir|bedFile|docDir|etcDir|extann|installDir|outputColHeader|ranking|genes|samplesidTSVcol|svtTSVcol|tclDir|userDir|Version$" $key]} {continue}
     if {$g_AnnotSV($key) eq ""} {continue}
     puts "\t-$key $g_AnnotSV($key)"
 }

@@ -1142,16 +1142,28 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
     set L_allRegulatedGenes [lsort -unique $L_allRegulatedGenes]
     puts "\t...[llength $L_allRegulatedGenes] genes regulated by a regulatory element which is overlapped with an SV\n"
     
-    ## Preparation of the phenotype-driven analysis (Exomiser)
+    ## Preparation of the phenotype-driven analysis (PhenoGenius + Exomiser)
     ## (to be able to access to the exomiser score of a gene with [ExomiserAnnotation $gName "score"])
-    ##################################################################################################
+    ## (to be able to access to the PhenoGenius specificity of a gene with [PhenoGeniusAnnotation $gName "specificity"])
+    ####################################################################################################################
     set L_allGenes $L_allGenesOverlapped
     lappend L_allGenes {*}$L_allRegulatedGenes
     set L_allGenes [lsort -unique $L_allGenes]
-    if {$g_AnnotSV(hpo) ne "" && $L_allGenes ne ""} {
+	if {$g_AnnotSV(PhenoGenius)} {		
+		set L_NCBI_ID {}
+		foreach g $L_allGenes {
+			set NCBI_ID [searchforGeneID $g]
+			if {$NCBI_ID ne ""} {
+				lappend L_NCBI_ID $NCBI_ID
+			}
+		}
+		set L_NCBI_ID [lsort -unique $L_NCBI_ID]
+		runPhenoGenius "$L_allGenes" "$L_NCBI_ID" "$g_AnnotSV(hpo)"
+    }
+	if {$g_AnnotSV(hpo) ne "" && $L_allGenes ne ""} {
         runExomiser "$L_allGenes" "$g_AnnotSV(hpo)"
     }
-    
+
     ## HI/TS information for these regulated genes
     ## -> definition of g_HI($gene) and g_TS($gene)
     ###############################################
@@ -1191,6 +1203,9 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
             catch {set HI "$g_HI($gName)"}
             set TS ""
             catch {set TS "$g_TS($gName)"}
+            if {$g_AnnotSV(PhenoGenius)} {
+                set PhenoGeniusSpecificity "[PhenoGeniusAnnotation $gName "specificity"]"
+            } else {set PhenoGeniusSpecificity ""}
             if {$g_AnnotSV(hpo) ne ""} {
                 set exomiserScore "[ExomiserAnnotation $gName "score"]"
             } else {set exomiserScore ""}
@@ -1201,10 +1216,11 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
                 #  - OMIM morbid genes
                 #  - HI genes (ClinGen HI = 3)
                 #  - TS genes (ClinGen TS = 3)
-                #  - Phenotype matched genes (Exomiser gene score > 0.7)
+                #  - Phenotype matched genes (PhenoGenius specificity = "A" or Exomiser gene score > 0.7)
                 #  - User candidate genes
                 if {$HI eq "3"} {lappend lAnn "HI=$HI"}
                 if {$TS eq "3"} {lappend lAnn "TS=$TS"}
+				if {$PhenoGeniusSpecificity eq "A"} {lappend lAnn "PG=A"}
                 if {$exomiserScore ne "" && $exomiserScore > 0.7} {lappend lAnn "EX=$exomiserScore"}
                 if {[isMorbid $gName]} {lappend lAnn "morbid"}
                 if {[isCandidate $gName]} {lappend lAnn "candidate"}
@@ -1216,6 +1232,7 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
             } else {
                 if {$HI ne ""} {lappend lAnn "HI=$HI"}
                 if {$TS ne ""} {lappend lAnn "TS=$TS"}
+                if {$PhenoGeniusSpecificity ne ""} {lappend lAnn "PG=A"}
                 if {$exomiserScore ne "" && $exomiserScore ne "0.0000" && $exomiserScore ne "-1.0"} {lappend lAnn "EX=$exomiserScore"}
                 if {[isMorbid $gName]} {lappend lAnn "morbid"}
                 if {[isCandidate $gName]} {lappend lAnn "candidate"}

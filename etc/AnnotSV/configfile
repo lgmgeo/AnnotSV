@@ -168,13 +168,13 @@ DDD_mode
 DDD_consequence
 DDD_disease
 DDD_pmid
-DDD_HI_percent			*
+DDD_HI_percent					*
 ExAC_synZ
 ExAC_misZ
 ExAC_delZ
 ExAC_dupZ
 ExAC_cnvZ
-LOEUF_bin			*
+LOEUF_bin						*
 ExAC_pLI                        
 GnomAD_pLI                      *
 OMIM_morbid                     *
@@ -182,8 +182,11 @@ OMIM_morbid_candidate
 OMIM_ID
 OMIM_phenotype
 OMIM_inheritance
-GnomAD_pLI			*
-Exomiser_gene_pheno_scorea	*
+GnomAD_pLI			            *
+PhenoGenius_score
+PhenoGenius_phenotype
+PhenoGenius_specificity         *
+Exomiser_gene_pheno_scorea      *
 Human_pheno_evidence
 Mouse_pheno_evidence
 Fish_pheno_evidence

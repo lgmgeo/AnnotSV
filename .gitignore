@@ -11,9 +11,11 @@ share/AnnotSV/Annotations_Mouse/
 share/AnnotSV/Annotations_Exomiser/
 
 # Python reimplementation of AnnotSV
+# + PhenoGenius install
 share/python3/annotsv/
 src/
 Python/
+share/python3/phenogenius/
 
 # Unit tests
 tests/data/check_all_public_test_directory.log

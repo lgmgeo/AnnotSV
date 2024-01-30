@@ -309,7 +309,8 @@ proc configureAnnotSV {argv} {
         puts "############################################################################"
         exit 2
     }
-    
+    set g_AnnotSV(outputDir) [file normalize $g_AnnotSV(outputDir)]
+ 
     # bedtools/bcftools: It should be a good path that we can run
     foreach tool {bedtools bcftools} {
         if {[catch {eval exec $g_AnnotSV($tool) --version} Message]} {
@@ -516,7 +517,7 @@ proc configureAnnotSV {argv} {
     # - Annotations essential for the ranking:                 Annotation_mode Gene_name Gene_Count Overlapped_CDS_percent Frameshift Location Location2 RE_gene Overlapped_CDS_length Exon_count
     #                                                          P_gain_coord P_loss_coord P_snvindel_nb B_gain_coord B_loss_coord
     #                                                          po_P_gain_coord po_P_loss_coord po_B_gain_allG_coord po_B_gain_someG_coord po_B_loss_allG_coord po_B_loss_someG_coord
-    #                                                          HI TS GnomAD_pLI LOEUF_bin DDD_HI_percent Exomiser_gene_pheno_score OMIM_morbid
+    #                                                          HI TS GnomAD_pLI LOEUF_bin DDD_HI_percent PhenoGenius_specificity Exomiser_gene_pheno_score OMIM_morbid
     # - Annotations essential for variantconvert (VCF output): Samples_ID
     # - Ranking annotations:                                   AnnotSV_ranking_score AnnotSV_ranking_criteria ACMG_class
     # - Annotations linked to the previous essential annotations: Tx Tx_start Tx_end Overlapped_tx_length Dist_nearest_SS Nearest_SS_type Intersect_start Intersect_end
@@ -525,7 +526,7 @@ proc configureAnnotSV {argv} {
     #                                                             P_snvindel_phen B_gain_source B_gain_AFmax B_loss_source B_loss_AFmax
     #                                                             po_B_gain_allG_source po_B_gain_someG_source po_B_gain_someG_coord po_B_loss_allG_source po_B_loss_someG_source
     set g_AnnotSV(genesBasedAnn) 1
-    foreach col "SV_chrom SV_start SV_end SV_length SV_type Annotation_mode Gene_name Gene_Count RE_gene P_gain_coord P_loss_coord P_snvindel_nb B_gain_coord B_loss_coord po_P_gain_coord po_P_loss_coord po_B_gain_allG_coord po_B_loss_allG_coord po_B_loss_someG_coord HI TS GnomAD_pLI LOEUF_bin DDD_HI_percent Exomiser_gene_pheno_score OMIM_morbid Location Location2 Overlapped_CDS_percent Frameshift Exon_count Samples_ID" {
+    foreach col "SV_chrom SV_start SV_end SV_length SV_type Annotation_mode Gene_name Gene_Count RE_gene P_gain_coord P_loss_coord P_snvindel_nb B_gain_coord B_loss_coord po_P_gain_coord po_P_loss_coord po_B_gain_allG_coord po_B_loss_allG_coord po_B_loss_someG_coord HI TS GnomAD_pLI LOEUF_bin DDD_HI_percent PhenoGenius_specificity Exomiser_gene_pheno_score OMIM_morbid Location Location2 Overlapped_CDS_percent Frameshift Exon_count Samples_ID" {
         if {[lsearch -exact "$g_AnnotSV(outputColHeader)" $col] eq -1} {
             lappend g_AnnotSV(outputColHeader) $col
         }

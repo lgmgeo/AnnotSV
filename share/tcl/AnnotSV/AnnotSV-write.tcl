@@ -300,6 +300,11 @@ proc OrganizeAnnotation {} {
         }
         if {$g_AnnotSV(geneBasedAnn_i) eq ""} {set g_AnnotSV(geneBasedAnn) 0}
     }
+
+    ####### "PhenoGenius header"
+    if {$g_AnnotSV(PhenoGenius)} {
+        append headerOutput "\tPhenoGenius_score\tPhenoGenius_phenotype\tPhenoGenius_specificity"
+    }
     
     ####### "Exomiser header"
     if {$g_AnnotSV(hpo) ne ""} {
@@ -435,6 +440,10 @@ proc OrganizeAnnotation {} {
         puts "\t...Gene-based annotations"
         puts "[join $g_ExtAnnotation(display) "\n"]"
     }
+
+    ####### "PhenoGenius annotations"
+    if {$g_AnnotSV(PhenoGenius)} {puts "\t...PhenoGenius annotations"}
+
     ####### "Exomiser annotation"
     if {$g_AnnotSV(hpo) ne ""} {puts "\t...Exomiser annotations"}
     
@@ -1155,7 +1164,23 @@ proc OrganizeAnnotation {} {
                 } else {set SVlength ""}
             }
         }
-        
+
+        ####### "Phenogenius annotation"
+        if {$g_AnnotSV(PhenoGenius)} {
+            if {$AnnotationMode eq "split"} {
+                set phenogeniusText [PhenoGeniusAnnotation $geneName "all"]
+            } else {
+                set bestSpecificity ""
+                foreach g [split $geneName ";"] {
+                    set specificity [PhenoGeniusAnnotation $g "specificity"]
+					# {"A" < "B"} => True
+					if {$specificity eq ""} {continue}
+					if {$bestSpecificity eq ""} {set bestSpecificity $specificity; continue}
+                    if {$specificity < $bestSpecificity} {set bestSpecificity $specificity}
+                }
+                set phenogeniusText "\t\t$bestSpecificity"
+            }
+        }
         ####### "Exomiser annotation"
         if {$g_AnnotSV(hpo) ne ""} {
             if {$AnnotationMode eq "split"} {
@@ -1274,6 +1299,10 @@ proc OrganizeAnnotation {} {
         ####### "Gene-based annotations"
         if {$g_AnnotSV(geneBasedAnn)} {
             append TextToWrite "\t$geneBasedText"
+        }
+        ####### "PhenoGenius annotation"
+        if {$g_AnnotSV(PhenoGenius)} {
+            append TextToWrite "\t$phenogeniusText"
         }
         ####### "Exomiser annotation"
         if {$g_AnnotSV(hpo) ne ""} {

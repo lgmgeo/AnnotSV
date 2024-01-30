@@ -11,6 +11,8 @@
 For more details, please see the README file.
 
 January,  , 2024, AnnotSV version 3.4
+	- Take use of PhenoGenius (Yauy et al., 2023) for the phenotype-driven analysis and the ranking
+		- Add 3 new features: PhenoGenius_score, PhenoGenius_phenotype and PhenoGenius_specificity
 	- Gene names are now sorted by genomic coordinates and no longer sorted alphabetically ("Gene_name" feature)
 	- Add new regulatory elements annotations:
 		- Activity-by-Contact (ABC) model annotations

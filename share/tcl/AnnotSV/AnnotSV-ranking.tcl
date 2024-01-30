@@ -79,7 +79,8 @@ proc SVprepareRanking {L_header} {
     set g_i(loeuf)     [lsearch -regexp $Ls "LOEUF_bin"];     if {$g_i(loeuf) == -1} {unset g_i; warningRankingMessage $L_header "LOEUF_bin"; return}
     set g_i(HIpercent) [lsearch -regexp $Ls "DDD_HI_percent"]; if {$g_i(HIpercent) == -1} {unset g_i; warningRankingMessage $L_header "DDD_HI_percent"; return}
     
-    set g_i(exomiser)  [lsearch -regexp $Ls "Exomiser_gene_pheno_score"];
+    set g_i(exomiser)    [lsearch -regexp $Ls "Exomiser_gene_pheno_score"];
+    set g_i(phenogenius) [lsearch -regexp $Ls "PhenoGenius_specificity"];
     
     set g_i(morbid)    [lsearch -regexp $Ls "OMIM_morbid"]; if {$g_i(morbid) == -1} {unset g_i; warningRankingMessage $L_header "OMIM_morbid"; return}
     
@@ -235,7 +236,8 @@ proc SVrankingLoss {L_annotations} {
         set gene   [lindex $Ls $g_i(gene)]
         set exomiser    [lindex $Ls $g_i(exomiser)]
         regsub "," $exomiser "." exomiser
-        
+        set phenogenius [lindex $Ls $g_i(phenogenius)]
+
         if {$HI eq "3" || $morbid eq "yes"} {
             set location   [lindex $Ls $g_i(location)]
             set location2  [lindex $Ls $g_i(location2)]
@@ -334,10 +336,10 @@ proc SVrankingLoss {L_annotations} {
         
         ## Section 5: Evaluation of inheritance pattern/family history for patient being studied
         ####################################################################################################################
-        if {$exomiser >= 0.7} {
+        if {$exomiser >= 0.7 || $phenogenius eq "A"} {
             # 5H. Inheritance information is unavailable or uninformative. The patient phenotype is highly specific and consistent with what has been described in similar cases (+0.30)
             lappend g_rankingExplanations($AnnotSV_ID,5H) "$gene"
-        } elseif {$exomiser >= 0.5} {
+        } elseif {$exomiser >= 0.5 || $phenogenius eq "B"} {
             # 5G. Inheritance information is unavailable or uninformative. The patient phenotype is nonspecific, but is consistent with what has been described in similar cases (+0.10)
             lappend g_rankingExplanations($AnnotSV_ID,5G) "$gene"
         }
@@ -631,6 +633,7 @@ proc SVrankingGain {L_annotations} {
         set location    [lindex $Ls $g_i(location)]
         set exomiser    [lindex $Ls $g_i(exomiser)]
         regsub "," $exomiser "." exomiser
+        set phenogenius [lindex $Ls $g_i(phenogenius)]
         
         if {[info exists g_rankingExplanations($AnnotSV_ID,2DE)]} {
             if {![regexp "exon|intron" $location]} {
@@ -650,8 +653,8 @@ proc SVrankingGain {L_annotations} {
                 if {$frameshift eq "yes"} {
                     # 2I-1. ...disrupts the reading frame (+0.45)
                     lappend g_rankingExplanations($AnnotSV_ID,2I-1) "$gene"
-                } elseif {$exomiser >= 0.7} {
-                    # 2I-2. ...patient phenotype is highly specific and consistent with what has been described for this HI gene / morbid gene (Exomiser_gene_pheno_score >= 0.7) (+0.45)
+                } elseif {$exomiser >= 0.7 || $phenogenius eq "A"} {
+                    # 2I-2. ...patient phenotype is highly specific and consistent with what has been described for this HI gene / morbid gene (PhenoGenius_specificity == "A" OR Exomiser_gene_pheno_score >= 0.7) (+0.45)
                     lappend g_rankingExplanations($AnnotSV_ID,2I-2) "$gene"
                 } else {
                     # 2I-3. ...patient phenotype is either inconsistent with what has been described for this HI gene / morbid gene (Exomiser_gene_pheno_score < 0.7) OR unknown (+0.00)
@@ -659,9 +662,9 @@ proc SVrankingGain {L_annotations} {
                 }
             } elseif {![regexp "^txStart" $location] || ![regexp "txEnd$" $location]} {
                 # One breakpoint is within an established HI gene
-                if {$exomiser >= 0.7} {
+                if {$exomiser >= 0.7 || $phenogenius eq "A"} {
                     # 2K. One breakpoint is within an established HI gene / morbid gene, patient’s phenotype is highly specific and consistent with what is expected
-                    #     for LOF of that gene (Exomiser_gene_pheno_score >= 0.7) (+0.45)
+                    #     for LOF of that gene (PhenoGenius_specificity == "A" OR Exomiser_gene_pheno_score >= 0.7) (+0.45)
                     lappend g_rankingExplanations($AnnotSV_ID,2K) "$gene"
                 } else {
                     # 2J. One breakpoint is within an established HI gene / morbid gene, patient’s phenotype is either inconsistent with what is expected for LOF of that gene OR unknown (+0.00)
@@ -669,8 +672,8 @@ proc SVrankingGain {L_annotations} {
                 }
             } elseif {$location eq "txStart-txEnd"} {
                 # 2H. HI gene / morbid gene fully contained within observed copy-number gain AND...
-                if {$exomiser >= 0.7} {
-                    # 2H-1. ...patient’s phenotype is highly specific and consistent with what is expected for LOF of that gene (Exomiser_gene_pheno_score >= 0.7) (+0.45)
+                if {$exomiser >= 0.7 || $phenogenius eq "A"} {
+                    # 2H-1. ...patient’s phenotype is highly specific and consistent with what is expected for LOF of that gene (PhenoGenius_specificity == "A" OR Exomiser_gene_pheno_score >= 0.7) (+0.45)
                     lappend g_rankingExplanations($AnnotSV_ID,2H-1) "$gene"
                 } else {
                     # 2H-2. ...patient's phenotype is nonspecific with what is expected for LOF of that gene (Exomiser_gene_pheno_score < 0.7) (+0.00)
@@ -684,10 +687,10 @@ proc SVrankingGain {L_annotations} {
         
         ## Section 5: Evaluation of inheritance pattern/family history for patient being studied
         ####################################################################################################################
-        if {$exomiser >= 0.7} {
+        if {$exomiser >= 0.7 || $phenogenius eq "A"} {
             # 5H. Inheritance information is unavailable or uninformative. The patient phenotype is highly specific and consistent with what has been described in similar cases (+0.15)
             lappend g_rankingExplanations($AnnotSV_ID,5H) "$gene"
-        } elseif {$exomiser >= 0.5} {
+        } elseif {$exomiser >= 0.5  || $phenogenius eq "B"} {
             # 5G. Inheritance information is unavailable or uninformative. The patient phenotype is nonspecific, but is consistent with what has been described in similar cases (+0.10)
             lappend g_rankingExplanations($AnnotSV_ID,5G) "$gene"
         }
