@@ -59,6 +59,8 @@ Annotation_mode                 *
 # Genes annotations:
 CytoBand			
 Gene_name                       *
+Closest_left
+Closest_right
 Gene_count                      *
 Tx                              *
 Tx_start                        *

@@ -152,7 +152,7 @@ proc OrganizeAnnotation {} {
             append headerOutput "\tCytoBand"
         }
     }
-    append headerOutput "\tGene_name\tGene_count\tTx\tTx_start\tTx_end\tOverlapped_tx_length\tOverlapped_CDS_length\tOverlapped_CDS_percent\tFrameshift\tExon_count\tLocation\tLocation2\tDist_nearest_SS\tNearest_SS_type\tIntersect_start\tIntersect_end\tRE_gene"
+    append headerOutput "\tGene_name\tClosest_left\tClosest_right\tGene_count\tTx\tTx_start\tTx_end\tOverlapped_tx_length\tOverlapped_CDS_length\tOverlapped_CDS_percent\tFrameshift\tExon_count\tLocation\tLocation2\tDist_nearest_SS\tNearest_SS_type\tIntersect_start\tIntersect_end\tRE_gene"
     
     ### Search for "ref" and "alt" information (to define the AnnotSV_ID)
     set i_ref [lsearch -exact [split $headerOutput "\t"] "REF"]
@@ -810,7 +810,35 @@ proc OrganizeAnnotation {} {
             if {$SVright<$tx_right} {set intersectEnd "$SVright"} else {set intersectEnd "$tx_right"}
             set intersect "$intersectStart\t$intersectEnd"
         }
-        
+       
+        # Closest genes annotation
+        if {$AnnotationMode eq "full"} {
+			# In Closest_left and Closest_right features, we only keep the closest gene:
+			#   - not overlapped with the SV (<=> not in $geneName)
+			#   - located up to 5 Mb to the left or right side of the SV
+			set L_geneName [split $geneName ";"] ;# => gene names overlapped with the SV
+			set L_closestGenesLeft [closestGenesAnnotation $SVchrom $SVleft "left"]
+			set i [expr {[llength $L_closestGenesLeft]-1}]
+			set closestGeneText ""
+			while {$i >= 0} {
+				set gClosest [lindex $L_closestGenesLeft $i]
+				if {[lsearch -exact $L_geneName $gClosest] eq -1} {
+					set closestGeneText "$gClosest"
+					break
+				} else {
+					incr i -1
+				}
+			}
+			set toAdd ""
+			foreach gClosest [closestGenesAnnotation $SVchrom $SVright "right"] {
+				if {[lsearch -exact $L_geneName $gClosest] eq -1} {
+                    set toAdd "$gClosest"
+                    break
+                } 
+            }
+			append closestGeneText "\t$toAdd"
+        } else {set closestGeneText "\t"}
+
         # Regulatory elements annotation (only for the full lines)
         # Human or mouse
         set reText ""
@@ -1087,7 +1115,7 @@ proc OrganizeAnnotation {} {
                 append ENCODEblacklistText "\t[ENCODEblacklistAnnotation $SVchrom $SVright]"
             } else {set ENCODEblacklistText "\t\t\t"}
         }
-        
+
         # TAD annotation
         if {$g_AnnotSV(tadAnn)} {
             if {$AnnotationMode eq "split"} {
@@ -1226,7 +1254,7 @@ proc OrganizeAnnotation {} {
         }
         
         ####### "Basic gene annotations"
-        append TextToWrite "\t$geneName\t$NbGenes\t$transcript\t$txStart\t$txEnd\t$txL\t$CDSl\t$CDSpercent\t$frameshift\t$nbExons\t$location\t$location2\t$distNearestSS\t$nearestSStype\t$intersect"
+        append TextToWrite "\t$geneName\t$closestGeneText\t$NbGenes\t$transcript\t$txStart\t$txEnd\t$txL\t$CDSl\t$CDSpercent\t$frameshift\t$nbExons\t$location\t$location2\t$distNearestSS\t$nearestSStype\t$intersect"
         
         ####### "Regulatory elements annotations"
         append TextToWrite "\t$reText"
