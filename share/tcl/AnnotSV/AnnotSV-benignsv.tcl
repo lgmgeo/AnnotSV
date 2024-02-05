@@ -62,7 +62,6 @@ proc checkBenignFiles {} {
         checkCMRI_benignFile $genomeBuild
         checkFGR_benignFile $genomeBuild
         checkHPRC_benignFile $genomeBuild
-		checkEEE_benignFile $genomeBuild
         catch {unset g_AnnotSV(benignText)}
         
         # Creation of *.tmp.formatted.bed
@@ -802,104 +801,6 @@ proc checkHPRC_benignFile {genomeBuild} {
     }
 
     return
-}
-
-
-proc checkEEE_benignFile {genomeBuild} {
-    
-    global g_AnnotSV
-    
-	if {$genomeBuild eq "GRCh38"} {
-	    ## Check if the GRCh38 PACBIO_EEE SV file has been downloaded
-	    #############################################################
-	    set benignDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/SVincludedInFt/BenignSV/GRCh38"
-	    set EEEfileDownloaded "$benignDir/EEE_SV-Pop_1.ALL.sites.20181204.vcf.gz"
-	    
-	    if {[file exist $EEEfileDownloaded]} {
-	        # We have some GRCh38 PACBIO EEE annotations to add in $benign*File
-			# Contains DEL, INS and INV only
-	        if {[info exists g_AnnotSV(benignText)]} {
-	            puts $g_AnnotSV(benignText)
-	            unset g_AnnotSV(benignText)
-	        }
-	        puts "\t   >>> GRCh38 PACBIO EEE parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
-	        
-	        set benignLossFile_Tmp "$benignDir/benign_Loss_SV_GRCh38.tmp.bed"
-	        set benignGainFile_Tmp "$benignDir/benign_Gain_SV_GRCh38.tmp.bed"
-	        set benignInsFile_Tmp "$benignDir/benign_Ins_SV_GRCh38.tmp.bed"
-	        set benignInvFile_Tmp "$benignDir/benign_Inv_SV_GRCh38.tmp.bed"
-	        set L_toWriteLoss {}
-	        set L_toWriteGain {}
-	        set L_toWriteIns {}
-	        set L_toWriteInv {}
-	        
-	        # VCFs do not contain multiallelic sites (no need to split into multiple rows)
-	        set f [open "| gzip -cd $EEEfileDownloaded"]
-	        while {![eof $f]} {
-	            set L [gets $f]
-	            if {[string index $L 0] eq "#" || $L eq ""} {continue}
-	            set Ls [split $L "\t"]
-	            set chrom [lindex $Ls 0]
-	            set pos [lindex $Ls 1]
-	            # From VCF to BED:
-	            if {$pos ne 0} {set pos [expr {$pos-1}]}
-	            
-	            set svid [lindex $Ls 2]
-	            
-	            catch {unset END}
-	            catch {unset SVTYPE}
-	            catch {unset MERGE_AF}
-	            set L_infos [split [lindex $Ls 7] ";"]
-	            foreach inf $L_infos {
-	                set inf [split $inf "="]
-	                set val [lindex $inf 0]
-	                set $val [lindex $inf 1]
-	            }
-	            if {![info exist END] || ![info exist SVTYPE] || ![info exist MERGE_AF]} {continue}
-	            # Skip SV with AF < 27% (identified in < 4/15 individuals)
-	            if {$MERGE_AF < 0.27} {continue}
-	            
-	            
-	            set coord "$chrom:${pos}-$END"
-	            set infos "$chrom\t$pos\t$END\tEEE:$svid\t$coord\t[format "%.4f" $MERGE_AF]"
-	            
-	            if {[regexp "DEL" $SVTYPE]} {
-	                lappend L_toWriteLoss "$infos"
-	            }
-	            if {[regexp "INS" $SVTYPE]} {
-	                lappend L_toWriteIns "$infos"
-	            }
-	            if {$SVTYPE eq "INV"} {
-	                lappend L_toWriteInv "$infos"
-	            }
-				#if {$END eq $pos} {puts "WARNING: SVTYPE=$SVTYPE -- END=$END eq POS=$pos $svid"}
-				#if {$END < $pos}  {puts "WARNING: SVTYPE=$SVTYPE -- END=$END < POS=$pos $svid"}
-	            
-	        }
-	        
-	        close $f
-	        
-	        # Writing:
-	        ##########
-            puts "\t       ([llength $L_toWriteLoss] SV Loss + [llength $L_toWriteIns] SV INS + [llength $L_toWriteInv] SV INV)"
-	        if {$L_toWriteLoss ne {}} {
-	            WriteTextInFile [join $L_toWriteLoss "\n"] $benignLossFile_Tmp
-	        }
-	        if {$L_toWriteIns ne {}} {
-	            WriteTextInFile [join $L_toWriteIns "\n"]  $benignInsFile_Tmp
-	        }
-	        if {$L_toWriteInv ne {}} {
-	            WriteTextInFile [join $L_toWriteInv "\n"]  $benignInvFile_Tmp
-	        }
-	        
-	        # Clean
-	        #######
-	        file delete -force $EEEfileDownloaded
-	    }
-	    
-    }
-
-	return
 }
 
 
