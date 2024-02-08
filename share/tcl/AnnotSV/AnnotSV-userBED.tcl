@@ -131,46 +131,46 @@ proc userBEDannotation {formattedSortedUserBEDfile SVchrom SVstart SVend} {
             set SVtoAnn_start [lindex $Ls 1]
             set SVtoAnn_end   [lindex $Ls 2]
             
-            set userBED_end [lindex $Ls end-$g_numberOfAnnotationCol($formattedSortedUserBEDfile)]
-            set userBED_start [lindex $Ls end-[expr $g_numberOfAnnotationCol($formattedSortedUserBEDfile)+1]]
+            set userFt_end [lindex $Ls end-$g_numberOfAnnotationCol($formattedSortedUserBEDfile)]
+            set userFt_start [lindex $Ls end-[expr {$g_numberOfAnnotationCol($formattedSortedUserBEDfile)+1}]]
             
             # Select:
             # - userBED that share > XX% length with the SV to annotate
             # (doesn't select the INSERTION)
-            set userBED_length [expr {$userBED_end-$userBED_start}]
+            set userFt_length [expr {$userFt_end-$userFt_start}]
             set SVtoAnn_length [expr {$SVtoAnn_end - $SVtoAnn_start}]
             # The user SV is an insertion or a breakpoint
-            if {$userBED_length<1} {
-                set userBED_length 1
+            if {$userFt_length<1} {
+                set userFt_length 1
             }
             # The SV to annotate is an insertion or a breakpoint
             if {$SVtoAnn_length<1} {
                 set SVtoAnn_length 1
             }
             
-            if {$SVtoAnn_start < $userBED_start} {
-                set overlap_start $userBED_start
+            if {$SVtoAnn_start < $userFt_start} {
+                set overlap_start $userFt_start
             } else {
                 set overlap_start $SVtoAnn_start
             }
-            if {$SVtoAnn_end < $userBED_end} {
+            if {$SVtoAnn_end < $userFt_end} {
                 set overlap_end $SVtoAnn_end
             } else {
-                set overlap_end $userBED_end
+                set overlap_end $userFt_end
             }
             set overlap_length [expr {$overlap_end - $overlap_start}]
             
             if {[regexp "FtIncludedInSV" $formattedSortedUserBEDfile]} {
                 ## FtIncludedInSV:
                 ## <=> Keeping only user regions (userRegion=Ft=Feature) included in the SV to annotate
-                ## <=> Keeping only Ft with > 70% (default) overlap with the SV
-                if {[expr {$overlap_length*100.0/$userBED_length}] < $g_AnnotSV(overlap)} {continue}
+                ## <=> Keeping only Ft with >= 100% ("overlap" option default) overlap with the SV
+                if {[expr {$overlap_length*100.0/$userFt_length}] < $g_AnnotSV(overlap)} {continue}
             } elseif {[regexp "SVincludedInFt" $formattedSortedUserBEDfile]} {
                 ## SVincludedInFt:
                 ## <=> Keeping user regions respecting the overlaps (reciprocal or not reciprocal)
                 if {[expr {$overlap_length*100.0/$SVtoAnn_length}] < $g_AnnotSV(overlap)} {continue}
                 if {$g_AnnotSV(reciprocal)} {
-                    if {[expr {$overlap_length*100.0/$userBED_length}] < $g_AnnotSV(overlap)} {continue}
+                    if {[expr {$overlap_length*100.0/$userFt_length}] < $g_AnnotSV(overlap)} {continue}
                 }
             } elseif {[regexp "AnyOverlap" $formattedSortedUserBEDfile]} {
                 ## AnyOverlap
@@ -189,7 +189,9 @@ proc userBEDannotation {formattedSortedUserBEDfile SVchrom SVstart SVend} {
         set i "$g_numberOfAnnotationCol($formattedSortedUserBEDfile)"
         while {$i > 0} {
             foreach SVtoAnn [array names L_userBEDAnn_$i] {
-                set L_userBEDAnn_${i}($SVtoAnn) [lsort -unique [set L_userBEDAnn_${i}($SVtoAnn)]]
+				# We want to keep the same order when removing the redundancy
+				set L_userBEDAnn_${i}($SVtoAnn) [RemoveRedundancyWithoutSorting [set L_userBEDAnn_${i}($SVtoAnn)]]
+
                 if {[llength [set L_userBEDAnn_${i}($SVtoAnn)]] > 50} {
                     # Too long (often with large SV) and can cause trouble in a spreadsheet
                     set L_userBEDAnn_${i}($SVtoAnn) [lrange [set L_userBEDAnn_${i}($SVtoAnn)] 0 50]

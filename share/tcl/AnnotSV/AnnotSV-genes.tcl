@@ -361,13 +361,8 @@ proc genesAnnotation {} {
                 # Writing of 1 "split" line...
                 if {$SVfromBED eq $oldSplitSV} {
 					# We remove the redundancy and we keep the coordinate sorting
-					set L_genes_coordSorted_uniq {}
-					foreach gtmp $L_genes {
-						if {[lsearch -exact $L_genes_coordSorted_uniq "$gtmp"] eq -1} {
-							lappend L_genes_coordSorted_uniq $gtmp 
-						}
-                    }
-					set L_genes $L_genes_coordSorted_uniq
+					set L_genes [RemoveRedundancyWithoutSorting $L_genes]
+
                     set g_Lgenes($shortOldSplitSV) [join $L_genes ";"]
                     # ...for each gene overlapped by the SV
                     foreach gene $L_genes {

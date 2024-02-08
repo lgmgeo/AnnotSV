@@ -10,7 +10,8 @@
 
 For more details, please see the README file.
 
-January,  , 2024, AnnotSV version 3.4
+February,  , 2024, AnnotSV version 3.4
+	- Fix a bug when setting the cytoband annotation (issue 210)
 	- Add 2 new features: Closest_left and Closest_right
 		=> AnnotSV expands the SV up to 5 megabases in both direction (left and right) and then tries to find neighboring genes
 		   In both directions, the closest gene to the SV is reported

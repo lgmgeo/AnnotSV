@@ -246,6 +246,18 @@ return $toreturn
 }
 
 
+proc RemoveRedundancyWithoutSorting {List} {
+    set newList {}
+    foreach element $List {
+        if {[lsearch -exact $newList "$element"] eq -1} {
+            lappend newList $element
+        }
+    }
+	return $newList
+}
+
+
+
 ##############################################################################
 #                          WORKING WITH SV TYPE
 ##############################################################################
