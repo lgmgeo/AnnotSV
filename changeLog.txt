@@ -15,15 +15,16 @@ February,  , 2024, AnnotSV version 3.4
 	- Add 2 new features: Closest_left and Closest_right
 		=> AnnotSV expands the SV up to 5 megabases in both direction (left and right) and then tries to find neighboring genes
 		   In both directions, the closest gene to the SV is reported
-	- Take use of PhenoGenius (Yauy et al., 2023) for the phenotype-driven analysis and the ranking
+	- Add new phenotype prioritization method: PhenoGenius (Yauy et al., 2023, doi: 10.1101/2022.07.29.22278181)
 		- Add 3 new features: PhenoGenius_score, PhenoGenius_phenotype and PhenoGenius_specificity
 	- Gene names are now sorted by genomic coordinates and no longer sorted alphabetically ("Gene_name" feature)
 	- Add new regulatory elements annotations:
-		- Activity-by-Contact (ABC) model annotations
-		- Massively Parallel Reporter assays (MPRA) annotations
-	- Add benign SV annotation:
+		- Activity-by-Contact (ABC) model annotations (doi: 10.1038/s41586-021-03446-x)
+		- Massively Parallel Reporter assays (MPRA) annotations (doi: 10.1038/s41467-019-11526-w)
+	- Add novel benign SV annotation sources:
 		- from gnomad v4 (GRCh38) (issue 201)
-		- from PACBIO long reads: HPRC dataset (GRCh38) (issue 202)
+		- from the Human Pangenome Reference Consortium (HPRC) dataset (PACBIO long reads, GRCh38 only) (issue 202)
+		- from dbVar (NCBI’s database of genomic structural variation)
 	- Fix misleading OMIM annotation (issues 156, 132)
 	- Add "NCBI_gene_ID" annotation
 	- Update of the "contact" recommendations in output (from email to GitHub)

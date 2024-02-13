@@ -56,6 +56,7 @@ proc checkBenignFiles {} {
         checkDGV_benignFile $genomeBuild
         checkDDD_benignFile $genomeBuild
         check1000g_benignFile $genomeBuild
+		checkdbVar_benignFile $genomeBuild
         checkClinGenHITS_benignFile $genomeBuild
         checkClinVar_benignFile $genomeBuild
         checkIMH_benignFile $genomeBuild
@@ -488,7 +489,7 @@ proc checkGnomAD_benignFile {genomeBuild} {
     
     global g_AnnotSV
     
-    # Timing: 50 min for GRCh38
+    # Timing: 15 min for GRCh38
     
     if {$genomeBuild eq "GRCh37"} {
         ## Check if GRCh37 gnomAD SV file (v2.1) has been downloaded
@@ -544,10 +545,10 @@ proc checkGnomAD_benignFile {genomeBuild} {
                 # => These SV are not selected.
                 if {[lsearch -exact {DEL DUP INS INV} "$SVTYPE"] eq -1} {continue}
                 
-                # At least one population allele frequency > 0.1% OR at least 5 homozygous individuals
+                # At least one population allele frequency > 0.1% AND at least 5 homozygous individuals
                 set nhomalt    [lindex $Ls $i_nhomalt]
                 set popmaxaf   [lindex $Ls $i_popmaxaf]
-                if {$popmaxaf < 0.001 && $nhomalt < 5} {continue}
+                if {$popmaxaf < 0.001 || $nhomalt < 5} {continue}
                 
                 set chrom      [lindex $Ls $i_chrom]
                 set start      [lindex $Ls $i_start]
@@ -615,6 +616,7 @@ proc checkGnomAD_benignFile {genomeBuild} {
             set L_toWriteInv {}
             
             foreach gnomADfileDownloaded $gnomADfilesDownloaded {
+				puts "\t       [file tail $gnomADfileDownloaded] ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
                 # VCFs do not contain multiallelic sites (no need to split into multiple rows)
                 set f [open "| gzip -cd $gnomADfileDownloaded"]
                 while {![eof $f]} {
@@ -630,24 +632,40 @@ proc checkGnomAD_benignFile {genomeBuild} {
                     set ref [lindex $Ls 3]
                     set alt [lindex $Ls 4]
                     
-                    catch {unset END}
-                    catch {unset SVTYPE}
-                    catch {unset N_HOMALT}
-                    catch {unset POPMAX_AF}
                     set L_infos [split [lindex $Ls 7] ";"]
-                    foreach inf $L_infos {
-                        set inf [split $inf "="]
-                        set val [lindex $inf 0]
-                        set $val [lindex $inf 1]
-                    }
-                    if {![info exist END] || ![info exist SVTYPE] || ![info exist N_HOMALT] || ![info exist POPMAX_AF]} {continue}
+					
+                    # WARNING: for the following search (succession of "lsearch" commands), keep the same order than the feature in the VCF lines:
+                    # "END SVTYPE controls_and_biobanks_AN controls_and_biobanks_AF controls_and_biobanks_N_HOMALT"
+					set k [lsearch -regexp $L_infos "^END="]
+					if {$k eq -1} {continue}
+					set END [lindex [split [lindex $L_infos $k] "="] 1]
+
+                    set k [lsearch -start $k -regexp $L_infos "^SVTYPE="]
+                    if {$k eq -1} {continue}
+                    set SVTYPE [lindex [split [lindex $L_infos $k] "="] 1]
                     # Skip SVTYPE="BND||CPX||CTX"
                     if {$SVTYPE eq "BND" || $SVTYPE eq "CPX" || $SVTYPE eq "CTX"} {continue}
-                    # Skip SV with AF < 1% or with "N_HOMALT < 5"
-                    if {$POPMAX_AF < 0.001 && $N_HOMALT < 5} {continue}
-                    
+ 
+                    set k [lsearch -start $k -regexp $L_infos "^controls_and_biobanks_AN="]
+                    if {$k eq -1} {continue}
+                    set GD_AN [lindex [split [lindex $L_infos $k] "="] 1]
+                    # Skip SV with controls_and_biobanks_AN < 1000
+                    if {$GD_AN < 1000} {continue}
+
+                    set k [lsearch -start $k -regexp $L_infos "^controls_and_biobanks_AF="]
+                    if {$k eq -1} {continue}
+                    set GD_AF [lindex [split [lindex $L_infos $k] "="] 1]
+                    # Skip SV with controls_and_biobanks_AF < 0.1% (minimum for the "-benignAF" option)
+                    if {$GD_AF < 0.001} {continue}
+
+                    set k [lsearch -start $k -regexp $L_infos "^controls_and_biobanks_N_HOMALT="]
+                    if {$k eq -1} {continue}
+                    set GD_N_HOMALT [lindex [split [lindex $L_infos $k] "="] 1]
+                    # Skip SV with "controls_and_biobanks_N_HOMALT < 5"
+                    if {$GD_N_HOMALT < 5} {continue}
+
                     set coord "$chrom:${pos}-$END"
-                    set infos "$chrom\t$pos\t$END\t$svid\t$coord\t[format "%.4f" $POPMAX_AF]"
+                    set infos "$chrom\t$pos\t$END\t$svid\t$coord\t[format "%.4f" $GD_AF]"
                     
                     if {[regexp "DEL" $SVTYPE]} {
                         lappend L_toWriteLoss "$infos"
@@ -1035,6 +1053,116 @@ proc check1000g_benignFile {genomeBuild} {
         file delete -force $1000gFileTmp
     }
     
+    return
+}
+
+proc checkdbVar_benignFile {genomeBuild} {
+
+    global g_AnnotSV
+
+    ## Check if dbVar SV files (del, dup or ins) have been downloaded
+    #################################################################
+    set benignDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/SVincludedInFt/BenignSV/$genomeBuild"
+
+	# Deletions
+    set dbVarDelFileDownloaded "$benignDir/$genomeBuild.nr_deletions.common.bed.gz"
+    if {[file exists $dbVarDelFileDownloaded]} {
+        # We have some dbVar annotations to add in benign file
+        if {[info exists g_AnnotSV(benignText)]} {
+            puts $g_AnnotSV(benignText)
+            unset g_AnnotSV(benignText)
+        }
+        puts "\t   >>> $genomeBuild deletion dbVar parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+
+        set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
+        set L_toWriteLoss {}
+        set f [open "| gzip -cd $dbVarDelFileDownloaded"]
+        while {![eof $f]} {
+            set L [gets $f]
+            if {$L eq ""} {continue}
+            set Ls [split $L "\t"]
+			set chrom [lindex $Ls 0]
+			set start [lindex $Ls 1]
+			set end [lindex $Ls 2]
+            set coord "$chrom:${start}-$end"
+            set infos "$chrom\t$start\t$end\tdbVar\t$coord\t0.01" ;# WARNING: As the frequency of these common variants is not given, it is assigned to 1% (minimum value of the AF in the curated dataset)
+            lappend L_toWriteLoss "$infos"
+        }
+        close $f
+        puts "\t       ([llength $L_toWriteLoss] SV Loss)"
+	}
+
+	# Duplications
+    set dbVarDupFileDownloaded "$benignDir/$genomeBuild.nr_duplications.common.bed.gz"
+    if {[file exists $dbVarDupFileDownloaded]} {
+        # We have some dbVar annotations to add in benign file
+        if {[info exists g_AnnotSV(benignText)]} {
+            puts $g_AnnotSV(benignText)
+            unset g_AnnotSV(benignText)
+        }
+        puts "\t   >>> $genomeBuild duplication dbVar parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+
+        set benignGainFile_Tmp "$benignDir/benign_Gain_SV_$genomeBuild.tmp.bed"
+        set L_toWriteGain {}
+        set f [open "| gzip -cd $dbVarDupFileDownloaded"]
+        while {![eof $f]} {
+            set L [gets $f]
+            if {$L eq ""} {continue}
+            set Ls [split $L "\t"]
+            set chrom [lindex $Ls 0]
+            set start [lindex $Ls 1]
+            set end [lindex $Ls 2]
+            set coord "$chrom:${start}-$end"
+            set infos "$chrom\t$start\t$end\tdbVar\t$coord\t0.01" ;# WARNING: As the frequency of these common variants is not given, it is assigned to 1% (minimum value of the AF in the curated dataset)
+            lappend L_toWriteGain "$infos"
+        }
+        close $f
+        puts "\t       ([llength $L_toWriteGain] SV Gain)"
+    }
+
+	# Insertions
+    set dbVarInsFileDownloaded "$benignDir/$genomeBuild.nr_insertions.common.bed.gz"
+    if {[file exists $dbVarInsFileDownloaded]} {
+        # We have some dbVar annotations to add in benign file
+        if {[info exists g_AnnotSV(benignText)]} {
+            puts $g_AnnotSV(benignText)
+            unset g_AnnotSV(benignText)
+        }
+        puts "\t   >>> $genomeBuild insertion dbVar parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+
+        set benignInsFile_Tmp "$benignDir/benign_Ins_SV_$genomeBuild.tmp.bed"
+        set L_toWriteIns {}
+        set f [open "| gzip -cd $dbVarInsFileDownloaded"]
+        while {![eof $f]} {
+            set L [gets $f]
+            if {$L eq ""} {continue}
+            set Ls [split $L "\t"]
+            set chrom [lindex $Ls 0]
+            set start [lindex $Ls 1]
+            set end [lindex $Ls 2]
+            set coord "$chrom:${start}-$end"
+            set infos "$chrom\t$start\t$end\tdbVar\t$coord\t0.01" ;# WARNING: As the frequency of these common variants is not given, it is assigned to 1% (minimum value of the AF in the curated dataset)
+            lappend L_toWriteIns "$infos"
+        }
+        close $f
+        puts "\t       ([llength $L_toWriteIns] SV INS)"
+    }
+
+    # Writing:
+    ##########
+    if {$L_toWriteLoss ne {}} {
+        WriteTextInFile [join $L_toWriteLoss "\n"] $benignLossFile_Tmp
+        file delete -force $dbVarDelFileDownloaded
+    }
+    if {$L_toWriteGain ne {}} {
+        WriteTextInFile [join $L_toWriteGain "\n"] $benignGainFile_Tmp
+        file delete -force $dbVarDupFileDownloaded
+    }
+    if {$L_toWriteIns ne {}} {
+        WriteTextInFile [join $L_toWriteIns "\n"]  $benignInsFile_Tmp
+        file delete -force $dbVarInsFileDownloaded
+    }
+
     return
 }
 
