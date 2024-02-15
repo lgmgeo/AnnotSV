@@ -1063,6 +1063,9 @@ proc checkdbVar_benignFile {genomeBuild} {
     ## Check if dbVar SV files (del, dup or ins) have been downloaded
     #################################################################
     set benignDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/SVincludedInFt/BenignSV/$genomeBuild"
+    set L_toWriteLoss {}
+    set L_toWriteGain {}
+    set L_toWriteIns {}
 
 	# Deletions
     set dbVarDelFileDownloaded "$benignDir/$genomeBuild.nr_deletions.common.bed.gz"
@@ -1075,7 +1078,6 @@ proc checkdbVar_benignFile {genomeBuild} {
         puts "\t   >>> $genomeBuild deletion dbVar parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 
         set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
-        set L_toWriteLoss {}
         set f [open "| gzip -cd $dbVarDelFileDownloaded"]
         while {![eof $f]} {
             set L [gets $f]
@@ -1103,7 +1105,6 @@ proc checkdbVar_benignFile {genomeBuild} {
         puts "\t   >>> $genomeBuild duplication dbVar parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 
         set benignGainFile_Tmp "$benignDir/benign_Gain_SV_$genomeBuild.tmp.bed"
-        set L_toWriteGain {}
         set f [open "| gzip -cd $dbVarDupFileDownloaded"]
         while {![eof $f]} {
             set L [gets $f]
@@ -1131,7 +1132,6 @@ proc checkdbVar_benignFile {genomeBuild} {
         puts "\t   >>> $genomeBuild insertion dbVar parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
 
         set benignInsFile_Tmp "$benignDir/benign_Ins_SV_$genomeBuild.tmp.bed"
-        set L_toWriteIns {}
         set f [open "| gzip -cd $dbVarInsFileDownloaded"]
         while {![eof $f]} {
             set L [gets $f]

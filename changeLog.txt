@@ -26,7 +26,7 @@ February,  , 2024, AnnotSV version 3.4
 		- from the Human Pangenome Reference Consortium (HPRC) dataset (PACBIO long reads, GRCh38 only) (issue 202)
 		- from dbVar (NCBI’s database of genomic structural variation)
 	- Fix misleading OMIM annotation (issues 156, 132)
-	- Add "NCBI_gene_ID" annotation
+	- Add "NCBI_gene_ID" and "Tx_version" annotations
 	- Update of the "contact" recommendations in output (from email to GitHub)
 
 January, 15, 2024, AnnotSV version 3.3.9

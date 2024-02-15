@@ -63,6 +63,7 @@ Closest_left
 Closest_right
 Gene_count                      *
 Tx                              *
+Tx_version
 Tx_start                        *
 Tx_end                          *
 Overlapped_tx_length            *

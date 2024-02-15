@@ -31,9 +31,10 @@ proc checkGenesRefSeqFile {} {
     #############################################################
     set genesDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes/$g_AnnotSV(genomeBuild)"
     
-    set genesFileDownloaded "[glob -nocomplain $genesDir/refGene.txt.gz]"
+    set genesFileDownloaded "[glob -nocomplain $genesDir/ncbiRefSeq.txt.gz]"
     set genesFileFormatted "[glob -nocomplain $genesDir/genes.RefSeq.sorted.bed]"
-    
+    set transcriptVersionFile "$genesDir/transcript_version.RefSeq.tsv"
+
     if {$genesFileDownloaded eq "" && $genesFileFormatted eq ""} {
         puts "############################################################################"
         puts "\"$genesDir/refGene.txt.gz\" file doesn't exist"
@@ -72,21 +73,34 @@ proc checkGenesRefSeqFile {} {
             if {![info exists L_lines(chr$val)]} {continue}
             lappend L_genesTXTsorted {*}"[lsort -command AscendingSortOnElement4 [lsort -command AscendingSortOnElement5 $L_lines(chr$val)]]"
         }
-        # Creation of the $genesFileFormatted.
+
+        # Creation of the "$genesFileFormatted"
+		#######################################
+        file delete -force $transcriptVersionFile
+
         # Chromosome nomenclature used: 1-22,X,Y,M,T (without "chr")
         ## INPUT:    #bin name chrom strand txStart txEnd cdsStart cdsEnd exonCount exonStarts exonEnds score name2 cdsStartStat cdsEndStat exonFrames
+		#            (cf https://genome.ucsc.edu/cgi-bin/hgTables?db=hg38&hgta_group=genes&hgta_track=refSeqComposite&hgta_table=ncbiRefSeqCurated&hgta_doSchema=describe+table+schema)
         ## OUTPUT:   chrom txStart txEnd strand name2 name cdsStart cdsEnd exonStarts exonEnds
         # WARNING : NR_* are for non coding RNA. However, cdsStart=cdsEnd, => CDSlength=1
+		set L_TxVersionToWrite {}
         foreach L $L_genesTXTsorted {
             set Ls [split $L "\t"]
             regsub "chr" [lindex $Ls 2] "" chrom
-            set line "$chrom\t[lindex $Ls 4]\t[lindex $Ls 5]\t[lindex $Ls 3]\t[lindex $Ls 12]\t[lindex $Ls 1]\t[lindex $Ls 6]\t[lindex $Ls 7]\t[lindex $Ls 9]\t[lindex $Ls 10]"
+			if {![regexp "(\[^.\]+)\\.(\[0-9\]+)$" [lindex $Ls 1] match transcript_ID transcript_version]} {
+				set transcript_ID [lindex $Ls 1]
+				set transcript_version ""
+			}
+			lappend L_TxVersionToWrite "$transcript_ID\t$transcript_version"
+            set line "$chrom\t[lindex $Ls 4]\t[lindex $Ls 5]\t[lindex $Ls 3]\t[lindex $Ls 12]\t$transcript_ID\t[lindex $Ls 6]\t[lindex $Ls 7]\t[lindex $Ls 9]\t[lindex $Ls 10]"
             if {![info exists infos($line)]} {
                 WriteTextInFile $line $genesFileFormatted.tmp
                 set infos($line) 1
             }
         }
         file delete -force $genesFileDownloaded
+        WriteTextInFile [join $L_TxVersionToWrite "\n"] $transcriptVersionFile
+
         # Sorting of the bedfile:
         # Intersection with very large files can cause trouble with excessive memory usage.
         # A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm.
@@ -125,9 +139,17 @@ proc checkGenesENSEMBLfile {} {
     #######################################################
     set genesDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes/$g_AnnotSV(genomeBuild)"
     
-    set GenesENSEMBLfileFormatted [glob -nocomplain $genesDir/genes.ENSEMBL.sorted.bed]
-    
-    if {$GenesENSEMBLfileFormatted eq ""} {
+    set TmpGenesENSEMBLfileFormatted "$genesDir/refGene.sorted.tmp.bed"
+	# Header of "refGene.sorted.tmp.bed" (after the awk command, cf in the README):
+	# 1       11868   14409   +       DDX11L2 ENST00000456328.2       14409   14409   11868,12612,13220,      12227,12721,14409,
+    set GenesENSEMBLfileFormatted "$genesDir/genes.ENSEMBL.sorted.bed"
+    # Header of "refGene.sorted.bed" (after this proc):
+    # 1       11868   14409   +       DDX11L2 ENST00000456328       14409   14409   11868,12612,13220,      12227,12721,14409,
+
+    set transcriptVersionFile "$genesDir/transcript_version.ENSEMBL.tsv"
+
+
+    if {![file exists $GenesENSEMBLfileFormatted] && ![file exists $TmpGenesENSEMBLfileFormatted]} {
         puts "############################################################################"
         puts "\"$genesDir/genes.ENSEMBL.sorted.bed\" doesn't exist"
         puts "Please check your install - Exit with error."
@@ -135,9 +157,68 @@ proc checkGenesENSEMBLfile {} {
         exit 2
     }
     
+	if {[file exists $TmpGenesENSEMBLfileFormatted] && ![file exists $GenesENSEMBLfileFormatted]} {
+        ## - Create the "genes.ENSEMBL.sorted.bed" and "transcript_version.ENSEMBL.tsv"
+        ###############################################################################
+        puts "\t...creation of $GenesENSEMBLfileFormatted ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+        puts "\t   (done only once during the first annotation)"
+
+		# WARNING: "transcript_version.ENSEMBL.tsv" is empty for the GRCh37 build
+
+		set L_TxVersionToWrite {}
+		set L_toWrite {}
+		foreach L [LinesFromFile $TmpGenesENSEMBLfileFormatted] {
+			set Ls [split $L "\t"]
+		    if {![regexp "(\[^.\]+)\\.(\[0-9\]+)$" [lindex $Ls 5] match transcript_ID transcript_version]} {
+			    set transcript_ID [lindex $Ls 5]
+				set transcript_version ""
+			}
+            lappend L_TxVersionToWrite "$transcript_ID\t$transcript_version"
+			lappend L_toWrite "[join [lrange $Ls 0 4] "\t"]\t$transcript_ID\t[join [lrange $Ls 6 end] "\t"]"
+		}
+		WriteTextInFile [join $L_TxVersionToWrite "\n"] $transcriptVersionFile
+		WriteTextInFile [join $L_toWrite "\n"] $GenesENSEMBLfileFormatted
+	
+		file delete -force $TmpGenesENSEMBLfileFormatted
+	}
+	
     # DISPLAY:
     ##########
     set g_AnnotSV(genesFile) $GenesENSEMBLfileFormatted
+}
+
+
+
+
+proc transcriptVersionAnnotation {transcript_ID} {
+
+    global g_AnnotSV
+    global g_transcriptVersion
+
+	if {![info exists g_transcriptVersion(Done)]} {
+		set g_transcriptVersion(Done) 1
+		set genesDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes/$g_AnnotSV(genomeBuild)"
+	    set transcriptVersionFile "$genesDir/transcript_version.$g_AnnotSV(tx).tsv"
+
+	    if {![file exists $transcriptVersionFile]} {
+	        puts "############################################################################"
+	        puts "\"$transcriptVersionFile\" doesn't exist"
+	        puts "Please check your install - Exit with error."
+	        puts "############################################################################"
+	        exit 2
+	    }
+
+		foreach L [LinesFromFile $transcriptVersionFile] {
+			set Ls [split $L "\t"]
+			set g_transcriptVersion([lindex $Ls 0]) [lindex $Ls 1]
+		}
+	}
+
+	if {[info exists g_transcriptVersion($transcript_ID)]} {
+		return $g_transcriptVersion($transcript_ID)
+	} else {
+		return ""
+	}
 }
 
 

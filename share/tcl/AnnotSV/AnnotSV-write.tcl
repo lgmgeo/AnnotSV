@@ -152,7 +152,7 @@ proc OrganizeAnnotation {} {
             append headerOutput "\tCytoBand"
         }
     }
-    append headerOutput "\tGene_name\tClosest_left\tClosest_right\tGene_count\tTx\tTx_start\tTx_end\tOverlapped_tx_length\tOverlapped_CDS_length\tOverlapped_CDS_percent\tFrameshift\tExon_count\tLocation\tLocation2\tDist_nearest_SS\tNearest_SS_type\tIntersect_start\tIntersect_end\tRE_gene"
+    append headerOutput "\tGene_name\tClosest_left\tClosest_right\tGene_count\tTx\tTx_version\tTx_start\tTx_end\tOverlapped_tx_length\tOverlapped_CDS_length\tOverlapped_CDS_percent\tFrameshift\tExon_count\tLocation\tLocation2\tDist_nearest_SS\tNearest_SS_type\tIntersect_start\tIntersect_end\tRE_gene"
     
     ### Search for "ref" and "alt" information (to define the AnnotSV_ID)
     set i_ref [lsearch -exact [split $headerOutput "\t"] "REF"]
@@ -557,6 +557,7 @@ proc OrganizeAnnotation {} {
             set geneName   [lindex $Ls end-9]
             set NbGenes    ""
             set transcript [lindex $Ls end-8]
+			set transcript_version [transcriptVersionAnnotation $transcript]
             set CDSstart   [lindex $Ls end-7]
             set CDSend     [lindex $Ls end-6]
             set exonStarts [lindex $Ls end-5]
@@ -599,6 +600,7 @@ proc OrganizeAnnotation {} {
                 set NbGenes 0
             }
             set transcript ""
+			set transcript_version ""
             set CDSl       ""
             set CDSpercent ""
             set txStart    ""
@@ -1150,7 +1152,7 @@ proc OrganizeAnnotation {} {
         # "bestAnn" annotation order:
         # chrom txStart txEnd name2 name cdsStart cdsEnd exonStarts exonEnds
         #
-        # headerOutput "\tAnnotation_mode\tGene_name\tGene_count\tTx\tTx_start\tTx_end\tOverlapped_tx_length\tOverlapped_CDS_length\tOverlapped_CDS_percent\tFrameshift\tExon_count\tLocation\tLocation2\tDist_nearest_SS\tNearest_SS_type\tIntersect_start\tIntersect_end\tRE_gene"
+        # headerOutput "\tAnnotation_mode\tGene_name\tGene_count\tTx\tTx_version\tTx_start\tTx_end\tOverlapped_tx_length\tOverlapped_CDS_length\tOverlapped_CDS_percent\tFrameshift\tExon_count\tLocation\tLocation2\tDist_nearest_SS\tNearest_SS_type\tIntersect_start\tIntersect_end\tRE_gene"
         
         # Insertion of the SV length in the fourth column:
         set SVchrom [lindex $Ls 0]
@@ -1254,7 +1256,7 @@ proc OrganizeAnnotation {} {
         }
         
         ####### "Basic gene annotations"
-        append TextToWrite "\t$geneName\t$closestGeneText\t$NbGenes\t$transcript\t$txStart\t$txEnd\t$txL\t$CDSl\t$CDSpercent\t$frameshift\t$nbExons\t$location\t$location2\t$distNearestSS\t$nearestSStype\t$intersect"
+        append TextToWrite "\t$geneName\t$closestGeneText\t$NbGenes\t$transcript\t$transcript_version\t$txStart\t$txEnd\t$txL\t$CDSl\t$CDSpercent\t$frameshift\t$nbExons\t$location\t$location2\t$distNearestSS\t$nearestSStype\t$intersect"
         
         ####### "Regulatory elements annotations"
         append TextToWrite "\t$reText"
