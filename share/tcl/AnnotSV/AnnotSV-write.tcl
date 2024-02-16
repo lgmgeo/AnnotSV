@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.3.9                                                                                            #
+# AnnotSV 3.4                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -909,9 +909,9 @@ proc OrganizeAnnotation {} {
                     set L_cytobandText "[userBEDannotation $cytobandBEDfile $SVchrom $SVleft $SVright]"
                 }
                 set L_cytobandText [split $L_cytobandText ";"]
-                set cytobandText [lindex $L_cytobandText end]
+                set cytobandText [lindex $L_cytobandText 0]
                 if {[llength $L_cytobandText] > 1} {
-                    append cytobandText "-[lindex $L_cytobandText 0]"
+                    append cytobandText "-[lindex $L_cytobandText end]"
                 }
             }
         }

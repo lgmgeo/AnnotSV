@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="docs/images/AnnotSV_logo.png" width="500">
+    <img src="share/doc/AnnotSV/Images/AnnotSV_logo.png" width="500">
 
 <br />
 
@@ -12,12 +12,12 @@
 # Table of contents
 
 - ## AnnotSV Annotations Engine
-    - ### [README](README.AnnotSV_latest.pdf)
-    - ### [Getting Started](docs/quickstart.md)
-    - ### [Ranking](docs/ranking.md)
-    - ### [Annotations](docs/annotations.md)
+    - ### [README](README.AnnotSV_3.4.pdf)
+    - ### [Getting Started](share/doc/AnnotSV/quickstart.md)
+    - ### [Ranking](share/doc/AnnotSV/ranking.md)
+    - ### [Annotations](share/doc/AnnotSV/annotations.md)
 - ## AnnotSV Webserver
-    - ### [Overview](docs/webserver_overview.md)
+    - ### [Overview](share/doc/AnnotSV/webserver_overview.md)
 <br />
 
 # Collaborative work

@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.3.9                                                                                            #
+# AnnotSV 3.4                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -33,13 +33,14 @@ ETCDIR               := $(PREFIX)/etc
 SHAREDIR             := $(PREFIX)/share
 DOCDIR               := $(SHAREDIR)/doc
 BASHDIR              := $(SHAREDIR)/bash
+TESTSDIR             := $(PREFIX)/tests
 TCLVERSION           := tcl$(shell echo 'puts $${tcl_version};exit 0' | tclsh)
 TCLDIRDISTRIBUTED    := share/tcl
 TCLDIR               := $(SHAREDIR)/$(TCLVERSION)
 PYTHONDIRDISTRIBUTED := share/python3
 PYTHONDIR            := $(SHAREDIR)/python3
 ANNOTSV              := AnnotSV
-VERSION              := 3.3.6
+VERSION              := 3.4
 RM                   := /bin/rm
 RMDIR                := /bin/rmdir
 MKDIR                := install -d
@@ -118,8 +119,9 @@ install-variantconvert:
 	@echo "---------------------------"
 	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/pipinstall.flag
 	chmod 777 $(DESTDIR)$(PYTHONDIR)/variantconvert/pipinstall.flag
-	pip3 install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. || pip install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. || rm -f $(DESTDIR)$(PYTHONDIR)/variantconvert/pipinstall.flag
-	@echo ""
+	pip3 install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. &> ./tmp.variantconvert.txt || pip install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. &> ./tmp.variantconvert.txt || rm -f $(DESTDIR)$(PYTHONDIR)/variantconvert/pipinstall.flag
+	rm -f ./tmp.variantconvert.txt
+	ls -l $(DESTDIR)$(PYTHONDIR)/variantconvert/pipinstall.flag || echo "variantconvert not installed"
 	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/configs/GRCh37/annotsv3_from_bed.local.json
 	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/configs/GRCh38/annotsv3_from_bed.local.json
 	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/configs/GRCh37/annotsv3_from_bed.local.json
@@ -165,15 +167,15 @@ install-human-annotation: Annotations_Human_$(VERSION).tar.gz install-exomiser
 	@echo ""
 	@echo "--> Human annotation installed"
 
-install-exomiser-1: 2202_phenotype.zip
+install-exomiser-1: 2309_phenotype.zip
 	@echo ""
 	@echo "Installation of Exomiser data:"
 	@echo ""
-	$(MKDIR) -p $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/2202
-	tar -xf 2202_hg19.tar.gz -C $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/2202/
-	unzip 2202_phenotype.zip -d $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/2202/
-	$(RM) -rf 2202_phenotype.zip
-	$(RM) -rf 2202_hg19.tar.gz
+	$(MKDIR) -p $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/2309
+	tar -xf 2309_hg19.tar.gz -C $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/2309/
+	unzip 2309_phenotype.zip -d $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/2309/
+	$(RM) -rf 2309_phenotype.zip
+	$(RM) -rf 2309_hg19.tar.gz
 
 install-exomiser-2:
 	install -p -m 0755 $(PROPERTIES) $(DESTDIR)$(ETCDIR)/$(ANNOTSV)
@@ -203,7 +205,7 @@ Annotations_%.tar.gz:
 	@echo ""
 	@echo "Download Exomiser supporting data files:"
 	@echo ""
-	curl -C - -LO https://www.lbgi.fr/~geoffroy/Annotations/2202_hg19.tar.gz
+	curl -C - -LO https://www.lbgi.fr/~geoffroy/Annotations/2309_hg19.tar.gz
 	curl -C - -LO https://data.monarchinitiative.org/exomiser/data/$@
 
 
@@ -232,6 +234,7 @@ uninstall1:
 	$(RM) -rf $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)
 	$(RM) -rf $(DESTDIR)$(BASHDIR)/$(ANNOTSV)
 	$(RM) -rf $(DESTDIR)$(ETCDIR)/$(ANNOTSV)
+	$(RM) -rf $(DESTDIR)$(TESTSDIR)/$(ANNOTSV)
 	$(RM) -rf $(DESTDIR)$(PREFIX)/Makefile
 	$(RM) -rf $(DESTDIR)$(PREFIX)/README.md
 	$(RM) -rf $(DESTDIR)$(PREFIX)/Scoring_Criteria_AnnotSV_*.xlsx
@@ -239,7 +242,7 @@ uninstall1:
 	$(RM) -rf $(DESTDIR)$(PREFIX)/.gitignore
 
 uninstall2:
-	$(RMDIR) --ignore-fail-on-non-empty $(DESTDIR)$(BINDIR) $(DESTDIR)$(BASHDIR) $(DESTDIR)$(TCLDIR) $(DESTDIR)$(PYTHONDIR) $(DESTDIR)$(DOCDIR) $(DESTDIR)$(SHAREDIR) $(DESTDIR)$(ETCDIR)
+	$(RMDIR) --ignore-fail-on-non-empty $(DESTDIR)$(BINDIR) $(DESTDIR)$(BASHDIR) $(DESTDIR)$(TCLDIR) $(DESTDIR)$(PYTHONDIR) $(DESTDIR)$(DOCDIR) $(DESTDIR)$(SHAREDIR) $(DESTDIR)$(ETCDIR) $(DESTDIR)$(TESTSDIR)
 
 uninstall3:
 	$(RMDIR) --ignore-fail-on-non-empty $(DESTDIR)$(PREFIX)

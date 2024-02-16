@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.3.9                                                                                            #
+# AnnotSV 3.4                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -194,6 +194,8 @@ proc transcriptVersionAnnotation {transcript_ID} {
 
     global g_AnnotSV
     global g_transcriptVersion
+
+	if {$g_AnnotSV(organism) ne "Human"} {set g_transcriptVersion(Done) 1}
 
 	if {![info exists g_transcriptVersion(Done)]} {
 		set g_transcriptVersion(Done) 1

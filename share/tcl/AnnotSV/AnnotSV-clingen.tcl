@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.3.9                                                                                            #
+# AnnotSV 3.4                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -20,6 +20,16 @@
 # You should have received a copy of the GNU General Public License                                        #
 # along with this program; If not, see <http://www.gnu.org/licenses/>.                                     #
 ############################################################################################################
+
+
+# ClinGenFileDownloaded:
+########################
+# ftp://ftp.clinicalgenome.org/ClinGen_gene_curation_list_GRCh37.tsv
+# Some genes are on chrom X AND chrom Y:
+# CSF2RA  1438    Xp22.33 and Yp11.2      chrX:1387693-1428828    30      Gene associated with autosomal recessive phenotype       0       No evidence available       2021-08-23       MONDO:0012580
+# CSF2RA  1438    Xp22.33 and Yp11.2      chrY:1268814-1325218    30      Gene associated with autosomal recessive phenotype       0       No evidence available       2021-08-23       MONDO:0012580
+# => be carreful to avoid redundancy
+
 
 ## - Check if the "ClinGen_gene_curation_list_GRCh37.tsv" file exists.
 ## - Check and create if necessary the 'date'_ClinGenAnnotations.tsv file.
@@ -72,7 +82,11 @@ proc checkClinGenFile {} {
             set gene [lindex $Ls $i_gene]
             set HI [lindex $Ls $i_HI]
             set TS [lindex $Ls $i_TS]
-            
+
+			# To avoir redundancy for genes (CSF2RA and VAMP7) presents on chrom X AND chrom Y
+			if {[info exists seen($gene)]} {continue}
+			set seen($gene) 1
+
             if {$HI eq "Not yet evaluated"} {set HI ""}
             if {$TS eq "Not yet evaluated"} {set TS ""}
             

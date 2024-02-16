@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.3.9                                                                                            #
+# AnnotSV 3.4                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -1342,7 +1342,6 @@ proc checkCMRI_benignFile {genomeBuild} {
         if {$L_toWriteGain ne {}} {
             WriteTextInFile [join $L_toWriteGain "\n"] $benignGainFile_Tmp
         }
-        puts "\t       ([llength $L_toWriteIns] INS + [llength $L_toWriteInv] INV)"
         if {$L_toWriteIns ne {}} {
             WriteTextInFile [join $L_toWriteIns "\n"]  $benignInsFile_Tmp
         }

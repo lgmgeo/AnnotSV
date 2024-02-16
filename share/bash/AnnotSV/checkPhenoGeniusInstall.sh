@@ -40,12 +40,12 @@ fi
 
 cd $ANNOTSV/share/python3/phenogenius/PhenoGenius
 
-if [ `poetry run python phenogenius_cli.py --help | grep -c -- "--hpo_list"` ]
+if [ `poetry run python phenogenius_cli.py --help | grep -c -- "--hpo_list"` == "1" ]
 then
 	exit 0
 else
 	poetry install &> ../poetry_install.log ;# Can be run from different servers
-	if [ `poetry run python phenogenius_cli.py --help | grep -c -- "--hpo_list"` ]
+	if [ `poetry run python phenogenius_cli.py --help | grep -c -- "--hpo_list"` == 1 ]
 	then
 		exit 0
 	else
@@ -54,4 +54,5 @@ else
 		exit 1
 	fi
 fi
+
 

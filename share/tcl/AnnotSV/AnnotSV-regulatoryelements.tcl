@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.3.9                                                                                            #
+# AnnotSV 3.4                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -300,7 +300,6 @@ proc checkEAfiles {} {
     set necessaryEAfile "$regElementsDir/$g_AnnotSV(genomeBuild)/EA_${g_AnnotSV(tx)}_$g_AnnotSV(genomeBuild).sorted.bed"
     if {[file exists $necessaryEAfile]} {set g_AnnotSV(EAann) 1}
 }
-
 
 
 

@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.3.9                                                                                            #
+# AnnotSV 3.4                                                                                              #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
@@ -10,14 +10,8 @@
 
 For more details, please see the README file.
 
-February,  , 2024, AnnotSV version 3.4
-	- Fix a bug when setting the cytoband annotation (issue 210)
-	- Add 2 new features: Closest_left and Closest_right
-		=> AnnotSV expands the SV up to 5 megabases in both direction (left and right) and then tries to find neighboring genes
-		   In both directions, the closest gene to the SV is reported
-	- Add new phenotype prioritization method: PhenoGenius (Yauy et al., 2023, doi: 10.1101/2022.07.29.22278181)
-		- Add 3 new features: PhenoGenius_score, PhenoGenius_phenotype and PhenoGenius_specificity
-	- Gene names are now sorted by genomic coordinates and no longer sorted alphabetically ("Gene_name" feature)
+February, 16, 2024, AnnotSV version 3.4
+	- Human annotation update
 	- Add new regulatory elements annotations:
 		- Activity-by-Contact (ABC) model annotations (doi: 10.1038/s41586-021-03446-x)
 		- Massively Parallel Reporter assays (MPRA) annotations (doi: 10.1038/s41467-019-11526-w)
@@ -25,9 +19,20 @@ February,  , 2024, AnnotSV version 3.4
 		- from gnomad v4 (GRCh38) (issue 201)
 		- from the Human Pangenome Reference Consortium (HPRC) dataset (PACBIO long reads, GRCh38 only) (issue 202)
 		- from dbVar (NCBI’s database of genomic structural variation)
+	- Add new phenotype prioritization method: PhenoGenius (Yauy et al., 2023, doi: 10.1101/2022.07.29.22278181)
+		- Add 3 new features: PhenoGenius_score, PhenoGenius_phenotype and PhenoGenius_specificity
+	- Add 4 new features: 
+		- Closest_left and Closest_right
+		  AnnotSV expands the SV up to 5 megabases in both direction (left and right) and then tries to find neighboring genes
+		  In both directions, the closest gene to the SV is reported
+		- NCBI_gene_ID 
+		- Tx_version (transcript version)
+	- Gene names are now sorted by genomic coordinates and no longer sorted alphabetically ("Gene_name" feature)
+	- Fix a bug when setting the cytoband annotation (issue 210)
 	- Fix misleading OMIM annotation (issues 156, 132)
-	- Add "NCBI_gene_ID" and "Tx_version" annotations
+	- Update of the Makefile
 	- Update of the "contact" recommendations in output (from email to GitHub)
+	- Reorganization of the GitHub .md files
 
 January, 15, 2024, AnnotSV version 3.3.9
 	- Fix a bug when setting the "hpoVersion" variable (issue 207)

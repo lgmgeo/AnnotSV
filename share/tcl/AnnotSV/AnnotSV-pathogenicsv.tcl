@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.3.9                                                                                            #
+# AnnotSV 3.4                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -215,7 +215,7 @@ proc checkClinVar_PathogenicFile {genomeBuild} {
         
         # Writing:
         ##########
-        puts "\t       ([llength $L_toWriteLoss] SV Loss + [llength $L_toWriteGain] SV Gain)"
+        puts "\t       ([llength $L_toWriteLoss] SV Loss + [llength $L_toWriteGain] SV Gain + [llength $L_toWriteIns] SV Ins + [llength $L_toWriteInv] SV Inv)"
         if {$L_toWriteLoss ne {}} {
             WriteTextInFile [join $L_toWriteLoss "\n"] $pathogenicLossFile_Tmp
         }
@@ -443,7 +443,7 @@ proc checkdbVar_PathogenicFile {genomeBuild} {
     
     # Writing:
     ##########
-    puts "\t       ([llength $L_toWriteLoss] SV Loss + [llength $L_toWriteGain] SV Gain)"
+    puts "\t       ([llength $L_toWriteLoss] SV Loss + [llength $L_toWriteGain] SV Gain + [llength $L_toWriteIns] SV Ins)"
     if {$L_toWriteLoss ne {}} {
         WriteTextInFile [join $L_toWriteLoss "\n"] $pathogenicLossFile_Tmp
     }
@@ -483,7 +483,7 @@ proc checkOMIM_PathogenicFile {genomeBuild} {
         puts "\t   >>> OMIM morbid genes parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
         
         # Genes coordinates
-        set genesDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes/$g_AnnotSV(genomeBuild)"
+        set genesDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes/$genomeBuild"
         set genesFileFormatted "[glob -nocomplain $genesDir/genes.$g_AnnotSV(tx).sorted.bed]"
         foreach L [LinesFromFile $genesFileFormatted] {
             set Ls [split $L "\t"]
