@@ -32,7 +32,7 @@ mkdir -p $ANNOTSV/share/python3/phenogenius
 cd $ANNOTSV/share/python3/phenogenius
 if [ ! -d PhenoGenius ]
 then
-	git clone git@github.com:kyauy/PhenoGenius.git --branch v1.0.0 &> PhenoGenius.install.log
+	git clone https://github.com/kyauy/PhenoGenius --branch v1.0.0 &> PhenoGenius.install.log
 	cd ./PhenoGenius
 	rm -rf .git .gitattributes .github .gitignore
     poetry install &> ../poetry_install.log
@@ -40,17 +40,19 @@ fi
 
 cd $ANNOTSV/share/python3/phenogenius/PhenoGenius
 
-if [ `poetry run python phenogenius_cli.py --help | grep -c -- "--hpo_list"` == "1" ]
+poetry run python phenogenius_cli.py --help  &> ../PhenoGenius.run.test1.log
+if [ `grep -c -- "--hpo_list" ../PhenoGenius.run.test1.log` == "1" ]
 then
 	exit 0
 else
 	poetry install &> ../poetry_install.log ;# Can be run from different servers
-	if [ `poetry run python phenogenius_cli.py --help | grep -c -- "--hpo_list"` == 1 ]
+    poetry run python phenogenius_cli.py --help &> ../PhenoGenius.run.test2.log
+	if [ `grep -c -- "--hpo_list" ../PhenoGenius.run.test2.log` == 1 ]
 	then
 		exit 0
 	else
 		echo "phenogenius_cli.py not installed"	
-		echo "WARNING: No Exomiser annotations available."
+		echo "WARNING: No PhenoGenius annotations available."
 		exit 1
 	fi
 fi

@@ -38,7 +38,8 @@ proc checkPhenoGenius {} {
         puts "\tINFO: AnnotSV takes use of PhenoGenius (Yauy et al., 2023) for the phenotype-driven analysis."
         set g_AnnotSV(PhenoGenius) "1"
     } else {
-        puts "\nWARNING: No PhenoGenius installation available for the phenotype-driven analysis.\n"
+        puts "\nWARNING: No PhenoGenius installation available for the phenotype-driven analysis."
+		puts "\ncf $g_AnnotSV(installDir)/share/python3/phenogenius/*.log\n"
         set g_AnnotSV(PhenoGenius) "0"
     }
  
@@ -71,7 +72,8 @@ proc runPhenoGenius {L_Genes L_NCBI_ID L_HPO} {
 
 	set codeToWrite "#!/bin/bash\n\n"
 	append codeToWrite "cd $g_AnnotSV(installDir)/share/python3/phenogenius/PhenoGenius\n"
-    append codeToWrite "poetry run python phenogenius_cli.py --hpo_list $L_HPO --result_file $tmpResultsFile &> $tmpResultsLogFile\n"
+    append codeToWrite "poetry install\n"
+    append codeToWrite "poetry run python3 phenogenius_cli.py --hpo_list $L_HPO --result_file $tmpResultsFile &> $tmpResultsLogFile \n"
 
     WriteTextInFile "$codeToWrite" $tmpCommandFile
 	file attributes $tmpCommandFile -permissions 0755
@@ -79,9 +81,9 @@ proc runPhenoGenius {L_Genes L_NCBI_ID L_HPO} {
 	if {[catch {exec $tmpCommandFile} Message]} {
 		puts ""
 		puts $Message
-		set g_AnnotSV(PhenoGenius) "0"
-		return
 	}
+
+	if {![file exists $tmpResultsLogFile]} {set g_AnnotSV(PhenoGenius) "0"; return}
 
 	foreach L [LinesFromFile $tmpResultsFile] {
 		set Ls [split $L "\t"]
