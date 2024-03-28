@@ -295,7 +295,16 @@ proc checkMorbidfile {} {
         ##   Header: genes, OMIM_morbid
         ## - Create the 'date'_morbidCandidate.tsv.gz file.
         ##   Header: genes, OMIM_morbid_candidate
-        
+       
+		# Memorize the link NCBIgeneID-GeneName
+	    set NCBIgeneDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/NCBIgeneID"
+        foreach L [LinesFromFile "$NCBIgeneDir/geneSymbol_NCBIgeneID.tsv"] {
+			set gene [lindex $L 0]
+			set NCBIgeneID [lindex $L 1] 
+			set NCBIgeneIDfor($gene) $NCBIgeneID
+			lappend L_genesFor($NCBIgeneID) $gene
+		}
+
         set MorbidFileFormatted "$omimDir/[clock format [clock seconds] -format "%Y%m%d"]_morbid.tsv"
         set MorbidCandidateFileFormatted "$omimDir/[clock format [clock seconds] -format "%Y%m%d"]_morbidCandidate.tsv"
         puts "\t...creation of [file tail $MorbidFileFormatted.gz] and [file tail $MorbidCandidateFileFormatted] ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
@@ -346,10 +355,20 @@ proc checkMorbidfile {} {
                 if {$g eq ""} {continue}
                 ## "{ }", indicate mutations that contribute to susceptibility to multifactorial disorders (e.g., diabetes, asthma) or to susceptibility to infection (e.g., malaria).
                 ## "?", before the phenotype name indicates that the relationship between the phenotype and gene is provisional.
+
+                # Add the gene names (approved symbol + other related symbol)
                 if {[regexp "^{.+}|^\\\?" $pheno]} {
-                    lappend L_morbidCandidate $g
+					if {[info exists NCBIgeneIDfor($g)]} {
+						lappend L_morbidCandidate {*}$L_genesFor($NCBIgeneIDfor($g))
+					} else {
+						lappend L_morbidCandidate $g
+					}
                 } else {
-                    lappend L_morbid $g
+                    if {[info exists NCBIgeneIDfor($g)]} {
+						lappend L_morbid {*}$L_genesFor($NCBIgeneIDfor($g))
+                    } else {
+                        lappend L_morbid $g
+                    }
                 }
             }
         }

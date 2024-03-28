@@ -172,6 +172,7 @@ if {$g_AnnotSV(tx) eq "RefSeq"} {
 # Annotation with GenCC?
 checkGenCCgeneFile
 # Annotation with OMIM?
+checkNCBI
 checkOMIMfile
 checkMorbidfile
 # Annotation with HI (Haploinsufficiency)?
@@ -179,7 +180,7 @@ checkHIfile
 # Annotation with ClinGen?
 checkClinGenFile
 # Annotation with Exomiser?
-checkNCBI
+# checkNCBI (done with OMIM)
 checkExomiserInstallation
 # Annotation with PhenoGenius?
 checkPhenoGenius
