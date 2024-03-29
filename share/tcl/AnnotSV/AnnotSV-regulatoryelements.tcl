@@ -1243,7 +1243,13 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
                 lappend g_re($SV) "$gName"
             }
         }
-        set g_re($SV) [join $g_re($SV) ";"]
+	 
+        # AnnotSV restricts the number of overlapping reported features to 50	
+		if {[llength $g_re($SV)] > 50} {
+			set g_re($SV) "[join [lrange $g_re($SV) 0 49] ";"]..."
+		} else {
+			set g_re($SV) [join $g_re($SV) ";"]
+		}
     }
     
     return

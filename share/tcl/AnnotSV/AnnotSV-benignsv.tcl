@@ -1696,11 +1696,11 @@ proc poBenignSVannotation {SVchrom SVstart SVend L_GenesSVtoAnnotate} {
         }
         
         # Loading benign final annotation for each SV
-        # (AnnotSV restrict the number of overlapping reported features to 20)
+        # (AnnotSV restricts the number of overlapping reported features to 20)
         if {[info exists L_benign_coord($SVtoAnn,$svtype,allG)]} {
             if {[llength $L_benign_source($SVtoAnn,$svtype,allG)] > 20} {
-                lappend L_poBenignText($SVtoAnn) "[join [lrange $L_benign_source($SVtoAnn,$svtype,allG) 0 20] ";"]..."
-                lappend L_poBenignText($SVtoAnn) "[join [lrange $L_benign_coord($SVtoAnn,$svtype,allG) 0 20] ";"]..."
+                lappend L_poBenignText($SVtoAnn) "[join [lrange $L_benign_source($SVtoAnn,$svtype,allG) 0 19] ";"]..."
+                lappend L_poBenignText($SVtoAnn) "[join [lrange $L_benign_coord($SVtoAnn,$svtype,allG) 0 19] ";"]..."
             } else {
                 lappend L_poBenignText($SVtoAnn) "[join $L_benign_source($SVtoAnn,$svtype,allG) ";"]"
                 lappend L_poBenignText($SVtoAnn) "[join $L_benign_coord($SVtoAnn,$svtype,allG) ";"]"
@@ -1711,8 +1711,8 @@ proc poBenignSVannotation {SVchrom SVstart SVend L_GenesSVtoAnnotate} {
         }
         if {[info exists L_benign_coord($SVtoAnn,$svtype,someG)]} {
             if {[llength $L_benign_source($SVtoAnn,$svtype,someG)] > 20} {
-                lappend L_poBenignText($SVtoAnn) "[join [lrange $L_benign_source($SVtoAnn,$svtype,someG) 0 20] ";"]..."
-                lappend L_poBenignText($SVtoAnn) "[join [lrange $L_benign_coord($SVtoAnn,$svtype,someG) 0 20] ";"]..."
+                lappend L_poBenignText($SVtoAnn) "[join [lrange $L_benign_source($SVtoAnn,$svtype,someG) 0 19] ";"]..."
+                lappend L_poBenignText($SVtoAnn) "[join [lrange $L_benign_coord($SVtoAnn,$svtype,someG) 0 19] ";"]..."
             } else {
                 lappend L_poBenignText($SVtoAnn) "[join $L_benign_source($SVtoAnn,$svtype,someG) ";"]"
                 lappend L_poBenignText($SVtoAnn) "[join $L_benign_coord($SVtoAnn,$svtype,someG) ";"]"
