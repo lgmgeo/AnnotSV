@@ -320,7 +320,22 @@ proc configureAnnotSV {argv} {
             puts "Exit with error."
             puts "############################################################################"
             exit 2
-        }
+        } else {
+			# Minimum bedtools version compatible with AnnotSV is version 2.25
+			if {$tool eq "bedtools"} {
+				if {[regexp "(\[0-9\]+\\.\[0-9\]+\\.\[0-9\]+)" $Message match bedtoolsVersion]} {
+					set L_bedtoolsVersion [split $bedtoolsVersion "."]
+					if {[lindex $L_bedtoolsVersion 0] < 2 || ([lindex $L_bedtoolsVersion 0] eq 2 && [lindex $L_bedtoolsVersion 1] < 25)} {
+					    puts "############################################################################"
+					    puts "The minimum bedtools version compatible with AnnotSV is version 2.25."
+						puts "You are using bedtools version $bedtoolsVersion"
+					    puts "Exit with error."
+					    puts "############################################################################"
+						exit 2
+					}
+				}
+			}
+		}
     }
     
     # tx: It must be "RefSeq" or "ENSEMBL"

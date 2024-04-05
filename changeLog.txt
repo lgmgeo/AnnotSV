@@ -10,6 +10,14 @@
 
 For more details, please see the README file.
 
+
+April, , 2024, AnnotSV version 3.4.1
+	- Check the user bedtools version
+	- Restricts the number of RE_gene features to 50
+	- Integrate all the gene symbols for OMIM morbid annotations
+	- Improve the creation of the benign dataset (gnomAD, 1000g and HPRC)
+	- Add log files for the PhenoGenius install
+
 February, 16, 2024, AnnotSV version 3.4
 	- Human annotation update
 	- Add new regulatory elements annotations:
