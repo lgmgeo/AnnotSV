@@ -94,6 +94,8 @@ proc updateFASTAfiles {} {
             set PathGB "$g_AnnotSV(genomeBuild)"
         } elseif {$g_AnnotSV(genomeBuild) eq "mm10"} {
             set PathGB "$g_AnnotSV(genomeBuild)"
+        } elseif {$g_AnnotSV(genomeBuild) eq "mm39"} {
+            set PathGB "$g_AnnotSV(genomeBuild)"
         }
         if {![file exists $extannDir/GCcontent/$PathGB/chr$chrom.fa]} {continue}
         WriteTextInFile [exec sed "s/chr//" $extannDir/GCcontent/$PathGB/chr$chrom.fa] $FASTAfileFormatted
@@ -101,7 +103,7 @@ proc updateFASTAfiles {} {
             set wcValue [exec wc $extannDir/GCcontent/$PathGB/chr$chrom.fa]
             set nbChars [lindex $wcValue 2]
             set nLignes [lindex $wcValue 0]
-            puts "wcValue $wcValue; nbChars $nbChars; nLignes $nLignes - length [string length ">chr$chrom"]"
+            # puts "wcValue $wcValue; nbChars $nbChars; nLignes $nLignes"
             WriteTextInFile "$chrom\t[expr {$nbChars-$nLignes-[string length ">chr$chrom"]}]" $ChromSizesFile ; # Removing of the header and "\n" characters
             # WARNING for chrY:
             # >chrY dna:chromosome chromosome:GRCh37:Y:2649521:59034049:1

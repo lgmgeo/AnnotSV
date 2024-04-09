@@ -12,6 +12,7 @@ For more details, please see the README file.
 
 
 April, , 2024, AnnotSV version 3.4.1
+	- Add the GRCm39/mm39 code and README for Mouse annotations (not the annotations)
 	- Check the user bedtools version
 	- Restricts the number of RE_gene features to 50
 	- Integrate all the gene symbols for OMIM morbid annotations
@@ -174,7 +175,6 @@ November 08, 2021, AnnotSV version 3.1
 	- Add bugfix in the SV input BED file, last column could not have empty values. Replaced with "." if empty
 	- Add bugfix in section 5 of the SV ranking
 	- Set the ACMG_class to "NA" if not defined 
-
 	- Update/Add Mouse annotations (CytoBand, miRNA from miRTargetLink)
 
 December 18, 2020, AnnotSV version 3.0

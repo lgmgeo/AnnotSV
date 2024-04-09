@@ -22,11 +22,16 @@
 ############################################################################################################
 
 proc warningRankingMessage {L_header field} {
-    puts "WARNING: \"$field\" annotation is missing:"
-    puts "******************************************"
-    puts "$L_header"
-    puts "******************************************"
-    puts "         => No ranking provided\n"
+    global g_AnnotSV
+
+	if {$g_AnnotSV(organism) eq "Human"} {
+	    puts "WARNING: \"$field\" annotation is missing:"
+	    puts "******************************************"
+	    puts "$L_header"
+	    puts "******************************************"
+	    puts "         => No ranking provided\n"
+	}
+	return
 }
 
 

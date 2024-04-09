@@ -511,18 +511,18 @@ proc configureAnnotSV {argv} {
         set g_AnnotSV(candidateSnvIndelSamples) ""
     }
     
-    ## It must be "GRCh37" or "GRCh38" or "mm9" or "mm10" for the genomeBuild option.
-    if {![regexp -nocase "^(GRCh37)|(GRCh38)|(mm9)|(mm10)$" $g_AnnotSV(genomeBuild)]} {
+    ## It must be "GRCh37" or "GRCh38" or "mm39" or "mm9" or "mm10" for the genomeBuild option.
+    if {![regexp -nocase "^(GRCh37)|(GRCh38)|(mm39)|(mm9)|(mm10)$" $g_AnnotSV(genomeBuild)]} {
         puts "############################################################################"
         puts "Bad option value: -genomeBuild = $g_AnnotSV(genomeBuild)"
-        puts "Should be \"GRCh37\", \"GRCh38\", \"mm9\" or \"mm10\""
+        puts "Should be \"GRCh37\", \"GRCh38\", \"mm39\", \"mm9\" or \"mm10\""
         puts "############################################################################"
         exit 2
     }
     # Definition of the $g_AnnotSV(organism) variable
     if {[regexp -nocase "^(GRCh37)|(GRCh38)$" $g_AnnotSV(genomeBuild)]} {
         set g_AnnotSV(organism) "Human"
-    } elseif {[regexp -nocase "^(mm9)|(mm10)$" $g_AnnotSV(genomeBuild)]} {
+    } elseif {[regexp -nocase "^(mm39)|(mm9)|(mm10)$" $g_AnnotSV(genomeBuild)]} {
         set g_AnnotSV(organism) "Mouse"
     }
     

@@ -31,13 +31,18 @@ proc checkGenesRefSeqFile {} {
     #############################################################
     set genesDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes/$g_AnnotSV(genomeBuild)"
     
-    set genesFileDownloaded "[glob -nocomplain $genesDir/ncbiRefSeq.txt.gz]"
+	if {[regexp "GRCh37|GRCh38|mm39" $g_AnnotSV(genomeBuild)]} {
+		set genesFileDownloaded [glob -nocomplain $genesDir/ncbiRefSeq.txt.gz]
+	} elseif {[regexp "mm9|mm10" $g_AnnotSV(genomeBuild)]} {
+		set genesFileDownloaded [glob -nocomplain $genesDir/refGene.txt.gz]
+	}
+
     set genesFileFormatted "[glob -nocomplain $genesDir/genes.RefSeq.sorted.bed]"
     set transcriptVersionFile "$genesDir/transcript_version.RefSeq.tsv"
 
     if {$genesFileDownloaded eq "" && $genesFileFormatted eq ""} {
         puts "############################################################################"
-        puts "\"$genesDir/refGene.txt.gz\" file doesn't exist"
+        puts "\"$genesFileDownloaded\" file doesn't exist"
         puts "Please check your install - Exit with error."
         puts "############################################################################"
         exit 2

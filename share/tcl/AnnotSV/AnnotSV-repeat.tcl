@@ -63,6 +63,9 @@ proc checkRepeatFile {} {
         # The downloaded file exist but not the formatted.
         set repeatFileFormatted "$extannDir/Repeat/$g_AnnotSV(genomeBuild)/[clock format [clock seconds] -format "%Y%m%d"]_Repeat.sorted.bed"
         file delete -force $repeatFileFormatted.tmp
+        puts "\t...Repeats configuration ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+        puts "\t\t...creation of $repeatFileFormatted"
+        puts "\t\t   (done only once during the first Repeats annotation)"
         
         set f [open $repeatFileDownloaded]
         set i 0
