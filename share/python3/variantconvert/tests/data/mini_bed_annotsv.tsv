@@ -1,0 +1,4 @@
+AnnotSV_ID	SV_chrom	SV_start	SV_end	SV_length	SV_type	Biologist_annotation	Biologist_ranking	Samples_ID	Annotation_mode	CytoBand	Gene_name	Gene_count	Tx	Tx_start	Tx_end	Overlapped_tx_length
+17_44171888_44297143_DUP_1	17	44171888	44297143	125255	DUP		Benign	Sample1	full	q21.31	KANSL1;KANSL1-AS1	2				
+17_44171888_44297143_DUP_1	17	44171888	44297143	125255	DUP		Benign	Sample1	split	q21.31	KANSL1		NM_001193465	44107281	44302733	125255
+17_44171888_44297143_DUP_1	17	44171888	44297143	125255	DUP		Benign	Sample1	split	q21.31	KANSL1-AS1		NR_034172	44270938	44274089	3151

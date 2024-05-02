@@ -1,7 +1,8 @@
 ##fileformat=VCFv4.3
 ##fileDate=23/01/2023
-##source=canoes_bed
 ##InputFile=/home1/HUB/bin/variantconvert/current/tests/data/canoes.bed
+##source=variantconvert from canoes_bed
+##variantconvertVersion=2.0.0
 ##FILTER=<ID=PASS,Description="Passed filter">
 ##ALT=<ID=DUP,Description="Duplication">
 ##ALT=<ID=DEL,Description="Deletion">
@@ -37,4 +38,4 @@
 ##reference=file:///home1/DB/STARK/genomes/current/hg19.fa
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SGT000000
 7	6012978	.	T	<DEL>	.	PASS	SVTYPE=DEL;SVLEN=5401;END=6018379	GT	0/1
-14	68331430	.	t	<DUP>	.	PASS	SVTYPE=DUP;SVLEN=508;END=68331938	GT	0/1
+14	68331430	.	T	<DUP>	.	PASS	SVTYPE=DUP;SVLEN=508;END=68331938	GT	0/1

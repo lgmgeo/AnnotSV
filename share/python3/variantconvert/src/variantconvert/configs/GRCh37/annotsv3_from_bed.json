@@ -1,0 +1,767 @@
+{
+	"GENERAL": {
+		"origin": "AnnotSV",
+		"input_format": "annotsv",
+		"output_format": "vcf",
+		"skip_rows": 0,
+		"comment": "",
+		"unique_variant_id": [
+			"AnnotSV_ID"
+		],
+		"default_present_genotype": "1/.",
+		"default_absent_genotype": "./.",
+		"mode": "combined",
+		"keep_empty_info": "false"
+	},
+	"GENOME": {
+		"assembly": "GRCh37",
+		"path": "/home1/data/genomes/GRCh37/Homo_sapiens.GRCh37.dna.primary_assembly.fa",
+		"vcf_header": [
+			"##contig=<ID=1,length=249250621,assembly=GRCh37>",
+			"##contig=<ID=10,length=135534747,assembly=GRCh37>",
+			"##contig=<ID=11,length=135006516,assembly=GRCh37>",
+			"##contig=<ID=12,length=133851895,assembly=GRCh37>",
+			"##contig=<ID=13,length=115169878,assembly=GRCh37>",
+			"##contig=<ID=14,length=107349540,assembly=GRCh37>",
+			"##contig=<ID=15,length=102531392,assembly=GRCh37>",
+			"##contig=<ID=16,length=90354753,assembly=GRCh37>",
+			"##contig=<ID=17,length=81195210,assembly=GRCh37>",
+			"##contig=<ID=18,length=78077248,assembly=GRCh37>",
+			"##contig=<ID=19,length=59128983,assembly=GRCh37>",
+			"##contig=<ID=2,length=243199373,assembly=GRCh37>",
+			"##contig=<ID=20,length=63025520,assembly=GRCh37>",
+			"##contig=<ID=21,length=48129895,assembly=GRCh37>",
+			"##contig=<ID=22,length=51304566,assembly=GRCh37>",
+			"##contig=<ID=3,length=198022430,assembly=GRCh37>",
+			"##contig=<ID=4,length=191154276,assembly=GRCh37>",
+			"##contig=<ID=5,length=180915260,assembly=GRCh37>",
+			"##contig=<ID=6,length=171115067,assembly=GRCh37>",
+			"##contig=<ID=7,length=159138663,assembly=GRCh37>",
+			"##contig=<ID=8,length=146364022,assembly=GRCh37>",
+			"##contig=<ID=9,length=141213431,assembly=GRCh37>",
+			"##contig=<ID=MT,length=16569,assembly=GRCh37>",
+			"##contig=<ID=X,length=155270560,assembly=GRCh37>",
+			"##contig=<ID=Y,length=59373566,assembly=GRCh37>",
+			"##contig=<ID=GL000192.1,length=547496,assembly=GRCh37>",
+			"##contig=<ID=GL000225.1,length=211173,assembly=GRCh37>",
+			"##contig=<ID=GL000194.1,length=191469,assembly=GRCh37>",
+			"##contig=<ID=GL000193.1,length=189789,assembly=GRCh37>",
+			"##contig=<ID=GL000200.1,length=187035,assembly=GRCh37>",
+			"##contig=<ID=GL000222.1,length=186861,assembly=GRCh37>",
+			"##contig=<ID=GL000212.1,length=186858,assembly=GRCh37>",
+			"##contig=<ID=GL000195.1,length=182896,assembly=GRCh37>",
+			"##contig=<ID=GL000223.1,length=180455,assembly=GRCh37>",
+			"##contig=<ID=GL000224.1,length=179693,assembly=GRCh37>",
+			"##contig=<ID=GL000219.1,length=179198,assembly=GRCh37>",
+			"##contig=<ID=GL000205.1,length=174588,assembly=GRCh37>",
+			"##contig=<ID=GL000215.1,length=172545,assembly=GRCh37>",
+			"##contig=<ID=GL000216.1,length=172294,assembly=GRCh37>",
+			"##contig=<ID=GL000217.1,length=172149,assembly=GRCh37>",
+			"##contig=<ID=GL000199.1,length=169874,assembly=GRCh37>",
+			"##contig=<ID=GL000211.1,length=166566,assembly=GRCh37>",
+			"##contig=<ID=GL000213.1,length=164239,assembly=GRCh37>",
+			"##contig=<ID=GL000220.1,length=161802,assembly=GRCh37>",
+			"##contig=<ID=GL000218.1,length=161147,assembly=GRCh37>",
+			"##contig=<ID=GL000209.1,length=159169,assembly=GRCh37>",
+			"##contig=<ID=GL000221.1,length=155397,assembly=GRCh37>",
+			"##contig=<ID=GL000214.1,length=137718,assembly=GRCh37>",
+			"##contig=<ID=GL000228.1,length=129120,assembly=GRCh37>",
+			"##contig=<ID=GL000227.1,length=128374,assembly=GRCh37>",
+			"##contig=<ID=GL000191.1,length=106433,assembly=GRCh37>",
+			"##contig=<ID=GL000208.1,length=92689,assembly=GRCh37>",
+			"##contig=<ID=GL000198.1,length=90085,assembly=GRCh37>",
+			"##contig=<ID=GL000204.1,length=81310,assembly=GRCh37>",
+			"##contig=<ID=GL000233.1,length=45941,assembly=GRCh37>",
+			"##contig=<ID=GL000237.1,length=45867,assembly=GRCh37>",
+			"##contig=<ID=GL000230.1,length=43691,assembly=GRCh37>",
+			"##contig=<ID=GL000242.1,length=43523,assembly=GRCh37>",
+			"##contig=<ID=GL000243.1,length=43341,assembly=GRCh37>",
+			"##contig=<ID=GL000241.1,length=42152,assembly=GRCh37>",
+			"##contig=<ID=GL000236.1,length=41934,assembly=GRCh37>",
+			"##contig=<ID=GL000240.1,length=41933,assembly=GRCh37>",
+			"##contig=<ID=GL000206.1,length=41001,assembly=GRCh37>",
+			"##contig=<ID=GL000232.1,length=40652,assembly=GRCh37>",
+			"##contig=<ID=GL000234.1,length=40531,assembly=GRCh37>",
+			"##contig=<ID=GL000202.1,length=40103,assembly=GRCh37>",
+			"##contig=<ID=GL000238.1,length=39939,assembly=GRCh37>",
+			"##contig=<ID=GL000244.1,length=39929,assembly=GRCh37>",
+			"##contig=<ID=GL000248.1,length=39786,assembly=GRCh37>",
+			"##contig=<ID=GL000196.1,length=38914,assembly=GRCh37>",
+			"##contig=<ID=GL000249.1,length=38502,assembly=GRCh37>",
+			"##contig=<ID=GL000246.1,length=38154,assembly=GRCh37>",
+			"##contig=<ID=GL000203.1,length=37498,assembly=GRCh37>",
+			"##contig=<ID=GL000197.1,length=37175,assembly=GRCh37>",
+			"##contig=<ID=GL000245.1,length=36651,assembly=GRCh37>",
+			"##contig=<ID=GL000247.1,length=36422,assembly=GRCh37>",
+			"##contig=<ID=GL000201.1,length=36148,assembly=GRCh37>",
+			"##contig=<ID=GL000235.1,length=34474,assembly=GRCh37>",
+			"##contig=<ID=GL000239.1,length=33824,assembly=GRCh37>",
+			"##contig=<ID=GL000210.1,length=27682,assembly=GRCh37>",
+			"##contig=<ID=GL000231.1,length=27386,assembly=GRCh37>",
+			"##contig=<ID=GL000229.1,length=19913,assembly=GRCh37>",
+			"##contig=<ID=GL000226.1,length=15008,assembly=GRCh37>",
+			"##contig=<ID=GL000207.1,length=4262,assembly=GRCh37>",
+			"##reference=file:///home1/data/genomes/GRCh37/Homo_sapiens.GRCh37.dna.primary_assembly.fa"
+		]
+	},
+	"VCF_COLUMNS": {
+		"#CHROM": "SV_chrom",
+		"POS": [
+			"HELPER_FUNCTION",
+			"get_pos_annotsv",
+			"SV_start",
+			"Tx_start",
+			"Annotation_mode"
+		],
+		"ID": [
+			"HELPER_FUNCTION",
+			"get_undefined_value"
+		],
+		"REF": [
+			"HELPER_FUNCTION",
+			"get_ref_annotsv",
+			"SV_chrom",
+			"POS"
+		],
+		"ALT": [
+			"HELPER_FUNCTION",
+			"get_alt_for_bed_based_annotsv",
+			"SV_type"
+		],
+		"QUAL": [
+			"HELPER_FUNCTION",
+			"get_undefined_value"
+		],
+		"FILTER": "",
+		"INFO": {
+			"AnnotSV_ID": "AnnotSV_ID",
+			"INFO": "INFO",
+			"ID": "ID",
+			"SV_start": "SV_start",
+			"END": [
+				"HELPER_FUNCTION",
+				"get_end_annotsv",
+				"Annotation_mode",
+				"SV_end",
+				"Tx_end"
+			],
+			"SVLEN": [
+				"HELPER_FUNCTION",
+				"get_svlen_annotsv",
+				"Annotation_mode",
+				"SV_length",
+				"Overlapped_tx_length"
+			],
+			"SVTYPE": "SV_type",
+			"Annotation_mode": "Annotation_mode"
+		},
+		"FORMAT": "",
+		"SAMPLE": "Samples_ID"
+	},
+	"COLUMNS_DESCRIPTION": {
+		"REF": {},
+		"ALT": {
+			"DUP": "Duplication",
+			"DEL": "Deletion"
+		},
+		"INFO": {
+			"AnnotSV_ID": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "AnnotSV ID"
+			},
+			"SV_chrom": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Name of the chromosome"
+			},
+			"SV_start": {
+				"Type": "Integer",
+				"Number": "1",
+				"Description": "Starting position of the SV in the chromosome"
+			},
+			"END": {
+				"Type": "Integer",
+				"Number": "1",
+				"Description": "Ending position of the SV in the chromosome"
+			},
+			"SVLEN": {
+				"Type": "Integer",
+				"Number": "1",
+				"Description": "Length of the SV (bp) (deletions have negative values)"
+			},
+			"SVTYPE": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Type of the SV (DEL, DUP, ...)"
+			},
+			"Samples_ID": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "List of the samples ID for which the SV was called (according to the SV input file)"
+			},
+			"REF": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Nucleotide sequence in the reference genome (extracted only from a VCF input file)"
+			},
+			"ALT": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Alternate nucleotide sequence (extracted only from a VCF input file)"
+			},
+			"'SampleID'": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "The sample ID column from a VCF file"
+			},
+			"Annotation_mode": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Indicate the type of annotation lines generated: annotation on the SV full length ('full'), annotation on each gene overlapped by the SV ('split')"
+			},
+			"Gene_name": {
+				"Type": "String",
+				"Number": ".",
+				"Description": "Gene symbol"
+			},
+			"Gene_count": {
+				"Type": "Integer",
+				"Number": "1",
+				"Description": "Number of overlapped genes with the SV"
+			},
+			"Tx": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Transcript symbol"
+			},
+			"Tx_start": {
+				"Type": "Integer",
+				"Number": "1",
+				"Description": "Starting position of the transcript"
+			},
+			"Tx_end": {
+				"Type": "Integer",
+				"Number": "1",
+				"Description": "Ending position of the transcript"
+			},
+			"Overlapped_tx_length": {
+				"Type": "Integer",
+				"Number": "1",
+				"Description": "Length of the transcript (bp) overlapping with the SV"
+			},
+			"Overlapped_CDS_length": {
+				"Type": "Integer",
+				"Number": "1",
+				"Description": "Length of the CoDing Sequence (CDS) (bp) overlapped with the SV"
+			},
+			"Overlapped_CDS_percent": {
+				"Type": "Integer",
+				"Number": "1",
+				"Description": "Percent of the CoDing Sequence (CDS) (bp) overlapped with the SV"
+			},
+			"Frameshift": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Indicates if the CDS length is not divisible by three (yes or no)"
+			},
+			"Exon_count": {
+				"Type": "Integer",
+				"Number": "1",
+				"Description": "Number of exons of the transcript"
+			},
+			"Location": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "SV location in the gene's. Values: txStart, txEnd, exon'i', intron'i' e.g. txStart-exon3"
+			},
+			"Location2": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "SV location in the gene's coding regions. Values: UTR (no CDS in the gene), 5'UTR (before the CDS start), 3'UTR (after the CDS end), CDS (between the CDS start and the CDS end, can be in an exon or an intron). e.g. 3'UTR-CDS"
+			},
+			"Dist_nearest_SS": {
+				"Type": "Integer",
+				"Number": "1",
+				"Description": "Absolute distance to nearest splice site after considering exonic and intronic SV breakpoints"
+			},
+			"Nearest_SS_type": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Nearest splice site type: 5' (donor) or 3' (acceptor)"
+			},
+			"Intersect_start": {
+				"Type": "Integer",
+				"Number": "1",
+				"Description": "Start position of the intersection between the SV and a transcript"
+			},
+			"Intersect_end": {
+				"Type": "Integer",
+				"Number": "1",
+				"Description": "End position of the intersection between the SV and a transcript"
+			},
+			"RE_gene": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Name of the genes regulated by a regulatory element overlapped with the SV to annotate. When available, the regulated gene name is detailed with associated haploinsufficiency (HI), triplosensitivity (TS), Exomiser (EX) scores, OMIM and candidate genes. (For the filtering output, see the -REselect1 and -REselect2 options)"
+			},
+			"B_gain_source": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Origin of the benign gain genomic regions completely overlapping the SV to annotate: gnomAD, ClinVar (CLN), ClinGen (TS40), DGV (dgv, nsv or esv), DDD, 1000 genomes (1000g), Ira M. Hall's lab (IMH), Children's Mercy Research Institute (CMRI)"
+			},
+			"B_gain_coord": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Coordinates of the benign gain genomic regions completely overlapping the SV to annotate"
+			},
+			"B_gain_AFmax": {
+				"Type": "Float",
+				"Number": "1",
+				"Description": "Maximum allele frequency of the reported benign gain genomic regions (if available)"
+			},
+			"B_loss_source": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Origin of the benign loss genomic regions completely overlapping the SV to annotate: gnomAD, ClinVar (CLN), ClinGen (HI40), DGV (dgv, nsv or esv), DDD, 1000 genomes (1000g), Ira M. Hall's lab (IMH), Children's Mercy Research Institute (CMRI)"
+			},
+			"B_loss_coord": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Coordinates of the benign loss genomic regions completely overlapping the SV to annotate"
+			},
+			"B_loss_AFmax": {
+				"Type": "Float",
+				"Number": "1",
+				"Description": "Maximum allele frequency of the reported benign loss genomic regions (if available)"
+			},
+			"B_ins_source": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Origin of the benign insertion genomic regions completely overlapping the SV to annotate: gnomAD, ClinVar (CLN), 1000 genomes (1000g), Ira M. Hall's lab (IMH), Children's Mercy Research Institute (CMRI)"
+			},
+			"B_ins_coord": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Coordinates of the benign insertion genomic regions completely overlapping the SV to annotate"
+			},
+			"B_ins_AFmax": {
+				"Type": "Float",
+				"Number": "1",
+				"Description": "Maximum allele frequency of the reported benign insertion genomic regions (if available)"
+			},
+			"B_inv_source": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Origin of the benign inversion genomic regions completely overlapping the SV to annotate: gnomAD, 1000 genomes (1000g), Ira M. Hall's lab (IMH), Children's Mercy Research Institute (CMRI)"
+			},
+			"B_inv_coord": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Coordinates of the benign inversion genomic regions completely overlapping the SV to annotate"
+			},
+			"B_inv_AFmax": {
+				"Type": "Float",
+				"Number": "1",
+				"Description": "Maximum allele frequency of the reported benign inversion genomic regions (if available)"
+			},
+			"P_gain_phen": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Phenotype of the pathogenic gain genomic regions completely overlapped with the SV to annotate"
+			},
+			"P_gain_hpo": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "HPO terms describing the pathogenic gain genomic regions completely overlapped with the SV to annotate"
+			},
+			"P_gain_source": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Origin of the pathogenic gain genomic regions completely overlapped with the SV to annotate: dbVarNR (dbVar), ClinVar (CLN), ClinGen (TS3)"
+			},
+			"P_gain_coord": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Coordinates of the pathogenic gain genomic regions completely overlapped with the SV to annotate"
+			},
+			"P_loss_phen": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Phenotype of the pathogenic loss genomic regions completely overlapped with the SV to annotate"
+			},
+			"P_loss_hpo": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "HPO terms describing the pathogenic loss genomic regions completely overlapped with the SV to annotate"
+			},
+			"P_loss_source": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Origin of the pathogenic loss genomic regions completely overlapped with the SV to annotate: dbVarNR (dbVar), ClinVar (CLN), ClinGen (HI3), morbid"
+			},
+			"P_loss_coord": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Coordinates of the pathogenic loss genomic regions completely overlapped with the SV to annotate"
+			},
+			"P_ins_phen": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Phenotype of the pathogenic insertion genomic regions completely overlapped with the SV to annotate"
+			},
+			"P_ins_hpo": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "HPO terms describing the pathogenic insertion genomic regions completely overlapped with the SV to annotate"
+			},
+			"P_ins_source": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Origin of the pathogenic insertion genomic regions completely overlapped with the SV to annotate: dbVarNR (dbVar), ClinVar (CLN)"
+			},
+			"P_ins_coord": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Coordinates of the pathogenic insertion genomic regions completely overlapped with the SV to annotate"
+			},
+			"P_snvindel_nb": {
+				"Type": "Integer",
+				"Number": "1",
+				"Description": "Number of pathogenic snv/indel from public databases completely overlapped with the SV to annotate"
+			},
+			"P_snvindel_phen": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Phenotypes of pathogenic snv/indel from public databases completely overlapped with the SV to annotate"
+			},
+			"TAD_coordinate": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Coordinates of the TAD whose boundaries overlapped with the annotated SV (boundaries included in the coordinates)"
+			},
+			"ENCODE_experiment": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "ENCODE experiments used to define the TAD"
+			},
+			"Cosmic_ID": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "COSMIC identifier"
+			},
+			"Cosmic_mut_typ": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Defined as Gain or Loss"
+			},
+			"CytoBand": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Cytogenic band annotation"
+			},
+			"GC_content_left": {
+				"Type": "Float",
+				"Number": "1",
+				"Description": "GC content around the left SV breakpoint (+/- 100bp)"
+			},
+			"GC_content_right": {
+				"Type": "Float",
+				"Number": "1",
+				"Description": "GC content around the right SV breakpoint (+/- 100bp)"
+			},
+			"Repeat_coord_left": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Repeats coordinates around the left SV breakpoint (+/- 100bp)"
+			},
+			"Repeat_type_left": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Repeats type around the left SV breakpoint (+/- 100bp) e.g. AluSp, L2b, L1PA2, LTR12C, SVA_D, ..."
+			},
+			"Repeat_coord_right": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Repeats coordinates around the right SV breakpoint (+/- 100bp)"
+			},
+			"Repeat_type_right": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Repeats type around the right SV breakpoint (+/- 100bp) e.g. AluSp, L2b, L1PA2, LTR12C, SVA_D, ..."
+			},
+			"Gap_left": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Gap regions coordinates around the left SV breakpoint (+/- 100bp)"
+			},
+			"Gap_right": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Gap regions coordinates around the right SV breakpoint (+/-100bp)"
+			},
+			"SegDup_left": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Segmental Duplication regions coordinates around the left SV breakpoint (+/- 100bp)"
+			},
+			"SegDup_right": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Segmental Duplication regions coordinates around the right SV breakpoint (+/- 100bp)"
+			},
+			"ENCODE_blacklist_left": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "ENCODE blacklist regions coordinates around the left SV breakpoint (+/- 100bp)"
+			},
+			"ENCODE_blacklist_characteristics_left": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "ENCODE blacklist regions characteristics around the left SV breakpoint (+/- 100bp)"
+			},
+			"ENCODE_blacklist_right": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "ENCODE blacklist regions coordinates around the right SV breakpoint (+/- 100bp)"
+			},
+			"ENCODE_blacklist_characteristics_right": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "ENCODE blacklist regions characteristics around the right SV breakpoint (+/- 100bp)"
+			},
+			"ACMG": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "ACMG genes"
+			},
+			"HI": {
+				"Type": "Integer",
+				"Number": "1",
+				"Description": "ClinGen Haploinsufficiency Score"
+			},
+			"TS": {
+				"Type": "Float",
+				"Number": "1",
+				"Description": "ClinGen Triplosensitivity Score"
+			},
+			"DDD_HI_percent": {
+				"Type": "Float",
+				"Number": "1",
+				"Description": "Haploinsufficiency ranks from DDD"
+			},
+			"GenCC_disease": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "GenCC disease name: e.g. Nizon-Isidor syndrome"
+			},
+			"GenCC_moi": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "GenCC mode of inheritance"
+			},
+			"GenCC_classification": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "GenCC classification (Definitive, Strong, Moderate, Limited, Disputed, Animal Model Only, Refuted or No known disease relationship)"
+			},
+			"GenCC_pmid": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "GenCC Pubmed Id"
+			},
+			"DDD_status": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "DDD status: e.g. confirmed, probable"
+			},
+			"DDD_mode": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "DDD allelic requirement: e.g. biallelic, hemizygous..."
+			},
+			"DDD_consequence": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "DDD mutation consequence: e.g. 'loss of function', uncertain ..."
+			},
+			"DDD_disease": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "DDD disease name: e.g. 'OCULOAURICULAR SYNDROME'"
+			},
+			"DDD_pmid": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "DDD Pubmed Id"
+			},
+			"ExAC_synZ": {
+				"Type": "Float",
+				"Number": "1",
+				"Description": "Positive synZ_ExAC (Z score) from ExAC indicate gene intolerance to synonymous variation"
+			},
+			"ExAC_misZ": {
+				"Type": "Float",
+				"Number": "1",
+				"Description": "Positive misZ_ExAC (Z score) from ExAC indicate gene intolerance to missense variation"
+			},
+			"ExAC_delZ": {
+				"Type": "Float",
+				"Number": "1",
+				"Description": "Positive delZ_ExAC (Z score) from ExAC indicate gene intolerance to deletion"
+			},
+			"ExAC_dupZ": {
+				"Type": "Float",
+				"Number": "1",
+				"Description": "Positive dupZ_ExAC (Z score) from ExAC indicate gene intolerance to duplication"
+			},
+			"ExAC_cnvZ": {
+				"Type": "Float",
+				"Number": "1",
+				"Description": "Positive cnvZ_ExAC (Z score) from ExAC indicate gene intolerance to CNV"
+			},
+			"OMIM_ID": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "OMIM unique six-digit identifier"
+			},
+			"OMIM_phenotype": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "e.g. Charcot-Marie-Tooth disease"
+			},
+			"OMIM_inheritance": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "e.g. AD (= 'Autosomal dominant'). Detailed in AnnotSV's FAQ."
+			},
+			"OMIM_morbid": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Set to 'yes' if the SV overlaps an OMIM morbid gene"
+			},
+			"OMIM_morbid_candidate": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Set to 'yes' if the SV overlaps an OMIM morbid gene candidate"
+			},
+			"LOEUF_bin": {
+				"Type": "Integer",
+				"Number": "1",
+				"Description": "Minimal 'decile bin of LOEUF' for given transcripts of a gene (lower values indicate more constrained). Values = integer [0-9]"
+			},
+			"GnomAD_pLI": {
+				"Type": "Float",
+				"Number": "1",
+				"Description": "Score computed by gnomAD indicating the probability that a gene is intolerant to a loss of function variation (Nonsense, splice acceptor/donor variants due to SNV/indel)"
+			},
+			"ExAC_pLI": {
+				"Type": "Float",
+				"Number": "1",
+				"Description": "Score computed by ExAC indicating the probability that a gene is intolerant to a loss of function variation (Nonsense, splice acceptor/donor variants due to SNV/indel). ExAC considers pLI>=0.9 as an extremely LoF intolerant gene"
+			},
+			"Exomiser_gene_pheno_score": {
+				"Type": "Float",
+				"Number": "1",
+				"Description": "Exomiser score for how close each overlapped gene is to the phenotype"
+			},
+			"Human_pheno_evidence": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Phenotypic evidence from Human model"
+			},
+			"Mouse_pheno_evidence": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Phenotypic evidence from Mouse model"
+			},
+			"Fish_pheno_evidence": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Phenotypic evidence from Fish model"
+			},
+			"Compound_htz(sample)": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "List of heterozygous SNV/indel (reported with 'chrom_position') presents in the gene overlapped by the annotated SV"
+			},
+			"Count_hom(sample)": {
+				"Type": "Integer",
+				"Number": "1",
+				"Description": "Number of homozygous SNV/indel (extracted from VCF input file) in the individual 'sample' which are present: 1) in the deletion SV ('full' annotation) and 2) between intersectStart and intersectEnd ('split' annotation)"
+			},
+			"Count_htz(sample)": {
+				"Type": "Integer",
+				"Number": "1",
+				"Description": "Number of heterozygous SNV/indel (extracted from VCF input file) in the individual 'sample' which are present: 1) in the SV ('full' annotation) and 2) between intersectStart and intersectEnd ('split' annotation)"
+			},
+			"Count_htz/allHom(sample)": {
+				"Type": "Float",
+				"Number": "1",
+				"Description": "Ratio for QC filtering: #htz(sample)/#allHom(sample)"
+			},
+			"Count_htz/total(cohort)": {
+				"Type": "Float",
+				"Number": "1",
+				"Description": "Ratio for QC filtering: #htz(sample)/#total(cohort)"
+			},
+			"Count_total(cohort)": {
+				"Type": "Integer",
+				"Number": "1",
+				"Description": "Total count of SNV/indel called from all the samples of the cohort and present in the interval of the deletion"
+			},
+			"AnnotSV_ranking_score": {
+				"Type": "Float",
+				"Number": "1",
+				"Description": "SV ranking score following the 2019 joint consensus recommendation of ACMG and ClinGen. Scoring: pathogenic >= 0.99, likely pathogenic [0.90;0.98], variant of uncertain significance [0.89;-0.89], likely benign [-0.90;-0.98], benign <= -0.99."
+			},
+			"AnnotSV_ranking_criteria": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Decision criteria explaining the AnnotSV ranking score"
+			},
+			"ACMG_class": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "SV ranking class into 1 of 5: class 1 (benign), class 2 (likely benign), class 3 (variant of unknown significance), class 4 (likely pathogenic), class 5 (pathogenic)"
+			}
+		},
+		"FORMAT": {
+			"GT": {
+				"Type": "String",
+				"Number": "1",
+				"Description": "Genotype"
+			},
+			"RE": {
+				"Type": "Integer",
+				"Number": "1",
+				"Description": "Reads Expected: the number of expected reads under the probabilistic model (Decon)"
+			},
+			"RO": {
+				"Type": "Integer",
+				"Number": "1",
+				"Description": "Reads observed: the number of observed reads (Decon)"
+			},
+			"RR": {
+				"Type": "Float",
+				"Number": "1",
+				"Description": "Reads ratio: the ratio of observed to expected reads (Decon)"
+			},
+			"NC": {
+				"Type": "Integer",
+				"Number": "1",
+				"Description": "N.comp: the number of samples used as the reference set (Decon)"
+			},
+			"CO": {
+				"Type": "Float",
+				"Number": "1",
+				"Description": "Correlation: the maximum correlation between the test sample and any other sample in the full set of BAM files (Decon)"
+			},
+			"BF": {
+				"Type": "Float",
+				"Number": "1",
+				"Description": "Bayes factor associated with the call (Decon)"
+			}
+		}
+	}
+}

@@ -1,7 +1,8 @@
 ##fileformat=VCFv4.3
 ##fileDate=23/01/2023
-##source=Decon
 ##InputFile=/home1/HUB/bin/variantconvert/current/tests/data/DECON.Design_results_all.txt
+##source=variantconvert from Decon
+##variantconvertVersion=2.0.0
 ##FILTER=<ID=PASS,Description="Passed filter">
 ##ALT=<ID=DUP,Description="Duplication">
 ##ALT=<ID=DEL,Description="Deletion">
@@ -83,11 +84,11 @@ chr7	55209944	.	C	<DUP>	.	PASS	SVTYPE=duplication;SVLEN=63419;END=55273363;CNV.I
 chr7	116409680	.	T	<DUP>	.	PASS	SVTYPE=duplication;SVLEN=13875;END=116423555;CNV.ID=25;N.exons=8;Start.b=729;End.b=736;Genomic.ID=chrchr7:116409680-116423555	GT:RE:RO:RR:NC:CO:BF	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	0/1:15003:20269:1.35:7:0.917262999320729:5.02	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.
 chr7	140624342	.	C	<DEL>	.	PASS	SVTYPE=deletion;SVLEN=209;END=140624551;CNV.ID=8;N.exons=1;Start.b=756;End.b=756;Genomic.ID=chrchr7:140624342-140624551	GT:RE:RO:RR:NC:CO:BF	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	0/1:152:20:0.132:3:0.891549019908297:4.14	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.
 chr8	32406210	.	G	<DEL>	.	PASS	SVTYPE=deletion;SVLEN=141;END=32406351;CNV.ID=33;N.exons=1;Start.b=757;End.b=757;Genomic.ID=chrchr8:32406210-32406351	GT:RE:RO:RR:NC:CO:BF	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	0/1:486:214:0.44:4:0.937846220696214:3.2	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.
-chr8	38269862	.	c	<DUP>	.	PASS	SVTYPE=duplication;SVLEN=45211;END=38315073;CNV.ID=19;N.exons=18;Start.b=769;End.b=786;Genomic.ID=chrchr8:38269862-38315073	GT:RE:RO:RR:NC:CO:BF	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	0/1:17575:29080:1.65:2:0.878757474184187:29.4	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.
+chr8	38269862	.	C	<DUP>	.	PASS	SVTYPE=duplication;SVLEN=45211;END=38315073;CNV.ID=19;N.exons=18;Start.b=769;End.b=786;Genomic.ID=chrchr8:38269862-38315073	GT:RE:RO:RR:NC:CO:BF	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	0/1:17575:29080:1.65:2:0.878757474184187:29.4	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.
 chr8	38272250	.	C	<DUP>	.	PASS	SVTYPE=duplication;SVLEN=13386;END=38285636;CNV.ID=34;N.exons=10;Start.b=774;End.b=783;Genomic.ID=chrchr8:38272250-38285636	GT:RE:RO:RR:NC:CO:BF	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	0/1:15273:19613:1.28:4:0.937846220696214:5.79	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.
 chr9	21970860	.	G	<DEL>	.	PASS	SVTYPE=deletion;SVLEN=23509;END=21994369;CNV.ID=35;N.exons=4;Start.b=812;End.b=815;Genomic.ID=chrchr9:21970860-21994369	GT:RE:RO:RR:NC:CO:BF	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	0/1:6558:4096:0.625:4:0.937846220696214:5.1	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.
 chr9	87285625	.	C	<DUP>	.	PASS	SVTYPE=duplication;SVLEN=81411;END=87367036;CNV.ID=26;N.exons=11;Start.b=816;End.b=826;Genomic.ID=chrchr9:87285625-87367036	GT:RE:RO:RR:NC:CO:BF	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	0/1:16851:24393:1.45:7:0.917262999320729:9.82	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.
-chr9	139440124	.	c	<DEL>	.	PASS	SVTYPE=deletion;SVLEN=139;END=139440263;CNV.ID=9;N.exons=1;Start.b=887;End.b=887;Genomic.ID=chrchr9:139440124-139440263	GT:RE:RO:RR:NC:CO:BF	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	0/1:52:9:0.173:3:0.891549019908297:2.72	0/1:248:106:0.427:4:0.937846220696214:3.15	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.
+chr9	139440124	.	C	<DEL>	.	PASS	SVTYPE=deletion;SVLEN=139;END=139440263;CNV.ID=9;N.exons=1;Start.b=887;End.b=887;Genomic.ID=chrchr9:139440124-139440263	GT:RE:RO:RR:NC:CO:BF	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	0/1:52:9:0.173:3:0.891549019908297:2.72	0/1:248:106:0.427:4:0.937846220696214:3.15	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.
 chrX	66764970	.	G	<DUP>	.	PASS	SVTYPE=duplication;SVLEN=172530;END=66937500;CNV.ID=41;N.exons=5;Start.b=888;End.b=892;Genomic.ID=chrchrX:66764970-66937500	GT:RE:RO:RR:NC:CO:BF	./.:.:.:.:.:.:.	0/1:34497:54248:1.57:10:0.958586216270185:5.42	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.
 chrX	66905734	.	C	<DUP>	.	PASS	SVTYPE=duplication;SVLEN=37961;END=66943695;CNV.ID=46;N.exons=6;Start.b=890;End.b=895;Genomic.ID=chrchrX:66905734-66943695	GT:RE:RO:RR:NC:CO:BF	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	0/1:29448:40523:1.38:5:0.946075460090573:7.49	./.:.:.:.:.:.:.
 chrX	66931206	.	A	<DEL>	.	PASS	SVTYPE=deletion;SVLEN=10625;END=66941831;CNV.ID=37;N.exons=3;Start.b=891;End.b=893;Genomic.ID=chrchrX:66931206-66941831	GT:RE:RO:RR:NC:CO:BF	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	./.:.:.:.:.:.:.	0/1:12095:7390:0.611:13:0.967641422768492:5.68

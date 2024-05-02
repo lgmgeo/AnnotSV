@@ -34,12 +34,10 @@ proc checkVariantconvertConfigfile {} {
         # - Check if the reference fasta file in the variantconvert bed configfiles has the good path
         #############################################################################################
         
-        ## SVinputfile is a BED
-        ## (useful only with a BED input file, because there is no need to have a reference fasta file from a VCF SVinputfile)
-        if {[regexp -nocase "\\.bed$" $g_AnnotSV(SVinputFile)]} {
+        foreach formatFile {bed vcf} {
             
-            set configfile "$g_AnnotSV(variantconvertDir)/configs/$g_AnnotSV(genomeBuild)/annotsv3_from_bed.json"
-            set localconfigfile "$g_AnnotSV(variantconvertDir)/configs/$g_AnnotSV(genomeBuild)/annotsv3_from_bed.local.json"
+            set configfile "$g_AnnotSV(variantconvertDir)/src/variantconvert/configs/$g_AnnotSV(genomeBuild)/annotsv3_from_$formatFile.json"
+            set localconfigfile "$g_AnnotSV(variantconvertDir)/src/variantconvert/configs/$g_AnnotSV(genomeBuild)/annotsv3_from_$formatFile.local.json"
             
             if {$g_AnnotSV(annotationsDir) ne ""} {
                 set pathDir "$g_AnnotSV(annotationsDir)"
@@ -101,7 +99,7 @@ proc runVariantconvert {outputFile} {
     
     regsub "\.tsv$" $outputFile ".vcf" VCFoutputFile
     
-    catch {exec python3 $g_AnnotSV(variantconvertDir)/variantconvert --version} Message
+    catch {exec python3 $g_AnnotSV(variantconvertDir)/src/variantconvert --version} Message
     if {[regexp "variantconvert (\[0-9\]+\\.\[0-9\]+\\.\[0-9\]+)" $Message match version]} {
         set version "v$version "
     } else {
@@ -116,7 +114,7 @@ proc runVariantconvert {outputFile} {
     
     if {[regexp -nocase "\\.vcf(.gz)?$" $g_AnnotSV(SVinputFile)]} {
         ## SVinputfile is a VCF
-        set command "python3 $g_AnnotSV(variantconvertDir)/variantconvert convert -i $outputFile -o $VCFoutputFile -fi annotsv -fo vcf -c $g_AnnotSV(variantconvertDir)/configs/$g_AnnotSV(genomeBuild)/annotsv3_from_vcf.json"
+        set command "python3 $g_AnnotSV(variantconvertDir)/src/variantconvert convert -i $outputFile -o $VCFoutputFile -c $g_AnnotSV(variantconvertDir)/src/variantconvert/configs/$g_AnnotSV(genomeBuild)/annotsv3_from_vcf.local.json"
     } else {
         ## SVinputfile is a BED)
         if {$g_AnnotSV(svtBEDcol) == -1 } {
@@ -125,14 +123,15 @@ proc runVariantconvert {outputFile} {
             if {$g_AnnotSV(svtBEDcol) == -1}       {puts "               -svtBEDcol $g_AnnotSV(svtBEDcol)"}
             return
         } else {
-            set command "python3 $g_AnnotSV(variantconvertDir)/variantconvert convert -i $outputFile -o $VCFoutputFile -fi annotsv -fo vcf -c $g_AnnotSV(variantconvertDir)/configs/$g_AnnotSV(genomeBuild)/annotsv3_from_bed.local.json"
+            set command "python3 $g_AnnotSV(variantconvertDir)/src/variantconvert convert -i $outputFile -o $VCFoutputFile -c $g_AnnotSV(variantconvertDir)/src/variantconvert/configs/$g_AnnotSV(genomeBuild)/annotsv3_from_bed.local.json"
         }
     }
     
     # variantconvert output
     
     catch {eval exec $command} Message
-    if {[regexp -nocase "error" $Message]} {
+	regsub -all "FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error" $Message "..." MessageReg  
+    if {[regexp -nocase "error" $MessageReg]} {
         puts "Error:"
     }
     ReplaceTextInFile "$command\n\n$Message" $LogFile
@@ -140,4 +139,6 @@ proc runVariantconvert {outputFile} {
     
     return
 }
+
+
 

@@ -1,7 +1,8 @@
 ##fileformat=VCFv4.3
 ##fileDate=23/01/2023
-##source=arriba
 ##InputFile=/home1/HUB/bin/variantconvert/current/tests/data/arriba.fusions.tsv
+##source=variantconvert from arriba
+##variantconvertVersion=2.0.0
 ##FILTER=<ID=PASS,Description="Passed filter">
 ##INFO=<ID=Fusion_Gene1,Number=1,Type=String,Description="Fusion gene 1">
 ##INFO=<ID=Fusion_Gene2,Number=1,Type=String,Description="Fusion gene 2">

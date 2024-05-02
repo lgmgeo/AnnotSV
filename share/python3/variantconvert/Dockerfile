@@ -1,8 +1,8 @@
 FROM centos:7
-MAINTAINER Samuel Nicaise
-LABEL Software="tsvconvert"
+LABEL org.opencontainers.image.authors="https://github.com/SamuelNicaise/variantconvert"
+LABEL Software="variantconvert"
 
-RUN yum -y install sudo make wget bzip2 gcc
+RUN yum -y install sudo make wget bzip2 gcc git
 
 #conda
 RUN cd /tmp
@@ -16,10 +16,6 @@ RUN rm -f /tmp/Miniconda3-latest-Linux-x86_64.sh
 
 #work env
 RUN conda create -n common python=3.10 pandas
-RUN /usr/local/lib/miniconda3/envs/common/bin/pip install pyfaidx
-RUN /usr/local/lib/miniconda3/envs/common/bin/pip install natsort
-RUN /usr/local/lib/miniconda3/envs/common/bin/pip install tqdm
-RUN /usr/local/lib/miniconda3/envs/common/bin/pip install polars
 
 #bcftools
 ENV BCFTOOLS_INSTALL_DIR=/opt/bcftools
@@ -49,5 +45,10 @@ RUN ln -s $HTSLIB_INSTALL_DIR/bin/bgzip /usr/bin/bgzip
 RUN ln -s $HTSLIB_INSTALL_DIR/bin/tabix /usr/bin/tabix
 RUN rm -rf /tmp/htslib-$HTSLIB_VERSION
 
+#install varianconvert
+RUN git clone https://github.com/SamuelNicaise/variantconvert.git 
+WORKDIR variantconvert/
+RUN /usr/local/lib/miniconda3/envs/common/bin/pip install -e .
+
 RUN echo "source activate common" > ~/.bashrc
-ENTRYPOINT ["/usr/local/lib/miniconda3/envs/common/bin/python"]
+ENTRYPOINT ["/usr/local/lib/miniconda3/envs/common/bin/python", "/variantconvert/variantconvert/__main__.py"]

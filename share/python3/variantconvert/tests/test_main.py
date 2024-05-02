@@ -27,8 +27,11 @@ import typing
 
 from os.path import join as osj
 
+import variantconvert
+
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from variantconvert.__main__ import main_convert
+from variantconvert.config import change_config
 
 
 def identical_except_date_and_genome(vcf_list: typing.List[str]):
@@ -40,7 +43,7 @@ def identical_except_date_and_genome(vcf_list: typing.List[str]):
     if len(vcf_list) < 2:
         raise RuntimeError("Expected a list containing at least 2 VCF paths")
 
-    VARIABLE_FIELDS = {"##fileDate=", "##reference=", "##InputFile="}
+    VARIABLE_FIELDS = {"##fileDate=", "##reference=", "##InputFile=", "##inputFile="}
 
     vcfs_lines = []
     k = 0
@@ -72,9 +75,7 @@ def test_varank_to_vcf(tmp_path):
                 "fam01_SAMPLE_VARANK_hg19_allVariants.rankingByGene.tsv",
             ),
             "outputFile": osj(tmp_path, "varank_test.vcf"),
-            "inputFormat": "varank",
-            "outputFormat": "vcf",
-            "configFile": osj(os.path.dirname(__file__), "..", "configs", "hg19", "varank.json"),
+            "configFile": osj(variantconvert.__default_config__, "hg19", "varank.json"),
             "verbosity": "debug",
             "coordConversionFile": osj(
                 os.path.dirname(__file__),
@@ -102,9 +103,7 @@ def test_decon_to_vcf(tmp_path):
                 "DECON.Design_results_all.txt",
             ),
             "outputFile": osj(tmp_path, "decon_test.vcf"),
-            "inputFormat": "tsv",
-            "outputFormat": "vcf",
-            "configFile": osj(os.path.dirname(__file__), "..", "configs", "hg19", "decon.json"),
+            "configFile": osj(variantconvert.__default_config__, "hg19", "decon.json"),
             "verbosity": "debug",
         },
     )
@@ -116,31 +115,27 @@ def test_decon_to_vcf(tmp_path):
     identical_except_date_and_genome([control, decon_tester.outputFile])
 
 
-def test_annotsv_to_vcf(tmp_path):
-    annotsv_tester = type(
+def test_decon_one_sample_to_vcf(tmp_path):
+    decon_tester = type(
         "obj",
         (object,),
         {
             "inputFile": osj(
                 os.path.dirname(__file__),
                 "data",
-                "DECON.results_all.AnnotSV.tsv",
+                "DECON.one_sample.all.tsv",
             ),
-            "outputFile": osj(tmp_path, "decon_annotsv_test.vcf"),
-            "inputFormat": "annotsv",
-            "outputFormat": "vcf",
-            "configFile": osj(
-                os.path.dirname(__file__), "..", "configs", "hg19", "annotsv3_from_vcf.json"
-            ),
+            "outputFile": osj(tmp_path, "decon_one_sample.vcf"),
+            "configFile": osj(variantconvert.__default_config__, "hg19", "decon.json"),
             "verbosity": "debug",
         },
     )
-    remove_if_exists(annotsv_tester.outputFile)
-    main_convert(annotsv_tester)
-    assert os.path.exists(annotsv_tester.outputFile)
+    remove_if_exists(decon_tester.outputFile)
+    main_convert(decon_tester)
+    assert os.path.exists(decon_tester.outputFile)
 
-    control = osj(os.path.dirname(__file__), "controls", "decon_annotsv_test.vcf")
-    identical_except_date_and_genome([control, annotsv_tester.outputFile])
+    control = osj(os.path.dirname(__file__), "controls", "decon_one_sample.vcf")
+    identical_except_date_and_genome([control, decon_tester.outputFile])
 
 
 def test_bed_to_vcf(tmp_path):
@@ -154,11 +149,7 @@ def test_bed_to_vcf(tmp_path):
                 "canoes.bed",
             ),
             "outputFile": osj(tmp_path, "canoes_bed.vcf"),
-            "inputFormat": "tsv",
-            "outputFormat": "vcf",
-            "configFile": osj(
-                os.path.dirname(__file__), "..", "configs", "hg19", "canoes_bed.json"
-            ),
+            "configFile": osj(variantconvert.__default_config__, "hg19", "canoes_bed.json"),
             "verbosity": "debug",
         },
     )
@@ -181,11 +172,7 @@ def test_breakpoints_to_vcf(tmp_path):
                 "star-fusion.fusion_predictions.tsv",
             ),
             "outputFile": osj(tmp_path, "star-fusion.vcf"),
-            "inputFormat": "breakpoints",
-            "outputFormat": "vcf",
-            "configFile": osj(
-                os.path.dirname(__file__), "..", "configs", "hg19", "starfusion.json"
-            ),
+            "configFile": osj(variantconvert.__default_config__, "hg19", "starfusion.json"),
             "verbosity": "debug",
         },
     )
@@ -208,9 +195,7 @@ def test_arriba_breakpoints_to_vcf(tmp_path):
                 "arriba.fusions.tsv",
             ),
             "outputFile": osj(tmp_path, "arriba.vcf"),
-            "inputFormat": "breakpoints",
-            "outputFormat": "vcf",
-            "configFile": osj(os.path.dirname(__file__), "..", "configs", "hg19", "arriba.json"),
+            "configFile": osj(variantconvert.__default_config__, "hg19", "arriba.json"),
             "verbosity": "debug",
         },
     )
@@ -219,60 +204,6 @@ def test_arriba_breakpoints_to_vcf(tmp_path):
     assert os.path.exists(breakpoints_tester.outputFile)
 
     control = osj(os.path.dirname(__file__), "controls", "arriba.vcf")
-    identical_except_date_and_genome([control, breakpoints_tester.outputFile])
-
-
-def test_bed_based_annotsv3_to_vcf(tmp_path):
-    breakpoints_tester = type(
-        "obj",
-        (object,),
-        {
-            "inputFile": osj(
-                os.path.dirname(__file__),
-                "data",
-                "annotsv_from_bed.tsv",
-            ),
-            "outputFile": osj(tmp_path, "annotsv3_from_bed.vcf"),
-            "inputFormat": "annotsv",
-            "outputFormat": "vcf",
-            "configFile": osj(
-                os.path.dirname(__file__), "..", "configs", "hg19", "annotsv3_from_bed.json"
-            ),
-            "verbosity": "debug",
-        },
-    )
-    remove_if_exists(breakpoints_tester.outputFile)
-    main_convert(breakpoints_tester)
-    assert os.path.exists(breakpoints_tester.outputFile)
-
-    control = osj(os.path.dirname(__file__), "controls", "annotsv3_from_bed.vcf")
-    identical_except_date_and_genome([control, breakpoints_tester.outputFile])
-
-
-def test_multisample_bed_based_annotsv3_to_vcf(tmp_path):
-    breakpoints_tester = type(
-        "obj",
-        (object,),
-        {
-            "inputFile": osj(
-                os.path.dirname(__file__),
-                "data",
-                "multisample_from_bed.annotated.tsv",
-            ),
-            "outputFile": osj(tmp_path, "multisample_annotsv3_from_bed.vcf"),
-            "inputFormat": "annotsv",
-            "outputFormat": "vcf",
-            "configFile": osj(
-                os.path.dirname(__file__), "..", "configs", "hg19", "annotsv3_from_bed.json"
-            ),
-            "verbosity": "debug",
-        },
-    )
-    remove_if_exists(breakpoints_tester.outputFile)
-    main_convert(breakpoints_tester)
-    assert os.path.exists(breakpoints_tester.outputFile)
-
-    control = osj(os.path.dirname(__file__), "controls", "multisample_annotsv3_from_bed.vcf")
     identical_except_date_and_genome([control, breakpoints_tester.outputFile])
 
 
@@ -287,9 +218,7 @@ def test_bedpe_to_vcf(tmp_path):
                 "chromothripsis.bedpe",
             ),
             "outputFile": osj(tmp_path, "chromo.vcf"),
-            "inputFormat": "bedpe",
-            "outputFormat": "vcf",
-            "configFile": osj(os.path.dirname(__file__), "..", "configs", "hg19", "bedpe.json"),
+            "configFile": osj(variantconvert.__default_config__, "hg19", "bedpe.json"),
             "verbosity": "debug",
         },
     )
@@ -299,3 +228,26 @@ def test_bedpe_to_vcf(tmp_path):
 
     control = osj(os.path.dirname(__file__), "controls", "chromothripsis.vcf")
     identical_except_date_and_genome([control, bed_tester.outputFile])
+
+
+def test_snp_to_vcf(tmp_path):
+    breakpoints_tester = type(
+        "obj",
+        (object,),
+        {
+            "inputFile": osj(
+                os.path.dirname(__file__),
+                "data",
+                "snp_test.tsv",
+            ),
+            "outputFile": osj(tmp_path, "snp_test.vcf"),
+            "configFile": osj(variantconvert.__default_config__, "hg19", "snp.json"),
+            "verbosity": "debug",
+        },
+    )
+    remove_if_exists(breakpoints_tester.outputFile)
+    main_convert(breakpoints_tester)
+    assert os.path.exists(breakpoints_tester.outputFile)
+
+    control = osj(os.path.dirname(__file__), "controls", "snp_test.vcf")
+    identical_except_date_and_genome([control, breakpoints_tester.outputFile])

@@ -13,7 +13,7 @@ share/AnnotSV/Annotations_Exomiser/
 # Python reimplementation of AnnotSV
 # + PhenoGenius install
 share/python3/annotsv/
-src/
+src/annotsv/
 Python/
 share/python3/phenogenius/
 
@@ -25,9 +25,11 @@ tests/AnnotSV/ToDo
 
 # VariantConvert
 share/python3/variantconvert/pipinstall.flag
-share/python3/variantconvert/configs/*/annotsv3_from_bed.local.json
-share/python3/variantconvert/variantconvert/__pycache__/
-share/python3/variantconvert/variantconvert/__pycache__/*.pyc
-share/python3/variantconvert/variantconvert/converters/__pycache__/
-share/python3/variantconvert/variantconvert/converters/__pycache__/*.pyc
-share/python3/variantconvert/variantconvert.egg-info/
+share/python3/variantconvert/src/variantconvert/configs/*/annotsv3_from_bed.local.json
+share/python3/variantconvert/src/variantconvert/__pycache__/
+share/python3/variantconvert/src/variantconvert/__pycache__/*.pyc
+share/python3/variantconvert/src/variantconvert/converters/__pycache__/
+share/python3/variantconvert/src/variantconvert/converters/__pycache__/*.pyc
+share/python3/variantconvert/src/variantconvert.egg-info/
+
+

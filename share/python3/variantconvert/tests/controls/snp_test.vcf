@@ -1,0 +1,135 @@
+##fileformat=VCFv4.3
+##fileDate=03/04/2023
+##InputFile=/home1/BAS/hameaue/variant_convert/variantconvert/tests/data/snp_test.tsv
+##source=variantconvert from SNP array
+##variantconvertVersion=2.0.0
+##FILTER=<ID=PASS,Description="Passed filter">
+##INFO=<ID=SVTYPE,Number=1,Type=String,Description="Type of structural variant">
+##INFO=<ID=MATEID,Number=1,Type=String,Description="ID of mate breakends">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##contig=<ID=chr1,length=249250621,assembly=hg19>
+##contig=<ID=chr2,length=243199373,assembly=hg19>
+##contig=<ID=chr3,length=198022430,assembly=hg19>
+##contig=<ID=chr4,length=191154276,assembly=hg19>
+##contig=<ID=chr5,length=180915260,assembly=hg19>
+##contig=<ID=chr6,length=171115067,assembly=hg19>
+##contig=<ID=chr7,length=159138663,assembly=hg19>
+##contig=<ID=chr8,length=146364022,assembly=hg19>
+##contig=<ID=chr9,length=141213431,assembly=hg19>
+##contig=<ID=chr10,length=135534747,assembly=hg19>
+##contig=<ID=chr11,length=135006516,assembly=hg19>
+##contig=<ID=chr12,length=133851895,assembly=hg19>
+##contig=<ID=chr13,length=115169878,assembly=hg19>
+##contig=<ID=chr14,length=107349540,assembly=hg19>
+##contig=<ID=chr15,length=102531392,assembly=hg19>
+##contig=<ID=chr16,length=90354753,assembly=hg19>
+##contig=<ID=chr17,length=81195210,assembly=hg19>
+##contig=<ID=chr18,length=78077248,assembly=hg19>
+##contig=<ID=chr19,length=59128983,assembly=hg19>
+##contig=<ID=chr20,length=63025520,assembly=hg19>
+##contig=<ID=chr21,length=48129895,assembly=hg19>
+##contig=<ID=chr22,length=51304566,assembly=hg19>
+##contig=<ID=chrM,length=16571,assembly=hg19>
+##contig=<ID=chrX,length=155270560,assembly=hg19>
+##contig=<ID=chrY,length=59373566,assembly=hg19>
+##reference=file:///STARK/databases/genomes/current/hg19.fa
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	sample1	sample2	sample3
+chr3	183635768	rs1000002	C	A	.	PASS	.	GT	0/1	1/0	1/1
+chr3	98342907	rs1000003	A	G,C,T	.	PASS	.	GT	1/1	1/1	0/1
+chr4	103374154	rs10000030	G	T,A,C	.	PASS	.	GT	1/0	1/1	1/1
+chr4	38924330	rs10000037	G	C	.	PASS	.	GT	1/1	0/1	1/1
+chr4	165621955	rs10000041	G	C	.	PASS	.	GT	0/1	1/1	0/0
+chr2	237752054	rs1000007	T	A,G	.	PASS	.	GT	1/1	1/1	1/1
+chr2	235690982	rs1000016	A	C,T	.	PASS	.	GT	1/1	1/0	0/1
+chr4	83899764	rs10000180	G	A,C	.	PASS	.	GT	1/1	1/1	1/1
+chr4	189690383	rs10000272	C	G,T	.	PASS	.	GT	0/0	0/1	0/1
+chr18	46361441	rs1000031	G	C,A,T	.	PASS	.	GT	1/1	1/1	1/0
+chr4	47511781	rs10000432	T	C,G	.	PASS	.	GT	1/1	0/1	1/1
+chr4	61773762	rs10000438	T	A,G,C	.	PASS	.	GT	1/1	1/0	1/1
+chr16	8138689	rs1000047	C	T,G	.	PASS	.	GT	0/1	1/0	0/1
+chr4	80943688	rs10000471	C	G,A,T	.	PASS	.	GT	1/0	1/1	0/1
+chr17	48298966	rs1000068	T	G,C	.	PASS	.	GT	0/1	1/1	1/1
+chr4	42475352	rs10000708	T	G,C,A	.	PASS	.	GT	1/1	1/1	1/1
+chr4	137429284	rs10000852	T	C,A,G	.	PASS	.	GT	0/1	1/1	0/1
+chr2	66350062	rs1000087	T	C	.	PASS	.	GT	1/1	1/0	0/1
+chr6	51990683	rs1000094	A	T,G	.	PASS	.	GT	1/1	1/1	1/1
+chr4	84978944	rs10000976	C	T,A	.	PASS	.	GT	0/1	1/0	0/1
+chr4	175644564	rs10000984	T	C,G	.	PASS	.	GT	0/0	1/1	0/1
+chr4	76010255	rs10000988	C	T,G	.	PASS	.	GT	1/1	1/1	0/1
+chr4	126535503	rs10001030	A	T,G	.	PASS	.	GT	0/1	1/0	1/1
+chr6	170353312	rs1000104	G	A,C	.	PASS	.	GT	1/1	0/1	1/1
+chr4	58810492	rs10001131	C	A,G,T	.	PASS	.	GT	1/1	0/1	1/1
+chr4	164101614	rs10001148	G	T,C	.	PASS	.	GT	1/1	1/1	1/1
+chr4	5249944	rs10001177	G	C	.	PASS	.	GT	0/1	1/0	0/0
+chr4	1755491	rs10001207	C	T,G	.	PASS	.	GT	0/0	1/0	1/1
+chr20	16223957	rs1000121	T	G,A	.	PASS	.	GT	1/1	1/0	1/0
+chr4	165452969	rs10001210	T	C,A	.	PASS	.	GT	0/0	0/1	1/1
+chr4	29763937	rs10001236	G	A,C	.	PASS	.	GT	1/1	1/1	0/0
+chr4	23626018	rs10001239	C	A,T,G	.	PASS	.	GT	1/1	1/1	0/1
+chr4	29912308	rs10001348	A	T,G,C	.	PASS	.	GT	1/1	1/1	0/1
+chr4	7613981	rs10001353	G	T,A,C	.	PASS	.	GT	1/1	1/1	1/1
+chr7	157644152	rs1000137	T	C,A	.	PASS	.	GT	1/0	1/1	1/1
+chr4	171751059	rs10001385	T	A,C	.	PASS	.	GT	1/1	1/0	1/1
+chr2	234242347	rs1000141	C	A,T	.	PASS	.	GT	1/1	0/1	1/0
+chr4	62474229	rs10001410	C	G,T	.	PASS	.	GT	0/1	1/1	1/1
+chr4	131392651	rs10001417	A	G,C,T	.	PASS	.	GT	1/1	0/1	1/1
+chr5	176284713	rs1000144	C	T,G	.	PASS	.	GT	0/1	0/1	1/1
+chr4	182756765	rs10001447	T	A	.	PASS	.	GT	1/0	1/0	1/0
+chr4	101137084	rs10001464	C	A	.	PASS	.	GT	1/0	1/0	0/0
+chr4	36461320	rs10001470	A	C,G	.	PASS	.	GT	1/1	1/1	1/1
+chr4	106936604	rs10001483	A	C,T,G	.	PASS	.	GT	0/1	0/1	1/1
+chr4	187508057	rs10001487	G	T,C	.	PASS	.	GT	0/1	1/0	1/1
+chr4	149936868	rs10001495	A	C,T,G	.	PASS	.	GT	0/1	1/1	1/1
+chr4	15722573	rs10001565	C	A,T,G	.	PASS	.	GT	1/1	1/1	1/1
+chr13	100950452	rs1000160	T	C,G	.	PASS	.	GT	1/1	1/0	1/1
+chr4	151071888	rs10001651	T	C,G,A	.	PASS	.	GT	1/1	1/1	0/1
+chr4	89249372	rs10001661	A	T,G,C	.	PASS	.	GT	1/0	1/1	1/0
+chr4	1867825	rs1000170	T	C,G	.	PASS	.	GT	1/1	1/1	1/0
+chr4	1867771	rs1000171	T	G,C	.	PASS	.	GT	1/1	1/1	1/0
+chr20	21233553	rs1000176	A	C,T	.	PASS	.	GT	0/1	1/1	1/1
+chr4	4884332	rs10001825	T	C,A	.	PASS	.	GT	1/1	1/1	1/1
+chr4	53744485	rs10001855	C	T,G	.	PASS	.	GT	1/1	0/1	1/1
+chr4	129223349	rs10001857	T	C,A	.	PASS	.	GT	0/1	1/1	1/0
+chr4	113454932	rs10001894	A	T,G	.	PASS	.	GT	1/1	1/0	1/1
+chr4	173758268	rs10001933	T	A,G	.	PASS	.	GT	1/0	1/0	1/1
+chr4	185579345	rs10001960	A	T,G,C	.	PASS	.	GT	1/0	1/1	1/1
+chr4	19035608	rs10001989	G	C,T,A	.	PASS	.	GT	1/1	1/1	0/1
+chr4	57859592	rs10002090	T	C,A	.	PASS	.	GT	1/0	1/1	0/1
+chr4	173178085	rs10002142	C	G	.	PASS	.	GT	0/0	1/1	0/1
+chr4	4449628	rs10002151	C	A,T	.	PASS	.	GT	1/1	1/1	1/1
+chr4	150915414	rs10002187	G	C,T	.	PASS	.	GT	1/1	1/1	1/0
+chr15	89627396	rs1000221	G	T	.	PASS	.	GT	1/1	0/1	1/0
+chr4	29626865	rs10002254	A	C,G,T	.	PASS	.	GT	1/1	1/1	0/1
+chr4	53488862	rs10002261	G	C,A,T	.	PASS	.	GT	1/1	1/1	1/1
+chr4	77442504	rs10002311	A	T,C	.	PASS	.	GT	1/0	1/0	1/1
+chr4	31249967	rs10002340	A	C,T	.	PASS	.	GT	0/0	0/1	1/1
+chr8	38474484	rs1000236	C	T	.	PASS	.	GT	1/1	0/1	1/1
+chr4	54927037	rs10002384	T	A,C,G	.	PASS	.	GT	1/1	0/1	0/1
+chr4	182370185	rs10002388	A	C,G,T	.	PASS	.	GT	1/1	1/1	1/1
+chr4	82786911	rs10002393	T	C,G	.	PASS	.	GT	1/1	1/1	1/1
+chr4	1157776	rs10002437	C	A,T,G	.	PASS	.	GT	1/0	1/0	1/1
+chr19	19030467	rs1000244	A	T,C	.	PASS	.	GT	1/1	0/1	1/1
+chr4	99926	rs10002444	G	T,A,C	.	PASS	.	GT	0/0	1/1	1/1
+chr4	158867973	rs10002472	A	C,T	.	PASS	.	GT	0/1	0/1	1/0
+chr4	47958679	rs10002500	C	T,G,A	.	PASS	.	GT	1/1	1/1	0/1
+chr4	111927642	rs10002518	A	C,T	.	PASS	.	GT	0/1	1/1	1/0
+chr4	24358882	rs10002552	A	T,C	.	PASS	.	GT	0/1	1/0	1/1
+chr4	183514227	rs10002568	G	T,C,A	.	PASS	.	GT	1/1	1/1	1/1
+chr4	110384938	rs10002595	T	C,A	.	PASS	.	GT	1/1	0/0	1/0
+chr4	105231571	rs10002598	C	T	.	PASS	.	GT	0/0	0/0	1/1
+chr8	134110278	rs1000264	A	C,T	.	PASS	.	GT	1/0	1/0	1/1
+chr4	75261407	rs10002688	A	G,T,C	.	PASS	.	GT	1/1	1/1	1/1
+chr4	116560690	rs10002695	C	T,G	.	PASS	.	GT	1/1	0/0	1/0
+chr4	98371858	rs10002703	A	T,C	.	PASS	.	GT	1/1	1/0	1/1
+chr4	180305067	rs10002760	C	G,A	.	PASS	.	GT	1/1	1/0	0/1
+chr4	99298166	rs10002767	A	C,T,G	.	PASS	.	GT	1/1	1/1	1/1
+chr4	186045532	rs10002793	C	T,G	.	PASS	.	GT	1/0	0/1	1/1
+chr4	121526447	rs10002802	G	C,A,T	.	PASS	.	GT	1/0	1/1	0/1
+chr4	60129838	rs10002811	T	G,C,A	.	PASS	.	GT	0/1	1/1	0/1
+chr1	209894661	rs1000283	G	T,A	.	PASS	.	GT	1/1	1/1	1/1
+chr8	96109370	rs1000286	C	G	.	PASS	.	GT	1/1	0/0	1/1
+chr4	64976578	rs10002861	C	T,A,G	.	PASS	.	GT	0/1	0/1	0/1
+chr3	188982808	rs1000291	G	T,C	.	PASS	.	GT	1/1	1/0	1/1
+chr12	104303246	rs1000295	C	A,T	.	PASS	.	GT	0/1	0/1	1/1
+chr4	31744915	rs10002958	A	G,C,T	.	PASS	.	GT	1/1	1/1	1/1
+chr4	65313065	rs10002960	T	A	.	PASS	.	GT	0/0	0/1	1/1
