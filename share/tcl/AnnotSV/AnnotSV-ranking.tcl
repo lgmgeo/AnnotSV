@@ -157,7 +157,7 @@ proc SVrankingLoss {L_annotations} {
         } else {
             if {$poPloss ne ""} {
                 # 2B. Partial overlap of a known pathogenic Loss SV (+0.00)
-                set g_rankingExplanations($AnnotSV_ID,2B) "2B (cf po_P_loss_source, HI and OMIM_morbid, +0.00);"
+                set g_rankingExplanations($AnnotSV_ID,2B) "2B (cf po_P_loss_source, HI, OMIM_morbid, +0.00);"
             }
             if {$Bloss ne ""} {
                 # 2F. Completely contained within an established benign CNV region (-1.00)
@@ -197,7 +197,7 @@ proc SVrankingLoss {L_annotations} {
             #     OR contains no additional genomic material).(-1.00)
             if {![info exists g_rankingExplanations($AnnotSV_ID,2F)]} {
                 # Does not add a -1 additional score if 2F/4O is completed.
-                set g_rankingExplanations($AnnotSV_ID,40) "40 (cf B_loss_source and po_B_loss_allG_source, -1.00);"
+                set g_rankingExplanations($AnnotSV_ID,40) "40 (cf B_loss_source, po_B_loss_allG_source, -1.00);"
             }
         }
         
@@ -557,7 +557,7 @@ proc SVrankingGain {L_annotations} {
         } else {
             if {$poPgain ne ""} {
                 # 2B. Partial overlap of a known pathogenic Gain SV (+0.00)
-                set g_rankingExplanations($AnnotSV_ID,2B) "2B (cf po_P_gain_source, TS, OMIM_morbid+0.00);"
+                set g_rankingExplanations($AnnotSV_ID,2B) "2B (cf po_P_gain_source, TS, OMIM_morbid, +0.00);"
             }
             
             if {$poBgainAllG ne ""} {
@@ -569,10 +569,10 @@ proc SVrankingGain {L_annotations} {
             } elseif {$poBgainAllG ne ""} {
                 # 2F. Larger than known benign copy-number gain, does not include additional protein-coding genes (-1.00)
                 # => non protein coding gene list to code to differentiate of 2C
-                set g_rankingExplanations($AnnotSV_ID,2F) "2F (cf po_B_gain_allG_source, -1.00)"
+                set g_rankingExplanations($AnnotSV_ID,2F) "2F (cf po_B_gain_allG_source, -1.00);"
             } elseif {$poBgainSomeG ne ""} {
                 # 2G. Overlaps a benign copy-number gain but includes additional genomic material (+0.00)
-                set g_rankingExplanations($AnnotSV_ID,2G) "2G (cf po_B_gain_someG_source, +0.00)"
+                set g_rankingExplanations($AnnotSV_ID,2G) "2G (cf po_B_gain_someG_source, +0.00);"
             }
         }
         
@@ -598,7 +598,7 @@ proc SVrankingGain {L_annotations} {
         ####################################################################################################################
         if {$poBgainAllG ne "" || $Bgain ne "" || $poBgainSomeG ne ""} {
             # 4O. Overlap with common population variation.
-            set g_rankingExplanations($AnnotSV_ID,40) "40 (cf po_B_gain_AllG_source, B_gain_source and po_B_gain_SomeG_source, +0.00);"
+            set g_rankingExplanations($AnnotSV_ID,40) "40 (cf po_B_gain_AllG_source, B_gain_source, po_B_gain_SomeG_source, +0.00);"
         }
         
         

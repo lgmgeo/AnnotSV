@@ -12,6 +12,7 @@ For more details, please see the README file.
 
 
 April, , 2024, AnnotSV version 3.4.1
+	- Remove typos in the ranking explanation
 	- Update of the variantconvert distribution (2.0.0 installed)
 	- Add the GRCm39/mm39 code and README for Mouse annotations (not the annotations)
 	- Check the user bedtools version
