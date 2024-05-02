@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 @Author: Samuel Nicaise
-@Version: v2.0.0
+@Version: v2.0.1
 """
 
 import logging as log
@@ -36,6 +36,7 @@ def set_log_level(verbosity):
 
 
 def run_shell(cmd):
+    log.debug(cmd)
     if log.root.level <= 10:  # only show stdout/stderr if level is log.DEBUG
         redirect = None
     else:

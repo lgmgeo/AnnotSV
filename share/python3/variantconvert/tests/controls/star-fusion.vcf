@@ -2,7 +2,7 @@
 ##fileDate=23/01/2023
 ##InputFile=/home1/HUB/bin/variantconvert/current/tests/data/star-fusion.fusion_predictions.tsv
 ##source=variantconvert from star-fusion
-##variantconvertVersion=2.0.0
+##variantconvertVersion=2.0.1
 ##FILTER=<ID=PASS,Description="Passed filter">
 ##INFO=<ID=FusionName,Number=1,Type=String,Description="Fusion name">
 ##INFO=<ID=JunctionReadCount,Number=1,Type=Integer,Description="Number of RNA-Seq fragments containing a read that aligns as a split read at the site of the putative fusion junction">

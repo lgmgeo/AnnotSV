@@ -25,7 +25,8 @@ tests/AnnotSV/ToDo
 
 # VariantConvert
 share/python3/variantconvert/pipinstall.flag
-share/python3/variantconvert/src/variantconvert/configs/*/annotsv3_from_bed.local.json
+share/python3/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from*local.json
+share/python3/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from*local.json
 share/python3/variantconvert/src/variantconvert/__pycache__/
 share/python3/variantconvert/src/variantconvert/__pycache__/*.pyc
 share/python3/variantconvert/src/variantconvert/converters/__pycache__/

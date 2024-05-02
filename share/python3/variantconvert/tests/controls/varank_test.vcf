@@ -28,6 +28,7 @@
 ##INFO=<ID=varReadDepth,Number=1,Type=String,Description="Number of reads supporting the variant">
 ##INFO=<ID=varType,Number=1,Type=String,Description="Variant Type (substitution, deletion, insertion, duplication, delins)">
 ##INFO=<ID=codingEffect,Number=1,Type=String,Description="Variant Coding effect (synonymous, missense, stop gain, in-frame, frameshift, start loss, stop loss)">
+##INFO=<ID=varLocation,Number=1,Type=String,Description="Variant location (upstream, 5'UTR, exon, intron, 3'UTR, downstream)">
 ##INFO=<ID=exon,Number=1,Type=String,Description="Exon number (nearest exon if intronic variant)">
 ##INFO=<ID=intron,Number=1,Type=String,Description="Intron number">
 ##INFO=<ID=gDNAstart,Number=1,Type=String,Description="gDNA start">
@@ -43,6 +44,8 @@
 ##INFO=<ID=clinVarClinSignifs,Number=1,Type=String,Description="List of ClinVar clinical significances separated by '|'">
 ##INFO=<ID=clinVarReviewStatus,Number=1,Type=String,Description="List of ClinVar reviews separated by '|', number of stars (0-4)">
 ##INFO=<ID=clinVarPhenotypes,Number=1,Type=String,Description="List of ClinVar phenotypes Ids separated by '|'">
+##INFO=<ID=rsId,Number=1,Type=String,Description="dbSNP variation">
+##INFO=<ID=rsValidations,Number=1,Type=String,Description="dbSNP validated status">
 ##INFO=<ID=rsValidationNumber,Number=1,Type=String,Description="dbSNP number of validation categories">
 ##INFO=<ID=rsClinicalSignificance,Number=1,Type=String,Description="dbSNP variation clinical significance">
 ##INFO=<ID=rsAncestralAllele,Number=1,Type=String,Description="dbSNP ancestral allele">
@@ -96,6 +99,7 @@
 ##INFO=<ID=gnomadFilter,Number=1,Type=String,Description="gnomAD VCF filter value (AC0, PASS, RF...)">
 ##INFO=<ID=gnomadReadDepth,Number=1,Type=String,Description="gnomAD read depth">
 ##INFO=<ID=gnomadOrigin,Number=1,Type=String,Description="gnomAD variant origin (Exomes, genomes, or both)">
+##INFO=<ID=deltaMaxEntScorePercent,Number=1,Type=Float,Description="% difference between the splice score of variant with the score of the reference base">
 ##INFO=<ID=wtMaxEntScore,Number=1,Type=Float,Description="WT seq. MaxEntScan score">
 ##INFO=<ID=varMaxEntScore,Number=1,Type=Float,Description="Variant seq. MaxEntScan score">
 ##INFO=<ID=deltaSSFscorePercent,Number=1,Type=Float,Description="% difference between the splice score of variant with the score of the reference base">
@@ -108,9 +112,12 @@
 ##INFO=<ID=nearestSSChange,Number=1,Type=Float,Description="Nearest splice site change">
 ##INFO=<ID=nearestSSType,Number=1,Type=String,Description="Nearest splice site type">
 ##INFO=<ID=localSpliceEffect,Number=1,Type=String,Description="Splicing  effect  in  variation  vicinity  (New  donor  Site,  New  Acceptor  Site,  Cryptic  Donor  Strongly  Activated, Cryptic Donor Weakly Activated, Cryptic Acceptor Strongly Activated, Cryptic Acceptor Weakly Activated)">
+##INFO=<ID=localSpliceAnnotation,Number=1,Type=String,Description="Splice site annotation: 'essential splice donor': variant in 5' SS at intronic position +1 or +2, 'essential splice acceptor': variant in 3' SS at intronic position -1 or -2, 'close splice donor': variant in 5' SS at position -3 to -1, +3 to +6, 'close splice acceptor': variant in 3' SS at position -12 to -2, and 0 to +2">
 ##INFO=<ID=localSS_pos,Number=1,Type=Float,Description="Genomic position of predicted new splice site or activated cryptic site">
 ##INFO=<ID=localSS_wtMaxEntScore,Number=1,Type=Float,Description="WT seq. MaxEntScan score used for local splice effect detection">
 ##INFO=<ID=localSS_wtNNSScore,Number=1,Type=Float,Description="WT seq. NNSPLICE score used for local splice effect detection">
+##INFO=<ID=localSS_varSSFScore,Number=1,Type=Float,Description="Variant seq. SSF score used for local splice effect detection">
+##INFO=<ID=localSS_wtSSFScore,Number=1,Type=Float,Description="WT seq. SSF score used for local splice effect detection">
 ##INFO=<ID=localSS_varMaxEntScore,Number=1,Type=Float,Description="Variant seq. MaxEntScan score used for local splice effect detection">
 ##INFO=<ID=localSS_varNNSScore,Number=1,Type=Float,Description="Variant seq. NNSPLICE score used for local splice effect detection">
 ##INFO=<ID=branchPointPos,Number=1,Type=Float,Description="Genomic position of affected putative branch point">
@@ -124,6 +131,8 @@
 ##INFO=<ID=SIFTmedian,Number=1,Type=Float,Description="SIFT median ranges from 0 to 4.32. This is used to measure the diversity of the sequences used for prediction. A warning will occur if this is greater than 3.25 because this indicates that the prediction was based on closely related sequences. The number should be between 2.75 and 3.5">
 ##INFO=<ID=PPH2pred,Number=1,Type=String,Description="PolyPhen-2 prediction using HumVar model are either 'neutral, possibly damaging, probably damaging' or 'neutral, deleterious' depending on the annotation engine.">
 ##INFO=<ID=phyloP,Number=1,Type=Float,Description="phyloP score">
+##INFO=<ID=phastCons,Number=1,Type=Float,Description="phastCons score">
+##INFO=<ID=granthamDist,Number=1,Type=String,Description="Grantham distance">
 ##INFO=<ID=AGVGDclass,Number=1,Type=String,Description="AlignGVGD class">
 ##INFO=<ID=AGVGDgv,Number=1,Type=String,Description="AlignGVGD: variation (GV)">
 ##INFO=<ID=AGVGDgd,Number=1,Type=String,Description="AlignGVGD: deviation (GD)">
@@ -150,15 +159,6 @@
 ##INFO=<ID=pLI,Number=1,Type=Float,Description="Score computed in the ExAc database indicating the probability that a gene is intolerant to a loss of function variation  (Nonsense,  splice  acceptor  and  donor  variants  caused  by  SNV).  ExAC  consider  pLI  >=  0.9  as  an extremely LoF intolerant set of genes">
 ##INFO=<ID=HI_percent,Number=1,Type=Float,Description="Haploinsufficiency ranks">
 ##INFO=<ID=varankVarScore,Number=1,Type=Integer,Description="VaRank score">
-##INFO=<ID=varLocation,Number=1,Type=String,Description="Extracted from VaRank">
-##INFO=<ID=rsId,Number=1,Type=String,Description="Extracted from VaRank">
-##INFO=<ID=rsValidations,Number=1,Type=String,Description="Extracted from VaRank">
-##INFO=<ID=deltaMaxEntScorePercent,Number=1,Type=String,Description="Extracted from VaRank">
-##INFO=<ID=localSpliceAnnotation,Number=1,Type=String,Description="Extracted from VaRank">
-##INFO=<ID=localSS_wtSSFScore,Number=1,Type=String,Description="Extracted from VaRank">
-##INFO=<ID=localSS_varSSFScore,Number=1,Type=String,Description="Extracted from VaRank">
-##INFO=<ID=phastCons,Number=1,Type=String,Description="Extracted from VaRank">
-##INFO=<ID=granthamDist,Number=1,Type=String,Description="Extracted from VaRank">
 ##INFO=<ID=GenotypeConcordance,Number=1,Type=String,Description="Extracted from VaRank">
 ##INFO=<ID=genes,Number=1,Type=String,Description="Extracted from VaRank">
 ##INFO=<ID=Disease_Acronym,Number=1,Type=String,Description="Extracted from VaRank">

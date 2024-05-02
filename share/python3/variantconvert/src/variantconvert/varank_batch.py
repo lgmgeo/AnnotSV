@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 @Author: Samuel Nicaise
-@Version: v2.0.0
+@Version: v2.0.1
 
 #for testing:
 docker run --rm -ti --entrypoint=bash -v /home1:/home1 tsvconvert
@@ -25,6 +25,7 @@ def conversion_worker(args):
     """
     args are contained in a tuple for ease of use with multiprocessing
     """
+    log.debug(f"args:{args}")
     varank_tsv, bcftools, bgzip, tabix, json_config, tmp_dir = args
     log.debug("###varank_tsv: " + varank_tsv)
     factory = ConverterFactory()
@@ -100,7 +101,6 @@ def main_varank_batch(args):
         ]
         for cmd in commands:
             log.info("Merging converted files...")
-            log.debug(cmd)
             run_shell(cmd)
 
     else:

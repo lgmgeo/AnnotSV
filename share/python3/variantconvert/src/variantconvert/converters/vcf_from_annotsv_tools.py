@@ -41,6 +41,7 @@ Two changes for type 3) in variantconvert >=2.0 :
 
 import logging as log
 import pandas as pd
+from typing import List
 
 from variantconvert.commons import all_equal, remove_decimal_or_strip
 
@@ -55,7 +56,7 @@ def check_config(config: dict) -> dict:
     return config
 
 
-def merge_full_and_split(config: dict, sample_list: list[str], df: pd.DataFrame, sep=",") -> dict:
+def merge_full_and_split(config: dict, sample_list: List[str], df: pd.DataFrame, sep=",") -> dict:
     """
     input: df of a single annotSV_ID ; containing only annotations (no sample/FORMAT data)
     it can contain full and/or split annotations

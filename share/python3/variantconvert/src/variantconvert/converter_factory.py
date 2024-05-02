@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 @Author: Samuel Nicaise
-@Version: v2.0.0
+@Version: v2.0.1
 """
 
 from variantconvert.converters.vcf_from_annotsv import VcfFromAnnotsv

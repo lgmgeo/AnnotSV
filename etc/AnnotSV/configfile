@@ -12,7 +12,7 @@
 
 -candidateGenesFiltering:   0
 
--genomeBuild:               GRCh38
+-genomeBuild:               "GRCh38"
 
 -hpo:                       ""
 
@@ -37,6 +37,8 @@
 -SVinputInfo:               1
 
 -SVminSize:                 50
+
+-variantconvertMode:        "combined"
 
 -vcf:			    0
 

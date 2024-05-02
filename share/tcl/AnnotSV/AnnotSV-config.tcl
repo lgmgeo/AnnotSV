@@ -80,13 +80,14 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(tx)                       "RefSeq"
     set g_AnnotSV(txFile)                   ""
     set g_AnnotSV(variantconvertDir)        ""
+    set g_AnnotSV(variantconvertMode)       "combined"
     set g_AnnotSV(vcf)                      "0"
     
     
     ###########################
     ## Load config file options
     ###########################
-    set lOptionsOk "annotationsDir annotationMode bcftools bedtools benignAF candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo includeCI metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering reciprocal REreport REselect1 REselect2 samplesidBEDcol snvIndelFiles snvIndelPASS snvIndelSamples SVinputFile SVinputInfo SVminSize svtBEDcol tx txFile variantconvertDir vcf"
+    set lOptionsOk "annotationsDir annotationMode bcftools bedtools benignAF candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo includeCI metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering reciprocal REreport REselect1 REselect2 samplesidBEDcol snvIndelFiles snvIndelPASS snvIndelSamples SVinputFile SVinputInfo SVminSize svtBEDcol tx txFile variantconvertDir variantconvertMode vcf"
     
     # Setting of $g_AnnotSV(SVinputFile) from the command line
     set i 0
@@ -400,7 +401,17 @@ proc configureAnnotSV {argv} {
         puts "############################################################################"
         exit 2
     }
-    
+   
+    ## It must be "combined", "full" or "fullsplit"
+    set L_variantconvertMode {combined full fullsplit}
+    if {[lsearch -exact $L_variantconvertMode "$g_AnnotSV(variantconvertMode)"] eq -1} {
+        puts "############################################################################"
+        puts "Bad option value: -variantconvertMode = $g_AnnotSV(variantconvertMode)"
+        puts "Should be \"combined\", \"full\" or \"fullsplit\""
+        puts "############################################################################"
+        exit 2
+    }
+ 
     ## The following step could be improved: too long
     #################################################
     set g_AnnotSV(snvIndelSamples) [split $g_AnnotSV(snvIndelSamples)  ";|,"]

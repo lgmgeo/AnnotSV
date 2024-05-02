@@ -198,7 +198,7 @@ class VcfFromAnnotsv(AbstractConverter):
         annots_dic = {}
         supplemental_info_fields = []
 
-        # method of versions < 2.0.0: merge full and split annotations into one variant
+        # method of versions < 2.0.1: merge full and split annotations into one variant
         if self.config["GENERAL"]["mode"] == "combined":
             id_col = self.config["VCF_COLUMNS"]["INFO"]["AnnotSV_ID"]
             for variant_id, df_variant in self.input_annot_df.groupby(id_col):

@@ -2,7 +2,7 @@
 ##fileDate=18/04/2024
 ##inputFile=/home1/HUB/bin/variantconvert/current/tests/data/DECON.results_all.AnnotSV.tsv
 ##source=variantconvert from AnnotSV
-##variantconvertVersion=2.0.0
+##variantconvertVersion=2.0.1
 ##variantconvertMode=full
 ##FILTER=<ID=PASS,Description="Passed filter">
 ##ALT=<ID=DUP,Description="Duplication">
