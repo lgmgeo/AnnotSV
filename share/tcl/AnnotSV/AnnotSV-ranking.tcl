@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.4                                                                                              #
+# AnnotSV 3.4.1                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -242,7 +242,6 @@ proc SVrankingLoss {L_annotations} {
         set exomiser    [lindex $Ls $g_i(exomiser)]
         regsub "," $exomiser "." exomiser
         set phenogenius [lindex $Ls $g_i(phenogenius)]
-
         if {$HI eq "3" || $morbid eq "yes"} {
             set location   [lindex $Ls $g_i(location)]
             set location2  [lindex $Ls $g_i(location2)]
@@ -301,42 +300,23 @@ proc SVrankingLoss {L_annotations} {
                     # 2E-4. ...>=1 exon deleted AND no established pathogenic snv/indel have been reported in the observed CNV AND variant removes > 10% of protein (+0.20)
                     lappend g_rankingExplanations($AnnotSV_ID,2E-4) "$gene"
                 }
-            }
-        } else {
-            set pLI        [lindex $Ls $g_i(pLI)]
-            regsub -all "," $pLI "." pLI
-            set loeuf      [lindex $Ls $g_i(loeuf)]
-            regsub -all "," $loeuf "." loeuf
-            set HIpercent  [lindex $Ls $g_i(HIpercent)]
-            regsub -all "," $HIpercent "." HIpercent
-            set i 0
-            if {$pLI >= 0.9} {incr i}
-            if {$HIpercent <= 10} {incr i}
-            if {$i >= 2} {
-                # 2H. Two or more HI predictors suggest that AT LEAST ONE gene in the interval is HI (+0.15)
-                lappend g_rankingExplanations($AnnotSV_ID,2H) "$gene"
-            }
-            #	    if {$loeuf != ""} {incr i}
-            #	    if {$i >= 2} {
-                #		# 2H. Two or more HI predictors suggest that AT LEAST ONE gene in the interval is HI (+0.15)
-                #		lappend g_rankingExplanations($AnnotSV_ID,2H) "$gene"
-                #		set scoreLoeuf(0) "0.075"
-                #		set scoreLoeuf(1) "0.0675"
-                #		set scoreLoeuf(2) "0.06"
-                #		set scoreLoeuf(3) "0.0525"
-                #		set scoreLoeuf(4) "0.0450"
-                #		set scoreLoeuf(5) "0.0375"
-                #		set scoreLoeuf(6) "0.03"
-                #		set scoreLoeuf(7) "0.0225"
-                #		set scoreLoeuf(8) "0.0150"
-                #		set scoreLoeuf(9) "0.0075"
-                #		set score2H [expr {0.075+$scoreLoeuf($loeuf)}]
-                #		if {![info exists g_rankingScore($AnnotSV_ID,maxLoeuf)]} {
-                    #		    set g_rankingScore($AnnotSV_ID,maxLoeuf) $score2H
-                    #		} elseif {$score2H > $g_rankingScore($AnnotSV_ID,maxLoeuf)} {
-                    #		    set g_rankingScore($AnnotSV_ID,maxLoeuf) $score2H
-                    #		}
-                #	    }
+            } 
+        } 
+
+		# Evaluation of the 2H criteria
+        set pLI        [lindex $Ls $g_i(pLI)]
+        regsub -all "," $pLI "." pLI
+        set loeuf      [lindex $Ls $g_i(loeuf)]
+        regsub -all "," $loeuf "." loeuf
+        set HIpercent  [lindex $Ls $g_i(HIpercent)]
+        regsub -all "," $HIpercent "." HIpercent
+        set i 0
+        if {$pLI >= 0.9} {incr i}
+        if {$HIpercent <= 10} {incr i}
+
+        if {$i >= 2} {
+            # 2H. Two or more HI predictors suggest that AT LEAST ONE gene in the interval is HI (+0.15)
+            lappend g_rankingExplanations($AnnotSV_ID,2H) "$gene"
         }
         
         ## Section 5: Evaluation of inheritance pattern/family history for patient being studied
@@ -376,7 +356,7 @@ proc achieveSVrankingLoss {AnnotSV_ID} {
     #   (the "0" scores are evaluated in a second time)
     
     # 40: Skip to section 5 if either your CNV overlapped with a pathogenic Loss SV in section 2
-    
+ 
     if {[info exists g_rankingExplanations($AnnotSV_ID,2A)]} {
         # 2A
         set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+1.00}]

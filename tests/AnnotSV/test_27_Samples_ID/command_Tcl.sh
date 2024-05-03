@@ -3,7 +3,7 @@
 set -eo pipefail
 
 
-cut="$ANNOTSV/tests/data/scripts/cutWithColumnNames.tcl"
+cut="$ANNOTSV/tests/AnnotSV/scripts/cutWithColumnNames.tcl"
 
 function exists_in_list() {
     LIST=$1

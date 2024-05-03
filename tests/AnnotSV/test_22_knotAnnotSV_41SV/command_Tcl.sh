@@ -3,7 +3,7 @@
 set -eo pipefail
 
 
-cut="$ANNOTSV/tests/data/scripts/cutWithColumnNames.tcl"
+cut="$ANNOTSV/tests/AnnotSV/scripts/cutWithColumnNames.tcl"
 
 function exists_in_list() {
     LIST=$1
@@ -44,7 +44,7 @@ done
 
 ## Creation of the tmp yaml file ("./output/config_41_SV_AnnotSV.tmp.yaml")
 rm -f "./output/config_41_SV_AnnotSV.tmp.yaml"
-$ANNOTSV/tests/data/scripts/complete_KnotAnnotSV_YAML_test.tcl "./output/test.41_SV_tcl.annotated.tsv" "$KNOTANNOTSV/config_AnnotSV.yaml" "./output/config_41_SV_AnnotSV.tmp.yaml"
+$ANNOTSV/tests/AnnotSV/scripts/complete_KnotAnnotSV_YAML_test.tcl "./output/test.41_SV_tcl.annotated.tsv" "$KNOTANNOTSV/config_AnnotSV.yaml" "./output/config_41_SV_AnnotSV.tmp.yaml"
 
 if [ ! -f "./output/config_41_SV_AnnotSV.tmp.yaml" ] 
 then
@@ -88,7 +88,7 @@ done
 
 ## Creation of the tmp yaml file ("./output/config_7_SV_AnnotSV.tmp.yaml")
 rm -f "./output/config_7_SV_AnnotSV.tmp.yaml"
-$ANNOTSV/tests/data/scripts/complete_KnotAnnotSV_YAML_test.tcl "./output/test.7_SV_tcl.annotated.tsv" "$KNOTANNOTSV/config_AnnotSV.yaml" "./output/config_7_SV_AnnotSV.tmp.yaml"
+$ANNOTSV/tests/AnnotSV/scripts/complete_KnotAnnotSV_YAML_test.tcl "./output/test.7_SV_tcl.annotated.tsv" "$KNOTANNOTSV/config_AnnotSV.yaml" "./output/config_7_SV_AnnotSV.tmp.yaml"
 
 if [ ! -f "./output/config_7_SV_AnnotSV.tmp.yaml" ]
 then

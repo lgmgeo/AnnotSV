@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.4                                                                                              #
+# AnnotSV 3.4.1                                                                                            #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
@@ -11,12 +11,13 @@
 For more details, please see the README file.
 
 
-April, , 2024, AnnotSV version 3.4.1
+May, 03, 2024, AnnotSV version 3.4.1
+	- Update of the variantconvert distribution (2.0.1 installed)
+	  Add of the "-variantconvertMode" option (to choose the variantconvert conversion mode)
+	- Mouse annotation update (Add GRCm39/mm39 annotations)
 	- Remove typos in the ranking explanation
-	- Update of the variantconvert distribution (2.0.0 installed)
-	- Add the GRCm39/mm39 code and README for Mouse annotations (not the annotations)
 	- Check the user bedtools version
-	- Restricts the number of RE_gene features to 50
+	- Restricts the number of RE_gene features to 50, RE with "PhenoGenius specificity = "A" or Exomiser gene score > 0.7" are displayed first.
 	- Integrate all the gene symbols for OMIM morbid annotations
 	- Improve the creation of the benign dataset (gnomAD, 1000g and HPRC)
 	- Add log files for the PhenoGenius install

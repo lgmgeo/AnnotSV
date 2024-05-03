@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.4                                                                                              #
+# AnnotSV 3.4.1                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -193,6 +193,7 @@ proc runExomiser {L_Genes L_HPO} {
     regsub "XXXX" $infos "$port" infos
     regsub "YYYY" $infos "$g_AnnotSV(annotationsDir)/Annotations_Exomiser/$hpoVersion" infos
     WriteTextInFile $infos $applicationPropertiesTmpFile
+
     # Start the REST service
     set exomiserStartServiceFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_exomiser.tmp"
     puts "\t...starting the REST service"
@@ -200,7 +201,6 @@ proc runExomiser {L_Genes L_HPO} {
     if {$idService ne ""} {
         # Requests
         foreach geneName $L_Genes {
-            
             # Search the geneID of the geneName
             set geneID [searchforGeneID $geneName]
             
@@ -221,7 +221,6 @@ proc runExomiser {L_Genes L_HPO} {
                 puts "$url"
                 continue
             }
-            
             # The exomiser http request can be used for x genes -> in this case, it returns in the results a list of dictionary, 1 for each gene
             # If the http request is only for 1 gene, the result is a list of 1 dict.
             # => We use only the first element of the results, which is a dict (a list of key-value)

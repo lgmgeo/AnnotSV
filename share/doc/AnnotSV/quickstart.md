@@ -1,7 +1,7 @@
 
 # Quick Installation
 
-Requirements are fully explained in the [README](../../../README.AnnotSV_3.4.pdf) file.
+Requirements are fully explained in the [README](../../../README.AnnotSV_3.4.1.pdf) file.
 
 1. The sources can be cloned to any directory:
 ```

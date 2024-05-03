@@ -12,7 +12,7 @@ rm -f ./output/command_*.annotated.tsv
 rm -f ./output/command_*.unannotated.tsv
 
 
-cut="$ANNOTSV/tests/data/scripts/cutWithColumnNames.tcl"
+cut="$ANNOTSV/tests/AnnotSV/scripts/cutWithColumnNames.tcl"
 
 
 # command_1: del_1
@@ -230,7 +230,7 @@ echo "Command_5 (angle) OK"
 
 # WARNING: No filtering on the SV min size (min > 50 bp) from a BED input file
 BEDresult=`$cut "./output/command_5_BED-empty_del.annotated.tsv" "AnnotSV_ID;SV_chrom;SV_start;SV_end;SV_length;SV_type;ACMG_class" | tail -1 | awk 'BEGIN{ORS=" "; OFS=" "} { print $1, $2, $3, $4, $5, $6, $7}'`
-if [ "$BEDresult" != "15_53040041_53040042_DEL_1 15 53040041 53040042 -1 DEL full=1 " ]
+if [ "$BEDresult" != "15_53040041_53040042_DEL_1 15 53040041 53040042 -1 DEL full=3 " ]
 then
         echo "error 1: Error with command_5 (BED bad values)"
         exit 1

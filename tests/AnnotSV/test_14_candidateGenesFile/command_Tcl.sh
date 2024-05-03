@@ -3,7 +3,7 @@
 set -eo pipefail
 
 
-cut="$ANNOTSV/tests/data/scripts/cutWithColumnNames.tcl"
+cut="$ANNOTSV/tests/AnnotSV/scripts/cutWithColumnNames.tcl"
 
 
 # -candidateGenesFile:            Path of a file containing the candidate genes of the user (gene names can be space-separated, tabulation-separated, or line-break-separated)

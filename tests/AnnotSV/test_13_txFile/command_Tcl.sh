@@ -2,7 +2,7 @@
 
 set -eo pipefail
 
-cut="$ANNOTSV/tests/data/scripts/cutWithColumnNames.tcl"
+cut="$ANNOTSV/tests/AnnotSV/scripts/cutWithColumnNames.tcl"
 
 
 ################################

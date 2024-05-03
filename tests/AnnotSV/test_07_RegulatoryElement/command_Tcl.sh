@@ -2,7 +2,7 @@
 
 set -eo pipefail
 
-cut="$ANNOTSV/tests/data/scripts/cutWithColumnNames.tcl"
+cut="$ANNOTSV/tests/AnnotSV/scripts/cutWithColumnNames.tcl"
 
 # Case study 1:
 ###############
@@ -32,17 +32,17 @@ $ANNOTSV/bin/AnnotSV -SVinputFile "./input/delSOX9.bed" -hpo "HP:0000278;HP:0000
 # Check that the "SOX9 RE" is annotated
 # SOX9 (HI=3/EX=0.9959/morbid/RE=ABC_enhancer+GH_enhancer)
 val=`$cut "./output/delSOX9_tcl.annotated.tsv" "RE_gene"`
-if [ `echo $val | egrep -c ";SOX9 \(HI=3/EX=0.9.{3}/morbid/RE=ABC_enhancer\+GH_enhancer\);"` != 1 ]
+if [ `echo $val | egrep -c "SOX9 \(HI=3/EX=0.9.{3}/morbid/RE=ABC_enhancer\+GH_enhancer\)"` != 1 ]
 then
         echo "error1: The SOX9 RE is not annotated!"
         exit 1
 fi
 
-# Check that the "ACMG_class" is "5"
+# Check that the "ACMG_class" is "3"
 val=`$cut "./output/delSOX9_tcl.annotated.tsv" "ACMG_class"`
-if [ `echo $val | grep -c "5"` != 1 ]
+if [ `echo $val | grep -c "3"` != 1 ]
 then
-        echo "error1: The ACMG_class is not set to 5"
+        echo "error1: The ACMG_class is not set to 3"
         exit 1
 fi
 

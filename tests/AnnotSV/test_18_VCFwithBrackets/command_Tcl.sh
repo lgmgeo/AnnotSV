@@ -2,7 +2,7 @@
 
 set -eo pipefail
 
-cut="$ANNOTSV/tests/data/scripts/cutWithColumnNames.tcl"
+cut="$ANNOTSV/tests/AnnotSV/scripts/cutWithColumnNames.tcl"
 
 
 # The square-bracketed nomenclature ("[[") is used for DEL, DUP, INV, TRA.
@@ -27,7 +27,7 @@ $ANNOTSV/bin/AnnotSV -SVinputFile "./input/triplesvmerge.vcf" -SVinputInfo 1 -ou
 
 $cut "./output/triplesvmerge.CI0_tcl.annotated.tsv" "AnnotSV_ID;SV_type;Annotation_mode;SV_start;SV_end;INFO" | grep full > "./output/tutu.CI0"
 
-test=`$ANNOTSV/tests/data/scripts/check_end_values.tcl "./output/tutu.CI0"`
+test=`$ANNOTSV/tests/AnnotSV/scripts/check_end_values.tcl "./output/tutu.CI0"`
 
 if [ $test == "Ok" ]
 then
@@ -50,7 +50,7 @@ $ANNOTSV/bin/AnnotSV -SVinputFile "./input/triplesvmerge.vcf" -SVinputInfo 1 -ou
 
 $cut "./output/triplesvmerge.CI1_tcl.annotated.tsv" "AnnotSV_ID;SV_type;Annotation_mode;SV_start;SV_end;INFO" | grep "TRA" | grep full > "./output/tutu.CI1"
 
-test=`$ANNOTSV/tests/data/scripts/check_includeCI.tcl "./output/tutu.CI1"`
+test=`$ANNOTSV/tests/AnnotSV/scripts/check_includeCI.tcl "./output/tutu.CI1"`
 
 if [ $test == "Ok" ]
 then

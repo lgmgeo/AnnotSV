@@ -11,7 +11,7 @@ The user can add optional sample related information such as the HPO terms to he
 ## Annotations
 AnnotSV compiles functionally, regulatory and clinically **relevant information** and aims at providing annotations useful to i) **interpret SV potential pathogenicity and ii) filter out SV potential false positives.**
 <br />
-These **relevant annotations** are detailed in the [README](../../../README.AnnotSV_3.4.pdf).
+These **relevant annotations** are detailed in the [README](../../../README.AnnotSV_3.4.1.pdf).
 
 ## Phenotype-driven prioritization
 To link the patient's phenotypic data to the already available knowledge for each gene, AnnotSV provide a phenotype driven prioritization module based on the [HPO (Human Phenotype Ontology) dataset](https://pubmed.ncbi.nlm.nih.gov/30476213/).
@@ -40,4 +40,4 @@ Every SV are reported, even those not covering a gene. This type of annotation g
 - An annotation of the SV **“split” by gene**:
 This type of annotation gives an opportunity to focus on each gene overlapped by the SV. Thus, when a SV spans over several genes, the output will contain as many annotations lines as covered genes (cf example in FAQ). This latter annotation is extremely powerful to shorten the identification of mutation implicated in a specific gene.
 
-The annotations columns available in the output file are detailed in the [README](../../../README.AnnotSV_3.4.pdf).
+The annotations columns available in the output file are detailed in the [README](../../../README.AnnotSV_3.4.1.pdf).

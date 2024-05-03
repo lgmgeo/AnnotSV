@@ -2,7 +2,7 @@
 
 set -eo pipefail
 
-cut="$ANNOTSV/tests/data/scripts/cutWithColumnNames.tcl"
+cut="$ANNOTSV/tests/AnnotSV/scripts/cutWithColumnNames.tcl"
 
 
 # -reciprocal:   Use of a reciprocal overlap between SV and user features (only for annotations with features overlapping the SV)

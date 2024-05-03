@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.4                                                                                              #
+# AnnotSV 3.4.1                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -37,10 +37,9 @@ TESTSDIR             := $(PREFIX)/tests
 TCLVERSION           := tcl$(shell echo 'puts $${tcl_version};exit 0' | tclsh)
 TCLDIRDISTRIBUTED    := share/tcl
 TCLDIR               := $(SHAREDIR)/$(TCLVERSION)
-PYTHONDIRDISTRIBUTED := share/python3
 PYTHONDIR            := $(SHAREDIR)/python3
 ANNOTSV              := AnnotSV
-VERSION              := 3.4
+VERSION              := 3.4.1
 RM                   := /bin/rm
 RMDIR                := /bin/rmdir
 MKDIR                := install -d
@@ -122,10 +121,31 @@ install-variantconvert:
 	pip3 install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. &> ./tmp.variantconvert.txt || pip install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. &> ./tmp.variantconvert.txt || rm -f $(DESTDIR)$(PYTHONDIR)/variantconvert/pipinstall.flag
 	rm -f ./tmp.variantconvert.txt
 	ls -l $(DESTDIR)$(PYTHONDIR)/variantconvert/pipinstall.flag || echo "variantconvert not installed"
-	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/configs/GRCh37/annotsv3_from_bed.local.json
-	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/configs/GRCh38/annotsv3_from_bed.local.json
-	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/configs/GRCh37/annotsv3_from_bed.local.json
-	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/configs/GRCh38/annotsv3_from_bed.local.json
+	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_bed.combined.local.json
+	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_bed.full.local.json
+	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_bed.fullsplit.local.json
+	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_vcf.combined.local.json
+	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_vcf.full.local.json
+	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_vcf.fullsplit.local.json
+	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_bed.combined.local.json
+	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_bed.full.local.json
+	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_bed.fullsplit.local.json
+	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_vcf.combined.local.json
+	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_vcf.full.local.json
+	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_vcf.fullsplit.local.json
+	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_bed.combined.local.json
+	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_bed.full.local.json
+	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_bed.fullsplit.local.json
+	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_vcf.combined.local.json
+	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_vcf.full.local.json
+	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_vcf.fullsplit.local.json
+	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_bed.combined.local.json
+	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_bed.full.local.json
+	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_bed.fullsplit.local.json
+	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_vcf.combined.local.json
+	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_vcf.full.local.json
+	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_vcf.fullsplit.local.json
+
 
 install-bash-toolbox: $(BASH_SCRIPTS)
 	@echo ""

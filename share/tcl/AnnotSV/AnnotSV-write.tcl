@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.4                                                                                              #
+# AnnotSV 3.4.1                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -846,10 +846,10 @@ proc OrganizeAnnotation {} {
         set reText ""
         if {$AnnotationMode eq "full"} {
             if {[info exists g_re($SVchrom\t$SVleft\t$SVright)]} {
-                set reText $g_re($SVchrom\t$SVleft\t$SVright)
-            }
+				set reText $g_re($SVchrom\t$SVleft\t$SVright)
+			}
         }
-        
+       
         # Annotations with pathogenic genes or genomic regions (FtIncludedInSV)
         if {$g_AnnotSV(organism) eq "Human"} {
             if {$AnnotationMode eq "split"} {

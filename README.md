@@ -12,7 +12,7 @@
 # Table of contents
 
 - ## AnnotSV Annotations Engine
-    - ### [README](README.AnnotSV_3.4.pdf)
+    - ### [README](README.AnnotSV_3.4.1.pdf)
     - ### [Getting Started](share/doc/AnnotSV/quickstart.md)
     - ### [Ranking](share/doc/AnnotSV/ranking.md)
     - ### [Annotations](share/doc/AnnotSV/annotations.md)

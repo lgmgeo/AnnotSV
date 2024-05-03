@@ -3,7 +3,7 @@
 set -eo pipefail
 
 
-cut="$ANNOTSV/tests/data/scripts/cutWithColumnNames.tcl"
+cut="$ANNOTSV/tests/AnnotSV/scripts/cutWithColumnNames.tcl"
 
 
 # Check with a bed containing 2 SV on MT chromosome
