@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.4                                                                                              #
+# AnnotSV 3.4.1                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -1193,6 +1193,9 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
     ####################################
     foreach SV [array names g_genesReg] {
         set g_re($SV) ""
+		set re_priority($SV) ""
+		set re_other($SV) ""
+		set re_noann($SV) ""
         foreach gName "$g_genesReg($SV)" {
             if {$g_AnnotSV(REselect2)} {
                 # AnnotSV restrict the report of the regulated genes to the ones not present in "Gene_name".
@@ -1210,6 +1213,7 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
             } else {set exomiserScore ""}
             
             set lAnn {}
+			set priority 0
             if {$g_AnnotSV(REselect1)} {
                 # By default, only the genes entering in one of the following categories are reported:
                 #  - OMIM morbid genes
@@ -1219,8 +1223,8 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
                 #  - User candidate genes
                 if {$HI eq "3"} {lappend lAnn "HI=$HI"}
                 if {$TS eq "3"} {lappend lAnn "TS=$TS"}
-				if {$PhenoGeniusSpecificity eq "A"} {lappend lAnn "PG=A"}
-                if {$exomiserScore ne "" && $exomiserScore > 0.7} {lappend lAnn "EX=$exomiserScore"}
+				if {$PhenoGeniusSpecificity eq "A"} {lappend lAnn "PG=A"; set priority 1}
+                if {$exomiserScore ne "" && $exomiserScore > 0.7} {lappend lAnn "EX=$exomiserScore"; set priority 1}
                 if {[isMorbid $gName]} {lappend lAnn "morbid"}
                 if {[isCandidate $gName]} {lappend lAnn "candidate"}
                 if {$lAnn eq ""} {
@@ -1238,17 +1242,30 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
                 lappend lAnn "RE=[join $g_reDB($SV,$gName) "+"]"
             }
             if {$lAnn ne ""} {
-                lappend g_re($SV) "$gName ([join $lAnn "/"])"
+				if {$priority} {
+					lappend re_priority($SV) "$gName ([join $lAnn "/"])"
+				} else {
+					lappend re_other($SV) "$gName ([join $lAnn "/"])"
+				}
             } else {
-                lappend g_re($SV) "$gName"
+                lappend re_noann($SV) "$gName"
             }
         }
 	 
-        # AnnotSV restricts the number of overlapping reported features to 50	
-		if {[llength $g_re($SV)] > 50} {
-			set g_re($SV) "[join [lrange $g_re($SV) 0 49] ";"]..."
-		} else {
-			set g_re($SV) [join $g_re($SV) ";"]
+		# We prioritarily keep RE with "PhenoGenius specificity = "A" or Exomiser gene score > 0.7" (for the ranking)
+        if {$re_priority($SV) ne ""} {
+            set g_re($SV) $re_priority($SV)
+        } elseif {$re_other($SV) ne ""} {
+            lappend g_re($SV) {*}$re_other($SV)
+        } elseif {$re_noann($SV) ne ""} {
+            lappend g_re($SV) {*}$re_noann($SV)
+		}
+
+        # AnnotSV restricts the number of overlapping reported features to 50
+        if {[llength $g_re($SV)] > 50} {
+            set g_re($SV) "[join [lrange $g_re($SV) 0 49] ";"]..."
+        } else {
+            set g_re($SV) [join $g_re($SV) ";"]
 		}
     }
     
