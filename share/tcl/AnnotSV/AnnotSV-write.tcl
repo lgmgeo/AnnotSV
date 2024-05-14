@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.4.1                                                                                            #
+# AnnotSV 3.4.2                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -903,10 +903,11 @@ proc OrganizeAnnotation {} {
             set cytobandDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/AnyOverlap/CytoBand/$g_AnnotSV(genomeBuild)/"
             set cytobandBEDfile [glob -nocomplain $cytobandDir/cytoBand_$g_AnnotSV(genomeBuild).formatted.sorted.bed]
             if {[file exists $cytobandBEDfile]} {
+				set use3points "0"
                 if {$AnnotationMode eq "split"} {
-                    set L_cytobandText "[userBEDannotation $cytobandBEDfile $SVchrom $intersectStart $intersectEnd]"
+                    set L_cytobandText "[userBEDannotation $cytobandBEDfile $SVchrom $intersectStart $intersectEnd $use3points]"
                 } else {
-                    set L_cytobandText "[userBEDannotation $cytobandBEDfile $SVchrom $SVleft $SVright]"
+                    set L_cytobandText "[userBEDannotation $cytobandBEDfile $SVchrom $SVleft $SVright $use3points]"
                 }
                 set L_cytobandText [split $L_cytobandText ";"]
                 set cytobandText [lindex $L_cytobandText 0]

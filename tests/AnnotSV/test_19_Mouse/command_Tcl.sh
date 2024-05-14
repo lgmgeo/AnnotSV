@@ -17,7 +17,7 @@ function exists_in_list() {
 #########################################
 
 rm -f "./output/test_tcl.annotated.tsv" "./output/output.log"
-$ANNOTSV/bin/AnnotSV -SVinputFile "./input/test.bed" -genomeBuild mm9 -SVinputInfo 1 -outputFile "./output/test_tcl.annotated.tsv" -svtBEDcol 4 &> "./output/output.log"
+$ANNOTSV/bin/AnnotSV -SVinputFile "./input/test.bed" -genomeBuild mm39 -SVinputInfo 1 -outputFile "./output/test_tcl.annotated.tsv" -svtBEDcol 4 &> "./output/output.log"
 
 #...output columns annotation (November 08 2021 - 13:34):
 #        AnnotSV_ID;SV_chrom;SV_start;SV_end;SV_length;SV_type;score;Annotation_mode;CytoBand;Gene_name;Gene_count;Tx;Tx_start;Tx_end;Overlapped_tx_length;Overlapped_CDS_length;Overlapped_CDS_percent;Frameshift;Exon_count;Location;Location2;Dist_nearest_SS;Nearest_SS_type;Intersect_start;Intersect_end;RE_gene;GC_content_left;GC_content_right;Repeat_coord_left;Repeat_type_left;Repeat_coord_right;Repeat_type_right
