@@ -11,8 +11,10 @@
 For more details, please see the README file.
 
 
+, 2024, AnnotSV version 3.4.3
+	- Add alias gene symbols in the OMIM annotations file
 
-May, 14, 2027, AnnotSV version 3.4.2
+May, 14, 2024, AnnotSV version 3.4.2
 	- Fix a bug when setting the cytoband annotation for large SV (issue 234)
 	- Update the mm39 repeat annotations (issue 225)
 

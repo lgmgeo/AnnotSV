@@ -26,7 +26,7 @@
 proc checkOMIMfile {} {
     
     global g_AnnotSV
-    
+     
     
     set omimDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/OMIM"
     
@@ -66,7 +66,7 @@ proc checkOMIMfile {} {
     if {$OMIMfile1FormattedGzip ne "" && $OMIMfile2FormattedGzip ne ""} {return}
     
     
-    ## - Create the 'date'_OMIM-1-annotations.tsv and 'date'_OMIM-2-annotations.tsv files.
+    ## - Create the 'date'_OMIM-1-annotations.tsv and 'date'_OMIM-2-annotations.tsv files (headers):
     ##   Header1: genes, OMIM_ID
     ##   Header2: genes, OMIM_phenotype, OMIM_inheritance
     
@@ -77,10 +77,11 @@ proc checkOMIMfile {} {
     ReplaceTextInFile "genes\tOMIM_ID" $OMIMfile1Formatted
     ReplaceTextInFile "genes\tOMIM_phenotype\tOMIM_inheritance" $OMIMfile2Formatted
     
-    
-    # Genomic coordinates are available in GRCh38 in "genemap2.txt"
-    # Memorize the gene coordinates in GRCh38
-    # => Permit to check the association "OMIM ID / gene" (only for validated genomic coordinates. cf issues 156 + 132)
+	# INFO:    
+    # Genomic coordinates associated to the OMIM phenotype are available in GRCh38 in "genemap2.txt" ($OMIMfileDownloaded)
+
+    # Here, we memorize the RefSeq/ENSEMBL gene coordinates in GRCh38
+    # => Will permit to check the association "OMIM ID / gene" (only for validated genomic coordinates. cf issues 156 + 132)
     set geneCoordFile "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes/GRCh38/genes.$g_AnnotSV(tx).sorted.bed"
     foreach L [LinesFromFile $geneCoordFile] {
         set chrom [lindex $L 0]
@@ -89,7 +90,22 @@ proc checkOMIMfile {} {
         set geneTmp [lindex $L 4]
         set coord($geneTmp) "$chrom $start $end"
     }
-    
+	# Then, for gene names not present in the $geneCoordFile (previous symbol, alias), we use the NCBIgeneID to retrieve the coordinates
+    # Memorize the link NCBIgeneID-GeneName
+    set NCBIgeneDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/NCBIgeneID"
+    foreach L [LinesFromFile "$NCBIgeneDir/geneSymbol_NCBIgeneID.tsv"] {
+        set gene [lindex $L 0]
+        set NCBIgeneID [lindex $L 1]
+        set NCBIgeneIDfor($gene) $NCBIgeneID
+        lappend L_genesFor($NCBIgeneID) $gene
+    }
+	foreach geneTmp [array names coord] {
+		if {![info exists NCBIgeneIDfor($geneTmp)]} {continue}
+		foreach aliasGene $L_genesFor($NCBIgeneIDfor($geneTmp)) {
+			set coord($aliasGene) $coord($geneTmp)
+		}
+	}	 
+
     # Parsing of $OMIMfileDownloaded
     foreach L [LinesFromFile $OMIMfileDownloaded] {
         
