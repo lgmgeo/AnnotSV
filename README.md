@@ -18,6 +18,12 @@
     - ### [Annotations](share/doc/AnnotSV/annotations.md)
 - ## AnnotSV Webserver
     - ### [Overview](share/doc/AnnotSV/webserver_overview.md)
+- ## AnnotSV issues
+	<b>Please detail your request when <a href="https://github.com/lgmgeo/AnnotSV/issues" target="_blank">reporting a bug</a>:</b>
+	- Give the version of AnnotSV and the command line used
+	- Add/join an input file that allow to reproduce the bug
+	- Give all the information that could have an impact on the bug reported (modifications made in the installation or in the annotation files)
+	- Specify if you use Singularity...
 <br />
 
 # Collaborative work
