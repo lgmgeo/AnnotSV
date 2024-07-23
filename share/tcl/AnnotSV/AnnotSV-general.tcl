@@ -117,14 +117,14 @@ proc WriteTextInFile {text fichier} {
 proc settingOfTheAnnotSVID {deb ref alt} {
     global g_ID
     global g_deb
-    
+   
     if {![info exists g_ID($deb,$ref,$alt)]} {
         set i 1
         while {[info exists g_deb(${deb}_$i)]} {incr i; continue}
         set g_deb(${deb}_$i) "1"
         set g_ID($deb,$ref,$alt) "${deb}_$i"
     }
-    
+
     return $g_ID($deb,$ref,$alt)
 }
 
@@ -264,24 +264,24 @@ proc RemoveRedundancyWithoutSorting {List} {
 
 proc normalizeSVtype {SVtype} {
 
-# SVtype in which category: DUP? DEL? INV? INS? None?
-if {[regexp -nocase "del|loss|<CN0>|<CN1>" $SVtype]} {
-    set SVtype "DEL"
-} elseif {[regexp -nocase "dup|gain|MCNV" $SVtype ]} {
-    set SVtype "DUP"
-} elseif {[regexp -nocase "<CN(\[0-9\]+)>" $SVtype match i]} {
-    if {$i>1} {set SVtype "DUP"}
-} elseif {[regexp -nocase "inv" $SVtype]} {
-    set SVtype "INV"
-} elseif {[regexp -nocase "ins|MEI|alu|line|sva" $SVtype]} { ;# "DEL_ALU" is set to "DEL", OK!
-    set SVtype "INS"
-} elseif {[regexp -nocase "TRA|TRN" $SVtype ]} {
-    set SVtype "TRA"
-} else {
-    set SVtype "None"
-}
+	# SVtype in which category: DUP? DEL? INV? INS? None?
+	if {[regexp -nocase "del|loss|<CN0>|<CN1>" $SVtype]} {
+	    set SVtype "DEL"
+	} elseif {[regexp -nocase "dup|gain|MCNV" $SVtype ]} {
+	    set SVtype "DUP"
+	} elseif {[regexp -nocase "<CN(\[0-9\]+)>" $SVtype match i]} {
+	    if {$i>1} {set SVtype "DUP"}
+	} elseif {[regexp -nocase "inv" $SVtype]} {
+	    set SVtype "INV"
+	} elseif {[regexp -nocase "ins|MEI|alu|line|sva" $SVtype]} { ;# "DEL_ALU" is set to "DEL", OK!
+	    set SVtype "INS"
+	} elseif {[regexp -nocase "TRA|TRN" $SVtype ]} {
+	    set SVtype "TRA"
+	} else {
+	    set SVtype "None"
+	}
 
-return $SVtype
+	return $SVtype
 }
 
 ##############################################################################
@@ -452,25 +452,25 @@ return $newBed
 # Check if a bed or VCF file is empty
 proc isAnEmptyFile {bedOrVCFfile} {
 
-# Return 1 if the extension is not .bed or .vcf
-if {![regexp -nocase "\\.(bed|vcf(.gz)?)$" $bedOrVCFfile]} {return 1}
+	# Return 1 if the extension is not .bed or .vcf
+	if {![regexp -nocase "\\.(bed|vcf(.gz)?)$" $bedOrVCFfile]} {return 1}
 
-# After filtering lines beginning with "#", at least 1 line should be still present
-if {[regexp -nocase ".gz$" $bedOrVCFfile]} {
-    set f [open "|gzip -cd $bedOrVCFfile"]
-} else {
-    set f [open "$bedOrVCFfile"]
-}
-set test 0
-while {![eof $f]} {
-    set L [gets $f]
-    if {$L eq ""} {continue}
-    if {[regexp "^#" $L]} {continue}
-    incr test
-    break
-}
+	# After filtering lines beginning with "#", at least 1 line should be still present
+	if {[regexp -nocase ".gz$" $bedOrVCFfile]} {
+	    set f [open "|gzip -cd $bedOrVCFfile"]
+	} else {
+	    set f [open "$bedOrVCFfile"]
+	}
+	set test 0
+	while {![eof $f]} {
+	    set L [gets $f]
+	    if {$L eq ""} {continue}
+	    if {[regexp "^#" $L]} {continue}
+	    incr test
+	    break
+	}
 
-if {$test} {return 0} else {return 1}
+	if {$test} {return 0} else {return 1}
 }
 
 
