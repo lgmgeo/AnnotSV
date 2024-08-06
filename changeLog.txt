@@ -12,6 +12,7 @@ For more details, please see the README file.
 
 
 , 2024, AnnotSV version 3.4.3
+	- Add a new check for the variantconvert configuration (issue 246)
 	- Fix a bug in the AnnotSV_ID setting when POS (e.g. 1) is contained in CHROM (e.g. 1)
 	- Add alias gene symbols in the OMIM annotations file
 

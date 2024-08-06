@@ -65,7 +65,25 @@ proc checkVariantconvertConfigfile {} {
             # 1 - AnnotSV install with the root user
             # 2 - AnnotSV run with non-root user
             # => The $localConfigfile can not be created by a non-root user. This file should exists with 777 permissions
-            if {![file exists $localConfigfile] || [file size $localConfigfile] eq 0} {
+
+			# If the user defined a wrong "-annotationsDir" during the first execution of AnnotSV (using the -vcf 1 parameter), the $localConfigfile need to be removed then recomputed.
+            if {[file exists $localConfigfile]} {
+				set testPathExists 0
+				set testRefExists 0
+                foreach L [LinesFromFile $localConfigfile] {
+					if {[regexp "\"path\": \"(.*)\"," $L match path]} {
+						if {[file exists $path]} {set testPathExists 1}
+					}
+                    if {[regexp "\"##reference=file:(.*)\"" $L match ref]} {
+                        if {[file exists $ref]} {set testRefExists 1}
+                    }
+				}	
+				if {$testPathExists eq 0 || $testRefExists eq 0} {
+					file delete -force $localConfigfile
+				}
+			}
+			# If the file has been deleted or does not yet exist: 
+            if {![file exists $localConfigfile]} {
                 set L_Lines {}
                 foreach L [LinesFromFile $configfile] {
                     if {[regexp "$distributedPathLine" $L]} {
