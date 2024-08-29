@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.4.2                                                                                            #
+# AnnotSV 3.4.3                                                                                            #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
@@ -11,7 +11,7 @@
 For more details, please see the README file.
 
 
-, 2024, AnnotSV version 3.4.3
+August, 29, 2024, AnnotSV version 3.4.3
 	- New definition of alias gene symbols used in OMIM annotation files. 
 	  Keep only aliases found with the NCBI_gene_ID and validated with genomic locations
 	- Add a new check for the variantconvert configuration (issue 246)
