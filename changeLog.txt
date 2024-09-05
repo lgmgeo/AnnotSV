@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.4.3                                                                                            #
+# AnnotSV 3.4.4                                                                                            #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
@@ -10,6 +10,9 @@
 
 For more details, please see the README file.
 
+September, 05, 2024, AnnotSV version 3.4.4
+	- Temporary fix for issues #239 and #250 (wrong PRDM10 line in the GenCC file)
+	  => Code to be removed after updating annotations
 
 August, 29, 2024, AnnotSV version 3.4.3
 	- New definition of alias gene symbols used in OMIM annotation files. 

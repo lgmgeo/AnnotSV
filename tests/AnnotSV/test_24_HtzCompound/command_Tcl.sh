@@ -7,12 +7,12 @@ cut="$ANNOTSV/tests/AnnotSV/scripts/cutWithColumnNames.tcl"
 
 
 
-###############################################################
-## Understanding the data used for TESTING
-###############################################################
+######################################################################
+## First, we need to understand the data that will be used for TESTING
+######################################################################
 
 
-# In "./input/test1.SV.vcf", ther is only 1 SV (identified in sample-002 but not in  sample-001)
+# In "./input/test1.SV.vcf", there is only 1 SV (identified in sample-002 but not in sample-001)
 ################################################################################################################
 
 # CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  sample-001      sample-002

@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.4.3                                                                                            #
+# AnnotSV 3.4.4                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -1515,7 +1515,11 @@ proc OrganizeAnnotation {} {
                 }
                 if {$doNotDisplay} {continue}
             }
-            
+           
+			# 05/09/2024 - Temporary fix for the issue #250 (bad GenCC file)
+			# (To remove after annotation update)
+			regsub -all "\t\"\t" $lineCompleted "\t\t" lineCompleted
+
             lappend L_lineCompleted [switchAllCoordinatesFromBEDtoVCFinLine "$lineCompleted"]
             
             # To avoid a segmentation fault

@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.4.3                                                                                            #
+# AnnotSV 3.4.4                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -144,8 +144,7 @@ proc runVariantconvert {outputFile} {
     }
     
     puts "...creation of the VCF output file: $VCFoutputFile"
-    puts "   AnnotSV relies on the variantconvert tool ${version}(https://github.com/SamuelNicaise/variantconvert)."
-    puts "   A minimal Python 3.8 installation is required, as well as the natsort, panda and pyfaidx Python modules."
+    puts "   AnnotSV relies on the variantconvert tool ${version}(https://github.com/SamuelNicaise/variantconvert)"
     
     regsub "\.vcf$" $VCFoutputFile ".variantconvert.log" LogFile
     
@@ -198,11 +197,12 @@ proc runVariantconvert {outputFile} {
     catch {eval exec $command} Message
 	regsub -all "FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error" $Message "..." MessageReg  
     if {[regexp -nocase "error" $MessageReg]} {
+	    puts "   (a minimal Python 3.8 installation is required, as well as the natsort, panda and pyfaidx Python modules)"
         puts "Error:"
+		puts "   => cf $LogFile"
     }
     ReplaceTextInFile "$command\n\n$Message" $LogFile
-    puts "   => cf $LogFile"
-    
+
     return
 }
 
