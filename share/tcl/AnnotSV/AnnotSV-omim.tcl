@@ -44,6 +44,8 @@ proc memorizeGeneNameAlias {} {
 	global g_alias
 	global g_L_coord
 
+	if {$g_AnnotSV(organism) ne "Human"} { return }
+
     # Here, we memorize the RefSeq/ENSEMBL GRCh38 gene coordinates
     # => Will permit to check the different alias of a unique gene (only for overlapping genomic coordinates. cf issues 156 + 132)
     set geneCoordFile "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes/GRCh38/genes.$g_AnnotSV(tx).sorted.bed"
