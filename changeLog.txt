@@ -10,8 +10,9 @@
 
 For more details, please see the README file.
 
-December, 05, 2024, AnnotSV version 3.4.5
-	- Add bug fix concerning Mouse annotations (issue #257)
+December, 19, 2024, AnnotSV version 3.4.5
+	- Fix a bug to set start position when converting from 0-based to 1-based format in some rare special cases (issue 266)
+	- Fix a bug concerning Mouse annotations (issue 257)
 
 September, 05, 2024, AnnotSV version 3.4.4
 	- Temporary fix for issues #239 and #250 (wrong PRDM10 line in the GenCC file)

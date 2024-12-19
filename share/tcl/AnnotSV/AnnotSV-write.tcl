@@ -40,8 +40,7 @@ proc switchAllCoordinatesFromBEDtoVCFinLine {lineCompleted} {
     # Formate "AnnotSV_ID" and "SV_start"
 	# (switch SV start coordinate from BED to VCF format)
     #####################################################
-
-	regexp "\[^\t\]+\t\[^\t\]+\t(\[0-9\]+)" $lineCompleted match SVstart
+	regexp "^\[^\t\]+\t\[^\t\]+\t(\[0-9\]+)" $lineCompleted match SVstart
     set formatedSVstart [expr {$SVstart+1}]
 
     # Formate "AnnotSV_ID"
@@ -55,12 +54,11 @@ proc switchAllCoordinatesFromBEDtoVCFinLine {lineCompleted} {
     set chrom [lindex $lineCompleted 1]
 	set length_chrom [string length $chrom]
     set length_updated_AnnotSV_ID [string length $updated_AnnotSV_ID]
-	set lengthTot [expr {$length_updated_AnnotSV_ID+$length_chrom}]
+	set lengthTot [expr {$length_updated_AnnotSV_ID+$length_chrom+1}]
     if {[regexp -start $lengthTot -indices "$SVstart" $lineCompleted match_indices]} {
         set i_start [lindex $match_indices 0]
         set i_end   [lindex $match_indices 1]
         set lineCompleted [string replace $lineCompleted $i_start $i_end $formatedSVstart]
-        set i [expr {$i_end+1}]
     }
     
     # Formate all genomic coordinates (e.g.: 2:1235-62531)
