@@ -378,7 +378,10 @@ proc VCFsToBED {SV_VCFfiles} {
         # - ”.” must be specified for each missing allele in the GT field (for example ./.) (=> if a call cannot be made for a sample at a given locus)
         #
         # In the code:
-        # - Sample ID with GT "./." or ".|." (unknown GT) are reported in the "Samples_ID" output column
+		# - if g_AnnotSV(missingGTinSamplesid) set to 1 (default):
+        #	=> Sample ID with GT "./." or ".|." (unknown GT) are reported in the "Samples_ID" output column
+        # - if g_AnnotSV(missingGTinSamplesid) set to 0:
+        #   => Sample ID with GT "./." or ".|." (unknown GT) are NOT reported in the "Samples_ID" output column
         set GTabsent 1; #To check if the “GT” field is indicated in the FORMAT column
         
         set VCFlineNumber 0
@@ -780,8 +783,19 @@ proc VCFsToBED {SV_VCFfiles} {
                 set isample 0
                 foreach sampleValue [lrange $Ls 9 end] {
                     set gt [lindex [split $sampleValue ":"] $i_gt]
-                    if {$gt ne "0/0" && $gt ne "0\|0"} {lappend L_samplesid [lindex $L_allSamples $isample]}; # AnnotSV reports the sample_id with unknown GT ("./." and ".|.")
-                    if {$gt eq "./." || $gt eq ".\|."} {incr nUnknownGT}
+                    if {$gt ne "0/0" && $gt ne "0\|0"} {
+	                    if {$gt eq "./." || $gt eq ".\|."} {
+							incr nUnknownGT
+							if {$g_AnnotSV(missingGTinSamplesid)} {
+								# AnnotSV reports the sample_id with unknown GT ("./." and ".|.")
+								lappend L_samplesid [lindex $L_allSamples $isample]
+							} else {
+								# AnnotSV do not reports the sample_id with unknown GT ("./." and ".|.")
+							}
+						} else {
+							lappend L_samplesid [lindex $L_allSamples $isample]
+						}
+					}
                     incr isample
                 }
             }
@@ -877,12 +891,14 @@ proc VCFsToBED {SV_VCFfiles} {
         
         # Warning for the unknown GT
         ############################
-        if {$nUnknownGT > 1} {
-            puts "\t...WARNING: $nUnknownGT sample IDs with missing alleles in the GT field (./. or .\|.) have been reported in the \"Samples_ID\" output field\n"
-        } elseif {$nUnknownGT eq 1} {
-            puts "\t...WARNING: 1 sample ID with missing alleles in the GT field (./. or .\|.) has been reported in the \"Samples_ID\" output field\n"
-        } else {puts "\n"}
-        
+		if {$g_AnnotSV(missingGTinSamplesid)} {
+			if {$nUnknownGT > 1} {
+			    puts "\t...WARNING: $nUnknownGT sample IDs with missing alleles in the GT field (./. or .\|.) have been reported in the \"Samples_ID\" output field\n"
+			} elseif {$nUnknownGT eq 1} {
+			    puts "\t...WARNING: 1 sample ID with missing alleles in the GT field (./. or .\|.) has been reported in the \"Samples_ID\" output field\n"
+			} else {puts "\n"}
+        }
+
         # Writing of the BED file
         #########################
         WriteTextInFile [join $L_TextToWrite "\n"] $SV_BEDfile

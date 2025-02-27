@@ -55,6 +55,7 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(includeCI)                "1"
     set g_AnnotSV(metrics)                  "us"
     set g_AnnotSV(minTotalNumber)           "500"
+    set g_AnnotSV(missingGTinSamplesid)     "1"
     set g_AnnotSV(outputColHeader)          ""    ;# not given in parameter
     set g_AnnotSV(outputDir)                ""
     set g_AnnotSV(outputFile)               ""
@@ -87,7 +88,7 @@ proc configureAnnotSV {argv} {
     ###########################
     ## Load config file options
     ###########################
-    set lOptionsOk "annotationsDir annotationMode bcftools bedtools benignAF candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo includeCI metrics minTotalNumber outputDir outputFile overlap overwrite promoterSize rankFiltering reciprocal REreport REselect1 REselect2 samplesidBEDcol snvIndelFiles snvIndelPASS snvIndelSamples SVinputFile SVinputInfo SVminSize svtBEDcol tx txFile variantconvertDir variantconvertMode vcf"
+    set lOptionsOk "annotationsDir annotationMode bcftools bedtools benignAF candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo includeCI metrics minTotalNumber missingGTinSamplesid outputDir outputFile overlap overwrite promoterSize rankFiltering reciprocal REreport REselect1 REselect2 samplesidBEDcol snvIndelFiles snvIndelPASS snvIndelSamples SVinputFile SVinputInfo SVminSize svtBEDcol tx txFile variantconvertDir variantconvertMode vcf"
     
     # Setting of $g_AnnotSV(SVinputFile) from the command line
     set i 0
@@ -233,7 +234,7 @@ proc configureAnnotSV {argv} {
     }
     
     ## It must be a boolean: 1 or 0
-    foreach val {candidateGenesFiltering includeCI overwrite reciprocal REreport REselect1 REselect2 SVinputInfo snvIndelPASS vcf} {
+    foreach val {candidateGenesFiltering includeCI missingGTinSamplesid overwrite reciprocal REreport REselect1 REselect2 SVinputInfo snvIndelPASS vcf} {
         if {$g_AnnotSV($val) ne "1" && $g_AnnotSV($val) ne "0"} {
             puts "############################################################################"
             puts "Bad option value: -$val = $g_AnnotSV($val)"

@@ -1,10 +1,21 @@
 #!/usr/bin/env tclsh
 
-source /home/geoffroy/Tcl/general.tcl
-
-
 ## Command line example:
 ## /maison/geoffroy/Tcl/cutWithColumnNames.tcl test.annotated.tsv "SV type;Samples_ID;AnnotSV ranking"
+
+
+proc ContentFromFile {{Fichier ""}} {
+    if {[string equal $Fichier ""]} {return ""}
+    set f     [open $Fichier r]
+    set Texte [read -nonewline $f]
+    close $f
+    return $Texte
+}
+
+proc LinesFromFile {{Fichier ""}} {
+    return [split [ContentFromFile $Fichier] "\n"]
+}
+
 
 #############
 ### INPUT ###
