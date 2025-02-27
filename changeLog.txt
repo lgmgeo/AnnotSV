@@ -1,20 +1,19 @@
 ############################################################################################################
-# AnnotSV 3.4.4                                                                                            #
+# AnnotSV 3.4.5                                                                                            #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
-# Copyright (C) 2017-2024 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
+# Copyright (C) 2017-present Veronique Geoffroy (veronique.geoffroy@inserm.fr)                             #
 #                                                                                                          #
 ############################################################################################################
 
 
 For more details, please see the README file.
 
-February, 27, 2025, AnnotSV version 
+
+February, 27, 2025, AnnotSV version 3.4.5
 	- Update the PhenoGenius install (Use of the client repo https://github.com/kyauy/PhenoGeniusCli: v.1.1.2)
 	- Add the "-missingGTinSamplesid" option (to report or not sample IDs with missing alleles in the GT field (./. or .|.) in the "Samples_ID" output field)
-
-December, 19, 2024, AnnotSV version 3.4.5
 	- Fix a bug to set start position when converting from 0-based to 1-based format in some rare special cases (issue 266)
 	- Fix a bug concerning Mouse annotations (issue 257)
 

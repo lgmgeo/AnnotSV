@@ -1,9 +1,9 @@
 ############################################################################################################
-# AnnotSV 3.4.4                                                                                            #
+# AnnotSV 3.4.5                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
-# Copyright (C) 2017-2024 Veronique Geoffroy (veronique.geoffroy@inserm.fr)                                #
+# Copyright (C) 2017-present Veronique Geoffroy (veronique.geoffroy@inserm.fr)                             #
 #                                                                                                          #
 # This is part of AnnotSV source code.                                                                     #
 #                                                                                                          #
@@ -21,7 +21,7 @@
 # along with this program; If not, see <http://www.gnu.org/licenses/>.                                     #
 ############################################################################################################
 
-SHELL = /bin/bash
+SHELL = /usr/bin/bash
 
 
 DESTDIR              ?=
@@ -39,7 +39,7 @@ TCLDIRDISTRIBUTED    := share/tcl
 TCLDIR               := $(SHAREDIR)/$(TCLVERSION)
 PYTHONDIR            := $(SHAREDIR)/python3
 ANNOTSV              := AnnotSV
-VERSION              := 3.4.4
+VERSION              := 3.4.5
 RM                   := /bin/rm
 RMDIR                := /bin/rmdir
 MKDIR                := install -d
