@@ -23,24 +23,24 @@
 
 
 
-## - Check if the PhenoGenius installation is ok
-##   Install of PhenoGenius is done here (if needed)
-proc checkPhenoGenius {} {
+## - Check if the PhenoGeniusCli installation is ok
+##   Install of PhenoGeniusCli is done here (if needed)
+proc checkPhenoGeniusCli {} {
     
     global g_AnnotSV
 
 	if {$g_AnnotSV(hpo) eq ""} {
-		set g_AnnotSV(PhenoGenius) "0" ;# No HPO terms in INPUT
+		set g_AnnotSV(PhenoGeniusCli) "0" ;# No HPO terms in INPUT
 		return
 	}
-	set checkResult [catch {exec $g_AnnotSV(bashDir)/checkPhenoGeniusInstall.sh} Message]
+	set checkResult [catch {exec $g_AnnotSV(bashDir)/checkPhenoGeniusCliInstall.sh} Message]
     if {$checkResult eq 0} {
         puts "\tINFO: AnnotSV takes use of PhenoGenius (Yauy et al., 2023) for the phenotype-driven analysis."
-        set g_AnnotSV(PhenoGenius) "1"
+        set g_AnnotSV(PhenoGeniusCli) "1"
     } else {
         puts "\nWARNING: No PhenoGenius installation available for the phenotype-driven analysis."
-		puts "\ncf $g_AnnotSV(installDir)/share/python3/phenogenius/*.log\n"
-        set g_AnnotSV(PhenoGenius) "0"
+		puts "\ncf $g_AnnotSV(installDir)/share/python3/phenogeniuscli/*.log\n"
+        set g_AnnotSV(PhenoGeniusCli) "0"
     }
  
     return
@@ -48,9 +48,9 @@ proc checkPhenoGenius {} {
 
 
 
-# Creation of the g_PhenoGenius variable:
-# g_PhenoGenius($geneName) = PhenoGenius_score\tPhenoGenius_phenotype\tPhenoGenius_specificity
-# g_PhenoGenius($NCBIid) = PhenoGenius_score\tPhenoGenius_phenotype\tPhenoGenius_specificity
+# Creation of the g_PhenoGeniusCli variable:
+# g_PhenoGeniusCli($geneName) = PhenoGeniusCli_score\tPhenoGeniusCli_phenotype\tPhenoGeniusCli_specificity
+# g_PhenoGeniusCli($NCBIid) = PhenoGeniusCli_score\tPhenoGeniusCli_phenotype\tPhenoGeniusCli_specificity
 # default = "-1.0\t\t"
 # 
 # INPUTS:
@@ -59,31 +59,31 @@ proc checkPhenoGenius {} {
 # L_HPO:   e.g. "HP:0001156,HP:0001363,HP:0011304,HP:0010055"
 #
 # INFO: This proc is run from "AnnotSV-regulatoryelements.tcl"
-proc runPhenoGenius {L_Genes L_NCBI_ID L_HPO} {
+proc runPhenoGeniusCli {L_Genes L_NCBI_ID L_HPO} {
     
     global g_AnnotSV
-    global g_PhenoGenius
+    global g_PhenoGeniusCli
     
-    puts "...running PhenoGenius for [llength $L_Genes] gene names ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+    puts "...running PhenoGeniusCli for [llength $L_Genes] gene names ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])\n"
     
-    set tmpCommandFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_run_phenogenius.tmp.bash"
-    set tmpResultsFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_phenogenius_results.tmp.tsv"
-    set tmpResultsLogFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_phenogenius_results.tmp.log"
+    set tmpCommandFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_run_phenogeniuscli.tmp.bash"
+    set tmpResultsFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_phenogeniuscli_results.tmp.tsv"
+    set tmpResultsLogFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_phenogeniuscli_results.tmp.log"
 
 	set codeToWrite "#!/bin/bash\n\n"
-	append codeToWrite "cd $g_AnnotSV(installDir)/share/python3/phenogenius/PhenoGenius\n"
+	append codeToWrite "cd $g_AnnotSV(installDir)/share/python3/phenogeniuscli/PhenoGeniusCli\n"
     append codeToWrite "poetry install\n"
     append codeToWrite "poetry run python3 phenogenius_cli.py --hpo_list $L_HPO --result_file $tmpResultsFile &> $tmpResultsLogFile \n"
 
     WriteTextInFile "$codeToWrite" $tmpCommandFile
 	file attributes $tmpCommandFile -permissions 0755
 
-	if {[catch {exec $tmpCommandFile} Message]} {
-		puts ""
+	if {[catch {exec $tmpCommandFile} Message] && [regexp -nocase "error" $Message]} {
+		puts "$codeToWrite\n"
 		puts $Message
 	}
 
-	if {![file exists $tmpResultsLogFile]} {set g_AnnotSV(PhenoGenius) "0"; return}
+	if {![file exists $tmpResultsLogFile]} {set g_AnnotSV(PhenoGeniusCli) "0"; return}
 
 	foreach L [LinesFromFile $tmpResultsFile] {
 		set Ls [split $L "\t"]
@@ -106,10 +106,10 @@ proc runPhenoGenius {L_Genes L_NCBI_ID L_HPO} {
 		regsub -all "\[\\\[\\\]{}'\]" $phenotype "" phenotype
         set specificity [string index [lindex $Ls $i_specificity] 0] ;# A, B, C or D
 		if {[lsearch -exact $L_Genes $gene] ne -1} {
-			set g_PhenoGenius($gene) "$score\t$phenotype\t$specificity"
+			set g_PhenoGeniusCli($gene) "$score\t$phenotype\t$specificity"
 		}
 		if {[lsearch -exact $L_NCBI_ID $NCBI_ID] ne -1} {
-            set g_PhenoGenius($NCBI_ID) "$score\t$phenotype\t$specificity"
+            set g_PhenoGeniusCli($NCBI_ID) "$score\t$phenotype\t$specificity"
         }
 	}
 
@@ -121,40 +121,40 @@ proc runPhenoGenius {L_Genes L_NCBI_ID L_HPO} {
 }
 
 
-# g_PhenoGenius($geneName) = PhenoGenius_score\tPhenoGenius_phenotype\tPhenoGenius_specificity
-# g_PhenoGenius($NCBIid) = PhenoGenius_score\tPhenoGenius_phenotype\tPhenoGenius_specificity
+# g_PhenoGeniusCli($geneName) = PhenoGeniusCli_score\tPhenoGeniusCli_phenotype\tPhenoGeniusCli_specificity
+# g_PhenoGeniusCli($NCBIid) = PhenoGeniusCli_score\tPhenoGeniusCli_phenotype\tPhenoGeniusCli_specificity
 # Return either only the specificity or all the annotation:
 # what = "specificity" or "all"
-proc PhenoGeniusAnnotation {GeneName what} {
+proc PhenoGeniusCliAnnotation {GeneName what} {
     
-    global g_PhenoGenius
+    global g_PhenoGeniusCli
     
     if {$what eq "all"} {
-        # Return all the annotation (PhenoGenius_score\tPhenoGenius_phenotype\tPhenoGenius_specificity) => for gene annotations
-        if {[info exists g_PhenoGenius($GeneName)]} {
-            return $g_PhenoGenius($GeneName)
+        # Return all the annotation (PhenoGeniusCli_score\tPhenoGeniusCli_phenotype\tPhenoGeniusCli_specificity) => for gene annotations
+        if {[info exists g_PhenoGeniusCli($GeneName)]} {
+            return $g_PhenoGeniusCli($GeneName)
 		} else {
 			set NCBI_ID [searchforGeneID $GeneName]
-			if {[info exists g_PhenoGenius($NCBI_ID)]} {
-				return $g_PhenoGenius($NCBI_ID)
+			if {[info exists g_PhenoGeniusCli($NCBI_ID)]} {
+				return $g_PhenoGeniusCli($NCBI_ID)
 			} else {
 				return "-1.0\t\t"
 			}
 		}
     } elseif {$what eq "specificity"} {
-        # Return only the specificity (PhenoGenius_specificity) => for regulatory elements annotations
-        if {[info exists g_PhenoGenius($GeneName)]} {
-            return [lindex [split $g_PhenoGenius($GeneName) "\t"] end]
+        # Return only the specificity (PhenoGeniusCli_specificity) => for regulatory elements annotations
+        if {[info exists g_PhenoGeniusCli($GeneName)]} {
+            return [lindex [split $g_PhenoGeniusCli($GeneName) "\t"] end]
         } else {
             set NCBI_ID [searchforGeneID $GeneName]
-            if {[info exists g_PhenoGenius($NCBI_ID)]} {
-                return [lindex [split $g_PhenoGenius($NCBI_ID) "\t"] end]
+            if {[info exists g_PhenoGeniusCli($NCBI_ID)]} {
+                return [lindex [split $g_PhenoGeniusCli($NCBI_ID) "\t"] end]
             } else {
                 return ""
             }
         }
     } else {
-        puts "proc PhenoGeniusAnnotation: Bad option value for \"what\" ($what)"
+        puts "proc PhenoGeniusCliAnnotation: Bad option value for \"what\" ($what)"
     }
 }
 

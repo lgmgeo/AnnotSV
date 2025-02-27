@@ -15,7 +15,7 @@ share/AnnotSV/Annotations_Exomiser/
 share/python3/annotsv/
 src/annotsv/
 Python/
-share/python3/phenogenius/
+share/python3/phenogeniuscli/
 
 # Unit tests
 tests/AnnotSV/privateTest_*

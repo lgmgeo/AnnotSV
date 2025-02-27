@@ -184,7 +184,7 @@ checkClinGenFile
 # checkNCBI (done with OMIM)
 checkExomiserInstallation
 # Annotation with PhenoGenius?
-checkPhenoGenius
+checkPhenoGeniusCli
 # Annotation with LOEUF
 checkLOEUFfile
 

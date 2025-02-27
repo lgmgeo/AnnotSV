@@ -1143,12 +1143,12 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
     
     ## Preparation of the phenotype-driven analysis (PhenoGenius + Exomiser)
     ## (to be able to access to the exomiser score of a gene with [ExomiserAnnotation $gName "score"])
-    ## (to be able to access to the PhenoGenius specificity of a gene with [PhenoGeniusAnnotation $gName "specificity"])
-    ####################################################################################################################
+    ## (to be able to access to the PhenoGenius specificity of a gene with [PhenoGeniusCliAnnotation $gName "specificity"])
+    #######################################################################################################################
     set L_allGenes $L_allGenesOverlapped
     lappend L_allGenes {*}$L_allRegulatedGenes
     set L_allGenes [lsort -unique $L_allGenes]
-	if {$g_AnnotSV(PhenoGenius)} {		
+	if {$g_AnnotSV(PhenoGeniusCli)} {		
 		set L_NCBI_ID {}
 		foreach g $L_allGenes {
 			set NCBI_ID [searchforGeneID $g]
@@ -1157,7 +1157,7 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
 			}
 		}
 		set L_NCBI_ID [lsort -unique $L_NCBI_ID]
-		runPhenoGenius "$L_allGenes" "$L_NCBI_ID" "$g_AnnotSV(hpo)"
+		runPhenoGeniusCli "$L_allGenes" "$L_NCBI_ID" "$g_AnnotSV(hpo)"
     }
 	if {$g_AnnotSV(hpo) ne "" && $L_allGenes ne ""} {
         runExomiser "$L_allGenes" "$g_AnnotSV(hpo)"
@@ -1205,8 +1205,8 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
             catch {set HI "$g_HI($gName)"}
             set TS ""
             catch {set TS "$g_TS($gName)"}
-            if {$g_AnnotSV(PhenoGenius)} {
-                set PhenoGeniusSpecificity "[PhenoGeniusAnnotation $gName "specificity"]"
+            if {$g_AnnotSV(PhenoGeniusCli)} {
+                set PhenoGeniusSpecificity "[PhenoGeniusCliAnnotation $gName "specificity"]"
             } else {set PhenoGeniusSpecificity ""}
             if {$g_AnnotSV(hpo) ne ""} {
                 set exomiserScore "[ExomiserAnnotation $gName "score"]"

@@ -26,19 +26,20 @@ fi
 # echo "Poetry: $poetryVersion"
 
 
-# Phenogenius install (if needed)
-#################################
-mkdir -p $ANNOTSV/share/python3/phenogenius
-cd $ANNOTSV/share/python3/phenogenius
-if [ ! -d PhenoGenius ]
+# PhenogeniusCli install (if needed)
+####################################
+mkdir -p $ANNOTSV/share/python3/phenogeniuscli
+cd $ANNOTSV/share/python3/phenogeniuscli
+if [ ! -d PhenoGeniusCli ]
 then
-	git clone https://github.com/kyauy/PhenoGenius --branch v1.0.0 &> PhenoGenius.install.log
-	cd ./PhenoGenius
-	rm -rf .git .gitattributes .github .gitignore
+	git clone https://github.com/kyauy/PhenoGeniusCli.git >> PhenoGeniusCli.install.log 2>&1
+	cd ./PhenoGeniusCli >> PhenoGeniusCli.install.log 2>&1
+	git checkout tags/v.1.1.2 >> ../PhenoGeniusCli.install.log 2>&1
+	rm -rf .git .gitattributes .github .gitignore >> ../PhenoGeniusCli.install.log 2>&1
     poetry install &> ../poetry_install.log
 fi
 
-cd $ANNOTSV/share/python3/phenogenius/PhenoGenius
+cd $ANNOTSV/share/python3/phenogeniuscli/PhenoGeniusCli
 
 poetry run python3 phenogenius_cli.py --help  &> ../PhenoGenius.run.test1.log
 if [ `grep -c -- "--hpo_list" ../PhenoGenius.run.test1.log` == "1" ]

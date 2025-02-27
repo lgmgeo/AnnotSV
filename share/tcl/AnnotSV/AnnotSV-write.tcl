@@ -311,7 +311,7 @@ proc OrganizeAnnotation {} {
     }
 
     ####### "PhenoGenius header"
-    if {$g_AnnotSV(PhenoGenius)} {
+    if {$g_AnnotSV(PhenoGeniusCli)} {
         append headerOutput "\tPhenoGenius_score\tPhenoGenius_phenotype\tPhenoGenius_specificity"
     }
     
@@ -451,7 +451,7 @@ proc OrganizeAnnotation {} {
     }
 
     ####### "PhenoGenius annotations"
-    if {$g_AnnotSV(PhenoGenius)} {puts "\t...PhenoGenius annotations"}
+    if {$g_AnnotSV(PhenoGeniusCli)} {puts "\t...PhenoGenius annotations"}
 
     ####### "Exomiser annotation"
     if {$g_AnnotSV(hpo) ne ""} {puts "\t...Exomiser annotations"}
@@ -1206,13 +1206,13 @@ proc OrganizeAnnotation {} {
         }
 
         ####### "Phenogenius annotation"
-        if {$g_AnnotSV(PhenoGenius)} {
+        if {$g_AnnotSV(PhenoGeniusCli)} {
             if {$AnnotationMode eq "split"} {
-                set phenogeniusText [PhenoGeniusAnnotation $geneName "all"]
+                set phenogeniusText [PhenoGeniusCliAnnotation $geneName "all"]
             } else {
                 set bestSpecificity ""
                 foreach g [split $geneName ";"] {
-                    set specificity [PhenoGeniusAnnotation $g "specificity"]
+                    set specificity [PhenoGeniusCliAnnotation $g "specificity"]
 					# {"A" < "B"} => True
 					if {$specificity eq ""} {continue}
 					if {$bestSpecificity eq ""} {set bestSpecificity $specificity; continue}
@@ -1341,7 +1341,7 @@ proc OrganizeAnnotation {} {
             append TextToWrite "\t$geneBasedText"
         }
         ####### "PhenoGenius annotation"
-        if {$g_AnnotSV(PhenoGenius)} {
+        if {$g_AnnotSV(PhenoGeniusCli)} {
             append TextToWrite "\t$phenogeniusText"
         }
         ####### "Exomiser annotation"
