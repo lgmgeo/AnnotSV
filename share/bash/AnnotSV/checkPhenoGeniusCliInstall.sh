@@ -34,8 +34,10 @@ if [ ! -d PhenoGeniusCli ]
 then
 	git clone https://github.com/kyauy/PhenoGeniusCli.git >> PhenoGeniusCli.install.log 2>&1
 	cd ./PhenoGeniusCli >> PhenoGeniusCli.install.log 2>&1
-	git checkout tags/v.1.1.2 >> ../PhenoGeniusCli.install.log 2>&1
+	# Search for the last PhenoGenius version tested/validated with AnnotSV
+	git checkout tags/v.1.1.3 >> ../PhenoGeniusCli.install.log 2>&1
 	rm -rf .git .gitattributes .github .gitignore >> ../PhenoGeniusCli.install.log 2>&1
+	poetry config keyring.enabled false
     poetry install &> ../poetry_install.log
 fi
 
@@ -46,6 +48,7 @@ if [ `grep -c -- "--hpo_list" ../PhenoGenius.run.test1.log` == "1" ]
 then
 	exit 0
 else
+	poetry config keyring.enabled false
 	poetry install &> ../poetry_install.log ;# Can be run from different servers
     poetry run python3 phenogenius_cli.py --help &> ../PhenoGenius.run.test2.log
 	if [ `grep -c -- "--hpo_list" ../PhenoGenius.run.test2.log` == 1 ]
