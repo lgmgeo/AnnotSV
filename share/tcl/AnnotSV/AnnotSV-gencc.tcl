@@ -111,14 +111,19 @@ proc updateGenCCgeneFile {} {
         set classif [lindex $Ls $i_classif]
         set pmid [lindex $Ls $i_pmid]
         
-        if {$disease ne ""} {
+        # 05/09/2024 - Issue #250 (bad GenCC file)
+        # 04/28/2025 - Bug always present:
+        #   DHX9    "   AD  Strong  37369308;37467750
+        #   FLVCR1  ";FLVCR1-related retinopathy with or without ataxia;posterior column ataxia-retinitis pigmentosa syndrome   AR  ...
+		# $disease should not be equal to "\""
+        if {$disease ne "" && $disease ne "\""} {
             lappend L_disease($gene) "$disease"
         }
         if {[regexp -nocase "Autosomal dominant" $moi]} {
             if {[regexp -nocase "with maternal imprinting" $moi]} {
                 set moi "ADm"
             } elseif {[regexp -nocase "with paternal imprinting" $moi]} {
-                set moi "ADm"
+                set moi "ADp"
             } else {
                 set moi "AD"
             }
@@ -159,7 +164,7 @@ proc updateGenCCgeneFile {} {
                 lappend L_moi($gene) "IPVE"
             }
         }
-        if {$classif ne ""} {
+        if {$classif ne "" && $classif ne "\""} {
             lappend L_classif($gene) "$classif"
         }
         regsub -all "\"" $pmid "" pmid
@@ -185,8 +190,10 @@ proc updateGenCCgeneFile {} {
         if {[info exists L_moi($gene)]}       {set b [join [lsort -unique $L_moi($gene)] ";"]}      else {set b ""}
         if {[info exists L_classif($gene) ]}  {set c [join [lsort -unique $L_classif($gene) ] ";"]} else {set c ""}
         if {[info exists L_pmid($gene)]}      {set d [join [lsort -unique $L_pmid($gene)] ";"]}     else {set d ""}
-        lappend TexteToWrite "$gene\t$a\t$b\t$c\t$d"
-    }
+
+        set L_toWrite "$gene\t$a\t$b\t$c\t$d"
+        lappend TexteToWrite $L_toWrite
+	}
     
     WriteTextInFile [join $TexteToWrite "\n"] $GenCCfileFormatted
     if {[catch {exec gzip $GenCCfileFormatted} Message]} {

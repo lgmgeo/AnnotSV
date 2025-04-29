@@ -27,7 +27,7 @@ proc startTheRESTservice {applicationPropertiesTmpFile port exomiserStartService
     
     global g_AnnotSV
     
-    set jarFile "$g_AnnotSV(annotationsDir)/jar/exomiser-rest-prioritiser-12.1.0.jar"
+    set jarFile [lindex [glob -nocomplain $g_AnnotSV(annotationsDir)/jar/exomiser-rest-prioritiser-*.jar] end]
     
     # Run the service
     

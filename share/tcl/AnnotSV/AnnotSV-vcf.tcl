@@ -74,6 +74,7 @@ proc VCFannotation {SVchrom SVstart SVend SVtype} {
             set tmpVCF1 "$g_AnnotSV(outputDir)/[file tail $vcfF].[clock seconds].separate.vcf"
             set tmpVCFgz1 "$g_AnnotSV(outputDir)/[file tail $vcfF].[clock seconds].separate.vcf.gz"
             catch {eval exec $g_AnnotSV(bcftools) norm -m -both $vcfF > $tmpVCF1} Message
+
             if {[file size $tmpVCF1] eq 0} {
                 # we continue AnnotSV without splitting the multiallelic sites!
                 puts "\t   -- VCFannotation --"
@@ -154,7 +155,7 @@ proc VCFannotation {SVchrom SVstart SVend SVtype} {
                     puts "Error: look at $tmpVCF3.error"
                 }
             }
-            
+           
             # Nettoyage
             file delete -force $tmpVCFgz1
             file delete -force $tmpVCFgz2
@@ -250,7 +251,7 @@ proc VCFannotation {SVchrom SVstart SVend SVtype} {
                 puts "\t\t-> $iSV SV excluded (considering only SNV/indel from the VCF)"
             }
             if {$iNotPASS} {
-                puts "\t\t-> $iNotPASS SNV/indel excluded beacause of the FILTER value not equal to \"PASS\""
+                puts "\t\t-> $iNotPASS SNV/indel excluded because of the FILTER value not equal to \"PASS\""
             }
             if {$iNotGT} {
                 puts "\t\t-> $iNotGT SNV/indel excluded because of the absence of GT information"

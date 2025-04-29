@@ -1513,10 +1513,6 @@ proc OrganizeAnnotation {} {
                 }
                 if {$doNotDisplay} {continue}
             }
-           
-			# 05/09/2024 - Temporary fix for the issue #250 (bad GenCC file)
-			# (To remove after annotation update)
-			regsub -all "\t\"\t" $lineCompleted "\t\t" lineCompleted
 
             lappend L_lineCompleted [switchAllCoordinatesFromBEDtoVCFinLine "$lineCompleted"]
             

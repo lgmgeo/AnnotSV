@@ -13,8 +13,8 @@ poetryDir=`which poetry`
 # The "$poetryDir" directory should exist
 if [ ! -e "$poetryDir" ]
 then
-    echo "Poetry seems not to be installed"
-    echo "WARNING: No PhenoGenius annotations available."
+	echo "Poetry seems not to be installed"
+	echo "WARNING: No PhenoGenius annotations available."
 	exit 1
 fi
 
@@ -38,7 +38,7 @@ then
 	git checkout tags/v.1.1.3 >> ../PhenoGeniusCli.install.log 2>&1
 	rm -rf .git .gitattributes .github .gitignore >> ../PhenoGeniusCli.install.log 2>&1
 	poetry config keyring.enabled false
-    poetry install &> ../poetry_install.log
+	poetry install &> ../poetry_install.log
 fi
 
 cd $ANNOTSV/share/python3/phenogeniuscli/PhenoGeniusCli
@@ -50,7 +50,7 @@ then
 else
 	poetry config keyring.enabled false
 	poetry install &> ../poetry_install.log ;# Can be run from different servers
-    poetry run python3 phenogenius_cli.py --help &> ../PhenoGenius.run.test2.log
+	poetry run python3 phenogenius_cli.py --help &> ../PhenoGenius.run.test2.log
 	if [ `grep -c -- "--hpo_list" ../PhenoGenius.run.test2.log` == 1 ]
 	then
 		exit 0

@@ -1,0 +1,20 @@
+# extract-HG00096.vcf extract-tutu.vcf sont quasiment les mêmes fichiers :
+# => nom de la colonne "sample" qui est différent
+# => 2 variants différetns (au niveau de POS)
+
+# diff extract-HG00096.vcf extract-tutu.vcf
+< #CHROM        POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  HG00096
+> #CHROM        POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  tutu
+< 1     3809347 rs192032080     T       C       100.0   PASS    AC=14;AF=0.00279553  GT:DP   0|1:6
+> 1     3809346 rs192032080     T       C       100.0   PASS    AC=14;AF=0.00279553  GT:DP   0|1:6
+
+ 
+# Les comptes sont faits sur tous les samples (ici, HG00096 et tutu)
+# Puis on affiche uniquement ceux dans -snvIndelSamples
+
+$ANNOTSV/bin/AnnotSV -SVinputFile "./input/SV.bed" -svtBEDcol 4 -outputFile "./output/SV_tcl.annotated.tsv" -snvIndelFiles "./input/extract-*.vcf" -snvIndelSamples tutu -genomeBuild GRCh37 -includeCI 0 &> "./output/output.log"
+
+$cut "./output/SV_tcl.annotated.tsv" "AnnotSV_ID;Annotation_mode;Count_hom(HG00096);Count_htz(HG00096);Count_htz/allHom(HG00096);Count_htz/total(cohort);Count_total(cohort);Count_hom(tutu);Count_htz(tutu);Count_htz/allHom(tutu);kk"
+
+
+

@@ -17,6 +17,11 @@ src/annotsv/
 Python/
 share/python3/phenogeniuscli/
 
+# Exomiser:
+# File share/AnnotSV/jar/exomiser-rest-prioritiser-14.1.0.jar is 114.75 MB; this exceeds GitHub's file size limit of 100.00 MB
+# => Downloaded with the Makefile
+share/AnnotSV/jar/exomiser-rest-prioritiser-14.1.0.jar
+
 # Unit tests
 tests/AnnotSV/privateTest_*
 tests/AnnotSV/test_*/command_Tcl.log
