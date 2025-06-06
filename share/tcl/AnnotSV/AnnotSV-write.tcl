@@ -1448,7 +1448,11 @@ proc OrganizeAnnotation {} {
                     } else {
                         append lineCompleted "\t$g_rankingScore($AnnotSV_ID)" ;#rankingScore
                     }
-                    if {![info exists g_rankingExplanations($AnnotSV_ID)]} {set g_rankingExplanations($AnnotSV_ID) ""}
+                    if {![info exists g_rankingExplanations($AnnotSV_ID)]} {
+						set g_rankingExplanations($AnnotSV_ID) ""
+					} elseif {[set g_AnnotSV(metrics)] eq "fr"} {
+						regsub -all {([0-9])\.([0-9])} $g_rankingExplanations($AnnotSV_ID) "\\1,\\2" g_rankingExplanations($AnnotSV_ID)
+					}
                     append lineCompleted "\t$g_rankingExplanations($AnnotSV_ID)" ;#rankingExplanations
                     if {$g_rankingScore($AnnotSV_ID) eq ""} {
                         set class "NA"
