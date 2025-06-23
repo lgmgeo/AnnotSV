@@ -184,7 +184,7 @@ proc runExomiser {L_Genes L_HPO} {
     }
     puts "\t...on port $port"
     
-    set applicationPropertiesTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_exomiser_application.properties"
+    set applicationPropertiesTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_[pid]_exomiser_application.properties"
     if {[file exist $g_AnnotSV(etcDir)/application.properties]} {
         set infos [ContentFromFile $g_AnnotSV(etcDir)/application.properties]
     } elseif {[file exist $g_AnnotSV(annotationsDir)/Annotations_Exomiser/$hpoVersion/application.properties]} {
@@ -195,7 +195,7 @@ proc runExomiser {L_Genes L_HPO} {
     WriteTextInFile $infos $applicationPropertiesTmpFile
 
     # Start the REST service
-    set exomiserStartServiceFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_exomiser.tmp"
+    set exomiserStartServiceFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_[pid]_exomiser.tmp"
     puts "\t...starting the REST service"
     set idService [startTheRESTservice $applicationPropertiesTmpFile $port $exomiserStartServiceFile]
     if {$idService ne ""} {

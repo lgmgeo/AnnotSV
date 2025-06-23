@@ -93,7 +93,7 @@ proc checkBenignFiles {} {
             set benignFile_TmpFormatted "$benignDir/benign_${SVtype}_SV_$genomeBuild.tmp.formatted.bed"
             if {![file exist $benignFile_TmpFormatted]} {continue}
             set benignFile_Sorted "$benignDir/benign_${SVtype}_SV_$genomeBuild.sorted.bed"
-            set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.tmp.bash"
+            set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_[pid]_sort.tmp.bash"
             ReplaceTextInFile "#!/bin/bash" $sortTmpFile
             WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $sortTmpFile
             WriteTextInFile "export LC_ALL=C" $sortTmpFile

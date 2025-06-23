@@ -85,7 +85,7 @@ proc closestGenesAnnotation {BreakpointChrom BreakpointPos Side} {
 		#
         # Intersection with very large files can cause trouble with excessive memory usage.
         # A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm.
-        set bashTmpFileLeft "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.left.tmp.bash"
+        set bashTmpFileLeft "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_[pid]_sort.left.tmp.bash"
         ReplaceTextInFile "#!/bin/bash" $bashTmpFileLeft
         WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $bashTmpFileLeft
         WriteTextInFile "export LC_ALL=C" $bashTmpFileLeft
@@ -102,7 +102,7 @@ proc closestGenesAnnotation {BreakpointChrom BreakpointPos Side} {
         file delete -force $tmpCLosestLeftFile.tmp
         
         # Right sorting: $tmpCLosestRightFile.tmp => ($bashTmpFileRight) => $tmpCLosestRightFile
-        set bashTmpFileRight "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.left.tmp.bash"
+        set bashTmpFileRight "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_[pid]_sort.left.tmp.bash"
         ReplaceTextInFile "#!/bin/bash" $bashTmpFileRight
         WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $bashTmpFileRight
         WriteTextInFile "export LC_ALL=C" $bashTmpFileRight

@@ -343,7 +343,7 @@ proc VCFsToBED {SV_VCFfiles} {
     ## - For precise structural variants (e.g. ref="G" and alt="ACTGCTA):
     ##   END = POS + length of REF allele - 1
     
-    set SV_BEDfile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_AnnotSV_inputSVfile.bed"
+    set SV_BEDfile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_[pid]_AnnotSV_inputSVfile.bed"
     file delete -force "$SV_BEDfile"
     set VCFheader ""
     # Variants from the input file that are not annotated by AnnotSV are reported in $unannotatedOutputFile

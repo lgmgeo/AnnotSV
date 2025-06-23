@@ -120,7 +120,7 @@ proc checkPromoterFile {} {
         # Sorting of the bedfile:
         # Intersection with very large files can cause trouble with excessive memory usage.
         # A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm.
-        set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.tmp.bash"
+        set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_[pid]_sort.tmp.bash"
         ReplaceTextInFile "#!/bin/bash" $sortTmpFile
         WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $sortTmpFile
         WriteTextInFile "export LC_ALL=C" $sortTmpFile
@@ -258,7 +258,7 @@ proc checkEAfiles {} {
     # Intersection with very large files can cause trouble with excessive memory usage.
     # A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm.
     # RefSeq
-    set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.tmp.bash"
+    set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_[pid]_sort.tmp.bash"
     ReplaceTextInFile "#!/bin/bash" $sortTmpFile
     WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $sortTmpFile
     WriteTextInFile "export LC_ALL=C" $sortTmpFile
@@ -274,7 +274,7 @@ proc checkEAfiles {} {
     file delete -force $sortTmpFile
     file delete -force $EARefSeqFileFormattedGRCh37.tmp
     # ENSEMBL
-    set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.tmp.bash"
+    set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_[pid]_sort.tmp.bash"
     ReplaceTextInFile "#!/bin/bash" $sortTmpFile
     WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $sortTmpFile
     WriteTextInFile "export LC_ALL=C" $sortTmpFile
@@ -469,7 +469,7 @@ proc checkGHfiles {} {
     # Intersection with very large files can cause trouble with excessive memory usage.
     # A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm.
     foreach GHfile {GHRefSeqFileFormatted37 GHRefSeqFileFormatted38 GHENSEMBLfileFormatted37 GHENSEMBLfileFormatted38} {
-        set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.tmp.bash"
+        set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_[pid]_sort.tmp.bash"
         ReplaceTextInFile "#!/bin/bash" $sortTmpFile
         WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $sortTmpFile
         WriteTextInFile "export LC_ALL=C" $sortTmpFile
@@ -643,7 +643,7 @@ proc checkMiRTargetLinkFiles {} {
     # A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm.
     foreach miRNAfile {miRNARefSeqFileFormatted38or10 miRNAENSEMBLfileFormatted38} {
         if {![file exists [set $miRNAfile].tmp]} {continue} ;# use for Mouse annotation, ENSEMBL annotation doesn't exist
-        set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.tmp.bash"
+        set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_[pid]_sort.tmp.bash"
         ReplaceTextInFile "#!/bin/bash" $sortTmpFile
         WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $sortTmpFile
         WriteTextInFile "export LC_ALL=C" $sortTmpFile
@@ -809,7 +809,7 @@ proc checkABCfiles {} {
     # Intersection with very large files can cause trouble with excessive memory usage.
     # A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm.
     # RefSeq
-    set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.tmp.bash"
+    set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_[pid]_sort.tmp.bash"
     ReplaceTextInFile "#!/bin/bash" $sortTmpFile
     WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $sortTmpFile
     WriteTextInFile "export LC_ALL=C" $sortTmpFile
@@ -825,7 +825,7 @@ proc checkABCfiles {} {
     file delete -force $sortTmpFile
     file delete -force $ABCRefSeqFileFormattedGRCh37.tmp
     # ENSEMBL
-    set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.tmp.bash"
+    set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_[pid]_sort.tmp.bash"
     ReplaceTextInFile "#!/bin/bash" $sortTmpFile
     WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $sortTmpFile
     WriteTextInFile "export LC_ALL=C" $sortTmpFile
@@ -1000,7 +1000,7 @@ proc checkMPRAfiles {} {
         # Intersection with very large files can cause trouble with excessive memory usage.
         # A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm.
         # RefSeq
-        set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.tmp.bash"
+        set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_[pid]_sort.tmp.bash"
         ReplaceTextInFile "#!/bin/bash" $sortTmpFile
         WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $sortTmpFile
         WriteTextInFile "export LC_ALL=C" $sortTmpFile
@@ -1016,7 +1016,7 @@ proc checkMPRAfiles {} {
         file delete -force $sortTmpFile
         file delete -force [set MPRARefSeqFileFormattedGRCh[set build]].tmp
         # ENSEMBL
-        set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.tmp.bash"
+        set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_[pid]_sort.tmp.bash"
         ReplaceTextInFile "#!/bin/bash" $sortTmpFile
         WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $sortTmpFile
         WriteTextInFile "export LC_ALL=C" $sortTmpFile

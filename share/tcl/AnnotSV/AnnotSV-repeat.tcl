@@ -88,7 +88,7 @@ proc checkRepeatFile {} {
         # Sorting of the bedfile:
         # Intersection with very large files can cause trouble with excessive memory usage.
         # A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm.
-        set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.tmp.bash"
+        set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_[pid]_sort.tmp.bash"
         ReplaceTextInFile "#!/bin/bash" $sortTmpFile
         WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $sortTmpFile
         WriteTextInFile "export LC_ALL=C" $sortTmpFile
@@ -167,7 +167,7 @@ proc RepeatAnnotation {BreakpointChrom BreakpointPos} {
             # Sorting of the bedfile:
             # Intersection with very large files can cause trouble with excessive memory usage.
             # A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm.
-            set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_sort.tmp.bash"
+            set sortTmpFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_[pid]_sort.tmp.bash"
             ReplaceTextInFile "#!/bin/bash" $sortTmpFile
             WriteTextInFile "# The locale specified by the environment can affects the traditional sort order. We need to use native byte values." $sortTmpFile
             WriteTextInFile "export LC_ALL=C" $sortTmpFile

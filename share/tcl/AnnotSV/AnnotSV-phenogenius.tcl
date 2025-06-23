@@ -66,9 +66,9 @@ proc runPhenoGeniusCli {L_Genes L_NCBI_ID L_HPO} {
     
     puts "...running PhenoGeniusCli for [llength $L_Genes] gene names ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])\n"
     
-    set tmpCommandFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_run_phenogeniuscli.tmp.bash"
-    set tmpResultsFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_phenogeniuscli_results.tmp.tsv"
-    set tmpResultsLogFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_phenogeniuscli_results.tmp.log"
+    set tmpCommandFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_[pid]_run_phenogeniuscli.tmp.bash"
+    set tmpResultsFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_[pid]_phenogeniuscli_results.tmp.tsv"
+    set tmpResultsLogFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_[pid]_phenogeniuscli_results.tmp.log"
 
 	set codeToWrite "#!/bin/bash\n\n"
 	append codeToWrite "cd $g_AnnotSV(installDir)/share/python3/phenogeniuscli/PhenoGeniusCli\n"
