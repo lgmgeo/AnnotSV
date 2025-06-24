@@ -197,7 +197,7 @@ proc SVrankingLoss {L_annotations} {
             #     OR contains no additional genomic material).(-1.00)
             if {![info exists g_rankingExplanations($AnnotSV_ID,2F)]} {
                 # Does not add a -1 additional score if 2F/4O is completed.
-                set g_rankingExplanations($AnnotSV_ID,40) "40 (cf B_loss_source, po_B_loss_allG_source, -1.00);"
+                set g_rankingExplanations($AnnotSV_ID,4O) "4O (cf B_loss_source, po_B_loss_allG_source, -1.00);"
             }
         }
         
@@ -355,7 +355,7 @@ proc achieveSVrankingLoss {AnnotSV_ID} {
     # - Evaluate scores from the higher (positive value) to the lower (negative value); stop the evaluation at the first match (only the higher match is reported)
     #   (the "0" scores are evaluated in a second time)
     
-    # 40: Skip to section 5 if either your CNV overlapped with a pathogenic Loss SV in section 2
+    # 4O: Skip to section 5 if either your CNV overlapped with a pathogenic Loss SV in section 2
  
     if {[info exists g_rankingExplanations($AnnotSV_ID,2A)]} {
         # 2A
@@ -447,7 +447,7 @@ proc achieveSVrankingLoss {AnnotSV_ID} {
     ####################################################################################################################
     
     # Add the higher score of the section 4 (only if no positive score has been attributed in section 2)
-    if {[info exists g_rankingExplanations($AnnotSV_ID,40)]} {
+    if {[info exists g_rankingExplanations($AnnotSV_ID,4O)]} {
         # 4O
         if {![info exists g_rankingExplanations($AnnotSV_ID,2A)] && \
             ![info exists g_rankingExplanations($AnnotSV_ID,2F)] && \
@@ -461,7 +461,7 @@ proc achieveSVrankingLoss {AnnotSV_ID} {
             ![info exists g_rankingExplanations($AnnotSV_ID,2E-4)] && \
             ![info exists g_rankingExplanations($AnnotSV_ID,2EH)]} {
             set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)-1.00}]
-            append g_rankingExplanations($AnnotSV_ID) "$g_rankingExplanations($AnnotSV_ID,40)"
+            append g_rankingExplanations($AnnotSV_ID) "$g_rankingExplanations($AnnotSV_ID,4O)"
         }
     }
     
@@ -578,7 +578,7 @@ proc SVrankingGain {L_annotations} {
         ####################################################################################################################
         if {$poBgainAllG ne "" || $Bgain ne "" || $poBgainSomeG ne ""} {
             # 4O. Overlap with common population variation.
-            set g_rankingExplanations($AnnotSV_ID,40) "40 (cf po_B_gain_AllG_source, B_gain_source, po_B_gain_SomeG_source, +0.00);"
+            set g_rankingExplanations($AnnotSV_ID,4O) "4O (cf po_B_gain_AllG_source, B_gain_source, po_B_gain_SomeG_source, +0.00);"
         }
         
         
