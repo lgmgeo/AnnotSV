@@ -1460,9 +1460,9 @@ proc OrganizeAnnotation {} {
                         set class 5
                     } elseif {$g_rankingScore($AnnotSV_ID) >= "0.9"} {
                         set class 4
-                    } elseif {$g_rankingScore($AnnotSV_ID) >= "-0.9"} {
+                    } elseif {$g_rankingScore($AnnotSV_ID) >= "-0.89"} {
                         set class 3
-                    } elseif {$g_rankingScore($AnnotSV_ID) >= "-0.99"} {
+                    } elseif {$g_rankingScore($AnnotSV_ID) >= "-0.98"} {
                         set class 2
                     } else {
                         set class 1
