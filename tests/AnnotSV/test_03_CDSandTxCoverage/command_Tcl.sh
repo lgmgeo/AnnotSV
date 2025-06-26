@@ -23,6 +23,7 @@ cut="$ANNOTSV/tests/AnnotSV/scripts/cutWithColumnNames.tcl"
 # Truth = input/test_tcl.annotated.tsv.truth.sauv
 
 
+mkdir -p ./output
 rm -f "./output/test_tcl.annotated.tsv"
 
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/control_9deletions_FCGR3A_NM_000569.bed" -SVinputInfo 1 -outputFile "./output/test_tcl.annotated.tsv" -svtBEDcol 4 -genomeBuild GRCh37

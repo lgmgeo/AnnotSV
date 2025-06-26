@@ -29,6 +29,7 @@ cp "./input/user_annotations.tsv" $ANNOTSV/share/AnnotSV/Annotations_Human/Users
 # The external annotation colums will be added only if they are reported in the configfile
 # => Use of ./input/configfile
 
+mkdir -p ./output
 rm -f "./output/input_tcl.annotated.tsv" "./output/output.log"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/input.bed" -outputFile "./output/input_tcl.annotated.tsv" -svtBEDcol 4 -genomeBuild GRCh37 &> "./output/output.log"
 #                ...user_annotations.tsv

@@ -37,6 +37,7 @@ cut="$ANNOTSV/tests/AnnotSV/scripts/cutWithColumnNames.tcl"
 # The "Sample_ID" feature allows to better visualize the samples which contain the SV (in our example, only the sample "sample-002" contains the SV)
 # "Samples_ID" present in the "./input/configfile"
 
+mkdir -p ./output
 rm -f "./output/test1_tcl.annotated.tsv"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/test1.SV.vcf" -candidateSnvIndelFiles "./input/test1.snvindel.vcf" -outputFile "./output/test1_tcl.annotated.tsv" -genomeBuild GRCh37
 

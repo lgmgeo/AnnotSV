@@ -18,7 +18,7 @@ function exists_in_list() {
 # (overlapping too many TAD boundaries => previously, caused a bug in excel display (split the line with a "\n")
 # chr1:2806107-107058351
 
-
+mkdir -p ./output
 rm -f "./output/test_tcl.annotated.tsv"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/test.bed" -SVinputInfo 1 -outputFile "./output/test_tcl.annotated.tsv" -svtBEDcol 6 -genomeBuild GRCh37
 

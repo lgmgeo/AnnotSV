@@ -19,6 +19,7 @@ User_BED_file_2="./input/user_SVincludedInFt.bed"
 cp "$User_BED_file_1" $ANNOTSV/share/AnnotSV/Annotations_Human/Users/GRCh37/FtIncludedInSV/
 cp "$User_BED_file_2" $ANNOTSV/share/AnnotSV/Annotations_Human/Users/GRCh37/SVincludedInFt
 
+mkdir -p ./output
 rm -f "./output/test_tcl.annotated.tsv" "./output/output.log"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/test.bed" -SVinputInfo 1 -outputFile "./output/test_tcl.annotated.tsv" -svtBEDcol 5 -overlap 70 -genomeBuild GRCh37 &> "./output/output.log"
 
@@ -47,7 +48,7 @@ fi
 # The output columns should have "SVincludedInFt" and "FtIncludedInSV" annotations
 ##################################################################################
 annotations=`$cut "./output/test_tcl.annotated.tsv" "BBBBBBBBBBBBBBBBBBBB"`
-if [ `echo $annotations | tr " " "\n" | grep -c "SVincludedInFt"` == 8 ]
+if [ `echo $annotations | tr " " "\n" | grep -c "SVincludedInFt"` == 9 ]
 then
         echo "Ok"
 else

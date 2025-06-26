@@ -10,7 +10,7 @@ set -eo pipefail
 ##################################
 
 => Need to be run in each directory:
-command_Tcl.sh >& command_Tcl.log
+./command_Tcl.sh >& command_Tcl.log
 
 gr error command_Tcl.log
 

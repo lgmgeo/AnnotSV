@@ -9,6 +9,7 @@ cut="$ANNOTSV/tests/AnnotSV/scripts/cutWithColumnNames.tcl"
 
 # With HPO where Exomiser and Phenogenius quite disagree
 ########################################################
+mkdir -p ./output
 rm -f "./output/test.GRCh37_tcl.annotated.tsv"
 $ANNOTSV/bin/AnnotSV -SVinputFile ./input/test.bed  -outputFile "./output/test.GRCh38_tcl.annotated.tsv" -svtbedcol 5 -genomeBuild GRCh38 -hpo "HP:0001156,HP:0001363,HP:0011304,HP:0010055"
 

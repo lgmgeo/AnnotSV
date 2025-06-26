@@ -13,21 +13,11 @@ function exists_in_list() {
 }
 
 
-# # BED file séparé par des espaces (au lieu de tabulation) : space-separated-input.bed
-# #####################################################################################
-# 
-# $ANNOTSV/bin/AnnotSV -SVinputFile space-separated-input.bed -SVinputInfo 1 -outputFile ./space-separated-input_tcl.annotated.tsv -svtBEDcol -1 -genomeBuild GRCh37
-# => plante :
-# -- refGeneAnnotation --
-# bedtools intersect -sorted -a ./space-separated-input.formatted.sorted.bed -b /home/geoffroy/analysisOfSV/AnnotSV/AnnotSV_dev/share/AnnotSV/Annotations_Human/RefGene/GRCh37/refGene.sorted.bed -wa -wb > ./space-separ
-# ated-input_tcl.annotated.tsv.tmp.tmp
-# Error: unable to open file or unable to determine types for file ./space-separated-input.formatted.sorted.bed
-# Exit with error
 
-
-
-# TSV: Check that no column is shifted
-######################################
+# BED = Tab Separated Values (OK) 
+#     => Check that no column is shifted
+###################################################################
+mkdir -p ./output
 rm -f "./output/test_tcl.annotated.tsv"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/tab-separated.bed" -SVinputInfo 1 -outputFile "./output/test_tcl.annotated.tsv" -svtBEDcol 4 -genomeBuild GRCh37 
 
@@ -41,14 +31,31 @@ do
         fi
 done
 
-# Space separated value: Error message
-######################################
+
+# BED = Space separated values (~in place of tabulations) 
+#     => BUG 
+# (space-separated-input.bed)
+###################################################################
+
+# $ANNOTSV/bin/AnnotSV -SVinputFile space-separated-input.bed -SVinputInfo 1 -outputFile ./space-separated-input_tcl.annotated.tsv -svtBEDcol -1 -genomeBuild GRCh37
+#
+# => plante :
+# ----------------------------------------------------------------------------------------------------------------
+# -- refGeneAnnotation --
+# bedtools intersect -sorted -a ./space-separated-input.formatted.sorted.bed -b /home/geoffroy/analysisOfSV/AnnotSV/AnnotSV_dev/share/AnnotSV/Annotations_Human/RefGene/GRCh37/refGene.sorted.bed -wa -wb > ./space-separ
+# ated-input_tcl.annotated.tsv.tmp.tmp
+# Error: unable to open file or unable to determine types for file ./space-separated-input.formatted.sorted.bed
+# Exit with error
+# ----------------------------------------------------------------------------------------------------------------
+
+
 # The above "set -e" option instructs bash to immediately exit if any command has a non-zero exit status.
 # So here, as the "AnnotSV" command fails, the "echo" command will run anyway thanks to the "||"
 rm -f "./output/space-separated_tcl.annotated.tsv"
 checks=`$ANNOTSV/bin/AnnotSV -SVinputFile "./input/space-separated.bed" -SVinputInfo 1 -outputFile "./output/space-separated_tcl.annotated.tsv" -svtBEDcol 4 -genomeBuild GRCh37 || echo "AnnotSV error"`
 
-if [ `echo $checks | grep -c "has non positional records, which are only valid for the groupBy tool"` == 1 ]
+# grep -E "motif1|motif2"
+if [ `echo $checks | grep -E -c "has non positional records, which are only valid for the groupBy tool|Please ensure that your file is TAB delimited"` == 1 ]
 then
         echo "Ok"
 else

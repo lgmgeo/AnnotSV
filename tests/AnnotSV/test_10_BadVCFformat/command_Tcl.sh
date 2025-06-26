@@ -44,6 +44,7 @@ set -o pipefail
 # VCF without header:
 #####################
 
+mkdir -p ./output
 rm -f "./output/testVCFwithoutHeader_tcl.annotated.tsv" "./output/testVCFwithoutHeader_tcl.log"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/testVCFwithoutHeader.vcf" -SVinputInfo 1 -outputFile "./output/testVCFwithoutHeader_tcl.annotated.tsv" -svtBEDcol 6 -genomeBuild GRCh37 &> "./output/testVCFwithoutHeader_tcl.log"
 

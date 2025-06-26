@@ -28,6 +28,7 @@ cut="$ANNOTSV/tests/AnnotSV/scripts/cutWithColumnNames.tcl"
 
 # 2F: Completely contained within an established benign CNV region.
 
+mkdir -p ./output
 rm -f "./output/test_tcl.annotated.tsv"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/test.bed" -svtBEDcol 4 -genomeBuild GRCh38 -outputFile "./output/test_tcl.annotated.tsv"
 

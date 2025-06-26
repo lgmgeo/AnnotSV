@@ -16,6 +16,7 @@ cut="$ANNOTSV/tests/AnnotSV/scripts/cutWithColumnNames.tcl"
 # Run without the "-candidateGenesFiltering" option
 ###################################################
 
+mkdir -p ./output
 rm -f "./output/test.without_tcl.annotated.tsv"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/test.bed" -SVinputInfo 1 -outputFile "./output/test.without_tcl.annotated.tsv" -svtBEDcol 5 -candidateGenesFile "./input/candidateGenesFile.txt" -genomeBuild GRCh37
 

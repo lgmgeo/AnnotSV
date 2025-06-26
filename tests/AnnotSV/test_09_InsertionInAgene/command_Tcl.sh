@@ -10,6 +10,7 @@ cut="$ANNOTSV/tests/AnnotSV/scripts/cutWithColumnNames.tcl"
 # 11      66278204        66278205        104252245       M        <INS>  M       M       M
  
 
+mkdir -p ./output
 rm -f "./output/test_tcl.annotated.tsv"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/test.bed" -SVinputInfo 1 -outputFile "./output/test_tcl.annotated.tsv" -svtBEDcol 6 -genomeBuild GRCh37
 

@@ -23,6 +23,7 @@ cut="$ANNOTSV/tests/AnnotSV/scripts/cutWithColumnNames.tcl"
 # ./input/input_1-big-ref.vcf
 # => ref with 43367 bp
 
+mkdir -p ./output
 rm -f "./output/test_tcl.annotated.tsv"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/input_1-big-ref.vcf" -outputFile "./output/test_tcl.annotated.tsv" -genomeBuild GRCh37 &> ./output/output.log
 

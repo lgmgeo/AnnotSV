@@ -22,6 +22,7 @@ cut="$ANNOTSV/tests/AnnotSV/scripts/cutWithColumnNames.tcl"
 # -> Check of the end for "TRA" (We should have "end = start" )
 # -> Check of the end for the other SV type (end defined with END from INFO)
 
+mkdir -p ./output
 rm -f "./output/triplesvmerge.CI0_tcl.annotated.tsv" "./output/tutu.CI0"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/triplesvmerge.vcf" -SVinputInfo 1 -outputFile "./output/triplesvmerge.CI0_tcl.annotated.tsv" -includeCI 0 -genomeBuild GRCh37
 

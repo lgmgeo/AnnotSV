@@ -44,6 +44,7 @@ SVinputVCFfile="./input/HG00096.wgs.mergedSV.v8.20130502.svs.genotypes.vcf"
 
 
 
+mkdir -p ./output
 rm -f ./output/HG00096_tcl_*annotated.tsv
 
 

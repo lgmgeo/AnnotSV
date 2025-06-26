@@ -23,6 +23,7 @@ cp "./input/user_SVincludedInFt.bed" $ANNOTSV/share/AnnotSV/Annotations_Human/Us
 # Checks of the "-reciprocal 0" and "-overlap 80" options with a BED input file:
 ################################################################################
 
+mkdir -p ./output
 rm -f "./output/testBED_tcl.annotated.reciprocalNo.Overlap80.tsv"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/test.bed" -SVinputInfo 1 -outputFile "./output/testBED_tcl.annotated.reciprocalNo.Overlap80.tsv"  -svtBEDcol 4 -reciprocal 0 -overlap 80 -genomeBuild GRCh37
 # => "SVincludedInFt" feature reported in the "BBBBBBBBBBBBBBBBBBBB" column

@@ -16,6 +16,7 @@ function exists_in_list() {
 # Test with Mouse annotations 
 #########################################
 
+mkdir -p ./output
 rm -f "./output/test_tcl.annotated.tsv" "./output/output.log"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/test.bed" -genomeBuild mm39 -SVinputInfo 1 -outputFile "./output/test_tcl.annotated.tsv" -svtBEDcol 4 &> "./output/output.log"
 

@@ -39,6 +39,7 @@ set -eo pipefail
 
 # Input BED file with header
 ############################
+mkdir -p ./output
 rm -f "./output/test_tcl.annotated.tsv"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/test.bed" -SVinputInfo 1 -outputFile "./output/test_tcl.annotated.tsv" -svtBEDcol 5 -overlap 70 -genomeBuild GRCh37
 

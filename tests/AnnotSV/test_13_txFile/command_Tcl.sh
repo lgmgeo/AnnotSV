@@ -24,6 +24,7 @@ cut="$ANNOTSV/tests/AnnotSV/scripts/cutWithColumnNames.tcl"
 # 1       1570602 1590465 -       CDK11B  NM_033490       1571125 1577849 1570602,1571298,1571694,1572043,1572258,1572442,1572769,1573123,1573861,1575637,1576408,1577022,1577266,1577746,1586817,1588824,1590374,    1571218,1571488,1571843,1572160,1572366,1572564,1572875,1573245,1573952,1575813,1576474,1577181,1577362,1577871,1586938,1588948,1590465,
 
 # By default, the CDK11B gene is annotated with the "NM_001787" transcript (and not the "NM_033486")
+mkdir -p ./output
 rm -f "./output/test.check1_tcl.annotated.tsv"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/test.check1.bed" -outputFile "./output/test.check1_tcl.annotated.tsv" -svtBEDcol 5 -genomeBuild GRCh37
 annotations=`$cut "./output/test.check1_tcl.annotated.tsv" "Gene_name;Tx" | grep "CDK11B"`

@@ -29,6 +29,7 @@ cut="$ANNOTSV/tests/AnnotSV/scripts/cutWithColumnNames.tcl"
 
 # GRCh37:
 #########
+mkdir -p ./output
 rm -f "./output/test.GRCh37_tcl.annotated.tsv"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/test.bed" -svtBEDcol 4 -outputFile "./output/test.GRCh37_tcl.annotated.tsv" -overlap 1 -genomeBuild GRCh37
 

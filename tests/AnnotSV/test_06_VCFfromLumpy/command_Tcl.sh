@@ -37,6 +37,7 @@ function exists_in_list() {
 
 
 
+mkdir -p ./output
 rm -f "./output/test1_tcl.annotated.tsv"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/test1.vcf" -SVinputInfo 0 -outputFile "./output/test1_tcl.annotated.tsv" -genomeBuild GRCh37
 

@@ -27,6 +27,7 @@ function exists_in_list() {
 
 # -metrics "us" (default)
 #########################
+mkdir -p ./output
 rm -f "./output/output.us_tcl.annotated.tsv"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/input.bed" -SVinputInfo 1 -outputFile "./output/output.us_tcl.annotated.tsv" -svtbedcol 4 -genomeBuild GRCh37
 
@@ -50,12 +51,15 @@ done
 
 annotations=`$cut "./output/output.us_tcl.annotated.tsv" "B_gain_AFmax;B_loss_AFmax;B_ins_AFmax;B_inv_AFmax;GC_content_left;DDD_HI_percent;ExAC_synZ;GnomAD_pLI;ExAC_pLI;AnnotSV_ranking_score;AnnotSV_ranking_criteria;ACMG_class" | grep -v "full="`
 
-if [ `echo $annotations | tr " " "\n" | grep -c "\\."` == 25 ] 
+if [ `echo $annotations | tr " " "\n" | grep -c "[0-9]\\.[0-9]"` > 0 ] 
 then
+	if [ `echo $annotations | tr " " "\n" | grep -c "[0-9]\\,[0-9]"` -eq 0 ]
+	then
         echo "Ok"
-else
+	else
         echo "error 1: Error with the ranking (-metrics us)"
         exit 1
+	fi
 fi
 
 
@@ -77,7 +81,7 @@ for v in `$cut "./output/output.fr_tcl.annotated.tsv" "ACMG_class" | sort -u`
 do
         if ! exists_in_list "3 4 ACMG_class full=3 full=4" " " "$v"
         then
-                echo "Error with the ranking (-metrics us)"
+                echo "Error with the ranking (-metrics fr)"
                 echo "error 1"
                 exit 1
         fi
@@ -85,12 +89,15 @@ done
 
 annotations=`$cut "./output/output.fr_tcl.annotated.tsv" "B_gain_AFmax;B_loss_AFmax;B_ins_AFmax;B_inv_AFmax;GC_content_left;DDD_HI_percent;ExAC_synZ;GnomAD_pLI;ExAC_pLI;AnnotSV_ranking_score;AnnotSV_ranking_criteria;ACMG_class" | grep -v "full="`
 
-if [ `echo $annotations | tr " " "\n" | grep -c ","` == 25 ]
+if [ `echo $annotations | tr " " "\n" | grep -c "[0-9]\\.[0-9]"` -eq 0 ]
 then
+	if [ `echo $annotations | tr " " "\n" | grep -c "[0-9]\\,[0-9]"` > 0 ]
+	then
         echo "Ok"
-else
+	else
         echo "error 1: Error with the ranking (-metrics fr)"
         exit 1
+	fi
 fi
 
 

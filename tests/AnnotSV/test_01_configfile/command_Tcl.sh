@@ -20,6 +20,7 @@ function exists_in_list() {
 
 
 # Run of AnnotSV, asking for the minimum of annotation columns (Using a "configfile" located in the same directory as the input file)
+mkdir -p ./output
 cp $ANNOTSV/etc/AnnotSV/configfile.minAnnotation ./input/configfile
 rm -f "./output/test_minAnn_tcl.annotated.tsv"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/test.bed" -svtBEDcol 5  -SVinputInfo 1 -outputFile "./output/test_minAnn_tcl.annotated.tsv" -genomeBuild GRCh37

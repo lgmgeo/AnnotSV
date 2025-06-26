@@ -17,8 +17,8 @@ function exists_in_list() {
 # Test of the BED file example available at the AnnotSV website (=/home/geoffroy/www/AnnotSV/web/Documentation/test.bed)
 ########################################################################################################################
 
-rm -f "./input/test.bed" "./output/test_tcl.annotated.tsv"
-cp "/home/geoffroy/www/AnnotSV/web/Documentation/test.bed" "./input"
+mkdir -p ./output
+rm -f "./output/test_tcl.annotated.tsv"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/test.bed" -SVinputInfo 1 -outputFile "./output/test_tcl.annotated.tsv" -svtBEDcol 4 -genomeBuild GRCh37
 
 # Look at the last column of the file (SV ranking) and check that there is no shift:

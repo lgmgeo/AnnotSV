@@ -29,6 +29,7 @@ fi
 # Check 1: file containing different SV types: "test.41_SV.bed"
 ###############################################################
 ###############################################################
+mkdir -p ./output
 rm -f "./output/test.41_SV_tcl.annotated.tsv"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/test.41_SV.bed" -svtBedCol 4 -outputFile "./output/test.41_SV_tcl.annotated.tsv" -hpo "HP:0001156,HP:0001363,HP:0011304,HP:0010055" -genomeBuild GRCh37
 

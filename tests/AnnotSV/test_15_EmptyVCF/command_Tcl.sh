@@ -12,6 +12,7 @@ set -eo pipefail
 #    SVinputFile (test.vcf is empty, no SV to annotate - Exit without error.
 #    ############################################################################
 
+mkdir -p ./output
 rm -f "./output/test_tcl.annotated.tsv" "./output/test_tcl.log"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/test.vcf" -SVinputInfo 1 -outputFile "./output/test_tcl.annotated.tsv" &> "./output/test_tcl.log"
 

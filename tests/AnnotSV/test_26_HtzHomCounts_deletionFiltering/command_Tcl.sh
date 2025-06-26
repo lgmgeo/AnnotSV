@@ -65,15 +65,14 @@ cut="$ANNOTSV/tests/AnnotSV/scripts/cutWithColumnNames.tcl"
 
 
 # First example:
+mkdir -p ./output
 rm -f "./output/SV_tcl.annotated.tsv" "./output/output.log"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/SV.bed" -svtBEDcol 4 -outputFile "./output/SV_tcl.annotated.tsv" -snvIndelFiles "./input/extract-HG00096.vcf" -genomeBuild GRCh37 -includeCI 0 &> "./output/output.log"
-#...parsing of snvIndelFiles for "HG00096" (October 29 2021 - 14:43)
-#        ...split multiallelic sites into multiple rows for extract-HG00096.vcf (October 29 2021 - 14:43)
-#        ...parsing of extract-HG00096.vcf (October 29 2021 - 14:43)
-#                -> 65 SNV/indel located in all the SV
-#                -> 65 SNV/indel loaded
+#        ...parsing of ./input/extract-HG00096.vcf (May 30 2025 - 12:33)
+#                -> 37 SNV/indel located in all the SV (potentially with redundancy depending on SV overlap)
+#                -> 37 SNV/indel loaded
 
-if [ `grep -c " 65 SNV/indel loaded" "./output/output.log"` == 1 ]
+if [ `grep -c " 37 SNV/indel loaded" "./output/output.log"` == 1 ]
 then
         echo "Ok"
 else
@@ -125,10 +124,10 @@ $ANNOTSV/bin/AnnotSV -SVinputFile "./input/3samples.SV.vcf" -outputFile "./outpu
 #...parsing of snvIndelFiles for "father mother prob" (October 29 2021 - 16:20)
 #        ...split multiallelic sites into multiple rows for 3samples.extract-HG00096.snvindel.vcf (October 29 2021 - 16:20)
 #        ...parsing of 3samples.extract-HG00096.snvindel.vcf (October 29 2021 - 16:20)
-#                -> 33 SNV/indel located in all the SV (potentially with redundancy depending on SV overlap)
-#                -> 33 SNV/indel loaded
+#                -> 19 SNV/indel located in all the SV (potentially with redundancy depending on SV overlap)
+#                -> 19 SNV/indel loaded
 
-if [ `grep -c " 33 SNV/indel loaded" "./output/output.log"` == 1 ]
+if [ `grep -c " 19 SNV/indel loaded" "./output/output.log"` == 1 ]
 then
         echo "Ok"
 else
@@ -203,7 +202,6 @@ fi
 
 
 echo "ok - Finished"
-
 
 
 

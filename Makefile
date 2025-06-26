@@ -39,6 +39,7 @@ TCLDIRDISTRIBUTED    := share/tcl
 TCLDIR               := $(SHAREDIR)/$(TCLVERSION)
 PYTHONDIR            := $(SHAREDIR)/python3
 ANNOTSV              := AnnotSV
+JARDIR               := $(SHAREDIR)/$(ANNOTSV)/jar
 VERSION              := 3.4.6
 RM                   := /bin/rm
 RMDIR                := /bin/rmdir
@@ -187,15 +188,16 @@ install-human-annotation: Annotations_Human_$(VERSION).tar.gz install-exomiser
 	@echo ""
 	@echo "--> Human annotation installed"
 
-install-exomiser-1: 2309_phenotype.zip
+install-exomiser-1: 2406_phenotype.zip
 	@echo ""
 	@echo "Installation of Exomiser data:"
 	@echo ""
-	$(MKDIR) -p $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/2309
-	tar -xf 2309_hg19.tar.gz -C $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/2309/
-	unzip 2309_phenotype.zip -d $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/2309/
-	$(RM) -rf 2309_phenotype.zip
-	$(RM) -rf 2309_hg19.tar.gz
+	$(MKDIR) -p $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/2406
+	unzip 2406_phenotype.zip -d $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/2406/
+	$(RM) -rf 2406_phenotype.zip
+	curl -C - -LO https://github.com/exomiser/Exomiser/releases/download/14.1.0/exomiser-rest-prioritiser-14.1.0.jar
+	$(MKDIR) -p $(DESTDIR)$(JARDIR)
+	install -p -m 0755 exomiser-rest-prioritiser-14.1.0.jar $(DESTDIR)$(JARDIR)/
 
 install-exomiser-2:
 	install -p -m 0755 $(PROPERTIES) $(DESTDIR)$(ETCDIR)/$(ANNOTSV)
@@ -225,7 +227,6 @@ Annotations_%.tar.gz:
 	@echo ""
 	@echo "Download Exomiser supporting data files:"
 	@echo ""
-	curl -C - -LO https://www.lbgi.fr/~geoffroy/Annotations/2309_hg19.tar.gz
 	curl -C - -LO https://data.monarchinitiative.org/exomiser/data/$@
 
 

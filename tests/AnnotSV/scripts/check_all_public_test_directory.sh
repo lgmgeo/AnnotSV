@@ -11,7 +11,7 @@ do
         echo "######## $d "
 	echo "###############################################################################"
         date
-        command_Tcl.sh &> command_Tcl.log
+        ./command_Tcl.sh &> command_Tcl.log
         grep -i error command_Tcl.log
         grep "ok - Finished" command_Tcl.log
         tail -2 command_Tcl.log

@@ -19,6 +19,7 @@ function exists_in_list() {
 #########################################
 
 # -> 1  3 4 5 (pas de 2)
+mkdir -p ./output
 rm -f "./output/test.1_tcl.annotated.tsv"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/test.bed" -SVinputInfo 1 -outputFile "./output/test.1_tcl.annotated.tsv" -svtBEDcol 4 -genomeBuild GRCh37
 for v in `$cut "./output/test.1_tcl.annotated.tsv" "ACMG_class" | sort -u`

@@ -19,6 +19,7 @@ cut="$ANNOTSV/tests/AnnotSV/scripts/cutWithColumnNames.tcl"
 # Gene positively scored with these HPO = FGFR2 (Entrez Gene: 2263)
 
 # GRCh37:
+mkdir -p ./output
 rm -f "./output/GRCh37-1SV_tcl.annotated.tsv"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/GRCh37-1SV.vcf" -outputFile "./output/GRCh37-1SV_tcl.annotated.tsv" -genomeBuild GRCh37 -hpo "HP:0001156,HP:0001363,HP:0011304,HP:0010055"
 

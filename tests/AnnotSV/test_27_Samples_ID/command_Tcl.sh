@@ -33,6 +33,7 @@ function exists_in_list() {
 
 # SV input BED file with header
 ###############################
+mkdir -p ./output
 rm -f "./output/test_tcl.annotated.tsv"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/test.bed" -SVinputInfo 1 -outputFile "./output/test_tcl.annotated.tsv" -svtbedcol 4 -samplesidBEDcol 5 -genomeBuild GRCh37
 # Samples_ID      ACMG_class

@@ -36,6 +36,7 @@ cut="$ANNOTSV/tests/AnnotSV/scripts/cutWithColumnNames.tcl"
 # => we can only calculate the distance in relation to the site in 3' (acceptor)
 # => distNearestSS = 211 in 3'
 
+mkdir -p ./output
 rm -f "./output/test1_tcl.annotated.tsv"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/test1.vcf" -outputFile "./output/test1_tcl.annotated.tsv" -genomeBuild GRCh37
 
