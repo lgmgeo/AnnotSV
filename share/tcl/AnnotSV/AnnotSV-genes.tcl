@@ -30,19 +30,21 @@ proc checkGenesRefSeqFile {} {
     ## Check if the Genes file has been downloaded then formatted
     #############################################################
     set genesDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes/$g_AnnotSV(genomeBuild)"
-    
+   
 	if {[regexp "GRCh37|GRCh38|mm39" $g_AnnotSV(genomeBuild)]} {
 		set genesFileDownloaded [glob -nocomplain $genesDir/ncbiRefSeq.txt.gz]
 	} elseif {[regexp "mm9|mm10" $g_AnnotSV(genomeBuild)]} {
 		set genesFileDownloaded [glob -nocomplain $genesDir/refGene.txt.gz]
-	}
+	} elseif {[regexp "CHM13" $g_AnnotSV(genomeBuild)]} {
+        set genesFileDownloaded [glob -nocomplain $genesDir/hs1_curGene*.txt.gz]
+    }
 
     set genesFileFormatted "[glob -nocomplain $genesDir/genes.RefSeq.sorted.bed]"
     set transcriptVersionFile "$genesDir/transcript_version.RefSeq.tsv"
 
     if {$genesFileDownloaded eq "" && $genesFileFormatted eq ""} {
         puts "############################################################################"
-        puts "\"$genesFileDownloaded\" file doesn't exist"
+        puts "\"$genesDir/*.txt.gz\" file doesn't exist"
         puts "Please check your install - Exit with error."
         puts "############################################################################"
         exit 2
@@ -51,14 +53,14 @@ proc checkGenesRefSeqFile {} {
     if {$genesFileFormatted eq ""} {
         
         ## Delete promoters files (need to be updated after the creation of new genes file)
-        #####################################################################################
+        ###################################################################################
         set promoterDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/FtIncludedInSV/Promoter/$g_AnnotSV(genomeBuild)"
         foreach promFile [glob -nocomplain "$promoterDir/promoter_*bp_RefSeq_$g_AnnotSV(genomeBuild).sorted.bed"] {
             file delete -force $promFile
         }
         
         ## - Create the "genes.RefSeq.sorted.bed"
-        #####################################
+        #########################################
         set genesFileFormatted "$genesDir/genes.RefSeq.sorted.bed"
         puts "\t...creation of $genesFileFormatted ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
         puts "\t   (done only once during the first annotation)"
@@ -89,21 +91,23 @@ proc checkGenesRefSeqFile {} {
         ## OUTPUT:   chrom txStart txEnd strand name2 name cdsStart cdsEnd exonStarts exonEnds
         # WARNING : NR_* are for non coding RNA. However, cdsStart=cdsEnd, => CDSlength=1
 		set L_TxVersionToWrite {}
+		set L_formattedGenesToWrite {}
         foreach L $L_genesTXTsorted {
             set Ls [split $L "\t"]
             regsub "chr" [lindex $Ls 2] "" chrom
-			if {![regexp "(\[^.\]+)\\.(\[0-9\]+)$" [lindex $Ls 1] match transcript_ID transcript_version]} {
+			if {![regexp "(\[^.\]+)\\.(\[0-9_\]+)$" [lindex $Ls 1] match transcript_ID transcript_version]} {
 				set transcript_ID [lindex $Ls 1]
 				set transcript_version ""
 			}
 			lappend L_TxVersionToWrite "$transcript_ID\t$transcript_version"
             set line "$chrom\t[lindex $Ls 4]\t[lindex $Ls 5]\t[lindex $Ls 3]\t[lindex $Ls 12]\t$transcript_ID\t[lindex $Ls 6]\t[lindex $Ls 7]\t[lindex $Ls 9]\t[lindex $Ls 10]"
             if {![info exists infos($line)]} {
-                WriteTextInFile $line $genesFileFormatted.tmp
+				lappend L_formattedGenesToWrite $line
                 set infos($line) 1
             }
         }
         file delete -force $genesFileDownloaded
+		WriteTextInFile [join $L_formattedGenesToWrite "\n"] $genesFileFormatted.tmp
         WriteTextInFile [join $L_TxVersionToWrite "\n"] $transcriptVersionFile
 
         # Sorting of the bedfile:
@@ -144,8 +148,8 @@ proc checkGenesENSEMBLfile {} {
     #######################################################
     set genesDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes/$g_AnnotSV(genomeBuild)"
     
-    set TmpGenesENSEMBLfileFormatted "$genesDir/refGene.sorted.tmp.bed"
-	# Header of "refGene.sorted.tmp.bed" (after the awk command, cf in the README):
+    set TmpGenesENSEMBLfileFormatted "$genesDir/genes.ENSEMBL.sorted.tmp.bed"
+	# Header of "genes.ENSEMBL.sorted.tmp.bed" (after the awk command, cf in the README):
 	# 1       11868   14409   +       DDX11L2 ENST00000456328.2       14409   14409   11868,12612,13220,      12227,12721,14409,
     set GenesENSEMBLfileFormatted "$genesDir/genes.ENSEMBL.sorted.bed"
     # Header of "refGene.sorted.bed" (after this proc):
@@ -156,7 +160,7 @@ proc checkGenesENSEMBLfile {} {
 
     if {![file exists $GenesENSEMBLfileFormatted] && ![file exists $TmpGenesENSEMBLfileFormatted]} {
         puts "############################################################################"
-        puts "\"$genesDir/genes.ENSEMBL.sorted.bed\" doesn't exist"
+        puts "\"$GenesENSEMBLfileFormatted\" doesn't exist"
         puts "Please check your install - Exit with error."
         puts "############################################################################"
         exit 2
@@ -174,7 +178,7 @@ proc checkGenesENSEMBLfile {} {
 		set L_toWrite {}
 		foreach L [LinesFromFile $TmpGenesENSEMBLfileFormatted] {
 			set Ls [split $L "\t"]
-		    if {![regexp "(\[^.\]+)\\.(\[0-9\]+)$" [lindex $Ls 5] match transcript_ID transcript_version]} {
+		    if {![regexp "(\[^.\]+)\\.(\[0-9_\]+)$" [lindex $Ls 5] match transcript_ID transcript_version]} {
 			    set transcript_ID [lindex $Ls 5]
 				set transcript_version ""
 			}

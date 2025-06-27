@@ -10,6 +10,7 @@ cut="$ANNOTSV/tests/AnnotSV/scripts/cutWithColumnNames.tcl"
 mkdir -p ./output
 rm -f "./output/test_tcl.annotated.tsv"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/test.bed" -svtBEDcol 4 -genomeBuild CHM13 -outputFile "./output/test_tcl.annotated.tsv"
+$ANNOTSV/bin/AnnotSV -SVinputFile "./input/test.bed" -svtBEDcol 4 -genomeBuild CHM13 -outputFile "./output/test_tcl.annotated.tsv" -Tx ENSEMBL
 
 # $cut "./output/test_tcl.annotated.tsv" "AnnotSV_ID;Annotation_mode;AnnotSV_ranking_score;AnnotSV_ranking_criteria;ACMG_class"
 
