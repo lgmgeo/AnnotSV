@@ -54,7 +54,7 @@ proc checkGenesRefSeqFile {} {
         
         ## Delete promoters files (need to be updated after the creation of new genes file)
         ###################################################################################
-        set promoterDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/FtIncludedInSV/Promoter/$g_AnnotSV(genomeBuild)"
+        set promoterDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/FtIncludedInSV/RegulatoryElements/$g_AnnotSV(genomeBuild)"
         foreach promFile [glob -nocomplain "$promoterDir/promoter_*bp_RefSeq_$g_AnnotSV(genomeBuild).sorted.bed"] {
             file delete -force $promFile
         }
