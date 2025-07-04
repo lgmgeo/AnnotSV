@@ -50,6 +50,7 @@ if {[llength $argv] < 3} {
 if {![regexp "^(.*?)(-|To|_)" [file tail $chainFile] match source]} {
     puts "...WARNING: No source extracted!"
 } else {
+	regsub -all "\"|'" $source "" source
     puts "...genome source: $source"
 }
 

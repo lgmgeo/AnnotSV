@@ -31,7 +31,7 @@ proc checkPathogenicFiles {} {
     
     global g_AnnotSV
     
-    foreach genomeBuild {GRCh37 GRCh38} {
+    foreach genomeBuild {GRCh37 GRCh38 CHM13} {
         set pathogenicDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/FtIncludedInSV/PathogenicSV/$genomeBuild"
         
         # Files to create/update

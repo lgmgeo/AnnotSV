@@ -56,7 +56,7 @@ proc checkBenignFiles {} {
         checkDGV_benignFile $genomeBuild
         checkDDD_benignFile $genomeBuild
         check1000g_benignFile $genomeBuild
-		checkdbVar_benignFile $genomeBuild
+        checkdbVar_benignFile $genomeBuild
         checkClinGenHITS_benignFile $genomeBuild
         checkClinVar_benignFile $genomeBuild
         checkIMH_benignFile $genomeBuild
@@ -136,15 +136,16 @@ proc checkBenignFiles {} {
 
 # Remove "overlappedGenes_$" files if there was an update of the benign dataset.
 proc removeOverlappedGenesBenignFiles {genomeBuild} {
-
+    
     global g_AnnotSV
-
+    
     foreach tx {RefSeq ENSEMBL} {
         foreach SVtype {Loss Gain Ins Inv} {
             set benignDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/SVincludedInFt/BenignSV/$genomeBuild"
             set overlappedGenes_in_benign${SVtype}File "$benignDir/overlappedGenes_${tx}_in_benign_${SVtype}_SV_$genomeBuild.tsv"
-		}
-	}
+            file delete -force [set overlappedGenes_in_benign${SVtype}File]
+        }
+    }
 }
 
 # If they do not exist, creation of:
@@ -159,53 +160,52 @@ proc checkOverlappedGenesBenignFiles {} {
     global g_AnnotSV
     
     if {$g_AnnotSV(organism) eq "Human"} {
-        foreach genomeBuild {GRCh37 GRCh38} {
-            set benignDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/SVincludedInFt/BenignSV/$genomeBuild"
-            set genesDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes/$genomeBuild"
+        set genomeBuild "$g_AnnotSV(genomeBuild)"
+        set benignDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/SVincludedInFt/BenignSV/$genomeBuild"
+        set genesDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes/$genomeBuild"
+        
+        foreach tx {RefSeq ENSEMBL} {
+            set GenesfileFormatted [glob -nocomplain $genesDir/genes.${tx}.sorted.bed]
             
-            foreach tx {RefSeq ENSEMBL} {
-                set GenesfileFormatted [glob -nocomplain $genesDir/genes.${tx}.sorted.bed]
+            foreach SVtype {Loss Gain Ins Inv} {
+                set benignBEDfile [glob -nocomplain "$benignDir/benign_${SVtype}_SV_$genomeBuild.sorted.bed"]
                 
-                foreach SVtype {Loss Gain Ins Inv} {
-                    set benignBEDfile [glob -nocomplain "$benignDir/benign_${SVtype}_SV_$genomeBuild.sorted.bed"]
-                    
-                    # Files to create
-                    set overlappedGenes_in_benign${SVtype}File "$benignDir/overlappedGenes_${tx}_in_benign_${SVtype}_SV_$genomeBuild.tsv"
-                    if {[file exists [set overlappedGenes_in_benign${SVtype}File]]} {continue}
-                    
-                    puts "\t   >>> creation of [set overlappedGenes_in_benign${SVtype}File] ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
-                    
-                    # Intersect
-                    set tmpFile "$g_AnnotSV(outputDir)/[clock seconds]_overlappedGenes_${tx}_in_benign_${SVtype}_SV_$genomeBuild.tmp.bed"
-                    file delete -force $tmpFile
-                    if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $GenesfileFormatted -b $benignBEDfile -wa -wb > $tmpFile} Message]} {
-                        if {[catch {exec $g_AnnotSV(bedtools) intersect -a $GenesfileFormatted -b $benignBEDfile -wa -wb > $tmpFile} Message]} {
-                            puts "-- checkOverlappedGenesBenignFiles, $genomeBuild, $tx, $SVtype --"
-                            puts "$g_AnnotSV(bedtools) intersect -sorted -a $GenesfileFormatted -b $benignBEDfile -wa -wb > $tmpFile"
-                            puts "$Message"
-                            puts "Exit with error"
-                            exit 2
-                        }
+                # Files to create
+                set overlappedGenes_in_benign${SVtype}File "$benignDir/overlappedGenes_${tx}_in_benign_${SVtype}_SV_$genomeBuild.tsv"
+                if {[file exists [set overlappedGenes_in_benign${SVtype}File]]} {continue}
+                
+                puts "\t   >>> creation of [set overlappedGenes_in_benign${SVtype}File] ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+                
+                # Intersect
+                set tmpFile "$g_AnnotSV(outputDir)/[clock seconds]_overlappedGenes_${tx}_in_benign_${SVtype}_SV_$genomeBuild.tmp.bed"
+                file delete -force $tmpFile
+                if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $GenesfileFormatted -b $benignBEDfile -wa -wb > $tmpFile} Message]} {
+                    if {[catch {exec $g_AnnotSV(bedtools) intersect -a $GenesfileFormatted -b $benignBEDfile -wa -wb > $tmpFile} Message]} {
+                        puts "-- checkOverlappedGenesBenignFiles, $genomeBuild, $tx, $SVtype --"
+                        puts "$g_AnnotSV(bedtools) intersect -sorted -a $GenesfileFormatted -b $benignBEDfile -wa -wb > $tmpFile"
+                        puts "$Message"
+                        puts "Exit with error"
+                        exit 2
                     }
-                    
-                    # Parse
-                    set f [open $tmpFile]
-                    while {![eof $f]} {
-                        set L [gets $f]
-                        if {$L eq ""} {continue}
-                        set Ls [split $L "\t"]
-                        set geneName [lindex $Ls 4]
-                        set benignSVcoord [lindex $Ls end-1]
-                        lappend L_genes($benignSVcoord) "$geneName"
-                    }
-                    file delete -force $tmpFile
-                    set L_toWrite {}
-                    foreach coord [array names L_genes] {
-                        lappend L_toWrite "$coord\t[join [lsort -unique $L_genes($coord)] ";"]"
-                    }
-                    WriteTextInFile [join $L_toWrite "\n"] [set overlappedGenes_in_benign${SVtype}File]
-                    unset L_genes
                 }
+                
+                # Parse
+                set f [open $tmpFile]
+                while {![eof $f]} {
+                    set L [gets $f]
+                    if {$L eq ""} {continue}
+                    set Ls [split $L "\t"]
+                    set geneName [lindex $Ls 4]
+                    set benignSVcoord [lindex $Ls end-1]
+                    lappend L_genes($benignSVcoord) "$geneName"
+                }
+                file delete -force $tmpFile
+                set L_toWrite {}
+                foreach coord [array names L_genes] {
+                    lappend L_toWrite "$coord\t[join [lsort -unique $L_genes($coord)] ";"]"
+                }
+                WriteTextInFile [join $L_toWrite "\n"] [set overlappedGenes_in_benign${SVtype}File]
+                unset L_genes
             }
         }
     }
@@ -238,9 +238,9 @@ proc checkClinVar_benignFile {genomeBuild} {
             unset g_AnnotSV(benignText)
         }
         puts "\t   >>> $genomeBuild ClinVar parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
-       
-		removeOverlappedGenesBenignFiles $genomeBuild
- 
+        
+        removeOverlappedGenesBenignFiles $genomeBuild
+        
         set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
         set benignGainFile_Tmp "$benignDir/benign_Gain_SV_$genomeBuild.tmp.bed"
         set benignInsFile_Tmp "$benignDir/benign_Ins_SV_$genomeBuild.tmp.bed"
@@ -335,9 +335,9 @@ proc checkClinGenHITS_benignFile {genomeBuild} {
         }
         puts "\t   >>> $genomeBuild ClinGen parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
     } else {return}
-   
+    
     removeOverlappedGenesBenignFiles $genomeBuild
- 
+    
     set L_files "$ClinGenFileDownloaded1"
     lappend L_files "$ClinGenFileDownloaded2"
     
@@ -423,7 +423,7 @@ proc checkDGV_benignFile {genomeBuild} {
             unset g_AnnotSV(benignText)
         }
         puts "\t   >>> $genomeBuild DGV parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
-
+        
         removeOverlappedGenesBenignFiles $genomeBuild
         
         set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
@@ -526,8 +526,8 @@ proc checkGnomAD_benignFile {genomeBuild} {
             }
             puts "\t   >>> GRCh37 gnomAD parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
             
-	        removeOverlappedGenesBenignFiles $genomeBuild
-
+            removeOverlappedGenesBenignFiles $genomeBuild
+            
             set benignLossFile_Tmp "$benignDir/benign_Loss_SV_GRCh37.tmp.bed"
             set benignGainFile_Tmp "$benignDir/benign_Gain_SV_GRCh37.tmp.bed"
             set benignInsFile_Tmp "$benignDir/benign_Ins_SV_GRCh37.tmp.bed"
@@ -560,9 +560,9 @@ proc checkGnomAD_benignFile {genomeBuild} {
                 
                 # Selection of the benign variants to keep:
                 ###########################################
-				set FILTER [lindex $Ls $i_filter]
-				if {$FILTER != "PASS"} {continue}
-
+                set FILTER [lindex $Ls $i_filter]
+                if {$FILTER != "PASS"} {continue}
+                
                 set SVTYPE [lindex $Ls $i_svtype]
                 regsub ":.+" $SVTYPE "" SVTYPE
                 # WARNING:
@@ -632,9 +632,9 @@ proc checkGnomAD_benignFile {genomeBuild} {
                 unset g_AnnotSV(benignText)
             }
             puts "\t   >>> GRCh38 gnomAD parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
-           
+            
             removeOverlappedGenesBenignFiles $genomeBuild
- 
+            
             set benignLossFile_Tmp "$benignDir/benign_Loss_SV_GRCh38.tmp.bed"
             set benignGainFile_Tmp "$benignDir/benign_Gain_SV_GRCh38.tmp.bed"
             set benignInsFile_Tmp "$benignDir/benign_Ins_SV_GRCh38.tmp.bed"
@@ -645,17 +645,17 @@ proc checkGnomAD_benignFile {genomeBuild} {
             set L_toWriteInv {}
             
             foreach gnomADfileDownloaded $gnomADfilesDownloaded {
-				puts "\t       [file tail $gnomADfileDownloaded] ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+                puts "\t       [file tail $gnomADfileDownloaded] ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
                 # VCFs do not contain multiallelic sites (no need to split into multiple rows)
                 set f [open "| gzip -cd $gnomADfileDownloaded"]
                 while {![eof $f]} {
                     set L [gets $f]
                     if {[string index $L 0] eq "#" || $L eq ""} {continue}
                     set Ls [split $L "\t"]
-
-					set FILTER [lindex $Ls 6]
-	                if {$FILTER != "PASS"} {continue}				
-
+                    
+                    set FILTER [lindex $Ls 6]
+                    if {$FILTER != "PASS"} {continue}
+                    
                     set chrom [lindex $Ls 0]
                     set pos [lindex $Ls 1]
                     # From VCF to BED:
@@ -666,37 +666,37 @@ proc checkGnomAD_benignFile {genomeBuild} {
                     set alt [lindex $Ls 4]
                     
                     set L_infos [split [lindex $Ls 7] ";"]
-					
+                    
                     # WARNING: for the following search (succession of "lsearch" commands), keep the same order than the feature in the VCF lines:
                     # "END SVTYPE controls_and_biobanks_AN controls_and_biobanks_AF controls_and_biobanks_N_HOMALT"
-					set k [lsearch -regexp $L_infos "^END="]
-					if {$k eq -1} {continue}
-					set END [lindex [split [lindex $L_infos $k] "="] 1]
-
+                    set k [lsearch -regexp $L_infos "^END="]
+                    if {$k eq -1} {continue}
+                    set END [lindex [split [lindex $L_infos $k] "="] 1]
+                    
                     set k [lsearch -start $k -regexp $L_infos "^SVTYPE="]
                     if {$k eq -1} {continue}
                     set SVTYPE [lindex [split [lindex $L_infos $k] "="] 1]
                     # Skip SVTYPE="BND||CPX||CTX"
                     if {$SVTYPE eq "BND" || $SVTYPE eq "CPX" || $SVTYPE eq "CTX"} {continue}
- 
+                    
                     set k [lsearch -start $k -regexp $L_infos "^controls_and_biobanks_AN="]
                     if {$k eq -1} {continue}
                     set GD_AN [lindex [split [lindex $L_infos $k] "="] 1]
                     # Skip SV with controls_and_biobanks_AN < 1000
                     if {$GD_AN < 1000} {continue}
-
+                    
                     set k [lsearch -start $k -regexp $L_infos "^controls_and_biobanks_AF="]
                     if {$k eq -1} {continue}
                     set GD_AF [lindex [split [lindex $L_infos $k] "="] 1]
                     # Skip SV with controls_and_biobanks_AF < 0.1% (minimum for the "-benignAF" option)
                     if {$GD_AF < 0.001} {continue}
-
+                    
                     set k [lsearch -start $k -regexp $L_infos "^controls_and_biobanks_N_HOMALT="]
                     if {$k eq -1} {continue}
                     set GD_N_HOMALT [lindex [split [lindex $L_infos $k] "="] 1]
                     # Skip SV with "controls_and_biobanks_N_HOMALT < 5"
                     if {$GD_N_HOMALT < 5} {continue}
-
+                    
                     set coord "$chrom:${pos}-$END"
                     set infos "$chrom\t$pos\t$END\t$svid\t$coord\t[format "%.4f" $GD_AF]"
                     
@@ -722,7 +722,7 @@ proc checkGnomAD_benignFile {genomeBuild} {
             
             # Writing:
             ##########
-	        puts "\t       ([llength $L_toWriteLoss] SV Loss + [llength $L_toWriteGain] SV Gain + [llength $L_toWriteIns] SV INS + [llength $L_toWriteInv] SV INV)"
+            puts "\t       ([llength $L_toWriteLoss] SV Loss + [llength $L_toWriteGain] SV Gain + [llength $L_toWriteIns] SV INS + [llength $L_toWriteInv] SV INV)"
             if {$L_toWriteLoss ne {}} {
                 WriteTextInFile [join $L_toWriteLoss "\n"] $benignLossFile_Tmp
             }
@@ -748,28 +748,28 @@ proc checkGnomAD_benignFile {genomeBuild} {
 }
 
 proc checkHPRC_benignFile {genomeBuild} {
-
+    
     global g_AnnotSV
-
+    
     if {$genomeBuild eq "GRCh38"} {
         ## Check if the GRCh38 PACBIO_HPRC SV file has been downloaded
         #############################################################
         set benignDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/SVincludedInFt/BenignSV/GRCh38"
         set HPRCfileDownloaded "$benignDir/hprc.GRCh38.pbsv.vcf.gz"
-
+        
         if {[file exist $HPRCfileDownloaded]} {
             # We have some GRCh38 PACBIO HPRC annotations to add in $benign*File
             # Contains BND, DEL, DUP, INS and INV
-			# FILTER = NearContigEnd, NearReferenceGap, NearReferenceGap;NearContigEnd or PASS
-
-		    if {[info exists g_AnnotSV(benignText)]} {
+            # FILTER = NearContigEnd, NearReferenceGap, NearReferenceGap;NearContigEnd or PASS
+            
+            if {[info exists g_AnnotSV(benignText)]} {
                 puts $g_AnnotSV(benignText)
                 unset g_AnnotSV(benignText)
             }
             puts "\t   >>> GRCh38 PACBIO HPRC parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
-
+            
             removeOverlappedGenesBenignFiles $genomeBuild
-
+            
             set benignLossFile_Tmp "$benignDir/benign_Loss_SV_GRCh38.tmp.bed"
             set benignGainFile_Tmp "$benignDir/benign_Gain_SV_GRCh38.tmp.bed"
             set benignInsFile_Tmp "$benignDir/benign_Ins_SV_GRCh38.tmp.bed"
@@ -778,24 +778,24 @@ proc checkHPRC_benignFile {genomeBuild} {
             set L_toWriteGain {}
             set L_toWriteIns {}
             set L_toWriteInv {}
-
+            
             # VCFs do not contain multiallelic sites (no need to split into multiple rows)
             set f [open "| gzip -cd $HPRCfileDownloaded"]
             while {![eof $f]} {
                 set L [gets $f]
                 if {[string index $L 0] eq "#" || $L eq ""} {continue}
                 set Ls [split $L "\t"]
-
-	            set FILTER [lindex $Ls 6]
-	            if {$FILTER != "PASS"} {continue}
-
+                
+                set FILTER [lindex $Ls 6]
+                if {$FILTER != "PASS"} {continue}
+                
                 set chrom [lindex $Ls 0]
                 set pos [lindex $Ls 1]
                 # From VCF to BED:
                 if {$pos ne 0} {set pos [expr {$pos-1}]}
-
+                
                 set svid [lindex $Ls 2]
-
+                
                 catch {unset END}
                 catch {unset SVTYPE}
                 catch {unset AF}
@@ -810,11 +810,11 @@ proc checkHPRC_benignFile {genomeBuild} {
                 if {$SVTYPE eq "BND"} {continue}
                 # Skip SV with AF < 5% (identified in < 6 individuals)
                 if {$AF < 0.05} {continue}
-
-
+                
+                
                 set coord "$chrom:${pos}-$END"
                 set infos "$chrom\t$pos\t$END\tHPRC:$svid\t$coord\t[format "%.4f" $AF]"
-
+                
                 if {[regexp "DUP" $SVTYPE]} {
                     lappend L_toWriteGain "$infos"
                 }
@@ -829,11 +829,11 @@ proc checkHPRC_benignFile {genomeBuild} {
                 }
                 #if {$END eq $pos} {puts "WARNING: SVTYPE=$SVTYPE -- END=$END eq POS=$pos $svid"}
                 #if {$END < $pos}  {puts "WARNING: SVTYPE=$SVTYPE -- END=$END < POS=$pos $svid"}
-
+                
             }
-
+            
             close $f
-
+            
             # Writing:
             ##########
             puts "\t       ([llength $L_toWriteLoss] SV Loss + [llength $L_toWriteGain] SV Gain + [llength $L_toWriteIns] SV INS + [llength $L_toWriteInv] SV INV)"
@@ -849,14 +849,14 @@ proc checkHPRC_benignFile {genomeBuild} {
             if {$L_toWriteInv ne {}} {
                 WriteTextInFile [join $L_toWriteInv "\n"]  $benignInvFile_Tmp
             }
-
+            
             # Clean
             #######
             file delete -force $HPRCfileDownloaded
         }
-
+        
     }
-
+    
     return
 }
 
@@ -878,7 +878,7 @@ proc checkDDD_benignFile {genomeBuild} {
             unset g_AnnotSV(benignText)
         }
         puts "\t   >>> $genomeBuild DDD parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
-
+        
         removeOverlappedGenesBenignFiles $genomeBuild
         
         set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
@@ -967,7 +967,7 @@ proc check1000g_benignFile {genomeBuild} {
             unset g_AnnotSV(benignText)
         }
         puts "\t   >>> $genomeBuild 1000g parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
-
+        
         removeOverlappedGenesBenignFiles $genomeBuild
         
         set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
@@ -1010,7 +1010,7 @@ proc check1000g_benignFile {genomeBuild} {
             
             set FILTER [lindex $Ls 6]
             if {$FILTER != "PASS"} {continue}
-
+            
             set chrom [lindex $Ls 0]
             set pos [lindex $Ls 1]
             # From VCF to BED format:
@@ -1103,17 +1103,17 @@ proc check1000g_benignFile {genomeBuild} {
 }
 
 proc checkdbVar_benignFile {genomeBuild} {
-
+    
     global g_AnnotSV
-
+    
     ## Check if dbVar SV files (del, dup or ins) have been downloaded
     #################################################################
     set benignDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/SVincludedInFt/BenignSV/$genomeBuild"
     set L_toWriteLoss {}
     set L_toWriteGain {}
     set L_toWriteIns {}
-
-	# Deletions
+    
+    # Deletions
     set dbVarDelFileDownloaded "$benignDir/$genomeBuild.nr_deletions.common.bed.gz"
     if {[file exists $dbVarDelFileDownloaded]} {
         # We have some dbVar annotations to add in benign file
@@ -1122,27 +1122,27 @@ proc checkdbVar_benignFile {genomeBuild} {
             unset g_AnnotSV(benignText)
         }
         puts "\t   >>> $genomeBuild deletion dbVar parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
-
+        
         removeOverlappedGenesBenignFiles $genomeBuild
-
+        
         set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
         set f [open "| gzip -cd $dbVarDelFileDownloaded"]
         while {![eof $f]} {
             set L [gets $f]
             if {$L eq ""} {continue}
             set Ls [split $L "\t"]
-			set chrom [lindex $Ls 0]
-			set start [lindex $Ls 1]
-			set end [lindex $Ls 2]
+            set chrom [lindex $Ls 0]
+            set start [lindex $Ls 1]
+            set end [lindex $Ls 2]
             set coord "$chrom:${start}-$end"
             set infos "$chrom\t$start\t$end\tdbVar\t$coord\t0.01" ;# WARNING: As the frequency of these common variants is not given, it is assigned to 1% (minimum value of the AF in the curated dataset)
             lappend L_toWriteLoss "$infos"
         }
         close $f
         puts "\t       ([llength $L_toWriteLoss] SV Loss)"
-	}
-
-	# Duplications
+    }
+    
+    # Duplications
     set dbVarDupFileDownloaded "$benignDir/$genomeBuild.nr_duplications.common.bed.gz"
     if {[file exists $dbVarDupFileDownloaded]} {
         # We have some dbVar annotations to add in benign file
@@ -1151,7 +1151,7 @@ proc checkdbVar_benignFile {genomeBuild} {
             unset g_AnnotSV(benignText)
         }
         puts "\t   >>> $genomeBuild duplication dbVar parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
-
+        
         set benignGainFile_Tmp "$benignDir/benign_Gain_SV_$genomeBuild.tmp.bed"
         set f [open "| gzip -cd $dbVarDupFileDownloaded"]
         while {![eof $f]} {
@@ -1168,8 +1168,8 @@ proc checkdbVar_benignFile {genomeBuild} {
         close $f
         puts "\t       ([llength $L_toWriteGain] SV Gain)"
     }
-
-	# Insertions
+    
+    # Insertions
     set dbVarInsFileDownloaded "$benignDir/$genomeBuild.nr_insertions.common.bed.gz"
     if {[file exists $dbVarInsFileDownloaded]} {
         # We have some dbVar annotations to add in benign file
@@ -1178,7 +1178,7 @@ proc checkdbVar_benignFile {genomeBuild} {
             unset g_AnnotSV(benignText)
         }
         puts "\t   >>> $genomeBuild insertion dbVar parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
-
+        
         set benignInsFile_Tmp "$benignDir/benign_Ins_SV_$genomeBuild.tmp.bed"
         set f [open "| gzip -cd $dbVarInsFileDownloaded"]
         while {![eof $f]} {
@@ -1195,7 +1195,7 @@ proc checkdbVar_benignFile {genomeBuild} {
         close $f
         puts "\t       ([llength $L_toWriteIns] SV INS)"
     }
-
+    
     # Writing:
     ##########
     if {$L_toWriteLoss ne {}} {
@@ -1210,7 +1210,7 @@ proc checkdbVar_benignFile {genomeBuild} {
         WriteTextInFile [join $L_toWriteIns "\n"]  $benignInsFile_Tmp
         file delete -force $dbVarInsFileDownloaded
     }
-
+    
     return
 }
 
@@ -1232,7 +1232,7 @@ proc checkIMH_benignFile {genomeBuild} {
         puts "\t   >>> $genomeBuild IMH parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
         
         removeOverlappedGenesBenignFiles $genomeBuild
-
+        
         set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
         set benignGainFile_Tmp "$benignDir/benign_Gain_SV_$genomeBuild.tmp.bed"
         set benignInsFile_Tmp "$benignDir/benign_Ins_SV_$genomeBuild.tmp.bed"
@@ -1335,7 +1335,7 @@ proc checkCMRI_benignFile {genomeBuild} {
         puts "\t   >>> $genomeBuild CMRI parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
         
         removeOverlappedGenesBenignFiles $genomeBuild
-
+        
         set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
         set benignGainFile_Tmp "$benignDir/benign_Gain_SV_$genomeBuild.tmp.bed"
         set benignInsFile_Tmp "$benignDir/benign_Ins_SV_$genomeBuild.tmp.bed"
@@ -1430,7 +1430,7 @@ proc checkFGR_benignFile {genomeBuild} {
         puts "\t   >>> $genomeBuild FGR parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
         
         removeOverlappedGenesBenignFiles $genomeBuild
-
+        
         set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
         set benignGainFile_Tmp "$benignDir/benign_Gain_SV_$genomeBuild.tmp.bed"
         set benignInsFile_Tmp "$benignDir/benign_Ins_SV_$genomeBuild.tmp.bed"

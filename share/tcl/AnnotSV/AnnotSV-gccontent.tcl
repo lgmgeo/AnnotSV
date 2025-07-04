@@ -88,7 +88,7 @@ proc updateFASTAfiles {} {
     foreach chrom {1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y M MT} {
         if {$g_AnnotSV(genomeBuild) eq "GRCh37"} {
             set PathGB "$g_AnnotSV(genomeBuild)"
-        } elseif {$g_AnnotSV(genomeBuild) eq "GRCh38"} {
+        } elseif {[regexp "GRCh38|CHM13" $g_AnnotSV(genomeBuild)]} {
             set PathGB "$g_AnnotSV(genomeBuild)/chroms"
         } elseif {$g_AnnotSV(genomeBuild) eq "mm9"} {
             set PathGB "$g_AnnotSV(genomeBuild)"
@@ -114,11 +114,11 @@ proc updateFASTAfiles {} {
     foreach tmpFile [glob -nocomplain "$extannDir/GCcontent/$PathGB/chr*.fa"] {
         file delete -force $tmpFile
     }
-    file delete -force $extannDir/GCcontent/GRCh38/chroms
+    file delete -force $extannDir/GCcontent/$g_AnnotSV(genomeBuild)/chroms
     
     # index file generation
     ReplaceTextInFile "1\t150000\t150200" $extannDir/GCcontent/test.bed
-    catch {exec bedtools nuc $FASTAfileFormatted -bed $extannDir/GCcontent/test.bed} Message
+    catch {exec bedtools nuc -fi $FASTAfileFormatted -bed $extannDir/GCcontent/test.bed} Message
     file delete -force $extannDir/GCcontent/test.bed
     
     file delete -force $FASTAfileDownloaded
