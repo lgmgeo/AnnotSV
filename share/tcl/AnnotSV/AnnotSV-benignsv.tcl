@@ -31,7 +31,7 @@ proc checkBenignFiles {} {
     
     global g_AnnotSV
     
-    foreach genomeBuild {GRCh37 GRCh38} {
+    foreach genomeBuild {GRCh37 GRCh38 CHM13} {
         set benignDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/SVincludedInFt/BenignSV/$genomeBuild"
         
         # Files to create / update
@@ -61,6 +61,7 @@ proc checkBenignFiles {} {
         checkClinVar_benignFile $genomeBuild
         checkIMH_benignFile $genomeBuild
         checkCMRI_benignFile $genomeBuild
+		checkPacBioCoLoRS_benignFile $genomeBuild
         checkFGR_benignFile $genomeBuild
         checkHPRC_benignFile $genomeBuild
         catch {unset g_AnnotSV(benignText)}
@@ -1408,6 +1409,94 @@ proc checkCMRI_benignFile {genomeBuild} {
     
     return
 }
+
+
+proc checkPacBioCoLoRS_benignFile {genomeBuild} {
+
+    global g_AnnotSV
+
+    ## Check if  file has been downloaded
+    ############################################
+    set benignDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/SVincludedInFt/BenignSV/$genomeBuild"
+	set PacBioCoLoRSfileDownloaded [lindex [glob -nocomplain "$benignDir/CoLoRSdb.$genomeBuild.v1.0.0.pbsv.jasmine.vcf.gz"] end]
+
+    if {$PacBioCoLoRSfileDownloaded ne ""} {
+        # We have some PacBioCoLoRS annotations to add in $benign*File
+        if {[info exists g_AnnotSV(benignText)]} {
+            puts $g_AnnotSV(benignText)
+            unset g_AnnotSV(benignText)
+        }
+        puts "\t   >>> $genomeBuild PacBioCoLoRS parsing ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
+
+        removeOverlappedGenesBenignFiles $genomeBuild
+
+        set benignLossFile_Tmp "$benignDir/benign_Loss_SV_$genomeBuild.tmp.bed"
+        set benignInsFile_Tmp "$benignDir/benign_Ins_SV_$genomeBuild.tmp.bed"
+        set benignInvFile_Tmp "$benignDir/benign_Inv_SV_$genomeBuild.tmp.bed"
+        set L_toWriteLoss {}
+        set L_toWriteIns {}
+        set L_toWriteInv {}
+        set f [open "| gzip -cd $PacBioCoLoRSfileDownloaded"]
+        while {! [eof $f]} {
+            set L [gets $f]
+            set Ls [split $L "\t"]
+            if {[regexp "^#" $L]} {continue}
+            set infos [lindex $Ls 7]
+
+            # Selection of the benign variants to keep:
+            ###########################################
+            # Criteria:
+            # - AN ≥ 500
+            # - DEL and INV ≥ $g_AnnotSV(SVminSize) bp in size (default 50)
+            # - AF > 0.05
+            # - “DEL”, “INS” or “INV” SV type
+			# Example line: SVTYPE=DEL;END=3210;SVLEN=-42;AC=79;AN=2762;NS=1381;AF=0.0286025;AC_Het=55;AC_Hom=24;AC_Hemi=0;HWE=1.153
+            if {![regexp "SVTYPE=(\[^;\]+)?;END=(\[^;\]+)?;.*SVLEN=(\[^;\]+)?;.*AN=(\[^;\]+)?;.*AF=(\[^;\]+)?" $infos match svtype end svlen totalcount freq]} {continue}
+            if {$totalcount < 500} {continue}
+            if {[expr abs($svlen)] < $g_AnnotSV(SVminSize)} {continue}
+            if {$freq < 0.05} {continue}
+            regsub "chr" [lindex $Ls 0] "" chrom
+            set start [lindex $Ls 1]
+            # From VCF to BED format:
+            if {$start ne 0} {set start [expr {$start-1}]}
+            set ref   [lindex $Ls 3]
+            set alt   [lindex $Ls 4]
+            set coord "${chrom}:${start}-$end"
+            if {$end eq $start} {set end [expr {$start+1}]}
+            if {$end < $start} {set i $start; set start $end; set end $i}
+
+
+            if {$svtype eq "DEL"} {
+                lappend L_toWriteLoss "$chrom\t$start\t$end\tPacBioCoLoRS\t$coord\t[format "%.4f" $freq]"
+            } elseif {$svtype eq "INS"} {
+                lappend L_toWriteIns "$chrom\t$start\t$end\tPacBioCoLoRS\t$coord\t[format "%.4f" $freq]"
+            } elseif {$svtype eq "INV"} {
+                lappend L_toWriteInv "$chrom\t$start\t$end\tPacBioCoLoRS\t$coord\t[format "%.4f" $freq]"
+            }
+        }
+        close $f
+
+        # Writing:
+        ##########
+        puts "\t       ([llength $L_toWriteLoss] SV Loss + [llength $L_toWriteIns] SV INS + [llength $L_toWriteInv] SV INV)"
+        if {$L_toWriteLoss ne {}} {
+            WriteTextInFile [join $L_toWriteLoss "\n"] $benignLossFile_Tmp
+        }
+        if {$L_toWriteIns ne {}} {
+            WriteTextInFile [join $L_toWriteIns "\n"]  $benignInsFile_Tmp
+        }
+        if {$L_toWriteInv ne {}} {
+            WriteTextInFile [join $L_toWriteInv "\n"]  $benignInvFile_Tmp
+        }
+
+        # Clean:
+        ########
+        file delete -force $PacBioCoLoRSfileDownloaded
+    }
+
+    return
+}
+
 
 proc checkFGR_benignFile {genomeBuild} {
     
