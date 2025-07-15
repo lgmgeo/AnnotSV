@@ -46,9 +46,9 @@ proc memorizeGeneNameAlias {} {
 
 	if {$g_AnnotSV(organism) ne "Human"} { return }
 
-    # Here, we memorize the RefSeq/ENSEMBL GRCh38 gene coordinates (more complete than the GRCh37)
+    # Here, we memorize the RefSeq/ENSEMBL CHM13 gene coordinates (more complete than the GRCh37 and GRCh38)
     # => Will permit to check the different alias of a unique gene (only for overlapping genomic coordinates. cf issues 156 + 132)
-    set geneCoordFile "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes/GRCh38/genes.$g_AnnotSV(tx).sorted.bed"
+    set geneCoordFile "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes/CHM13/genes.$g_AnnotSV(tx).sorted.bed"
     foreach L [LinesFromFile $geneCoordFile] {
         set chrom [lindex $L 0]
         set start [lindex $L 1]
@@ -91,7 +91,6 @@ proc memorizeGeneNameAlias {} {
 
         if {![info exists NCBIgeneIDfor($geneToMatch)]} {continue}
 		
-		set testLappend 0
 		foreach coordTrue $g_L_coord($geneToMatch) {
 			set trueChrom [lindex $coordTrue 0]
 			set trueStart [lindex $coordTrue 1]
@@ -110,7 +109,6 @@ proc memorizeGeneNameAlias {} {
 					}
 				}
 		    }
-            if {$testLappend} {break}
 		}
 	}
 	foreach g [array names g_alias] {
