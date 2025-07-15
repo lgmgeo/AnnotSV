@@ -435,7 +435,7 @@ proc VCFsToBED {SV_VCFfiles} {
             ##########################################
             # Example of SV:
             # - Type1: ref="G" and alt="ACTGCTAACGATCCGTTTGCTGCTAACGATCTAACGATCGGGATTGCTAACGATCTCGGG" (length > 50bp)
-            # - Type2: alt="<INS>", "<DEL>", ...
+            # - Type2: alt="<INS>", "<DEL>", "<TRA>"...
             # - Type3: squared-bracketed SV notation: alt="G]17:1584563]" or alt="G]chr17:1584563]" (length > 50bp)
             #          (developed with the assistance and guidance of Rodrigo Martin, BSC, Spain)
             set BNDrescue 0 ;# The ALT of a rescue BND is not square-bracketed anymore
@@ -479,6 +479,18 @@ proc VCFsToBED {SV_VCFfiles} {
                     set end $posVCF
                     set svtype "TRA"
                     set svlen 0
+					# Processing the alt of the TRA (in case of having 2 TRA with the same "start" but different "end"):
+                    # "alt" => "alt_CHR2_END"
+					#
+					# Example:
+                    # Two translocations that start at the same position, but both ENDs are different:
+					#    chrX  83731873  .  T   <TRA>   46    .   CHR2=chr1;CIEND=-563,563;CIPOS=-563,563;END=102454994;SVLEN=1;SVTYPE=TRA    GT:PE:SR    0/1:7,2:0,0
+					#    chrX  83731873  .  T   <TRA>   69    .   CHR2=chr1;CIEND=-563,563;CIPOS=-563,563;END=111581087;SVLEN=1;SVTYPE=TRA    GT:PE:SR    0/1:6,3:0,0
+					# => alt => <TRA>_chr1_102454994
+					# => This will permit to obtain 2 different AnnotSV_ID for the 1st breakend: X_83731310_83732436_TRA_1 and X_83731310_83732436_TRA_2
+					set alt "<TRA>_${chr2}_$END"
+					set altVCF $alt
+					lset Ls 4 "$alt"
                 } else {
                     # First, we choose the SVtype in the ALT column.
                     # Second, we choose the SVTYPE in the INFO column.
@@ -487,7 +499,7 @@ proc VCFsToBED {SV_VCFfiles} {
                     }
                     set svtype [normalizeSVtype $svtype] ;# DEL or DUP or INS or INV or None
                 }
-                
+               
                 if {$svlen eq "" && $end ne ""} {
                     if {$svtype eq "DEL"} {
                         set svlen [expr {$posVCF-$end}]
@@ -711,6 +723,8 @@ proc VCFsToBED {SV_VCFfiles} {
                 continue
             }
             
+
+
             if {$end < $pos} {set tutu $end; set end $pos; set pos $tutu}
             if {$end eq $pos} {set end [expr {$pos+1}]}
             
@@ -834,7 +848,7 @@ proc VCFsToBED {SV_VCFfiles} {
                             }
                         }
                     }
-                    set AnnotSV_ID [settingOfTheAnnotSVID "${chrom}_${pos}_${end}_${svtype}" "$refVCF" "$altVCF"]
+					set AnnotSV_ID [settingOfTheAnnotSVID "${chrom}_${pos}_${end}_${svtype}" "$refVCF" "$altVCF"]
                 }
                 if {$TRArescue} {
                     set idTRA "${chrom2}_${posVCF2}_${end2}_${svtype}_${ref}_<TRA>"

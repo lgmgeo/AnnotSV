@@ -88,7 +88,7 @@ proc OrganizeAnnotation {} {
     global g_rankingExplanations
     global g_re
     global g_HITS
-    
+ 
     # OUTPUT
     ###############
     set FullAndSplitBedFile "$g_AnnotSV(outputDir)/$g_AnnotSV(outputFile).tmp" ;# created in AnnotSV-genes.tcl
@@ -1351,7 +1351,9 @@ proc OrganizeAnnotation {} {
         
         ####### "Memorize the AnnotSV_ID to then order the output lines"
         ## Done only the first time an AnnotSV_ID is met
-        ## (not for the split lines + not in case of SV redundancy in the SV input file)
+        ## (not for the split lines)
+		## WARNING: AnnotSV_ID redundancy is not authorized between full lines
+		##			Each SV is assumed to only have one single line of 'full' annotation (no ID redundancy authorized in VCF)
         if {![info exists L_TextToWrite($AnnotSV_ID)]} {
             lappend L_AnnotSV_ID $AnnotSV_ID
             if {$g_AnnotSV(hpo) ne ""} {
