@@ -469,6 +469,10 @@ done
 # SV input VCF file
 ###################
 
+# We have some unannotated vSV. 
+  ./tput/test_tcl.unannotated.tsv
+
+
 rm -f "./output/test_tcl.annotated.tsv"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/test.vcf" -SVinputInfo 1 -outputFile "./output/test_tcl.annotated.tsv" -genomeBuild GRCh37
 # $cut "./output/test_tcl.annotated.tsv" "Samples_ID;ACMG_class"| grep -v full | sort -u

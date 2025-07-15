@@ -908,9 +908,11 @@ proc VCFsToBED {SV_VCFfiles} {
         ############################
 		if {$g_AnnotSV(missingGTinSamplesid)} {
 			if {$nUnknownGT > 1} {
-			    puts "\t...WARNING: $nUnknownGT sample IDs with missing alleles in the GT field (./. or .\|.) have been reported in the \"Samples_ID\" output field\n"
+			    puts "\t...WARNING: $nUnknownGT missing alleles (./. or .\|.) found in the GT field of reported SV"
+				puts "\t            Corresponding samples have been reported in the \"Samples_ID\" output field\n"
 			} elseif {$nUnknownGT eq 1} {
-			    puts "\t...WARNING: 1 sample ID with missing alleles in the GT field (./. or .\|.) has been reported in the \"Samples_ID\" output field\n"
+			    puts "\t...WARNING: 1 missing allele (./. or .\|.) found in the GT field of reported SV"
+                puts "\t            Corresponding samples have been reported in the \"Samples_ID\" output field\n"
 			} else {puts "\n"}
         }
 
