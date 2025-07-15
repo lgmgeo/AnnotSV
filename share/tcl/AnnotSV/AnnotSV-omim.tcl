@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.4.6                                                                                            #
+# AnnotSV 3.5                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -30,10 +30,10 @@
 #			=> AGS3 is morbid
 #		grep AGS3 $ANNOTSV/share/AnnotSV/Annotations_Human/Genes/GRCh38/genes.RefSeq.sorted.bed
 #			=> No genomic coordinates
-#		grep AGS3 $ANNOTSV/share/AnnotSV/Annotations_Human/Gene-based/NCBIgeneID/geneSymbol_NCBIgeneID.tsv
+#		grep AGS3 $ANNOTSV/share/AnnotSV/Annotations_Human/Gene-based/NCBIandHGNCgeneID/geneSymbol_NCBIandHGNCgeneID.tsv
 #			AGS3    26086
 #			=> NCBIgeneID(AGS3) = 26086
-#		grep 26086 $ANNOTSV/share/AnnotSV/Annotations_Human/Gene-based/NCBIgeneID/geneSymbol_NCBIgeneID.tsv
+#		grep 26086 $ANNOTSV/share/AnnotSV/Annotations_Human/Gene-based/NCBIandHGNCgeneID/geneSymbol_NCBIandHGNCgeneID.tsv
 #			GPSM1   26086
 #			AGS3    26086
 #			DKFZP727I051    26086
@@ -74,8 +74,8 @@ proc memorizeGeneNameAlias {} {
 
     # Then, for gene names not present in the $geneCoordFile (previous symbol, alias), we use the NCBIgeneID to retrieve new alias
     # Memorize the link NCBIgeneID-GeneName
-    set NCBIgeneDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/NCBIgeneID"
-    foreach L [LinesFromFile "$NCBIgeneDir/geneSymbol_NCBIgeneID.tsv"] {
+    set NCBIandHGNCgeneDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/NCBIandHGNCgeneID"
+    foreach L [LinesFromFile "$NCBIandHGNCgeneDir/geneSymbol_NCBIandHGNCgeneID.tsv"] {
         set gene [lindex $L 0]
         set NCBIgeneID [lindex $L 1]
         set NCBIgeneIDfor($gene) $NCBIgeneID

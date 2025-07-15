@@ -168,6 +168,7 @@ GenCC_moi
 GenCC_classification    
 GenCC_pmid
 NCBI_gene_ID
+HGNC_gene_ID
 DDD_status
 DDD_mode
 DDD_consequence

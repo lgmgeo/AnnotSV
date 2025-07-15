@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.4.6                                                                                            #
+# AnnotSV 3.5                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -96,33 +96,33 @@ proc checkExomiserInstallation {} {
     global hpoVersion
     
     
-#    # Check the existence of the "$NCBIgeneDir/results.txt" file (for Human annotations)
+#    # Check the existence of the "$NCBIandHGNCgeneDir/results.txt" file (for Human annotations)
 #    # Approved symbol Alias symbol    Previous symbol NCBI gene ID
 #    # A1BG-AS1        FLJ23569        NCRNA00181      503538
-#    set NCBIgeneDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/NCBIgeneID"
+#    set NCBIandHGNCgeneDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/NCBIandHGNCgeneID"
 #    if {![regexp "Human" $g_AnnotSV(organism)]} {
 #        ## Checked the organism: should be "Human"
 #        set g_AnnotSV(hpo) ""
-#    } elseif {![file exists "$NCBIgeneDir/results.txt"]} {
+#    } elseif {![file exists "$NCBIandHGNCgeneDir/results.txt"]} {
 #        ## Checked if the "results.txt" file exists
 #        puts "\nWARNING: No Exomiser annotations available."
-#        puts "...$NCBIgeneDir/results.txt doesn't exist"
+#        puts "...$NCBIandHGNCgeneDir/results.txt doesn't exist"
 #        set g_AnnotSV(hpo) ""
-#    } elseif {![file exists "$NCBIgeneDir/geneSymbol_NCBIgeneID.tsv"]} {
-#        # Checked if the "geneSymbol_NCBIgeneID.tsv" file exists
+#    } elseif {![file exists "$NCBIandHGNCgeneDir/geneSymbol_NCBIandHGNCgeneID.tsv"]} {
+#        # Checked if the "geneSymbol_NCBIandHGNCgeneID.tsv" file exists
 #        set L_TextToWrite {"genes\tNCBI_gene_ID"}
-#        foreach L [LinesFromFile "$NCBIgeneDir/results.txt"] {
+#        foreach L [LinesFromFile "$NCBIandHGNCgeneDir/results.txt"] {
 #            set Ls [split $L "\t"]
-#            set NCBIgeneID [lindex $Ls 3]
-#            if {$NCBIgeneID eq "" || $NCBIgeneID eq "NCBI gene ID"} {continue}
+#            set NCBIandHGNCgeneID [lindex $Ls 3]
+#            if {$NCBIandHGNCgeneID eq "" || $NCBIandHGNCgeneID eq "NCBI gene ID"} {continue}
 #            set ApprovedSymbol [lindex $Ls 0]
-#            if {$ApprovedSymbol ne "" && ![info exist tmp($ApprovedSymbol)]} {set tmp($ApprovedSymbol) 1; lappend L_TextToWrite "$ApprovedSymbol\t$NCBIgeneID"}
+#            if {$ApprovedSymbol ne "" && ![info exist tmp($ApprovedSymbol)]} {set tmp($ApprovedSymbol) 1; lappend L_TextToWrite "$ApprovedSymbol\t$NCBIandHGNCgeneID"}
 #            set AliasSymbol [lindex $Ls 1]
-#            if {$AliasSymbol ne "" && ![info exist tmp($AliasSymbol)]} {set tmp($AliasSymbol) 1; lappend L_TextToWrite "$AliasSymbol\t$NCBIgeneID"}
+#            if {$AliasSymbol ne "" && ![info exist tmp($AliasSymbol)]} {set tmp($AliasSymbol) 1; lappend L_TextToWrite "$AliasSymbol\t$NCBIandHGNCgeneID"}
 #            set PreviousSymbol [lindex $Ls 2]
-#            if {$PreviousSymbol ne "" && ![info exist tmp($PreviousSymbol)]} {set tmp($PreviousSymbol) 1; lappend L_TextToWrite "$PreviousSymbol\t$NCBIgeneID"}
+#            if {$PreviousSymbol ne "" && ![info exist tmp($PreviousSymbol)]} {set tmp($PreviousSymbol) 1; lappend L_TextToWrite "$PreviousSymbol\t$NCBIandHGNCgeneID"}
 #        }
-#        WriteTextInFile [join $L_TextToWrite "\n"] "$NCBIgeneDir/geneSymbol_NCBIgeneID.tsv"
+#        WriteTextInFile [join $L_TextToWrite "\n"] "$NCBIandHGNCgeneDir/geneSymbol_NCBIandHGNCgeneID.tsv"
 #    }
     
     ## Check if the Exomiser data files exist
@@ -202,7 +202,7 @@ proc runExomiser {L_Genes L_HPO} {
         # Requests
         foreach geneName $L_Genes {
             # Search the geneID of the geneName
-            set geneID [searchforGeneID $geneName]
+            set geneID [searchforNCBIGeneID $geneName]
             
             # Check if the information exists
             if {$geneID eq ""} {continue}
