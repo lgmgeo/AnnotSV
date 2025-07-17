@@ -7,7 +7,7 @@ set -eo pipefail
 ./commandAnnotSV.sh &
 
 # RAM tracking
-rm -f ramAnnotSV-`hostname`-ram.txt
+rm -f ramAnnotSV-*-ram.txt
 sleep 1
 pid=`ps -ef | grep AnnotSV | grep -v "grep" | grep "bin/AnnotSV" | awk '{print $2}'`
 while [ -e running.flag ]
@@ -21,6 +21,9 @@ done
 ramFile="ramAnnotSV-`hostname`-ram.txt"
 max=`sort -n $ramFile  | tail -1`
 echo "rss = $max Ko"
+
+rm -f $ramFile
+
 
 echo "ok - Finished"
 

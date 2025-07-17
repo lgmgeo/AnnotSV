@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.4.6                                                                                            #
+# AnnotSV 3.5                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -189,9 +189,9 @@ proc userBEDannotation {formattedSortedUserBEDfile SVchrom SVstart SVend {use3po
         set i "$g_numberOfAnnotationCol($formattedSortedUserBEDfile)"
         while {$i > 0} {
             foreach SVtoAnn [array names L_userBEDAnn_$i] {
-				# We want to keep the same order when removing the redundancy
-				set L_userBEDAnn_${i}($SVtoAnn) [RemoveRedundancyWithoutSorting [set L_userBEDAnn_${i}($SVtoAnn)]]
-
+                # We want to keep the same order when removing the redundancy
+                set L_userBEDAnn_${i}($SVtoAnn) [RemoveRedundancyWithoutSorting [set L_userBEDAnn_${i}($SVtoAnn)]]
+                
                 if {$use3points && [llength [set L_userBEDAnn_${i}($SVtoAnn)]] > 50} {
                     # Too long (often with large SV) and can cause trouble in a spreadsheet. Not used for Cytobands.
                     set L_userBEDAnn_${i}($SVtoAnn) [lrange [set L_userBEDAnn_${i}($SVtoAnn)] 0 50]

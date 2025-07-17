@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.4.6                                                                                            #
+# AnnotSV 3.5                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -36,25 +36,25 @@ proc switchCoordinatesFromBEDtoVCF {BEDcoord} {
 proc switchAllCoordinatesFromBEDtoVCFinLine {lineCompleted} {
     # lineCompleted: AnnotSV_ID              chrom   SV_start   ...
     # e.g.           15_1_20000000_DEL_1     15      1          ...
- 
+    
     # Formate "AnnotSV_ID" and "SV_start"
-	# (switch SV start coordinate from BED to VCF format)
+    # (switch SV start coordinate from BED to VCF format)
     #####################################################
-	regexp "^\[^\t\]+\t\[^\t\]+\t(\[0-9\]+)" $lineCompleted match SVstart
+    regexp "^\[^\t\]+\t\[^\t\]+\t(\[0-9\]+)" $lineCompleted match SVstart
     set formatedSVstart [expr {$SVstart+1}]
-
+    
     # Formate "AnnotSV_ID"
-	set AnnotSV_ID [lindex $lineCompleted 0]
-	set L_AnnotSV_ID [split $AnnotSV_ID "_"]
-	set updated_AnnotSV_ID [lindex $L_AnnotSV_ID 0]_${formatedSVstart}_[lindex $L_AnnotSV_ID 2]_[lindex $L_AnnotSV_ID 3]_[lindex $L_AnnotSV_ID 4]
+    set AnnotSV_ID [lindex $lineCompleted 0]
+    set L_AnnotSV_ID [split $AnnotSV_ID "_"]
+    set updated_AnnotSV_ID [lindex $L_AnnotSV_ID 0]_${formatedSVstart}_[lindex $L_AnnotSV_ID 2]_[lindex $L_AnnotSV_ID 3]_[lindex $L_AnnotSV_ID 4]
     set length_AnnotSV_ID [expr {[string length $AnnotSV_ID]-1}]
     set lineCompleted [string replace $lineCompleted 0 $length_AnnotSV_ID $updated_AnnotSV_ID]
-	
+    
     # Formate "SV_start"
     set chrom [lindex $lineCompleted 1]
-	set length_chrom [string length $chrom]
+    set length_chrom [string length $chrom]
     set length_updated_AnnotSV_ID [string length $updated_AnnotSV_ID]
-	set lengthTot [expr {$length_updated_AnnotSV_ID+$length_chrom+1}]
+    set lengthTot [expr {$length_updated_AnnotSV_ID+$length_chrom+1}]
     if {[regexp -start $lengthTot -indices "$SVstart" $lineCompleted match_indices]} {
         set i_start [lindex $match_indices 0]
         set i_end   [lindex $match_indices 1]
@@ -70,7 +70,7 @@ proc switchAllCoordinatesFromBEDtoVCFinLine {lineCompleted} {
         set lineCompleted [string replace $lineCompleted $i_start $i_end [switchCoordinatesFromBEDtoVCF $BEDcoord]]
         set i [expr {$i_end+1}]
     }
-
+    
     return $lineCompleted
 }
 
@@ -88,7 +88,7 @@ proc OrganizeAnnotation {} {
     global g_rankingExplanations
     global g_re
     global g_HITS
- 
+    
     # OUTPUT
     ###############
     set FullAndSplitBedFile "$g_AnnotSV(outputDir)/$g_AnnotSV(outputFile).tmp" ;# created in AnnotSV-genes.tcl
@@ -309,7 +309,7 @@ proc OrganizeAnnotation {} {
         }
         if {$g_AnnotSV(geneBasedAnn_i) eq ""} {set g_AnnotSV(geneBasedAnn) 0}
     }
-
+    
     ####### "PhenoGenius header"
     if {$g_AnnotSV(PhenoGeniusCli)} {
         append headerOutput "\tPhenoGenius_score\tPhenoGenius_phenotype\tPhenoGenius_specificity"
@@ -449,10 +449,10 @@ proc OrganizeAnnotation {} {
         puts "\t...Gene-based annotations"
         puts "[join $g_ExtAnnotation(display) "\n"]"
     }
-
+    
     ####### "PhenoGenius annotations"
     if {$g_AnnotSV(PhenoGeniusCli)} {puts "\t...PhenoGenius annotations"}
-
+    
     ####### "Exomiser annotation"
     if {$g_AnnotSV(hpo) ne ""} {puts "\t...Exomiser annotations"}
     
@@ -566,7 +566,7 @@ proc OrganizeAnnotation {} {
             set geneName   [lindex $Ls end-9]
             set NbGenes    ""
             set transcript [lindex $Ls end-8]
-			set transcript_version [transcriptVersionAnnotation $transcript]
+            set transcript_version [transcriptVersionAnnotation $transcript]
             set CDSstart   [lindex $Ls end-7]
             set CDSend     [lindex $Ls end-6]
             set exonStarts [lindex $Ls end-5]
@@ -609,7 +609,7 @@ proc OrganizeAnnotation {} {
                 set NbGenes 0
             }
             set transcript ""
-			set transcript_version ""
+            set transcript_version ""
             set CDSl       ""
             set CDSpercent ""
             set txStart    ""
@@ -821,44 +821,44 @@ proc OrganizeAnnotation {} {
             if {$SVright<$tx_right} {set intersectEnd "$SVright"} else {set intersectEnd "$tx_right"}
             set intersect "$intersectStart\t$intersectEnd"
         }
-       
+        
         # Closest genes annotation
         if {$AnnotationMode eq "full"} {
-			# In Closest_left and Closest_right features, we only keep the closest gene:
-			#   - not overlapped with the SV (<=> not in $geneName)
-			#   - located up to 5 Mb to the left or right side of the SV
-			set L_geneName [split $geneName ";"] ;# => gene names overlapped with the SV
-			set L_closestGenesLeft [closestGenesAnnotation $SVchrom $SVleft "left"]
-			set i [expr {[llength $L_closestGenesLeft]-1}]
-			set closestGeneText ""
-			while {$i >= 0} {
-				set gClosest [lindex $L_closestGenesLeft $i]
-				if {[lsearch -exact $L_geneName $gClosest] eq -1} {
-					set closestGeneText "$gClosest"
-					break
-				} else {
-					incr i -1
-				}
-			}
-			set toAdd ""
-			foreach gClosest [closestGenesAnnotation $SVchrom $SVright "right"] {
-				if {[lsearch -exact $L_geneName $gClosest] eq -1} {
+            # In Closest_left and Closest_right features, we only keep the closest gene:
+            #   - not overlapped with the SV (<=> not in $geneName)
+            #   - located up to 5 Mb to the left or right side of the SV
+            set L_geneName [split $geneName ";"] ;# => gene names overlapped with the SV
+            set L_closestGenesLeft [closestGenesAnnotation $SVchrom $SVleft "left"]
+            set i [expr {[llength $L_closestGenesLeft]-1}]
+            set closestGeneText ""
+            while {$i >= 0} {
+                set gClosest [lindex $L_closestGenesLeft $i]
+                if {[lsearch -exact $L_geneName $gClosest] eq -1} {
+                    set closestGeneText "$gClosest"
+                    break
+                } else {
+                    incr i -1
+                }
+            }
+            set toAdd ""
+            foreach gClosest [closestGenesAnnotation $SVchrom $SVright "right"] {
+                if {[lsearch -exact $L_geneName $gClosest] eq -1} {
                     set toAdd "$gClosest"
                     break
-                } 
+                }
             }
-			append closestGeneText "\t$toAdd"
+            append closestGeneText "\t$toAdd"
         } else {set closestGeneText "\t"}
-
+        
         # Regulatory elements annotation (only for the full lines)
         # Human or mouse
         set reText ""
         if {$AnnotationMode eq "full"} {
             if {[info exists g_re($SVchrom\t$SVleft\t$SVright)]} {
-				set reText $g_re($SVchrom\t$SVleft\t$SVright)
-			}
+                set reText $g_re($SVchrom\t$SVleft\t$SVright)
+            }
         }
-       
+        
         # Annotations with pathogenic genes or genomic regions (FtIncludedInSV)
         if {$g_AnnotSV(organism) eq "Human"} {
             if {$AnnotationMode eq "split"} {
@@ -912,7 +912,7 @@ proc OrganizeAnnotation {} {
             set cytobandDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/AnyOverlap/CytoBand/$g_AnnotSV(genomeBuild)/"
             set cytobandBEDfile [glob -nocomplain $cytobandDir/cytoBand_$g_AnnotSV(genomeBuild).formatted.sorted.bed]
             if {[file exists $cytobandBEDfile]} {
-				set use3points "0"
+                set use3points "0"
                 if {$AnnotationMode eq "split"} {
                     set L_cytobandText "[userBEDannotation $cytobandBEDfile $SVchrom $intersectStart $intersectEnd $use3points]"
                 } else {
@@ -1127,7 +1127,7 @@ proc OrganizeAnnotation {} {
                 append ENCODEblacklistText "\t[ENCODEblacklistAnnotation $SVchrom $SVright]"
             } else {set ENCODEblacklistText "\t\t\t"}
         }
-
+        
         # TAD annotation
         if {$g_AnnotSV(tadAnn)} {
             if {$AnnotationMode eq "split"} {
@@ -1204,7 +1204,7 @@ proc OrganizeAnnotation {} {
                 } else {set SVlength ""}
             }
         }
-
+        
         ####### "Phenogenius annotation"
         if {$g_AnnotSV(PhenoGeniusCli)} {
             if {$AnnotationMode eq "split"} {
@@ -1213,9 +1213,9 @@ proc OrganizeAnnotation {} {
                 set bestSpecificity ""
                 foreach g [split $geneName ";"] {
                     set specificity [PhenoGeniusCliAnnotation $g "specificity"]
-					# {"A" < "B"} => True
-					if {$specificity eq ""} {continue}
-					if {$bestSpecificity eq ""} {set bestSpecificity $specificity; continue}
+                    # {"A" < "B"} => True
+                    if {$specificity eq ""} {continue}
+                    if {$bestSpecificity eq ""} {set bestSpecificity $specificity; continue}
                     if {$specificity < $bestSpecificity} {set bestSpecificity $specificity}
                 }
                 set phenogeniusText "\t\t$bestSpecificity"
@@ -1352,8 +1352,8 @@ proc OrganizeAnnotation {} {
         ####### "Memorize the AnnotSV_ID to then order the output lines"
         ## Done only the first time an AnnotSV_ID is met
         ## (not for the split lines)
-		## WARNING: AnnotSV_ID redundancy is not authorized between full lines
-		##			Each SV is assumed to only have one single line of 'full' annotation (no ID redundancy authorized in VCF)
+        ## WARNING: AnnotSV_ID redundancy is not authorized between full lines
+        ##			Each SV is assumed to only have one single line of 'full' annotation (no ID redundancy authorized in VCF)
         if {![info exists L_TextToWrite($AnnotSV_ID)]} {
             lappend L_AnnotSV_ID $AnnotSV_ID
             if {$g_AnnotSV(hpo) ne ""} {
@@ -1429,7 +1429,7 @@ proc OrganizeAnnotation {} {
     
     foreach AnnotSV_ID $L_AnnotSV_ID {
         set AnnotSV_ID [lindex $AnnotSV_ID 0]
-
+        
         foreach fullOrSplitLine $L_TextToWrite($AnnotSV_ID) {
             set AnnMo [lindex [split $fullOrSplitLine "\t"] $i_Annotation_mode]
             set geneName [lindex [split $fullOrSplitLine "\t"] $i_genename]
@@ -1451,10 +1451,10 @@ proc OrganizeAnnotation {} {
                         append lineCompleted "\t$g_rankingScore($AnnotSV_ID)" ;#rankingScore
                     }
                     if {![info exists g_rankingExplanations($AnnotSV_ID)]} {
-						set g_rankingExplanations($AnnotSV_ID) ""
-					} elseif {[set g_AnnotSV(metrics)] eq "fr"} {
-						regsub -all {([0-9])\.([0-9])} $g_rankingExplanations($AnnotSV_ID) "\\1,\\2" g_rankingExplanations($AnnotSV_ID)
-					}
+                        set g_rankingExplanations($AnnotSV_ID) ""
+                    } elseif {[set g_AnnotSV(metrics)] eq "fr"} {
+                        regsub -all {([0-9])\.([0-9])} $g_rankingExplanations($AnnotSV_ID) "\\1,\\2" g_rankingExplanations($AnnotSV_ID)
+                    }
                     append lineCompleted "\t$g_rankingExplanations($AnnotSV_ID)" ;#rankingExplanations
                     if {$g_rankingScore($AnnotSV_ID) eq ""} {
                         set class "NA"
@@ -1519,7 +1519,7 @@ proc OrganizeAnnotation {} {
                 }
                 if {$doNotDisplay} {continue}
             }
-
+            
             lappend L_lineCompleted [switchAllCoordinatesFromBEDtoVCFinLine "$lineCompleted"]
             
             # To avoid a segmentation fault

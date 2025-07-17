@@ -1,7 +1,7 @@
 #!/usr/bin/env tclsh
 
 ############################################################################################################
-# AnnotSV 3.4.6                                                                                            #
+# AnnotSV 3.5                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -172,7 +172,7 @@ if {$g_AnnotSV(tx) eq "RefSeq"} {
 # Annotation with GenCC?
 checkGenCCgeneFile
 # Annotation with OMIM?
-checkNCBI
+checkNCBIandHGNC
 memorizeGeneNameAlias
 checkOMIMfile
 checkMorbidfile

@@ -469,10 +469,7 @@ done
 # SV input VCF file
 ###################
 
-# We have some unannotated vSV. 
-  ./tput/test_tcl.unannotated.tsv
-
-
+rm -f "./output/test_tcl.unannotated.tsv"
 rm -f "./output/test_tcl.annotated.tsv"
 $ANNOTSV/bin/AnnotSV -SVinputFile "./input/test.vcf" -SVinputInfo 1 -outputFile "./output/test_tcl.annotated.tsv" -genomeBuild GRCh37
 # $cut "./output/test_tcl.annotated.tsv" "Samples_ID;ACMG_class"| grep -v full | sort -u
@@ -493,7 +490,7 @@ fi
 
 for v in `$cut "./output/test_tcl.annotated.tsv" "Samples_ID" | grep -v full | sort -u`
 do
-        if ! exists_in_list "Samples_ID sample1 sample1,sample2 sample2" " " "$v"
+        if ! exists_in_list "Samples_ID sample1,sample3 sample1,sample2,sample3 sample2 sample2,sample3" " " "$v"
         then
                 echo "Error with ./input/test.bed (test 17B)"
                 echo "error 1"
@@ -520,7 +517,7 @@ fi
 
 for v in `$cut "./output/test_tcl.annotated.tsv" "Samples_ID" | grep -v full | sort -u`
 do
-        if ! exists_in_list "Samples_ID sample1 sample1,sample2 sample2" " " "$v"
+        if ! exists_in_list "Samples_ID sample1,sample3 sample1,sample2,sample3 sample2 sample2,sample3" " " "$v"
         then
                 echo "Error with ./input/test.bed (test 18B)"
                 echo "error 1"

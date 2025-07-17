@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.4.6                                                                                            #
+# AnnotSV 3.5                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -40,7 +40,7 @@ TCLDIR               := $(SHAREDIR)/$(TCLVERSION)
 PYTHONDIR            := $(SHAREDIR)/python3
 ANNOTSV              := AnnotSV
 JARDIR               := $(SHAREDIR)/$(ANNOTSV)/jar
-VERSION              := 3.4.6
+VERSION              := 3.5
 RM                   := /bin/rm
 RMDIR                := /bin/rmdir
 MKDIR                := install -d
@@ -53,6 +53,8 @@ MAKEFILE             := Makefile
 PROPERTIES           := etc/$(ANNOTSV)/application.properties
 BASH_SCRIPTS         := $(shell find share/bash/$(ANNOTSV)/ -name '*.bash' 2> /dev/null)
 DOCUMENTATIONS       := $(shell find License.txt changeLog.txt commandLineOptions.txt README.AnnotSV_*.pdf 2> /dev/null)
+VC_FLAG              := $(DESTDIR)$(PYTHONDIR)/variantconvert/pipinstall.flag
+
 
 # make install
 .PHONY: install
@@ -61,8 +63,8 @@ all: install-display install-documentationlight install-variantconvert install-d
 install: install-display install-documentationlight install-variantconvert install-done
 install-exomiser: install-exomiser-1 install-exomiser-3
 else
-all: install-display install-configfile install-makefile install-executable install-tcl-toolbox install-python-toolbox install-bash-toolbox install-doc install-others-doc install-variantconvert install-done
-install: install-display install-configfile install-makefile install-executable install-tcl-toolbox install-python-toolbox install-bash-toolbox install-doc install-others-doc install-variantconvert install-done
+all: install-display install-configfile install-makefile install-executable install-tcl-toolbox install-bash-toolbox install-doc install-others-doc install-variantconvert install-done
+install: install-display install-configfile install-makefile install-executable install-tcl-toolbox install-bash-toolbox install-doc install-others-doc install-variantconvert install-done
 install-exomiser: install-exomiser-1 install-exomiser-2 install-exomiser-3
 endif
 
@@ -106,46 +108,49 @@ install-tcl-toolbox:
 	$(MKDIR) $(DESTDIR)$(TCLDIR)/$(ANNOTSV)
 	cd share/tcl ; tar cf - $(ANNOTSV) | tar xf - -C $(DESTDIR)$(TCLDIR)/
 
-install-python-toolbox:
-	@echo ""
-	@echo "Python scripts installation"
-	@echo "---------------------------"
-	$(MKDIR) $(DESTDIR)$(PYTHONDIR)/variantconvert
-	cd share/python3 ; tar cf - variantconvert | tar xf - -C $(DESTDIR)$(PYTHONDIR)/
-
 install-variantconvert:
 	@echo ""
 	@echo "variantconvert installation"
 	@echo "---------------------------"
-	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/pipinstall.flag
-	chmod 777 $(DESTDIR)$(PYTHONDIR)/variantconvert/pipinstall.flag
-	pip3 install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. &> ./tmp.variantconvert.txt || pip install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. &> ./tmp.variantconvert.txt || rm -f $(DESTDIR)$(PYTHONDIR)/variantconvert/pipinstall.flag
+	git clone https://github.com/SamuelNicaise/variantconvert.git $(DESTDIR)$(PYTHONDIR)/variantconvert/
+	touch $(VC_FLAG)
+	chmod 777 $(VC_FLAG)
+	pip3 install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. &> ./tmp.variantconvert.txt || pip install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. &> ./tmp.variantconvert.txt || rm -f $(VC_FLAG)
 	rm -f ./tmp.variantconvert.txt
-	ls -l $(DESTDIR)$(PYTHONDIR)/variantconvert/pipinstall.flag || echo "variantconvert not installed"
-	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_bed.combined.local.json
-	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_bed.full.local.json
-	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_bed.fullsplit.local.json
-	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_vcf.combined.local.json
-	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_vcf.full.local.json
-	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_vcf.fullsplit.local.json
-	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_bed.combined.local.json
-	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_bed.full.local.json
-	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_bed.fullsplit.local.json
-	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_vcf.combined.local.json
-	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_vcf.full.local.json
-	touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_vcf.fullsplit.local.json
-	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_bed.combined.local.json
-	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_bed.full.local.json
-	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_bed.fullsplit.local.json
-	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_vcf.combined.local.json
-	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_vcf.full.local.json
-	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_vcf.fullsplit.local.json
-	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_bed.combined.local.json
-	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_bed.full.local.json
-	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_bed.fullsplit.local.json
-	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_vcf.combined.local.json
-	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_vcf.full.local.json
-	$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_vcf.fullsplit.local.json
+	@if [ -f $(VC_FLAG) ]; then \
+		echo "variantconvert installed"; \
+		$(MV) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/hs1 $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/CHM13; \
+		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/CHM13/annotsv3_from_bed.combined.local.json; \
+		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/CHM13/annotsv3_from_bed.full.local.json; \
+		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/CHM13/annotsv3_from_bed.fullsplit.local.json; \
+		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/CHM13/annotsv3_from_vcf.combined.local.json; \
+		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/CHM13/annotsv3_from_vcf.full.local.json; \
+		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/CHM13/annotsv3_from_vcf.fullsplit.local.json; \
+		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_bed.combined.local.json; \
+		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_bed.full.local.json; \
+		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_bed.fullsplit.local.json; \
+		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_vcf.combined.local.json; \
+		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_vcf.full.local.json; \
+		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_vcf.fullsplit.local.json; \
+		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_bed.combined.local.json; \
+		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_bed.full.local.json; \
+		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_bed.fullsplit.local.json; \
+		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_vcf.combined.local.json; \
+		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_vcf.full.local.json; \
+		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_vcf.fullsplit.local.json; \
+		$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/CHM13/annotsv3_*.local.json; \
+		$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_*.local.json; \
+		$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_*.local.json; \
+		for f in $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/CHM13/annotsv*; do \
+			case "$$f" in \
+				*.local.json) ;; \
+				*) \
+					sed -i 's/"##contig=<ID=chr/"##contig=<ID=/g' "$$f" ;; \
+			esac; \
+		done; \
+	else \
+		echo "variantconvert not installed"; \
+	fi
 
 
 install-bash-toolbox: $(BASH_SCRIPTS)
@@ -198,6 +203,7 @@ install-exomiser-1: 2406_phenotype.zip
 	curl -C - -LO https://github.com/exomiser/Exomiser/releases/download/14.1.0/exomiser-rest-prioritiser-14.1.0.jar
 	$(MKDIR) -p $(DESTDIR)$(JARDIR)
 	install -p -m 0755 exomiser-rest-prioritiser-14.1.0.jar $(DESTDIR)$(JARDIR)/
+	$(RM) exomiser-rest-prioritiser-14.1.0.jar
 
 install-exomiser-2:
 	install -p -m 0755 $(PROPERTIES) $(DESTDIR)$(ETCDIR)/$(ANNOTSV)

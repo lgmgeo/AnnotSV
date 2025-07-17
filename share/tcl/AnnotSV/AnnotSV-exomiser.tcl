@@ -96,34 +96,34 @@ proc checkExomiserInstallation {} {
     global hpoVersion
     
     
-#    # Check the existence of the "$NCBIandHGNCgeneDir/results.txt" file (for Human annotations)
-#    # Approved symbol Alias symbol    Previous symbol NCBI gene ID
-#    # A1BG-AS1        FLJ23569        NCRNA00181      503538
-#    set NCBIandHGNCgeneDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/NCBIandHGNCgeneID"
-#    if {![regexp "Human" $g_AnnotSV(organism)]} {
-#        ## Checked the organism: should be "Human"
-#        set g_AnnotSV(hpo) ""
-#    } elseif {![file exists "$NCBIandHGNCgeneDir/results.txt"]} {
-#        ## Checked if the "results.txt" file exists
-#        puts "\nWARNING: No Exomiser annotations available."
-#        puts "...$NCBIandHGNCgeneDir/results.txt doesn't exist"
-#        set g_AnnotSV(hpo) ""
-#    } elseif {![file exists "$NCBIandHGNCgeneDir/geneSymbol_NCBIandHGNCgeneID.tsv"]} {
-#        # Checked if the "geneSymbol_NCBIandHGNCgeneID.tsv" file exists
-#        set L_TextToWrite {"genes\tNCBI_gene_ID"}
-#        foreach L [LinesFromFile "$NCBIandHGNCgeneDir/results.txt"] {
-#            set Ls [split $L "\t"]
-#            set NCBIandHGNCgeneID [lindex $Ls 3]
-#            if {$NCBIandHGNCgeneID eq "" || $NCBIandHGNCgeneID eq "NCBI gene ID"} {continue}
-#            set ApprovedSymbol [lindex $Ls 0]
-#            if {$ApprovedSymbol ne "" && ![info exist tmp($ApprovedSymbol)]} {set tmp($ApprovedSymbol) 1; lappend L_TextToWrite "$ApprovedSymbol\t$NCBIandHGNCgeneID"}
-#            set AliasSymbol [lindex $Ls 1]
-#            if {$AliasSymbol ne "" && ![info exist tmp($AliasSymbol)]} {set tmp($AliasSymbol) 1; lappend L_TextToWrite "$AliasSymbol\t$NCBIandHGNCgeneID"}
-#            set PreviousSymbol [lindex $Ls 2]
-#            if {$PreviousSymbol ne "" && ![info exist tmp($PreviousSymbol)]} {set tmp($PreviousSymbol) 1; lappend L_TextToWrite "$PreviousSymbol\t$NCBIandHGNCgeneID"}
-#        }
-#        WriteTextInFile [join $L_TextToWrite "\n"] "$NCBIandHGNCgeneDir/geneSymbol_NCBIandHGNCgeneID.tsv"
-#    }
+    #    # Check the existence of the "$NCBIandHGNCgeneDir/results.txt" file (for Human annotations)
+    #    # Approved symbol Alias symbol    Previous symbol NCBI Gene ID
+    #    # A1BG-AS1        FLJ23569        NCRNA00181      503538
+    #    set NCBIandHGNCgeneDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/NCBIandHGNCgeneID"
+    #    if {![regexp "Human" $g_AnnotSV(organism)]} {
+        #        ## Checked the organism: should be "Human"
+        #        set g_AnnotSV(hpo) ""
+        #    } elseif {![file exists "$NCBIandHGNCgeneDir/results.txt"]} {
+        #        ## Checked if the "results.txt" file exists
+        #        puts "\nWARNING: No Exomiser annotations available."
+        #        puts "...$NCBIandHGNCgeneDir/results.txt doesn't exist"
+        #        set g_AnnotSV(hpo) ""
+        #    } elseif {![file exists "$NCBIandHGNCgeneDir/geneSymbol_NCBIandHGNCgeneID.tsv"]} {
+        #        # Checked if the "geneSymbol_NCBIandHGNCgeneID.tsv" file exists
+        #        set L_TextToWrite {"genes\tNCBI_gene_ID"}
+        #        foreach L [LinesFromFile "$NCBIandHGNCgeneDir/results.txt"] {
+            #            set Ls [split $L "\t"]
+            #            set NCBIandHGNCgeneID [lindex $Ls 3]
+            #            if {$NCBIandHGNCgeneID eq "" || $NCBIandHGNCgeneID eq "NCBI Gene ID"} {continue}
+            #            set ApprovedSymbol [lindex $Ls 0]
+            #            if {$ApprovedSymbol ne "" && ![info exist tmp($ApprovedSymbol)]} {set tmp($ApprovedSymbol) 1; lappend L_TextToWrite "$ApprovedSymbol\t$NCBIandHGNCgeneID"}
+            #            set AliasSymbol [lindex $Ls 1]
+            #            if {$AliasSymbol ne "" && ![info exist tmp($AliasSymbol)]} {set tmp($AliasSymbol) 1; lappend L_TextToWrite "$AliasSymbol\t$NCBIandHGNCgeneID"}
+            #            set PreviousSymbol [lindex $Ls 2]
+            #            if {$PreviousSymbol ne "" && ![info exist tmp($PreviousSymbol)]} {set tmp($PreviousSymbol) 1; lappend L_TextToWrite "$PreviousSymbol\t$NCBIandHGNCgeneID"}
+            #        }
+        #        WriteTextInFile [join $L_TextToWrite "\n"] "$NCBIandHGNCgeneDir/geneSymbol_NCBIandHGNCgeneID.tsv"
+        #    }
     
     ## Check if the Exomiser data files exist
     ## + HPO citation
@@ -193,7 +193,7 @@ proc runExomiser {L_Genes L_HPO} {
     regsub "XXXX" $infos "$port" infos
     regsub "YYYY" $infos "$g_AnnotSV(annotationsDir)/Annotations_Exomiser/$hpoVersion" infos
     WriteTextInFile $infos $applicationPropertiesTmpFile
-
+    
     # Start the REST service
     set exomiserStartServiceFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_[pid]_exomiser.tmp"
     puts "\t...starting the REST service"
@@ -209,7 +209,6 @@ proc runExomiser {L_Genes L_HPO} {
             
             # Exomiser request
             set url "http://localhost:${port}/exomiser/api/prioritise/?phenotypes=${L_HPO}&prioritiser=hiphive&prioritiser-params=human,mouse,fish,ppi&genes=$geneID"
-            
             if {[catch {
                     set token [::http::geturl $url]
                     set exomiserResult [::http::data $token]

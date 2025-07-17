@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.4.6                                                                                            #
+# AnnotSV 3.5                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -177,6 +177,7 @@ proc configureAnnotSV {argv} {
             exit 2
         }
     }
+    regsub -all {/+} $g_AnnotSV(annotationsDir) {/} g_AnnotSV(annotationsDir)
     if {$g_AnnotSV(variantconvertDir) eq ""} {
         set g_AnnotSV(variantconvertDir) "$g_AnnotSV(installDir)/share/python3/variantconvert/"
     } else {
@@ -186,6 +187,7 @@ proc configureAnnotSV {argv} {
             exit 2
         }
     }
+    regsub -all {/+} $g_AnnotSV(variantconvertDir) {/} g_AnnotSV(variantconvertDir)
     
     ## SVinputFile: We should have a bed or VCF input file
     if {$g_AnnotSV(SVinputFile) eq ""} {
@@ -312,7 +314,7 @@ proc configureAnnotSV {argv} {
         exit 2
     }
     set g_AnnotSV(outputDir) [file normalize $g_AnnotSV(outputDir)]
- 
+    
     # bedtools/bcftools: It should be a good path that we can run
     foreach tool {bedtools bcftools} {
         if {[catch {eval exec $g_AnnotSV($tool) --version} Message]} {
@@ -323,21 +325,21 @@ proc configureAnnotSV {argv} {
             puts "############################################################################"
             exit 2
         } else {
-			# Minimum bedtools version compatible with AnnotSV is version 2.25
-			if {$tool eq "bedtools"} {
-				if {[regexp "(\[0-9\]+\\.\[0-9\]+\\.\[0-9\]+)" $Message match bedtoolsVersion]} {
-					set L_bedtoolsVersion [split $bedtoolsVersion "."]
-					if {[lindex $L_bedtoolsVersion 0] < 2 || ([lindex $L_bedtoolsVersion 0] eq 2 && [lindex $L_bedtoolsVersion 1] < 25)} {
-					    puts "############################################################################"
-					    puts "The minimum bedtools version compatible with AnnotSV is version 2.25."
-						puts "You are using bedtools version $bedtoolsVersion"
-					    puts "Exit with error."
-					    puts "############################################################################"
-						exit 2
-					}
-				}
-			}
-		}
+            # Minimum bedtools version compatible with AnnotSV is version 2.25
+            if {$tool eq "bedtools"} {
+                if {[regexp "(\[0-9\]+\\.\[0-9\]+\\.\[0-9\]+)" $Message match bedtoolsVersion]} {
+                    set L_bedtoolsVersion [split $bedtoolsVersion "."]
+                    if {[lindex $L_bedtoolsVersion 0] < 2 || ([lindex $L_bedtoolsVersion 0] eq 2 && [lindex $L_bedtoolsVersion 1] < 25)} {
+                        puts "############################################################################"
+                        puts "The minimum bedtools version compatible with AnnotSV is version 2.25."
+                        puts "You are using bedtools version $bedtoolsVersion"
+                        puts "Exit with error."
+                        puts "############################################################################"
+                        exit 2
+                    }
+                }
+            }
+        }
     }
     
     # tx: It must be "RefSeq" or "ENSEMBL"
@@ -402,7 +404,7 @@ proc configureAnnotSV {argv} {
         puts "############################################################################"
         exit 2
     }
-   
+    
     ## It must be "combined", "full" or "fullsplit"
     set L_variantconvertMode {combined full fullsplit}
     if {[lsearch -exact $L_variantconvertMode "$g_AnnotSV(variantconvertMode)"] eq -1} {
@@ -412,7 +414,7 @@ proc configureAnnotSV {argv} {
         puts "############################################################################"
         exit 2
     }
- 
+    
     ## The following step could be improved: too long
     #################################################
     set g_AnnotSV(snvIndelSamples) [split $g_AnnotSV(snvIndelSamples)  ";|,"]

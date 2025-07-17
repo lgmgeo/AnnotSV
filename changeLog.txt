@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.4.6                                                                                            #
+# AnnotSV 3.5                                                                                              #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
@@ -10,6 +10,17 @@
 
 For more details, please see the README file.
 
+
+July, 17, 2025, AnnotSV version 3.5
+	- Add the T2T-CHM13v2.0 human annotations
+	- Update GRCh38 and GRCh37 human annotations 
+	- Update the Exomiser install
+	- Add bugfix concerning the AnnotSV_ranking_criteria
+	- Add bugfix concerning the naming of temporary files. Add the pid in the file names
+	- Add bugfix concerning the boundary mismatch for ACMG scores 
+	- Improvements in the tests section
+	- Add the PacBio-CoLoRS Benign SV annotations (Long Read Sequencing Database, GRCh38, CHM13)
+	- Return 2 unique AnnotSV_Ids for two translocations starting at the same position but ending at a different position 
 
 March, 06, 2025, AnnotSV version 3.4.6
 	- Update the PhenoGenius install (Use of the client repo https://github.com/kyauy/PhenoGeniusCli: v.1.1.3) (issue 274)

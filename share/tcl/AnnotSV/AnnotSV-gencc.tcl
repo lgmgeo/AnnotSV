@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.4.6                                                                                            #
+# AnnotSV 3.5                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -115,7 +115,7 @@ proc updateGenCCgeneFile {} {
         # 04/28/2025 - Bug always present:
         #   DHX9    "   AD  Strong  37369308;37467750
         #   FLVCR1  ";FLVCR1-related retinopathy with or without ataxia;posterior column ataxia-retinitis pigmentosa syndrome   AR  ...
-		# $disease should not be equal to "\""
+        # $disease should not be equal to "\""
         if {$disease ne "" && $disease ne "\""} {
             lappend L_disease($gene) "$disease"
         }
@@ -190,10 +190,10 @@ proc updateGenCCgeneFile {} {
         if {[info exists L_moi($gene)]}       {set b [join [lsort -unique $L_moi($gene)] ";"]}      else {set b ""}
         if {[info exists L_classif($gene) ]}  {set c [join [lsort -unique $L_classif($gene) ] ";"]} else {set c ""}
         if {[info exists L_pmid($gene)]}      {set d [join [lsort -unique $L_pmid($gene)] ";"]}     else {set d ""}
-
+        
         set L_toWrite "$gene\t$a\t$b\t$c\t$d"
         lappend TexteToWrite $L_toWrite
-	}
+    }
     
     WriteTextInFile [join $TexteToWrite "\n"] $GenCCfileFormatted
     if {[catch {exec gzip $GenCCfileFormatted} Message]} {

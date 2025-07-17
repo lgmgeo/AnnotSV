@@ -481,7 +481,7 @@ fi
 echo "Command_11 (square) OK"
 
 angleResult=`$cut "./output/command_11_angle-bracketed-tra1.annotated.tsv" "AnnotSV_ID;ID;SV_length;SV_type;REF;ALT;ACMG_class" | grep -v "full=" | tail -2 | awk 'BEGIN{ORS=" "; OFS=" "} { print $1, $2, $3, $4, $5, $6, $7}'`
-if [ "$angleResult" != "13_123456_123456_TRA_1 tra_b 0 TRA C <TRA> NA 2_321682_321682_TRA_1 tra_a 0 TRA T <TRA> NA " ]
+if [ "$angleResult" != "13_123456_123456_TRA_1 tra_b 0 TRA C <TRA>_2_123456 NA 2_321682_321682_TRA_1 tra_a 0 TRA T <TRA>_13_321682 NA " ]
 then
         echo "error 1: Error with command_11 (angle bad values)"
         exit 1

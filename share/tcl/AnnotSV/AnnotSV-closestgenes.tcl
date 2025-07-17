@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.4.6                                                                                            #
+# AnnotSV 3.5                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -28,15 +28,15 @@ proc closestGenesAnnotation {BreakpointChrom BreakpointPos Side} {
     global g_AnnotSV
     global g_closestGenesLeft
     global g_closestGenesRight
-
     
- 
+    
+    
     if {![info exists g_closestGenesLeft(DONE)]} {
         
         # Creation of "$tmpCLosestLeftFile" with:
         #   SV Left coordinates: "start-5000000bp" "start"
         #   => To find the closest left gene
-		#
+        #
         # Creation of "$tmpCLosestRightFile" with:
         #   SV Right coordinates: "end" "end+5000000bp"
         #   => To find the closest right gene
@@ -77,12 +77,12 @@ proc closestGenesAnnotation {BreakpointChrom BreakpointPos Side} {
         close $f
         WriteTextInFile [join [lsort -unique $L_LinesToWriteLeft] "\n"] $tmpCLosestLeftFile.tmp
         WriteTextInFile [join [lsort -unique $L_LinesToWriteRight] "\n"] $tmpCLosestRightFile.tmp
-
+        
         unset L_LinesToWriteLeft
         unset L_LinesToWriteRight
         
         # Right sorting: $tmpCLosestLeftFile.tmp => ($bashTmpFileLeft) => $tmpCLosestLeftFile
-		#
+        #
         # Intersection with very large files can cause trouble with excessive memory usage.
         # A presort of the bed files by chromosome and then by start position combined with the use of the -sorted option will invoke a memory-efficient algorithm.
         set bashTmpFileLeft "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_[pid]_sort.left.tmp.bash"
@@ -117,12 +117,12 @@ proc closestGenesAnnotation {BreakpointChrom BreakpointPos Side} {
         }
         file delete -force $bashTmpFileRight
         file delete -force $tmpCLosestRightFile.tmp
-
-    
-		# RefSeq or ENSEMBL gene file
-		set genesDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes/$g_AnnotSV(genomeBuild)"
-	    set GenesFileFormatted $genesDir/genes.$g_AnnotSV(tx).sorted.bed
- 
+        
+        
+        # RefSeq or ENSEMBL gene file
+        set genesDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes/$g_AnnotSV(genomeBuild)"
+        set GenesFileFormatted $genesDir/genes.$g_AnnotSV(tx).sorted.bed
+        
         # Intersect Left
         regsub -nocase "(.formatted)?.bed$" $g_AnnotSV(bedFile) ".intersect.closestGenesLeft.bed" tmpIntersectGeneFileLeft
         set tmpIntersectGeneFileLeft "$g_AnnotSV(outputDir)/[file tail $tmpIntersectGeneFileLeft]"
@@ -149,7 +149,7 @@ proc closestGenesAnnotation {BreakpointChrom BreakpointPos Side} {
                 exit 2
             }
         }
- 
+        
         # Loading g_closestGenesLeft($chrom,$pos)
         set f [open $tmpIntersectGeneFileLeft]
         while {![eof $f]} {
@@ -159,63 +159,63 @@ proc closestGenesAnnotation {BreakpointChrom BreakpointPos Side} {
             
             # SV Left coordinates: "chrom" "start-5000000bp" "start"
             set chrom [lindex $Ls 0]
-            set pos [lindex $Ls 2] 
+            set pos [lindex $Ls 2]
             
-			if {![info exists g_closestGenesLeft($chrom,$pos)]} {
-				lappend g_closestGenesLeft($chrom,$pos) [lindex $Ls 7]
-			} else {
-				if {[lsearch -exact $g_closestGenesLeft($chrom,$pos) [lindex $Ls 7]] eq -1} {
-					lappend g_closestGenesLeft($chrom,$pos) [lindex $Ls 7]
-				}
-			}
+            if {![info exists g_closestGenesLeft($chrom,$pos)]} {
+                lappend g_closestGenesLeft($chrom,$pos) [lindex $Ls 7]
+            } else {
+                if {[lsearch -exact $g_closestGenesLeft($chrom,$pos) [lindex $Ls 7]] eq -1} {
+                    lappend g_closestGenesLeft($chrom,$pos) [lindex $Ls 7]
+                }
+            }
         }
         file delete -force $tmpIntersectGeneFileLeft
-
+        
         # Loading g_closestGenesRight($chrom,$pos)
         set f [open $tmpIntersectGeneFileRight]
         while {![eof $f]} {
             set L [gets $f]
             if {$L eq ""} {continue}
             set Ls [split $L "\t"]
-
-	        # SV Right coordinates: "chrom" "end" "end+5000000bp"
+            
+            # SV Right coordinates: "chrom" "end" "end+5000000bp"
             set chrom [lindex $Ls 0]
-            set pos [lindex $Ls 1] 
-
+            set pos [lindex $Ls 1]
+            
             if {![info exists g_closestGenesRight($chrom,$pos)]} {
                 lappend g_closestGenesRight($chrom,$pos) [lindex $Ls 7]
             } else {
- 				if {[lsearch -exact $g_closestGenesRight($chrom,$pos) [lindex $Ls 7]] eq -1} {
-					lappend g_closestGenesRight($chrom,$pos) [lindex $Ls 7]
-				}
-			}
+                if {[lsearch -exact $g_closestGenesRight($chrom,$pos) [lindex $Ls 7]] eq -1} {
+                    lappend g_closestGenesRight($chrom,$pos) [lindex $Ls 7]
+                }
+            }
         }
         file delete -force $tmpIntersectGeneFileRight
-
-
-		# Memorisation done
+        
+        
+        # Memorisation done
         set g_closestGenesLeft(DONE) 1
-
-		# Clean
+        
+        # Clean
         file delete -force $tmpCLosestLeftFile
         file delete -force $tmpCLosestRightFile
-
+        
     }
-   
-	if {$Side eq "left"} { 
-	    if {[info exist g_closestGenesLeft($BreakpointChrom,$BreakpointPos)]} {
-	        return "$g_closestGenesLeft($BreakpointChrom,$BreakpointPos)"
-	    } else {
-	        return ""
-	    }
-	} elseif {$Side eq "right"} {
+    
+    if {$Side eq "left"} {
+        if {[info exist g_closestGenesLeft($BreakpointChrom,$BreakpointPos)]} {
+            return "$g_closestGenesLeft($BreakpointChrom,$BreakpointPos)"
+        } else {
+            return ""
+        }
+    } elseif {$Side eq "right"} {
         if {[info exist g_closestGenesRight($BreakpointChrom,$BreakpointPos)]} {
             return "$g_closestGenesRight($BreakpointChrom,$BreakpointPos)"
         } else {
             return ""
         }
-	} else {
-		return ""
-	}
+    } else {
+        return ""
+    }
 }
 

@@ -11,7 +11,7 @@ The user can add optional sample related information such as the HPO terms to he
 ## Annotations
 AnnotSV compiles functionally, regulatory and clinically **relevant information** and aims at providing annotations useful to i) **interpret SV potential pathogenicity and ii) filter out SV potential false positives.**
 <br />
-These **relevant annotations** are detailed in the [README](../../../README.AnnotSV_3.4.1.pdf).
+These **relevant annotations** are detailed in the [README](../../../README.AnnotSV_3.5.pdf).
 
 ## Phenotype-driven prioritization
 To link the patient's phenotypic data to the already available knowledge for each gene, AnnotSV provide a phenotype driven prioritization module based on the [HPO (Human Phenotype Ontology) dataset](https://pubmed.ncbi.nlm.nih.gov/30476213/).

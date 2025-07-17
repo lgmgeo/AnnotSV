@@ -26,12 +26,12 @@ proc checkNCBIandHGNC {} {
     global g_AnnotSV
     
     # Check the existence of the "$NCBIandHGNCgeneDir/results.txt" file (for Human annotations)
-	# HGNC ID   Approved symbol                   Previous symbols        Alias symbols   NCBI Gene ID
-	# HGNC:5               A1BG                                                                      1
-	# HGNC:37133       A1BG-AS1        NCRNA00181, A1BGAS, A1BG-AS             FLJ23569         503538
-	# HGNC:24086           A1CF  ACF, ASP, ACF64, ACF65, APOBEC1CF                               29974
-	# HGNC:6              A1S9T
-
+    # HGNC ID   Approved symbol                   Previous symbols        Alias symbols   NCBI Gene ID
+    # HGNC:5               A1BG                                                                      1
+    # HGNC:37133       A1BG-AS1        NCRNA00181, A1BGAS, A1BG-AS             FLJ23569         503538
+    # HGNC:24086           A1CF  ACF, ASP, ACF64, ACF65, APOBEC1CF                               29974
+    # HGNC:6              A1S9T
+    
     set NCBIandHGNCgeneDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/NCBIandHGNCgeneID"
     if {![regexp "Human" $g_AnnotSV(organism)]} {
         ## Checked the organism: should be "Human"
@@ -46,25 +46,25 @@ proc checkNCBIandHGNC {} {
         set L_TextToWrite {"genes\tNCBI_gene_ID\tHGNC_gene_ID"}
         foreach L [LinesFromFile "$NCBIandHGNCgeneDir/results.txt"] {
             set Ls [split $L "\t"]
-
+            
             set NCBIgeneID [lindex $Ls 4]
             if {$NCBIgeneID eq "" || [regexp -nocase "NCBI Gene ID" $NCBIgeneID]} {continue}
-
-			set HGNCgeneID [lindex $Ls 0]
-
+            
+            set HGNCgeneID [lindex $Ls 0]
+            
             set ApprovedSymbol [lindex $Ls 1]
             if {$ApprovedSymbol ne "" && ![info exist tmp($ApprovedSymbol)]} {set tmp($ApprovedSymbol) 1; lappend L_TextToWrite "$ApprovedSymbol\t$NCBIgeneID\t$HGNCgeneID"}
-
+            
             regsub -all " " [lindex $Ls 2] "" PreviousSymbol
-			foreach ps [split $PreviousSymbol ","] {
-				if {$ps ne "" && ![info exist tmp($ps)]} {set tmp($ps) 1; lappend L_TextToWrite "$ps\t$NCBIgeneID\t$HGNCgeneID"}
-			}
-
+            foreach ps [split $PreviousSymbol ","] {
+                if {$ps ne "" && ![info exist tmp($ps)]} {set tmp($ps) 1; lappend L_TextToWrite "$ps\t$NCBIgeneID\t$HGNCgeneID"}
+            }
+            
             regsub -all " " [lindex $Ls 3] "" AliasSymbol
             foreach as [split $PreviousSymbol ","] {
                 if {$as ne "" && ![info exist tmp($as)]} {set tmp($as) 1; lappend L_TextToWrite "$as\t$NCBIgeneID\t$HGNCgeneID"}
             }
-		}
+        }
         WriteTextInFile [join $L_TextToWrite "\n"] "$NCBIandHGNCgeneDir/geneSymbol_NCBIandHGNCgeneID.tsv"
     }
     
@@ -81,16 +81,16 @@ proc searchforNCBIGeneID {geneName} {
         
         set NCBIandHGNCgeneDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/NCBIandHGNCgeneID"
         # Header:
-	    # HGNC ID   Approved symbol                   Previous symbols        Alias symbols   NCBI Gene ID
-	    # HGNC:5               A1BG                                                                      1
-	    # HGNC:37133       A1BG-AS1        NCRNA00181, A1BGAS, A1BG-AS             FLJ23569         503538
-	    # HGNC:24086           A1CF  ACF, ASP, ACF64, ACF65, APOBEC1CF                               29974
-	    # HGNC:6              A1S9T
+        # HGNC ID   Approved symbol                   Previous symbols        Alias symbols   NCBI Gene ID
+        # HGNC:5               A1BG                                                                      1
+        # HGNC:37133       A1BG-AS1        NCRNA00181, A1BGAS, A1BG-AS             FLJ23569         503538
+        # HGNC:24086           A1CF  ACF, ASP, ACF64, ACF65, APOBEC1CF                               29974
+        # HGNC:6              A1S9T
         foreach L [LinesFromFile "$NCBIandHGNCgeneDir/results.txt"] {
             set Ls [split $L "\t"]
             if {[regexp "Approved symbol" $L]} {
                 set i_approuved [lsearch -exact $Ls "Approved symbol"]
-                set i_ncbi [lsearch -exact $Ls "NCBI gene ID"]
+                set i_ncbi [lsearch -exact $Ls "NCBI Gene ID"]
                 set i_previous [lsearch -exact $Ls "Previous symbol"]
                 set i_alias [lsearch -exact $Ls "Alias symbol"]
                 continue
@@ -115,5 +115,4 @@ proc searchforNCBIGeneID {geneName} {
     
     return $geneID($geneName)
 }
-
 

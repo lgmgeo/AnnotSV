@@ -1,0 +1,5 @@
+
+$ANNOTSV/bin/AnnotSV -SVinputFile test1.bed -outputFile ./test1.annotated.tsv -svtBEDcol 4 -genomeBuild GRCh37 -vcf 1
+
+$ANNOTSV/bin/AnnotSV -SVinputFile test2.vcf -outputFile ./test2.annotated.tsv -genomeBuild GRCh37 -vcf 1
+

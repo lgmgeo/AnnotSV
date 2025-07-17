@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.4.6                                                                                            #
+# AnnotSV 3.5                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -23,15 +23,15 @@
 
 proc warningRankingMessage {L_header field} {
     global g_AnnotSV
-
-	if {$g_AnnotSV(organism) eq "Human"} {
-	    puts "WARNING: \"$field\" annotation is missing:"
-	    puts "******************************************"
-	    puts "$L_header"
-	    puts "******************************************"
-	    puts "         => No ranking provided\n"
-	}
-	return
+    
+    if {$g_AnnotSV(organism) eq "Human"} {
+        puts "WARNING: \"$field\" annotation is missing:"
+        puts "******************************************"
+        puts "$L_header"
+        puts "******************************************"
+        puts "         => No ranking provided\n"
+    }
+    return
 }
 
 
@@ -300,10 +300,10 @@ proc SVrankingLoss {L_annotations} {
                     # 2E-4. ...>=1 exon deleted AND no established pathogenic snv/indel have been reported in the observed CNV AND variant removes > 10% of protein (+0.20)
                     lappend g_rankingExplanations($AnnotSV_ID,2E-4) "$gene"
                 }
-            } 
-        } 
-
-		# Evaluation of the 2H criteria
+            }
+        }
+        
+        # Evaluation of the 2H criteria
         set pLI        [lindex $Ls $g_i(pLI)]
         regsub -all "," $pLI "." pLI
         set loeuf      [lindex $Ls $g_i(loeuf)]
@@ -313,7 +313,7 @@ proc SVrankingLoss {L_annotations} {
         set i 0
         if {$pLI >= 0.9} {incr i}
         if {$HIpercent <= 10} {incr i}
-
+        
         if {$i >= 2} {
             # 2H. Two or more HI predictors suggest that AT LEAST ONE gene in the interval is HI (+0.15)
             lappend g_rankingExplanations($AnnotSV_ID,2H) "$gene"
@@ -356,7 +356,7 @@ proc achieveSVrankingLoss {AnnotSV_ID} {
     #   (the "0" scores are evaluated in a second time)
     
     # 4O: Skip to section 5 if either your CNV overlapped with a pathogenic Loss SV in section 2
- 
+    
     if {[info exists g_rankingExplanations($AnnotSV_ID,2A)]} {
         # 2A
         set g_rankingScore($AnnotSV_ID) [expr {$g_rankingScore($AnnotSV_ID)+1.00}]

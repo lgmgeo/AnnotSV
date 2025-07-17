@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.4.6                                                                                            #
+# AnnotSV 3.5                                                                                              #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -82,11 +82,11 @@ proc checkClinGenFile {} {
             set gene [lindex $Ls $i_gene]
             set HI [lindex $Ls $i_HI]
             set TS [lindex $Ls $i_TS]
-
-			# To avoir redundancy for genes (CSF2RA and VAMP7) presents on chrom X AND chrom Y
-			if {[info exists seen($gene)]} {continue}
-			set seen($gene) 1
-
+            
+            # To avoir redundancy for genes (CSF2RA and VAMP7) presents on chrom X AND chrom Y
+            if {[info exists seen($gene)]} {continue}
+            set seen($gene) 1
+            
             if {$HI eq "Not yet evaluated"} {set HI ""}
             if {$TS eq "Not yet evaluated"} {set TS ""}
             

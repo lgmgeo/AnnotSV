@@ -39,12 +39,13 @@ command_Tcl.tcl >& command_Tcl.log
 - 680 Mb
 
 ## AnnotSV 3.0 (2020/12/18)
-- 152804
+- 152804 Ko
 
 ## AnnotSV 3.1 (2021/10/26)
-- 179724
+- 179724 Ko
 
-##AnnotSV 3.2 (2022/12/13)
+## AnnotSV 3.2 (2022/12/13)
 - 283884 Ko
 
-
+## AnnotSV 3.5 (2025/07/17)
+- 481472 Ko
