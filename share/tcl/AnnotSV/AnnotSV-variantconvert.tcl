@@ -110,17 +110,18 @@ proc checkVariantconvertConfigfile {} {
         
         # => Can be done during the installation with the Makefile (if the python environment is OK)
         set currentDir [pwd]
+        set flagFile "$g_AnnotSV(variantconvertDir)/pipinstall.flag"
         catch {
-            if {![file exists $g_AnnotSV(variantconvertDir)/pipinstall.flag]} {
+            if {![file exists $flagFile] || ![regexp -nocase "Successfully installed variantconvert" [ContentFromFile $flagFile]]} {
                 cd $g_AnnotSV(variantconvertDir)
                 if {[catch {exec pip3 install -e .}]} {
                     if {[catch {exec pip install -e .} Message]} {
-                        WriteTextInFile "$Message" $g_AnnotSV(variantconvertDir)/pipinstall.flag
+                        WriteTextInFile "$Message" $flagFile
                     } else {
-                        WriteTextInFile "Done" $g_AnnotSV(variantconvertDir)/pipinstall.flag
+                        WriteTextInFile "Done" $flagFile
                     }
                 } else {
-                    WriteTextInFile "Done" $g_AnnotSV(variantconvertDir)/pipinstall.flag
+                    WriteTextInFile "Done" $flagFile
                 }
             }
         }
