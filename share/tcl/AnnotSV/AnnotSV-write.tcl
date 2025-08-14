@@ -532,7 +532,9 @@ proc OrganizeAnnotation {} {
     ########################################################################
     ################### Parse the "FullAndSplitBedFile" ####################
     ########################################################################
-    
+   
+	# FullAndSplitBedFile: Coordinates 0-based!!!
+ 
     set f [open "$FullAndSplitBedFile"]
     
     while {! [eof $f]} {
@@ -1176,8 +1178,9 @@ proc OrganizeAnnotation {} {
         regsub -all "\[ .():;\]" $SVtype "_" SVtypeTmp
         set AnnotSV_ID [settingOfTheAnnotSVID "${SVchrom}_${SVstart}_${SVend}_$SVtypeTmp" "$ref" "$alt"]
         
+        # FullAndSplitBedFile: Coordinates 0-based!!!
         # Report of the SV length
-        #set SVlength [expr {$SVend-$SVstart}] ; # No! Wrong for an insertion, a BND or a translocation
+        # set SVlength [expr {$SVend-$SVstart}] ; # No! Wrong for an insertion, a BND or a translocation
         if {[info exists g_SVLEN($AnnotSV_ID)]} {
             set SVlength $g_SVLEN($AnnotSV_ID)
         } else {
@@ -1185,9 +1188,9 @@ proc OrganizeAnnotation {} {
             if {![info exist VCFheader]} {
                 # SVinputFile = BED
                 if {[regexp "DEL" $svtypenorm]} { ;# DEL
-                    set SVlength [expr {$SVstart-$SVend+1}]
+                    set SVlength [expr {$SVstart-$SVend}]
                 } elseif {[regexp "DUP|INV" $svtypenorm]} { ;# DUP or INV
-                    set SVlength [expr {$SVend-$SVstart-1}]
+                    set SVlength [expr {$SVend-$SVstart}]
                 } elseif {[regexp "TRA" $svtypenorm]} { ;# TRA
                     set SVlength 0
                     set g_SVLEN($AnnotSV_ID) 0

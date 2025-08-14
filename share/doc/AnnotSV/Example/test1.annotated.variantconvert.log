@@ -1,7 +1,7 @@
 python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/variantconvert convert -i /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/doc/AnnotSV/Example/test1.annotated.tsv -o /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/doc/AnnotSV/Example/test1.annotated.vcf -c /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/variantconvert/configs/GRCh37/annotsv3_from_bed.combined.local.json
 
-2025-07-15 14:42:27 [INFO] running variantconvert 2.0.1
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '[1.0 '.' 2.0 '.' '.' 1.0 '.' 9.0 '.' '.' '.' '.' '.' '.' '.' '.' '.' 2.0
+2025-08-05 09:47:16 [INFO] running variantconvert 2.0.1
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '[1.0 '.' 2.0 '.' '.' 1.0 '.' 9.0 '.' '.' '.' '.' '.' '.' '.' '.' '.' 2.0
  '.' '.' 1.0 '.' 1.0 '.' 1.0 '.' 2.0 '.' '.' 0.0 26.0 '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' 17.0 '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
@@ -33,7 +33,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  '.' '.' '.' '.' '.' '.' '.' '.' '.' 6.0 '.' '.' '.' '.' '.' '.' 1.0 '.'
  9.0 '.' '.' '.' '.' '.' '.' '.' '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' 1.0 '.' 6.0 3.0 '.' 2.0 '.' 1.0 2.0 2.0 2.0 3.0 1.0 1.0 1.0 1.0 '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' 1.0 '.' 6.0 3.0 '.' 2.0 '.' 1.0 2.0 2.0 2.0 3.0 1.0 1.0 1.0 1.0 '.'
  5.0 2.0 '.' 5.0 '.' 5.0 '.' 1.0 '.' 1.0 2.0 '.' '.' 1.0 1.0 2.0 2.0 1.0
  2.0 1.0 1.0 1.0 1.0 2.0 1.0 2.0 2.0 1.0 1.0 2.0 4.0 1.0 1.0 1.0 1.0 1.0
  1.0 1.0 3.0 '.' 1.0 2.0 2.0 1.0 2.0 1.0 1.0 1.0 1.0 2.0 1.0 2.0 2.0 1.0
@@ -65,7 +65,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  1.0 1.0 1.0 3.0 4.0 3.0 1.0 4.0 4.0 '.' 3.0 1.0 1.0 1.0 2.0 3.0 '.' 4.0
  '.' 2.0 3.0 4.0 1.0 5.0 3.0 7.0 1.0 1.0]' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' 149194105.0 '.' 196743969.0 196788860.0 '.' 248753787.0 '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' 149194105.0 '.' 196743969.0 196788860.0 '.' 248753787.0 '.'
  46992020.0 47083456.0 47096453.0 47133334.0 47157988.0 47177206.0
  47192907.0 47379719.0 47590260.0 '.' 66278105.0 66288095.0 '.' 63952692.0
  '.' 63952692.0 '.' 22847807.0 '.' 73945188.0 74003846.0 '.' '.'
@@ -147,7 +147,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  140739967.0 '.' 53205458.0 53262057.0 53401069.0 53432604.0 53449821.0
  53458208.0 53559056.0 53583183.0 53584152.0]' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' 149194269.0 '.' 196764537.0 196801319.0 '.' 248761001.0 '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' 149194269.0 '.' 196764537.0 196801319.0 '.' 248761001.0 '.'
  47007881.0 47088320.0 47151400.0 47133898.0 47173994.0 47181688.0
  47213477.0 47421238.0 47640844.0 '.' 66301069.0 66313519.0 '.' 64062273.0
  '.' 64062273.0 '.' 22951948.0 '.' 74025651.0 74010500.0 '.' '.'
@@ -229,7 +229,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  141467843.0 '.' 53254389.0 53350548.0 53449603.0 53432697.0 53458063.0
  53461317.0 53713664.0 53583302.0 53584235.0]' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' 164.0 '.' 8306.0 10442.0 '.' 7214.0 '.' 15861.0 4864.0 54947.0 564.0
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' 164.0 '.' 8306.0 10442.0 '.' 7214.0 '.' 15861.0 4864.0 54947.0 564.0
  16006.0 4482.0 20570.0 41519.0 735.0 '.' 1759.0 752.0 '.' 109581.0 '.'
  109581.0 '.' 104141.0 '.' 20673.0 6654.0 '.' '.' 8815.0 97785.0 10021.0
  13353.0 86684.0 75.0 30943.0 82.0 52867.0 46560.0 8226.0 2476.0 31407.0
@@ -286,7 +286,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  683.0 1041.0 50365.0 7021.0 '.' 26435.0 '.' 3736.0 88491.0 48534.0 93.0
  8242.0 3109.0 154608.0 119.0 83.0]' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' 0.0 '.' 563.0 607.0 '.' 939.0 '.' 1449.0 1128.0 0.0 0.0 984.0 0.0 0.0
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' 0.0 '.' 563.0 607.0 '.' 939.0 '.' 1449.0 1128.0 0.0 0.0 984.0 0.0 0.0
  0.0 0.0 '.' 238.0 0.0 '.' 2277.0 '.' 2277.0 '.' 0.0 '.' 0.0 1266.0 '.'
  '.' 0.0 0.0 2175.0 0.0 0.0 0.0 1635.0 0.0 0.0 0.0 0.0 0.0 1635.0 0.0 0.0
  0.0 942.0 951.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 2007.0 '.' 0.0 2175.0 0.0 0.0
@@ -330,7 +330,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  0.0 0.0 1041.0 1503.0 333.0 '.' 0.0 '.' 150.0 4467.0 3702.0 0.0 1140.0
  786.0 13125.0 0.0 0.0]' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' 0.0 '.' 56.0 61.0 '.' 97.0 '.' 100.0 73.0 0.0 0.0 100.0 0.0 0.0 0.0
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' 0.0 '.' 56.0 61.0 '.' 97.0 '.' 100.0 73.0 0.0 0.0 100.0 0.0 0.0 0.0
  0.0 '.' 13.0 0.0 '.' 100.0 '.' 100.0 '.' 0.0 '.' 0.0 100.0 '.' '.' 0.0
  0.0 100.0 0.0 0.0 0.0 100.0 0.0 0.0 0.0 0.0 0.0 100.0 0.0 0.0 0.0 95.0
  100.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 100.0 '.' 0.0 100.0 0.0 0.0 0.0 100.0
@@ -371,7 +371,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  100.0 100.0 100.0 '.' 0.0 '.' 3.0 100.0 100.0 0.0 100.0 100.0 100.0 0.0
  0.0]' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' 1.0 '.' 6.0 6.0 '.' 2.0 '.' 4.0 2.0 4.0 1.0 12.0 3.0 8.0 7.0 5.0 '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' 1.0 '.' 6.0 6.0 '.' 2.0 '.' 4.0 2.0 4.0 1.0 12.0 3.0 8.0 7.0 5.0 '.'
  17.0 5.0 '.' 22.0 '.' 22.0 '.' 5.0 '.' 18.0 3.0 '.' '.' 6.0 26.0 11.0
  18.0 3.0 1.0 11.0 1.0 5.0 4.0 1.0 1.0 11.0 8.0 3.0 9.0 1.0 1.0 1.0 2.0
  2.0 1.0 3.0 1.0 18.0 9.0 '.' 26.0 11.0 18.0 3.0 1.0 11.0 1.0 5.0 4.0 1.0
@@ -405,7 +405,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  '.' 6.0 1.0 2.0 1.0 4.0 5.0 '.' 23.0 '.' 26.0 15.0 25.0 1.0 8.0 6.0 84.0
  1.0 1.0]' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' 1114.0 327.0 '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' 53.0
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' 1114.0 327.0 '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' 53.0
  '.' 0.0 90.0 '.' '.' '.' '.' '.' '.' '.' 3130.0 '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
@@ -438,7 +438,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  '.' '.' '.' '.' 412.0 '.' 124.0 '.' '.' '.' '.' '.' '.' 1187.0 '.' 555.0
  '.' '.' '.' '.' '.' '.' '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' 149194105.0 '.' 196756231.0 196788860.0 '.' 248753787.0 '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' 149194105.0 '.' 196756231.0 196788860.0 '.' 248753787.0 '.'
  46992020.0 47083456.0 47096453.0 47133334.0 47157988.0 47177206.0
  47192907.0 47379719.0 47590260.0 '.' 66287088.0 66288095.0 '.' 63952692.0
  '.' 63952692.0 '.' 22847807.0 '.' 74001651.0 74003846.0 '.' '.'
@@ -520,7 +520,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  141035363.0 '.' 53250653.0 53262057.0 53401069.0 53432604.0 53449821.0
  53458208.0 53559056.0 53583183.0 53584152.0]' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' 149194269.0 '.' 196764537.0 196799302.0 '.' 248761001.0 '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' 149194269.0 '.' 196764537.0 196799302.0 '.' 248761001.0 '.'
  47007881.0 47088320.0 47151400.0 47133898.0 47173994.0 47181688.0
  47213477.0 47421238.0 47590995.0 '.' 66288847.0 66288847.0 '.' 64062273.0
  '.' 64062273.0 '.' 22951948.0 '.' 74022324.0 74010500.0 '.' '.'
@@ -602,7 +602,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  141061798.0 '.' 53254389.0 53350548.0 53449603.0 53432697.0 53458063.0
  53461317.0 53713664.0 53583302.0 53584235.0]' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
@@ -634,7 +634,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
@@ -666,7 +666,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
@@ -698,7 +698,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
@@ -730,7 +730,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' 14.0
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' 14.0
  14.0 7.0 1.0 1.0 1.0 1.0 '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
@@ -763,7 +763,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  '.' '.' '.' '.' '.' '.' '.' '.' '.' 277.0 6.0 136.0 118.0 '.' '.' 4.0
  13.0 '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '[0.08 0.08 0.1822 0.1822 0.1822 '.' '.' 0.11 0.9544 0.11 0.11 0.9544 0.11
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '[0.08 0.08 0.1822 0.1822 0.1822 '.' '.' 0.11 0.9544 0.11 0.11 0.9544 0.11
  0.11 0.11 0.11 0.11 '.' '.' '.' '.' 0.0257 '.' 0.0257 '.' 0.02 0.1799
  0.1799 0.1799 0.0828 0.15 0.39 0.39 0.39 0.39 0.39 0.39 0.39 0.39 0.39
  0.39 0.39 0.39 0.39 0.39 0.39 0.39 0.4271 0.4271 0.4271 0.4271 0.4271
@@ -803,7 +803,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  0.2355 0.2355 0.2355 0.2355 0.2355 0.2355 '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '[0.3041 0.3041 0.4486 0.4486 0.4486 0.2767 0.2767 0.026 0.026 0.026 0.026
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '[0.3041 0.3041 0.4486 0.4486 0.4486 0.2767 0.2767 0.026 0.026 0.026 0.026
  0.026 0.04 0.04 0.04 0.026 0.0318 '.' '.' '.' '.' 0.01 '.' 0.01 '.'
  0.0107 0.8135 0.8135 0.8135 0.2438 0.1 0.271 0.271 0.271 0.271 0.271
  0.271 0.271 0.271 0.271 0.271 0.13 0.13 0.13 0.13 0.13 0.13 0.13 0.13
@@ -844,7 +844,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  0.2237 0.3262 0.5182 '.' '.' '.' '.' '.' '.' '.' 0.01 0.01 '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
@@ -876,7 +876,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
@@ -908,7 +908,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
@@ -940,7 +940,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '[0.4999 0.4999 0.3095 0.3095 0.3095 0.4394 0.4394 0.0179 0.0179 0.0179
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '[0.4999 0.4999 0.3095 0.3095 0.3095 0.4394 0.4394 0.0179 0.0179 0.0179
  0.0179 0.0179 0.0179 0.0179 0.0179 0.0179 0.0179 0.432 0.432 0.432 0.107
  0.107 0.107 0.107 '.' '.' 0.0264 0.0264 0.0264 '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
@@ -985,7 +985,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' 0.128 0.128 0.128 0.128 0.128 0.128 0.128 0.128 0.128 0.128]' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
@@ -1017,7 +1017,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
@@ -1049,7 +1049,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
@@ -1081,7 +1081,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
@@ -1113,7 +1113,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '[0.455 '.' 0.35 '.' '.' 0.305 '.' 0.415 '.' '.' '.' '.' '.' '.' '.' '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '[0.455 '.' 0.35 '.' '.' 0.305 '.' 0.415 '.' '.' '.' '.' '.' '.' '.' '.'
  '.' 0.565 '.' '.' 0.53 '.' 0.53 '.' 0.25 '.' 0.42 '.' '.' 0.355 0.38 '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' 0.31 '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
@@ -1146,7 +1146,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  '.' '.' '.' 0.41 '.' '.' '.' '.' '.' '.' 0.535 '.' 0.42 '.' '.' '.' '.'
  '.' '.' '.' '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '[0.44 '.' 0.285 '.' '.' 0.33 '.' 0.5 '.' '.' '.' '.' '.' '.' '.' '.' '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '[0.44 '.' 0.285 '.' '.' 0.33 '.' 0.5 '.' '.' '.' '.' '.' '.' '.' '.' '.'
  0.545 '.' '.' 0.43 '.' 0.43 '.' 0.39 '.' 0.38 '.' '.' 0.425 0.455 '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' 0.275 '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
@@ -1179,7 +1179,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  '.' 0.33 '.' '.' '.' '.' '.' '.' 0.38 '.' 0.295 '.' '.' '.' '.' '.' '.'
  '.' '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
@@ -1211,7 +1211,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
@@ -1243,7 +1243,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
@@ -1275,7 +1275,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
@@ -1307,7 +1307,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' 0.0 '.' '.' '.' '.' '.' '.' 30.0
  3.0 3.0 3.0 3.0 '.' '.' 0.0 0.0 '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
@@ -1339,7 +1339,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' 0.0 '.' '.' '.' '.' '.' '.' 0.0
  '.' 0.0 0.0 0.0 '.' '.' 0.0 0.0 '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' 98.26 98.26 92.58 92.08 92.08 89.5 82.54 66.73 '.' '.' 75.66 89.5
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' 98.26 98.26 92.58 92.08 92.08 89.5 82.54 66.73 '.' '.' 75.66 89.5
  '.' '.' '.' 67.28 40.7 67.28 81.13 81.13 81.13 81.13 '.' '.' 85.75 85.75
  79.11 '.' 93.81 '.' '.' 93.81 '.' '.' '.' 92.58 '.' '.' '.' '.' '.' 91.86
  '.' '.' '.' 76.23 75.33 '.' '.' '.' '.' '.' '.' '.' 93.48 93.81 '.' 93.81
@@ -1379,7 +1379,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  '.' 78.38 15.18 47.62 53.39 53.39 75.6 11.71 26.16 14.23 '.' 75.6 21.63
  10.58 '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  -0.648300458519823 -0.648300458519823 -1.23986898178133 '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
@@ -1446,7 +1446,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  0.107633755409335 0.107633755409335 '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  0.663432885116562 0.663432885116562 0.616417349113344 '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
@@ -1514,7 +1514,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  0.400234098889925 -1.97676981971355 -1.97676981971355 '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  0.155145712015149 0.155145712015149 -0.188374414893838 '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
@@ -1582,7 +1582,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  0.586548999968454 -1.34878674017516 -1.34878674017516 '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' 1.07662990621103 0.6684477327677 1.07662990621103
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' 1.07662990621103 0.6684477327677 1.07662990621103
  0.553342166544692 0.553342166544692 -2.98697085794417 -3.10473776124822
  -2.98697085794417 '.' '.' '.' '.' '.' '.' '.' 0.635599914039232
  0.0819191978639822 0.635599914039232 1.02618176351368 1.02618176351368
@@ -1668,7 +1668,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  0.807946261414963 -1.20041549946446 -0.257046228208263 -0.112682658348456
  '.' 0.80408198011521 0.807946261414963 -1.65771922174252 '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' 1.30887789301822 0.697024247535932 1.30887789301822
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' 1.30887789301822 0.697024247535932 1.30887789301822
  -0.565086620797697 -0.565086620797697 -2.90416172871297 -3.32991530871711
  -2.90416172871297 '.' '.' '.' '.' '.' '.' '.' 1.04727080312339
  0.0377121632347663 1.04727080312339 1.66555804568279 1.66555804568279
@@ -1751,7 +1751,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  9.03470791370173 5.44441583895939 4.55717824142058 6.67845368195785 '.'
  0.293719819544616 2.17074250392365 9.03470791370173 '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' 101954269.0 '.' 10878.0 3078.0 '.' 127069.0 '.' 9721.0 5540.0
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' 101954269.0 '.' 10878.0 3078.0 '.' 127069.0 '.' 9721.0 5540.0
  643650.0 728643.0 728113.0 100132929.0 653259.0 439965.0 100996567.0 '.'
  582.0 254359.0 '.' 283417.0 '.' 283417.0 '.' 105370401.0 '.' 399671.0
  641371.0 '.' '.' 646096.0 283755.0 727832.0 729786.0 606.0 100422949.0
@@ -1817,7 +1817,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  105375847.0 4342.0 5324.0 79145.0 '.' 83696.0 '.' 8242.0 23096.0 8243.0
  102465516.0 158787.0 3028.0 10075.0 407054.0 406889.0]' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' 8.0 8.0 8.0 9.0 9.0 8.0 8.0 8.0 '.' '.' 9.0 '.' '.' '.' '.' 5.0
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' 8.0 8.0 8.0 9.0 9.0 8.0 8.0 8.0 '.' '.' 9.0 '.' '.' '.' '.' 5.0
  5.0 7.0 4.0 4.0 4.0 4.0 '.' '.' 6.0 6.0 8.0 '.' 8.0 '.' '.' 8.0 '.' '.'
  '.' 8.0 '.' '.' '.' '.' '.' 9.0 '.' '.' '.' 9.0 9.0 '.' '.' '.' '.' '.'
  '.' '.' 8.0 8.0 '.' 8.0 '.' '.' '.' 8.0 '.' '.' '.' '.' '.' 9.0 '.' '.'
@@ -1849,7 +1849,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  '.' '.' 9.0 8.0 9.0 9.0 9.0 '.' 9.0 0.0 5.0 '.' '.' 3.0 0.0 6.0 3.0 3.0
  0.0 0.0 0.0 0.0 '.' 1.0 1.0 0.0 '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' 2.6297e-08 1.72e-11 2.6297e-08 0.00065559 0.00065559 0.33439
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' 2.6297e-08 1.72e-11 2.6297e-08 0.00065559 0.00065559 0.33439
  3.8557e-06 8.2144e-07 '.' '.' 0.33439 '.' '.' '.' '.' 0.0004208
  3.4063e-12 0.0004208 1.0936e-13 1.0936e-13 1.0936e-13 1.0936e-13 '.' '.'
  6.4141e-05 1.3711e-29 6.4141e-05 '.' 0.35277 '.' '.'
@@ -1904,7 +1904,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  0.020686 '.' '.' 0.58928 0.99532 0.034885 2.2898e-14 2.2898e-14 1.0 1.0
  0.99998 1.0 '.' 0.983 0.93604 1.0 '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' 0.00090932 1.219e-05 0.00090932 0.00015575 0.00015575 0.00029629
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['.' '.' 0.00090932 1.219e-05 0.00090932 0.00015575 0.00015575 0.00029629
  0.00029629 6.116e-09 '.' '.' '.' '.' '.' '.' '.' 0.0061403 1.7787e-07
  0.0061403 7.0294e-05 7.0294e-05 7.0294e-05 7.0294e-05 '.' '.' 0.035999
  6.2323e-17 0.035999 '.' 0.57189 '.' '.' 0.086864 '.' '.' '.' 0.57189 '.'
@@ -1955,7 +1955,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  0.38798 5.7604e-06 5.7604e-06 1.0 0.99784 0.97539 0.99999 '.' 0.96626
  0.88687 1.0 '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '[-1.0 '.' 1.0 '.' '.' -1.0 '.' -1.0 '.' '.' '.' '.' '.' '.' '.' '.' '.'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '[-1.0 '.' 1.0 '.' '.' -1.0 '.' -1.0 '.' '.' '.' '.' '.' '.' '.' '.' '.'
  0.9 '.' '.' 1.0 '.' 0.0 '.' -1.0 '.' -1.0 '.' '.' -1.6 -1.0 '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' -1.0 '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
@@ -1987,7 +1987,7 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' 1.0 '.' '.' '.' '.' '.'
  '.' -1.0 '.' 1.0 '.' '.' '.' '.' '.' '.' '.' '.' '.']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, df.columns != sample_col] = df.loc[:, df.columns != sample_col].fillna(".")
-/PROGS/EXTERN/AnnotSV/AnnotSV_3.4.4/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:60: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA'
+/PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:60: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA'
  'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA'
  'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA'
  'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA'
@@ -2028,4 +2028,4 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA'
  'NA' 'NA' 'NA' 'NA']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, sample_col] = df.loc[:, sample_col].fillna("NA")
-2025-07-15 14:42:27 [INFO] variantconvert finished.
+2025-08-05 09:47:17 [INFO] variantconvert finished.
