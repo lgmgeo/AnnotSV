@@ -115,32 +115,13 @@ install-variantconvert:
 	git clone https://github.com/SamuelNicaise/variantconvert.git $(DESTDIR)$(PYTHONDIR)/variantconvert/
 	touch $(VC_FLAG)
 	chmod 777 $(VC_FLAG)
-	pip3 install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. &> ./tmp.variantconvert.txt || pip install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. &> ./tmp.variantconvert.txt || rm -f $(VC_FLAG)
-	rm -f ./tmp.variantconvert.txt
+	pip3 install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. &> ./tmp.variantconvert.txt || pip install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. &>> ./tmp.variantconvert.txt || python -m pip install -e ./share/python3/variantconvert/. &>> ./tmp.variantconvert.txt || rm -f $(VC_FLAG)
 	@if [ -f $(VC_FLAG) ]; then \
 		echo "variantconvert installed"; \
+		$(CHMOD) ./tmp.variantconvert.txt \
+		rm -f ./tmp.variantconvert.txt \
+		$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs; \
 		$(MV) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/hs1 $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/CHM13; \
-		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/CHM13/annotsv3_from_bed.combined.local.json; \
-		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/CHM13/annotsv3_from_bed.full.local.json; \
-		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/CHM13/annotsv3_from_bed.fullsplit.local.json; \
-		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/CHM13/annotsv3_from_vcf.combined.local.json; \
-		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/CHM13/annotsv3_from_vcf.full.local.json; \
-		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/CHM13/annotsv3_from_vcf.fullsplit.local.json; \
-		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_bed.combined.local.json; \
-		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_bed.full.local.json; \
-		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_bed.fullsplit.local.json; \
-		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_vcf.combined.local.json; \
-		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_vcf.full.local.json; \
-		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_from_vcf.fullsplit.local.json; \
-		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_bed.combined.local.json; \
-		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_bed.full.local.json; \
-		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_bed.fullsplit.local.json; \
-		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_vcf.combined.local.json; \
-		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_vcf.full.local.json; \
-		touch $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_from_vcf.fullsplit.local.json; \
-		$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/CHM13/annotsv3_*.local.json; \
-		$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh37/annotsv3_*.local.json; \
-		$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/GRCh38/annotsv3_*.local.json; \
 		for f in $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/CHM13/annotsv*; do \
 			case "$$f" in \
 				*.local.json) ;; \
