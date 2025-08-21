@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.5                                                                                              #
+# AnnotSV 3.5.1                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -40,7 +40,9 @@ TCLDIR               := $(SHAREDIR)/$(TCLVERSION)
 PYTHONDIR            := $(SHAREDIR)/python3
 ANNOTSV              := AnnotSV
 JARDIR               := $(SHAREDIR)/$(ANNOTSV)/jar
-VERSION              := 3.5
+VERSION              := 3.5.1
+HUMANVERSION         := 3.5
+MOUSEVERSION         := 3.4.2
 RM                   := /bin/rm
 RMDIR                := /bin/rmdir
 MKDIR                := install -d
@@ -164,12 +166,12 @@ install-done:
 # make install_organism_annotations
 install-all-annotations: install-human-annotation install-mouse-annotation                                     
 
-install-human-annotation: Annotations_Human_$(VERSION).tar.gz install-exomiser
+install-human-annotation: Annotations_Human_$(HUMANVERSION).tar.gz install-exomiser
 	@echo ""
 	@echo "Installation of human annotation:"
 	@echo ""
-	tar -xf Annotations_Human_$(VERSION).tar.gz -C $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/
-	$(RM) -rf Annotations_Human_$(VERSION).tar.gz
+	tar -xf Annotations_Human_$(HUMANVERSION).tar.gz -C $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/
+	$(RM) -rf Annotations_Human_$(HUMANVERSION).tar.gz
 	$(CHMOD) $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_*
 	@echo ""
 	@echo "--> Human annotation installed"
@@ -194,13 +196,13 @@ install-exomiser-3:
 	@echo ""
 	@echo "--> Exomiser data installed"
 
-install-mouse-annotation: Annotations_Mouse_$(VERSION).tar.gz 
+install-mouse-annotation: Annotations_Mouse_$(MOUSEVERSION).tar.gz 
 	@echo ""
 	@echo "Installation of mouse annotation:"
 	@echo ""
 	$(MKDIR) $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/
-	tar -xf Annotations_Mouse_$(VERSION).tar.gz -C $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/
-	$(RM) -rf Annotations_Mouse_$(VERSION).tar.gz
+	tar -xf Annotations_Mouse_$(MOUSEVERSION).tar.gz -C $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/
+	$(RM) -rf Annotations_Mouse_$(MOUSEVERSION).tar.gz
 	@echo ""
 	@echo "--> Mouse annotation installed"
 
