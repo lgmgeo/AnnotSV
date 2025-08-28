@@ -1,0 +1,33 @@
+cd $ANNOTSV/tests/data/test_37_SVLEN
+
+
+# SV can be described:
+# - in different file format (VCF, BED)
+# - with different notations 
+#
+# Categories:
+#############
+
+- VCF: <INS> (symbolic SV allele <=> angle-bracketed notation)
+
+- VCF: <DEL>, <INV>, <DUP>, <CN0>... (symbolic SV allele, other than INS <=> angle-bracketed notation)
+	input-angle-bracketed-del.vcf
+	input-angle-bracketed-dup.vcf
+	input-angle-bracketed-inv.vcf
+	input-angle-bracketed-tra.vcf
+
+- VCF: square-bracketed notation
+	input-square-bracketed-del.vcf
+	input-square-bracketed-dup.vcf
+	input-square-bracketed-ins_by_gridss.vcf
+	input-square-bracketed-inv.vcf
+	input-square-bracketed-tra.vcf
+
+- VCF: REF=A ALT=ATTCGTT
+
+- BED: CHROM POS END ... (0-based notation)
+	input-del.bed
+	input-dup.bed
+	input-ins_by_gridss.bed
+	input-inv.bed
+	input-tra.bed
