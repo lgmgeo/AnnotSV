@@ -307,6 +307,10 @@ proc checkEAfiles {} {
 ##   - GeneHancer_elements.txt
 ##   - GeneHancer_gene_associations_scores.txt
 ##   - GeneHancer_hg19.txt
+##   Or:
+##   - GeneHancer_AnnotSV_elements_v5.25.txt
+##   - GeneHancer_AnnotSV_gene_associations_scores_v5.25.txt (association w/ or w/o "s")
+##   - GeneHancer_AnnotSV_hg19_v5.25.txt
 ##
 ## - Check and create if necessary:
 ##   - GH_RefSeq_GRCh37.sorted.bed
@@ -338,9 +342,9 @@ proc checkGHfiles {} {
     ## Check if GH file has been downloaded and unzipped
     ####################################################
     # Checks if the unzipped GH files exist:
-    set GHelementsF "$regElementsDir/GeneHancer_elements.txt" ;# GRCh38
-    set GHassociationsF "$regElementsDir/GeneHancer_gene_associations_scores.txt" ;# genes
-    set GHhg19F "$regElementsDir/GeneHancer_hg19.txt" ;# GRCh37
+    set GHelementsF [lindex [glob -no complain "$regElementsDir/GeneHancer*elements*.txt"] end];# GRCh38
+    set GHassociationsF [lindex [glob -nocomplain "$regElementsDir/GeneHancer*gene_association*_scores*.txt"] end] ;# genes
+    set GHhg19F [lindex [glob -nocomplain "$regElementsDir/GeneHancer*hg19*.txt"] end];# GRCh37
     foreach GHfile "$GHelementsF $GHassociationsF $GHhg19F" {
         if {![file exists $GHfile]} {
             if {$g_AnnotSV(organism) eq "Human"} {
