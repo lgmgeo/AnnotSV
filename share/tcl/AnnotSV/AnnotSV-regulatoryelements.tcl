@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.5.1                                                                                            #
+# AnnotSV 3.5.2                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -342,9 +342,12 @@ proc checkGHfiles {} {
     ## Check if GH file has been downloaded and unzipped
     ####################################################
     # Checks if the unzipped GH files exist:
-    set GHelementsF [lindex [glob -no complain "$regElementsDir/GeneHancer*elements*.txt"] end];# GRCh38
-    set GHassociationsF [lindex [glob -nocomplain "$regElementsDir/GeneHancer*gene_association*_scores*.txt"] end] ;# genes
-    set GHhg19F [lindex [glob -nocomplain "$regElementsDir/GeneHancer*hg19*.txt"] end];# GRCh37
+    set GHelementsF [glob -no complain "$regElementsDir/GeneHancer*elements*.txt"] ;# GRCh38
+    set GHelementsF [expr {[llength $GHelementsF] > 0 ? [lindex $GHelementsF end] : "no_file_exists"}]
+    set GHassociationsF [glob -nocomplain "$regElementsDir/GeneHancer*gene_association*_scores*.txt"] ;# genes
+    set GHassociationsF [expr {[llength $GHassociationsF] > 0 ? [lindex $GHassociationsF end] : "no_file_exists"}]
+    set GHhg19F [glob -nocomplain "$regElementsDir/GeneHancer*hg19*.txt"] ;# GRCh37
+    set GHhg19F [expr {[llength $GHhg19F] > 0 ? [lindex $GHhg19F end] : "no_file_exists"}]
     foreach GHfile "$GHelementsF $GHassociationsF $GHhg19F" {
         if {![file exists $GHfile]} {
             if {$g_AnnotSV(organism) eq "Human"} {
