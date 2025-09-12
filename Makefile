@@ -250,6 +250,7 @@ uninstall1:
 	$(RM) -rf $(DESTDIR)$(PREFIX)/Scoring_Criteria_AnnotSV_*.xlsx
 	$(RM) -rf $(DESTDIR)$(PREFIX)/.git
 	$(RM) -rf $(DESTDIR)$(PREFIX)/.gitignore
+	$(RM) -rf $(DESTDIR)$(PREFIX)/tmp.variantconvert.txt
 
 uninstall2:
 	$(RMDIR) --ignore-fail-on-non-empty $(DESTDIR)$(BINDIR) $(DESTDIR)$(BASHDIR) $(DESTDIR)$(TCLDIR) $(DESTDIR)$(PYTHONDIR) $(DESTDIR)$(DOCDIR) $(DESTDIR)$(SHAREDIR) $(DESTDIR)$(ETCDIR) $(DESTDIR)$(TESTSDIR)
