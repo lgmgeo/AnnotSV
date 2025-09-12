@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.5.2                                                                                            #
+# AnnotSV 3.5.3                                                                                            #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
@@ -10,6 +10,9 @@
 
 For more details, please see the README file.
 
+
+September, 12, 2025, AnnotSV version 3.5.3
+	- Improvments of the INSTALL_annotations.sh file to be version-controlled (issue 296)
 
 August, 29, 2025, AnnotSV version 3.5.2
 	- Improvements in the GeneHancer section (several sources authorized for the downloaded files)
