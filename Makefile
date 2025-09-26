@@ -56,6 +56,8 @@ PROPERTIES           := etc/$(ANNOTSV)/application.properties
 BASH_SCRIPTS         := $(shell find share/bash/$(ANNOTSV)/ -name '*.bash' 2> /dev/null)
 DOCUMENTATIONS       := $(shell find License.txt changeLog.txt commandLineOptions.txt README.AnnotSV_*.pdf 2> /dev/null)
 VC_FLAG              := $(DESTDIR)$(PYTHONDIR)/variantconvert/pipinstall.flag
+VC_VERSION           := 2.0.1
+VC_CONFIGDIR         := $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs
 
 
 # make install
@@ -114,27 +116,38 @@ install-variantconvert:
 	@echo ""
 	@echo "variantconvert installation"
 	@echo "---------------------------"
-	git clone https://github.com/SamuelNicaise/variantconvert.git $(DESTDIR)$(PYTHONDIR)/variantconvert/
+	git clone --branch $(VC_VERSION) https://github.com/SamuelNicaise/variantconvert.git $(DESTDIR)$(PYTHONDIR)/variantconvert/
 	touch $(VC_FLAG)
 	chmod 777 $(VC_FLAG)
-	pip3 install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. &> ./tmp.variantconvert.txt || pip install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. &>> ./tmp.variantconvert.txt || python -m pip install -e ./share/python3/variantconvert/. &>> ./tmp.variantconvert.txt || rm -f $(VC_FLAG)
+	pip3 install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. > ./tmp.variantconvert.txt 2>&1 \
+	|| pip install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. >> ./tmp.variantconvert.txt 2>&1 \
+	|| python -m pip install -e ./share/python3/variantconvert/. >> ./tmp.variantconvert.txt 2>&1 \
+	|| rm -f $(VC_FLAG)
 	@if [ -f $(VC_FLAG) ]; then \
 		echo "variantconvert installed"; \
 		$(CHMOD) ./tmp.variantconvert.txt; \
 		rm -f ./tmp.variantconvert.txt; \
-		$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs; \
-		$(MV) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/hs1 $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/CHM13; \
-		for f in $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/CHM13/annotsv*; do \
+		$(CHMOD) $(VC_CONFIGDIR); \
+		$(MV) $(VC_CONFIGDIR)/hs1 $(VC_CONFIGDIR)/CHM13; \
+		for f in $(VC_CONFIGDIR)/CHM13/annotsv*; do \
 			case "$$f" in \
-				*.local.json) ;; \
-				*) \
+				*.json) \
 					sed -i 's/"##contig=<ID=chr/"##contig=<ID=/g' "$$f" ;; \
 			esac; \
+		done; \
+		# Creation of the "*.local.json" files for Conda use. \
+		for genome in GRCh37 GRCh38 CHM13; do \
+			for source in bed vcf; do \
+				for type in combined full fullsplit; do \
+					echo "touch $(VC_CONFIGDIR)/$$genome/annotsv3_from_$$source.$$type.local.json" ; \
+					touch $(VC_CONFIGDIR)/$$genome/annotsv3_from_$$source.$$type.local.json; \
+					$(CHMOD) $(VC_CONFIGDIR)/$$genome/annotsv3_from_$$source.$$type.local.json; \
+				done; \
+			done; \
 		done; \
 	else \
 		echo "variantconvert not installed"; \
 	fi
-
 
 install-bash-toolbox: $(BASH_SCRIPTS)
 	@echo ""

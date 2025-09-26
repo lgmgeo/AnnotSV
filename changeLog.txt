@@ -11,6 +11,9 @@
 For more details, please see the README file.
 
 
+
+	-Add bugfix in the Makefile for Conda and variantconvert users
+
 September, 12, 2025, AnnotSV version 3.5.3
 	- Improvments of the INSTALL_annotations.sh file to be version-controlled (issue 296)
 
