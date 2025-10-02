@@ -189,8 +189,7 @@ install-exomiser-1: 2406_phenotype.zip
 	$(RM) exomiser-rest-prioritiser-14.1.0.jar
 
 install-exomiser-2:
-	install -p -m 0755 $(PROPERTIES) $(DESTDIR)$(ETCDIR)/$(ANNOTSV)
-	$(CPDIR) share/AnnotSV/jar/ $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/
+	install -D -p -m 0755 $(PROPERTIES) $(DESTDIR)$(ETCDIR)/$(ANNOTSV)
 
 install-exomiser-3:
 	@echo ""
