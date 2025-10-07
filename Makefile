@@ -35,7 +35,7 @@ DOCDIR               := $(SHAREDIR)/doc
 BASHDIR              := $(SHAREDIR)/bash
 TESTSDIR             := $(PREFIX)/tests
 TCLVERSION           := tcl$(shell echo 'puts $${tcl_version};exit 0' | tclsh)
-TCLDIRDISTRIBUTED    := share/tcl
+TCLDIRDISTRIBUTED    := $(SHAREDIR)/tcl
 TCLDIR               := $(SHAREDIR)/$(TCLVERSION)
 PYTHONDIR            := $(SHAREDIR)/python3
 ANNOTSV              := AnnotSV
@@ -50,10 +50,10 @@ MV                   := /bin/mv
 CP                   := install -p -m 0644
 CPDIR                := /bin/cp -r
 CHMOD                := /bin/chmod -R 777
-CONFIGFILE           := etc/$(ANNOTSV)/configfile
+CONFIGFILE           := $(ETCDIR)/$(ANNOTSV)/configfile
 MAKEFILE             := Makefile
-PROPERTIES           := etc/$(ANNOTSV)/application.properties
-BASH_SCRIPTS         := $(shell find share/bash/$(ANNOTSV)/ -name '*.bash' 2> /dev/null)
+PROPERTIES           := $(ETCDIR)/$(ANNOTSV)/application.properties
+BASH_SCRIPTS         := $(shell find $(BASHDIR)/$(ANNOTSV)/ -name '*.bash' 2> /dev/null)
 DOCUMENTATIONS       := $(shell find License.txt changeLog.txt commandLineOptions.txt README.AnnotSV_*.pdf 2> /dev/null)
 VC_FLAG              := $(DESTDIR)$(PYTHONDIR)/variantconvert/pipinstall.flag
 VC_VERSION           := 2.0.1
@@ -110,7 +110,7 @@ install-tcl-toolbox:
 	@echo "Tcl scripts installation"
 	@echo "------------------------"
 	$(MKDIR) $(DESTDIR)$(TCLDIR)/$(ANNOTSV)
-	cd share/tcl ; tar cf - $(ANNOTSV) | tar xf - -C $(DESTDIR)$(TCLDIR)/
+	cd $(SHAREDIR)/tcl ; tar cf - $(ANNOTSV) | tar xf - -C $(DESTDIR)$(TCLDIR)/
 
 install-variantconvert:
 	@echo ""
@@ -121,7 +121,7 @@ install-variantconvert:
 	chmod 777 $(VC_FLAG)
 	pip3 install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. > ./tmp.variantconvert.txt 2>&1 \
 	|| pip install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. >> ./tmp.variantconvert.txt 2>&1 \
-	|| python -m pip install -e ./share/python3/variantconvert/. >> ./tmp.variantconvert.txt 2>&1 \
+	|| python -m pip install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. >> ./tmp.variantconvert.txt 2>&1 \
 	|| rm -f $(VC_FLAG)
 	@if [ -f $(VC_FLAG) ]; then \
 		echo "variantconvert installed"; \
@@ -163,7 +163,7 @@ install-doc: $(DOCUMENTATIONS)
 	$(MKDIR) $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
 	$(CP) $^ $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
 
-install-others-doc: share/doc/$(ANNOTSV)/Example
+install-others-doc: $(DESTDIR)$(DOCDIR)/$(ANNOTSV)/Example
 	$(CPDIR) $^ $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
 
 install-done: 
