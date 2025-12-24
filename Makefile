@@ -21,7 +21,7 @@
 # along with this program; If not, see <http://www.gnu.org/licenses/>.                                     #
 ############################################################################################################
 
-SHELL = /usr/bin/bash
+SHELL = /usr/bin/env bash
 
 
 DESTDIR              ?=
@@ -80,8 +80,8 @@ install-display:
 
 install-documentationlight: $(DOCUMENTATIONS)
 	@echo ""
-	$(MV) $^ $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
-	$(MV) $(TCLDIRDISTRIBUTED) $(TCLDIR)
+	$(CP) $^ $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
+	$(CPDIR) $(TCLDIRDISTRIBUTED) $(TCLDIR)
 
 install-configfile: $(CONFIGFILE)
 	@echo ""
@@ -114,6 +114,13 @@ install-variantconvert:
 	@echo ""
 	@echo "variantconvert installation"
 	@echo "---------------------------"
+	
+	@echo "hi"
+	@if [ -d $(DESTDIR)$(PYTHONDIR)/variantconvert ]; then \
+		rm -rf $(DESTDIR)$(PYTHONDIR)/variantconvert; \
+		echo "variantconvert build directory found; purging locally before re-installing." \
+	fi
+		
 	git clone https://github.com/SamuelNicaise/variantconvert.git $(DESTDIR)$(PYTHONDIR)/variantconvert/
 	touch $(VC_FLAG)
 	chmod 777 $(VC_FLAG)
@@ -123,7 +130,7 @@ install-variantconvert:
 		$(CHMOD) ./tmp.variantconvert.txt; \
 		rm -f ./tmp.variantconvert.txt; \
 		$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs; \
-		$(MV) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/hs1 $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/CHM13; \
+		$(CP) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/hs1 $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/CHM13; \
 		for f in $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/CHM13/annotsv*; do \
 			case "$$f" in \
 				*.local.json) ;; \
