@@ -56,7 +56,8 @@ PROPERTIES           := etc/$(ANNOTSV)/application.properties
 BASH_SCRIPTS         := $(shell find share/bash/$(ANNOTSV)/ -name '*.bash' 2> /dev/null)
 DOCUMENTATIONS       := $(shell find License.txt changeLog.txt commandLineOptions.txt README.AnnotSV_*.pdf 2> /dev/null)
 VC_FLAG              := $(DESTDIR)$(PYTHONDIR)/variantconvert/pipinstall.flag
-
+USEANNODIR           := #flag whether separate annotation resources directory needed (e.g. for HPC environvment)
+EXRP_FILE            := #optional filepath for previously downloaded rest-prioritiser
 
 # make install
 .PHONY: install
@@ -115,10 +116,9 @@ install-variantconvert:
 	@echo "variantconvert installation"
 	@echo "---------------------------"
 	
-	@echo "hi"
 	@if [ -d $(DESTDIR)$(PYTHONDIR)/variantconvert ]; then \
-		rm -rf $(DESTDIR)$(PYTHONDIR)/variantconvert; \
-		echo "variantconvert build directory found; purging locally before re-installing." \
+		echo "variantconvert directory found; purging locally before re-installing." \
+		rm -rf $(DESTDIR)$(PYTHONDIR)/variantconvert/; \
 	fi
 		
 	git clone https://github.com/SamuelNicaise/variantconvert.git $(DESTDIR)$(PYTHONDIR)/variantconvert/
@@ -173,7 +173,8 @@ install-done:
 # make install_organism_annotations
 install-all-annotations: install-human-annotation install-mouse-annotation                                     
 
-install-human-annotation: Annotations_Human_$(HUMANVERSION).tar.gz install-exomiser
+install-human-annotation: install-exomiser $(if $(USEANNODIR),,Annotations_Human_$(HUMANVERSION).tar.gz)
+ifndef USEANNODIR
 	@echo ""
 	@echo "Installation of human annotation:"
 	@echo ""
@@ -182,18 +183,36 @@ install-human-annotation: Annotations_Human_$(HUMANVERSION).tar.gz install-exomi
 	$(CHMOD) $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_*
 	@echo ""
 	@echo "--> Human annotation installed"
+else
+	@echo ""
+	@echo "Flag for custom annotationDir; skipping local install of human annotations"
+	@echo ""
+endif
 
-install-exomiser-1: 2406_phenotype.zip
+install-exomiser-1: $(if $(USEANNODIR),,2406_phenotype.zip)
 	@echo ""
 	@echo "Installation of Exomiser data:"
 	@echo ""
+	
+ifndef USEANNODIR
 	$(MKDIR) -p $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/2406
 	unzip 2406_phenotype.zip -d $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/Annotations_Exomiser/2406/
 	$(RM) -rf 2406_phenotype.zip
-	curl -C - -LO https://github.com/exomiser/Exomiser/releases/download/14.1.0/exomiser-rest-prioritiser-14.1.0.jar
+else
+	@echo ""
+	@echo "Flag for custom annotationDir; skipped Exomiser phenotypes local installation"
+	@echo ""
+endif
+	
 	$(MKDIR) -p $(DESTDIR)$(JARDIR)
+ifndef EXRP_FILE
+	curl -C - -LO https://github.com/exomiser/Exomiser/releases/download/14.1.0/exomiser-rest-prioritiser-14.1.0.jar
 	install -p -m 0755 exomiser-rest-prioritiser-14.1.0.jar $(DESTDIR)$(JARDIR)/
 	$(RM) exomiser-rest-prioritiser-14.1.0.jar
+else
+	@echo "Custom rest-priotiser path provided; creating symlink"
+	ln -sf $(EXRP_FILE) $(DESTDIR)$(JARDIR)/$(notdir $(EXRP_FILE))
+endif
 
 install-exomiser-2:
 	install -p -m 0755 $(PROPERTIES) $(DESTDIR)$(ETCDIR)/$(ANNOTSV)
@@ -203,15 +222,22 @@ install-exomiser-3:
 	@echo ""
 	@echo "--> Exomiser data installed"
 
-install-mouse-annotation: Annotations_Mouse_$(MOUSEVERSION).tar.gz 
+install-mouse-annotation: $(if $(USEANNODIR),,Annotations_Mouse_$(MOUSEVERSION).tar.gz) 
+ifndef USEANNODIR
 	@echo ""
 	@echo "Installation of mouse annotation:"
-	@echo ""
+	@echo ""	
 	$(MKDIR) $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/
 	tar -xf Annotations_Mouse_$(MOUSEVERSION).tar.gz -C $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/
 	$(RM) -rf Annotations_Mouse_$(MOUSEVERSION).tar.gz
 	@echo ""
 	@echo "--> Mouse annotation installed"
+else
+	@echo ""
+	@echo "Flag for custom annotationDir; skipping local install of mouse annotations"
+	@echo ""
+endif
+
 
 Annotations_%.tar.gz:
 	@echo ""
