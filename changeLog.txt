@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.5.3                                                                                            #
+# AnnotSV 3.5.4                                                                                            #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
@@ -11,8 +11,8 @@
 For more details, please see the README file.
 
 
-
-	-Add bugfix in the Makefile for Conda and variantconvert users
+February, 27, 2026 AnnotSV version 3.5.4
+	- Improvements of the Makefile (by Bradford Powell)
 
 September, 12, 2025, AnnotSV version 3.5.3
 	- Improvments of the INSTALL_annotations.sh file to be version-controlled (issue 296)
