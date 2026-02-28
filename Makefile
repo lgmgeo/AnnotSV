@@ -117,7 +117,7 @@ install-variantconvert:
 	@echo "---------------------------"
 	
 	@if [ -d $(DESTDIR)$(PYTHONDIR)/variantconvert ]; then \
-		echo "variantconvert directory found; purging locally before re-installing." \
+		echo "variantconvert directory found; purging locally before re-installing."; \
 		rm -rf $(DESTDIR)$(PYTHONDIR)/variantconvert/; \
 	fi
 		
