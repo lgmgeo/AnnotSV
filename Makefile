@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.5.3                                                                                            #
+# AnnotSV 3.5.4                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -35,12 +35,12 @@ DOCDIR               := $(SHAREDIR)/doc
 BASHDIR              := $(SHAREDIR)/bash
 TESTSDIR             := $(PREFIX)/tests
 TCLVERSION           := tcl$(shell echo 'puts $${tcl_version};exit 0' | tclsh)
-TCLDIRDISTRIBUTED    := share/tcl
+TCLDIRDISTRIBUTED    := $(SHAREDIR)/tcl
 TCLDIR               := $(SHAREDIR)/$(TCLVERSION)
 PYTHONDIR            := $(SHAREDIR)/python3
 ANNOTSV              := AnnotSV
 JARDIR               := $(SHAREDIR)/$(ANNOTSV)/jar
-VERSION              := 3.5.3
+VERSION              := 3.5.4
 HUMANVERSION         := 3.5
 MOUSEVERSION         := 3.4.2
 RM                   := /bin/rm
@@ -50,12 +50,14 @@ MV                   := /bin/mv
 CP                   := install -p -m 0644
 CPDIR                := /bin/cp -r
 CHMOD                := /bin/chmod -R 777
-CONFIGFILE           := etc/$(ANNOTSV)/configfile
+CONFIGFILE           := $(ETCDIR)/$(ANNOTSV)/configfile
 MAKEFILE             := Makefile
-PROPERTIES           := etc/$(ANNOTSV)/application.properties
-BASH_SCRIPTS         := $(shell find share/bash/$(ANNOTSV)/ -name '*.bash' 2> /dev/null)
+PROPERTIES           := $(ETCDIR)/$(ANNOTSV)/application.properties
+BASH_SCRIPTS         := $(shell find $(BASHDIR)/$(ANNOTSV)/ -name '*.bash' 2> /dev/null)
 DOCUMENTATIONS       := $(shell find License.txt changeLog.txt commandLineOptions.txt README.AnnotSV_*.pdf 2> /dev/null)
 VC_FLAG              := $(DESTDIR)$(PYTHONDIR)/variantconvert/pipinstall.flag
+VC_VERSION           := 2.0.1
+VC_CONFIGDIR         := $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs
 USEANNODIR           := #flag whether separate annotation resources directory needed (e.g. for HPC environvment)
 EXRP_FILE            := #optional filepath for previously downloaded rest-prioritiser
 
@@ -109,7 +111,7 @@ install-tcl-toolbox:
 	@echo "Tcl scripts installation"
 	@echo "------------------------"
 	$(MKDIR) $(DESTDIR)$(TCLDIR)/$(ANNOTSV)
-	cd share/tcl ; tar cf - $(ANNOTSV) | tar xf - -C $(DESTDIR)$(TCLDIR)/
+	cd $(SHAREDIR)/tcl ; tar cf - $(ANNOTSV) | tar xf - -C $(DESTDIR)$(TCLDIR)/
 
 install-variantconvert:
 	@echo ""
@@ -120,28 +122,39 @@ install-variantconvert:
 		echo "variantconvert directory found; purging locally before re-installing."; \
 		rm -rf $(DESTDIR)$(PYTHONDIR)/variantconvert/; \
 	fi
-		
-	git clone https://github.com/SamuelNicaise/variantconvert.git $(DESTDIR)$(PYTHONDIR)/variantconvert/
+	git clone --branch $(VC_VERSION) https://github.com/SamuelNicaise/variantconvert.git $(DESTDIR)$(PYTHONDIR)/variantconvert/
+
 	touch $(VC_FLAG)
 	chmod 777 $(VC_FLAG)
-	pip3 install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. &> ./tmp.variantconvert.txt || pip install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. &>> ./tmp.variantconvert.txt || python -m pip install -e ./share/python3/variantconvert/. &>> ./tmp.variantconvert.txt || rm -f $(VC_FLAG)
+	pip3 install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. > ./tmp.variantconvert.txt 2>&1 \
+	|| pip install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. >> ./tmp.variantconvert.txt 2>&1 \
+	|| python -m pip install -e $(DESTDIR)$(PYTHONDIR)/variantconvert/. >> ./tmp.variantconvert.txt 2>&1 \
+	|| rm -f $(VC_FLAG)
 	@if [ -f $(VC_FLAG) ]; then \
 		echo "variantconvert installed"; \
 		$(CHMOD) ./tmp.variantconvert.txt; \
 		rm -f ./tmp.variantconvert.txt; \
-		$(CHMOD) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs; \
-		$(CP) $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/hs1 $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/CHM13; \
-		for f in $(DESTDIR)$(PYTHONDIR)/variantconvert/src/variantconvert/configs/CHM13/annotsv*; do \
+		$(CHMOD) $(VC_CONFIGDIR); \
+		$(MV) $(VC_CONFIGDIR)/hs1 $(VC_CONFIGDIR)/CHM13; \
+		for f in $(VC_CONFIGDIR)/CHM13/annotsv*; do \
 			case "$$f" in \
-				*.local.json) ;; \
-				*) \
+				*.json) \
 					sed -i 's/"##contig=<ID=chr/"##contig=<ID=/g' "$$f" ;; \
 			esac; \
+		done; \
+		# Creation of the "*.local.json" files for Conda use. \
+		for genome in GRCh37 GRCh38 CHM13; do \
+			for source in bed vcf; do \
+				for type in combined full fullsplit; do \
+					echo "touch $(VC_CONFIGDIR)/$$genome/annotsv3_from_$$source.$$type.local.json" ; \
+					touch $(VC_CONFIGDIR)/$$genome/annotsv3_from_$$source.$$type.local.json; \
+					$(CHMOD) $(VC_CONFIGDIR)/$$genome/annotsv3_from_$$source.$$type.local.json; \
+				done; \
+			done; \
 		done; \
 	else \
 		echo "variantconvert not installed"; \
 	fi
-
 
 install-bash-toolbox: $(BASH_SCRIPTS)
 	@echo ""
@@ -157,7 +170,7 @@ install-doc: $(DOCUMENTATIONS)
 	$(MKDIR) $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
 	$(CP) $^ $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
 
-install-others-doc: share/doc/$(ANNOTSV)/Example
+install-others-doc: $(DESTDIR)$(DOCDIR)/$(ANNOTSV)/Example
 	$(CPDIR) $^ $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
 
 install-done: 
@@ -215,8 +228,7 @@ else
 endif
 
 install-exomiser-2:
-	install -p -m 0755 $(PROPERTIES) $(DESTDIR)$(ETCDIR)/$(ANNOTSV)
-	$(CPDIR) share/AnnotSV/jar/ $(DESTDIR)$(SHAREDIR)/$(ANNOTSV)/
+	install -D -p -m 0755 $(PROPERTIES) $(DESTDIR)$(ETCDIR)/$(ANNOTSV)
 
 install-exomiser-3:
 	@echo ""

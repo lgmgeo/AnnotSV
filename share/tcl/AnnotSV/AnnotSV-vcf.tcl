@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.5.3                                                                                            #
+# AnnotSV 3.5.4                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -423,7 +423,7 @@ proc VCFsToBED {SV_VCFfiles} {
                 continue
             }
             incr i
-            
+           
             if {$VCFheaderNotPresent} {
                 set VCFheaderNotPresent 0
                 puts "ERROR:\n$VCFfile: no VCF header line (prefixed with \"#CHROM\"). Check your VCF."
@@ -617,7 +617,7 @@ proc VCFsToBED {SV_VCFfiles} {
                         set L "$chrom\t$posVCF\t[lindex $Ls 2]\t$ref\t$altVCF\t[join [lrange $Ls 5 6] "\t"]\t$INFOcol\t[join [lrange $Ls 8 end] "\t"]"
                         set Ls [split $L "\t"]
                     }
-                    
+                   
                     if {[string length $baseLeft] > 1 || [string length $baseRight] > 1} {
                         # INS ("first mapped base" is followed by the inserted sequence)
                         ################################################################
@@ -630,8 +630,10 @@ proc VCFsToBED {SV_VCFfiles} {
                         set alt "<INS>"
                         if {$svlen<$g_AnnotSV(SVminSize)} {
                             # it is an indel
+# Bug ici avec cet exemple envoyé par Tatiana par mail
+# chrX    114967277       gridss299bf_21o A       ]chrX:115163566]TCTCATACCA
                             WriteTextInFile "${chrom}_${posVCF}_${end}_${svtype}_${ref}_${altVCF}: variantLength ($svlen) < SVminSize ($g_AnnotSV(SVminSize)) (line $VCFlineNumber)" $unannotatedOutputFile
-                            continue
+							continue
                         }
                     } elseif {$bracketRight eq "]" && $baseRight ne ""} {
                         # DUP ("first mapped base" is NOT contained in the bracket: "N[" or "]N"; REF is after the brackets
