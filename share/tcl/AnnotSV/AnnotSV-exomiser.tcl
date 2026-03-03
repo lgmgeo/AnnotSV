@@ -192,6 +192,7 @@ proc runExomiser {L_Genes L_HPO} {
     }
     regsub "XXXX" $infos "$port" infos
     regsub "YYYY" $infos "$g_AnnotSV(annotationsDir)/Annotations_Exomiser/$hpoVersion" infos
+	regsub "ZZZZ" $infos "$hpoVersion" infos
     WriteTextInFile $infos $applicationPropertiesTmpFile
     
     # Start the REST service

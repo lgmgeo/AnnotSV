@@ -11,6 +11,9 @@
 For more details, please see the README file.
 
 
+March, 03, 2026 AnnotSV version 3.5.5
+	- Improvements of the Makefile (by @drew-sinha)
+
 February, 27, 2026 AnnotSV version 3.5.4
 	- Improvements of the Makefile (by Bradford Powell)
 
