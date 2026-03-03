@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.5.4                                                                                            #
+# AnnotSV 3.5.5                                                                                            #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
@@ -13,9 +13,14 @@ For more details, please see the README file.
 
 March, 03, 2026 AnnotSV version 3.5.5
 	- Improvements of the Makefile (by @drew-sinha)
+		add flag for annotation file download, expose path to rest-prioritiser 
+		Annotations installion script no longer relies on AnnotSV make/install
+		application.properties now has version filled in programmatically
+		Non-destructive install; fix git install to allow repeats (still doesn't install for system apk builds)
 
 February, 27, 2026 AnnotSV version 3.5.4
-	- Improvements of the Makefile (by Bradford Powell)
+	- Improvements of the Makefile (by Bradford Powell @bpow-patch)
+		Update install-exomiser-2 command in Makefile to support PREFIX
 
 September, 12, 2025, AnnotSV version 3.5.3
 	- Improvments of the INSTALL_annotations.sh file to be version-controlled (issue 296)
