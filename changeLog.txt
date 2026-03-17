@@ -10,6 +10,14 @@
 
 For more details, please see the README file.
 
+March, , 2026 AnnotSV version 3.5.6
+	- Add of the "AltBracketRefactor" option
+		Define how AnnotSV handles variants using square-bracket notation in the ALT field:
+			- 1 (default): Refactor bracketed ALT alleles and convert them into canonical SV types 
+			               (e.g. DEL, INS, DUP, INV).
+			- 0: Treat any bracketed ALT allele as a breakend (BND) event.
+	- Add bugfix for the interpretation of square-bracketed DUP fields in the VCF (those containing the start of the duplicated sequence)
+	- Add bugfix in the Makefile for bioconda (issue 307#issuecomment-4054614762)
 
 March, 03, 2026 AnnotSV version 3.5.5
 	- Improvements of the Makefile (by @drew-sinha)

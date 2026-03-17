@@ -4,6 +4,10 @@
 # Installing AnnotSV human annotations in a local directory
 ############################################################
 
+# USAGE:
+########
+# INSTALL_annotations.sh "Version of AnnotSV human annotation" "Version of Exomiser phenotype annotations"
+
 # AIM:
 ######
 # Download Exomiser and AnnotSV annotations to be used with the "-annotationsDir" option
@@ -13,11 +17,8 @@
 # To work with bioconda/docker/singularity, AnnotSV couldn't contain the annotations in the recipe (that would make the recipe very large, which is a bad practice in bioconda)
 # Users need to download the annotation files once and pass the directory to AnnotSV at runtime with the "-annotationsDir" option.
 
-# USAGE:
-########
-# INSTALL_annotations.sh "Version of AnnotSV human annotation" "Version of Exomiser phenotype annotations"
 
-########
+
 
 mkdir AnnotSV_annotations
 cd AnnotSV_annotations
@@ -30,7 +31,7 @@ curl -C - -LO https://www.lbgi.fr/~geoffroy/Annotations/Annotations_Human_$1.tar
 tar -xf Annotations_Human_$1.tar.gz -C ./
 rm -rf Annotations_Human_$1.tar.gz
 
-#Exomiser
+# Exomiser
 echo ""
 echo "Download Exomiser supporting data files:"
 echo ""

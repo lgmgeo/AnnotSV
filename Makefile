@@ -35,7 +35,7 @@ DOCDIR               := $(SHAREDIR)/doc
 BASHDIR              := $(SHAREDIR)/bash
 TESTSDIR             := $(PREFIX)/tests
 TCLVERSION           := tcl$(shell echo 'puts $${tcl_version};exit 0' | tclsh)
-TCLDIRDISTRIBUTED    := $(SHAREDIR)/tcl
+TCLDIRDISTRIBUTED    := share/tcl
 TCLDIR               := $(SHAREDIR)/$(TCLVERSION)
 PYTHONDIR            := $(SHAREDIR)/python3
 ANNOTSV              := AnnotSV
@@ -50,10 +50,10 @@ MV                   := /bin/mv
 CP                   := install -p -m 0644
 CPDIR                := /bin/cp -r
 CHMOD                := /bin/chmod -R 777
-CONFIGFILE           := $(ETCDIR)/$(ANNOTSV)/configfile
+CONFIGFILE           := etc/$(ANNOTSV)/configfile
 MAKEFILE             := Makefile
-PROPERTIES           := $(ETCDIR)/$(ANNOTSV)/application.properties
-BASH_SCRIPTS         := $(shell find $(BASHDIR)/$(ANNOTSV)/ -name '*.bash' 2> /dev/null)
+PROPERTIES           := etc/$(ANNOTSV)/application.properties
+BASH_SCRIPTS         := $(shell find share/bash/$(ANNOTSV)/ -name '*.bash' 2> /dev/null)
 DOCUMENTATIONS       := $(shell find License.txt changeLog.txt commandLineOptions.txt README.AnnotSV_*.pdf 2> /dev/null)
 VC_FLAG              := $(DESTDIR)$(PYTHONDIR)/variantconvert/pipinstall.flag
 VC_VERSION           := 2.0.1
@@ -111,7 +111,7 @@ install-tcl-toolbox:
 	@echo "Tcl scripts installation"
 	@echo "------------------------"
 	$(MKDIR) $(DESTDIR)$(TCLDIR)/$(ANNOTSV)
-	cd $(SHAREDIR)/tcl ; tar cf - $(ANNOTSV) | tar xf - -C $(DESTDIR)$(TCLDIR)/
+	cd $(DESTDIR)$(TCLDIR) ; tar cf - $(ANNOTSV) | tar xf - -C $(DESTDIR)$(TCLDIR)/
 
 install-variantconvert:
 	@echo ""
@@ -170,7 +170,7 @@ install-doc: $(DOCUMENTATIONS)
 	$(MKDIR) $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
 	$(CP) $^ $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
 
-install-others-doc: $(DESTDIR)$(DOCDIR)/$(ANNOTSV)/Example
+install-others-doc: share/doc/$(ANNOTSV)/Example
 	$(CPDIR) $^ $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
 
 install-done: 

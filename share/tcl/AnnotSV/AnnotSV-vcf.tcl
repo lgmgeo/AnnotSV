@@ -522,7 +522,12 @@ proc VCFsToBED {SV_VCFfiles} {
             } elseif {[regexp "(\[acgtnACGTN\]*)(\\\[|\\\])(\[^:\]+):(\[0-9\]+)(\\\[|\\\])(\[acgtnACGTN\]*)" $alt match baseLeft bracketLeft inBracketChrom inBracketStart bracketRight baseRight]} {
                 # Type3: square-bracketed notation ]...]
                 # => Developed with the assistance and guidance of Rodrigo Martin, BSC, Spain
-                
+               
+                if {$g_AnnotSV(altBracketRefactor)} {
+				    #-altBracketRefactor:  Define how AnnotSV handles variants using square-bracket notation in the ALT field:
+			    	#                      1 -> Refactor bracketed ALT alleles and convert them into canonical SV types (e.g. DEL, INS, DUP, INV)
+				    #                      0 -> Treat any bracketed ALT allele as a breakend (BND) event
+
                 # With this bracketed notation, we have 1 line in the VCF for each breakend (=> 2 lines)
                 # => It corresponds to only 1 line in the BED file, except for translocation (where both breakends are annotated)
                 #
@@ -618,8 +623,10 @@ proc VCFsToBED {SV_VCFfiles} {
                         set Ls [split $L "\t"]
                     }
                    
-                    if {[string length $baseLeft] > 1 || [string length $baseRight] > 1} {
-                        # INS ("first mapped base" is followed by the inserted sequence)
+                    if {([string length $baseLeft] > 1 || [string length $baseRight] > 1) && $inBracketStart == [expr {$posVCF+1}]} {
+		                # INS ("first mapped base" is followed by the inserted sequence)
+						# -> number of bases indicated in ALT > 1
+				        # -> END = POS + 1
                         ################################################################
                         # Example:
                         # 13      53040041        ins_by_gridss   T       TATATATATACACAC[13:53040042[	=> Line analysed by AnnotSV
@@ -682,7 +689,11 @@ proc VCFsToBED {SV_VCFfiles} {
                             continue
                         }
                     }
-                }
+                } else {
+					# $g_AnnotSV(altBracketRefactor) = 0
+
+
+				}
             } elseif {[regexp -nocase "^\[acgtnACGTN.*\]+$" $ref$alt]} {
                 # Type1
                 regsub -all "\[*.\]" $ref "" refbis ;# cf GRIDSS comment, just below

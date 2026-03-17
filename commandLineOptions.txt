@@ -6,6 +6,11 @@ COMMAND LINE USAGE
 
 OPTIONS
 
+-altBracketRefactor:           Define how AnnotSV handles variants using square-bracket notation in the ALT field:
+                               - Refactor bracketed ALT alleles and convert them into canonical SV types (e.g. DEL, INS, DUP, INV)
+                               - Treat any bracketed ALT allele as a breakend (BND) event
+                               Values: 1 (default, refactor enabled) or 0 (refactor disabled)
+
 -annotationsDir:                Path of the annotations directory
 
 -annotationMode:                Description of the types of lines produced by AnnotSV
