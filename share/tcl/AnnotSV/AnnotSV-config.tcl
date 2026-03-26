@@ -39,12 +39,13 @@ proc configureAnnotSV {argv} {
     ## Load default options
     #######################
     puts "\t...configuration data by default"
-    set g_AnnotSV(altBracketRefactor)       ""
     set g_AnnotSV(annotationsDir)           ""
     set g_AnnotSV(annotationMode)           "both"
     set g_AnnotSV(bcftools)                 "bcftools"
     set g_AnnotSV(bedtools)                 "bedtools"
     set g_AnnotSV(benignAF)                 "0.01"
+    set g_AnnotSV(bracketedAltMaxSize)      "10"
+    set g_AnnotSV(bracketedAltMode)         "ALL"
     set g_AnnotSV(candidateGenesFile)       ""
     set g_AnnotSV(candidateGenesFiltering)  "0"
     set g_AnnotSV(candidateSnvIndelFiles)   ""
@@ -89,7 +90,7 @@ proc configureAnnotSV {argv} {
     ###########################
     ## Load config file options
     ###########################
-    set lOptionsOk "altBracketRefactor annotationsDir annotationMode bcftools bedtools benignAF candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo includeCI metrics minTotalNumber missingGTinSamplesid outputDir outputFile overlap overwrite promoterSize rankFiltering reciprocal REreport REselect1 REselect2 samplesidBEDcol snvIndelFiles snvIndelPASS snvIndelSamples SVinputFile SVinputInfo SVminSize svtBEDcol tx txFile variantconvertDir variantconvertMode vcf"
+    set lOptionsOk "annotationsDir annotationMode bcftools bedtools benignAF bracketedAltMaxSize bracketedAltMode candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo includeCI metrics minTotalNumber missingGTinSamplesid outputDir outputFile overlap overwrite promoterSize rankFiltering reciprocal REreport REselect1 REselect2 samplesidBEDcol snvIndelFiles snvIndelPASS snvIndelSamples SVinputFile SVinputInfo SVminSize svtBEDcol tx txFile variantconvertDir variantconvertMode vcf"
     
     # Setting of $g_AnnotSV(SVinputFile) from the command line
     set i 0
@@ -218,6 +219,15 @@ proc configureAnnotSV {argv} {
         exit 0
     }
     
+    ## bracketedAltMaxSize: positive float
+    if {![string is double $g_AnnotSV(bracketedAltMaxSize)] || $g_AnnotSV(bracketedAltMaxSize) < 0 } {
+        puts "############################################################################"
+        puts "Bad option value: -bracketedAltMaxSize = $g_AnnotSV(bracketedAltMaxSize)"
+        puts "Should be a positive float, default = 10"
+        puts "############################################################################"
+        exit 2
+    }
+
     ## benignAF: [0.001-0.1], default = 0.01
     if {![string is double $g_AnnotSV(benignAF)] || $g_AnnotSV(benignAF) < 0.001 || $g_AnnotSV(benignAF) > 0.1} {
         puts "############################################################################"
@@ -237,7 +247,7 @@ proc configureAnnotSV {argv} {
     }
     
     ## It must be a boolean: 1 or 0
-    foreach val {altBracketRefactor candidateGenesFiltering includeCI missingGTinSamplesid overwrite reciprocal REreport REselect1 REselect2 SVinputInfo snvIndelPASS vcf} {
+    foreach val {candidateGenesFiltering includeCI missingGTinSamplesid overwrite reciprocal REreport REselect1 REselect2 SVinputInfo snvIndelPASS vcf} {
         if {$g_AnnotSV($val) ne "1" && $g_AnnotSV($val) ne "0"} {
             puts "############################################################################"
             puts "Bad option value: -$val = $g_AnnotSV($val)"

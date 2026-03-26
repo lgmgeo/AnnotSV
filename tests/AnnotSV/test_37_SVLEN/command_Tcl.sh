@@ -229,12 +229,8 @@ $ANNOTSV/bin/AnnotSV -SVinputFile "./input/input-del.bed" -svtBEDcol 5 -outputFi
 # tail -1 ./input/input-del.bed
 # 12      2999    5000    breakend_del_1_a        DEL
 
-# gr breakend_del_ Rodrigo_tests_ignore/output.csv
-# breakend_del_1_a,12,3000,12,5000,T,T[12:5000[,2000,N[,DEL
-
-
 BEDresult=`$cut "./output/category_5_BED-del.annotated.tsv" "SV_length" | tail -1 | awk 'BEGIN{ORS=" "; OFS=" "} { print $1}'`
-if [ "$BEDresult" != "-2000 " ]
+if [ "$BEDresult" != "-2001 " ]
 then
         echo "Error with category_5 (BED del)"
         exit 1
@@ -251,11 +247,8 @@ $ANNOTSV/bin/AnnotSV -SVinputFile "./input/input-dup.bed" -svtBEDcol 5 -outputFi
 # tail -1 ./input/input-dup.bed
 # 2       2999    5000    breakend_dup_a  DUP
 
-# gr breakend_dup_ Rodrigo_tests_ignore/output.csv
-# breakend_dup_a,2,3000,2,5000,T,]2:5000]T,2000,]N,DUP
-
 BEDresult=`$cut "./output/category_5_BED-dup.annotated.tsv" "SV_length" | tail -1 | awk 'BEGIN{ORS=" "; OFS=" "} { print $1 }'`
-if [ "$BEDresult" != "2000 " ]
+if [ "$BEDresult" != "2001 " ]
 then
         echo "Error with category_5 (BED dup)"
         exit 1
@@ -272,10 +265,6 @@ $ANNOTSV/bin/AnnotSV -SVinputFile "./input/input-ins_by_gridss.bed" -svtBEDcol 5
 
 # tail -1 ./input/input-ins_by_gridss.bed
 # 13      53040040        53040041        ns_by_gridss    INS     ATATATATACACAC
-
-# gr ins_by_gridss Rodrigo_tests_ignore/output.csv
-# ins_by_gridss,13,53040041,13,53040041,T,TATATATATACACAC,14,,INS
-
 
 BEDresult=`$cut "./output/category_5_BED-ins_by_gridss.annotated.tsv" "SV_length" | grep -v "full=" | tail -1 | awk 'BEGIN{ORS=" "; OFS=" "} { print $1 }'`
 if [ "$BEDresult" != " " ]
@@ -296,7 +285,7 @@ $ANNOTSV/bin/AnnotSV -SVinputFile "./input/input-inv.bed" -svtBEDcol 5 -outputFi
 # 3       2998    5000    breakend_inv_1_a        INV
 
 BEDresult=`$cut "./output/category_5_BED-inv.annotated.tsv" "SV_length" | tail -1 | awk 'BEGIN{ORS=" "; OFS=" "} { print $1 }'`
-if [ "$BEDresult" != "2001 " ]
+if [ "$BEDresult" != "2002 " ]
 then
         echo "Error with category_5 (BED inv)"
         exit 1

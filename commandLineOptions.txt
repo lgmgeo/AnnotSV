@@ -6,11 +6,6 @@ COMMAND LINE USAGE
 
 OPTIONS
 
--altBracketRefactor:           Define how AnnotSV handles variants using square-bracket notation in the ALT field:
-                               - Refactor bracketed ALT alleles and convert them into canonical SV types (e.g. DEL, INS, DUP, INV)
-                               - Treat any bracketed ALT allele as a breakend (BND) event
-                               Values: 1 (default, refactor enabled) or 0 (refactor disabled)
-
 -annotationsDir:                Path of the annotations directory
 
 -annotationMode:                Description of the types of lines produced by AnnotSV
@@ -22,6 +17,15 @@ OPTIONS
 
 -benignAF:                      Allele frequency threshold to select the benign SV in the data sources
                                 Range values: [0.001-0.1], default = 0.01 (i.e. 1%)	
+
+-bracketedAltMaxSize:           Maximum SV length (Mb) for SVTYPE inference from bracketed ALT values
+                                Values: positive float (default: 10; above 10 Mb, bracketed ALT is treated as BND)
+
+-bracketedAltMode:              Defines how bracketed ALT values in VCF are interpreted:
+                                The SV can be considered as DEL, DUP, INS or INV, or considered as BND (TRA is always reported as BND)
+                                Values: ALL (default, infer all compatible SVTYPE: DEL,DUP,INS,INV)
+                                        BND (treat all bracketed ALT as BND)
+                                        comma-separated SVTYPE values among DEL, DUP, INS or INV (infer only selected SVTYPE; e.g.: "DEL,DUP". Others are treated as BND)
 
 -candidateGenesFile:            Path of a file containing the candidate genes of the user (gene names can be space-separated, tabulation-separated, or line-break-separated)
 

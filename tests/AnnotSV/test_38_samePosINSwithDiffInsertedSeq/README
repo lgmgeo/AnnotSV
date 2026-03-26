@@ -1,0 +1,85 @@
+##############################################################################################
+#
+#                                         INSERTIONS
+#
+##############################################################################################
+
+
+# List of the different "tags/flags" used in the VCF INFO column to specify the inserted sequence
+#################################################################################################
+
+=> INS, INSERTED_SEQUENCE, SVINSSEQ, INSSEQ, SEQ, CONSENSUS
+
+
+# GATK, ANNOVAR
+INS=ACG 
+
+# tools derived from Mutalyzer
+INSERTED_SEQUENCE=ACG
+
+# Manta
+SVINSLEN
+SVINSSEQ
+LEFT_SVINSSEQ
+RIGHT_SVINSSEQ
+
+# DRAGEN (Illumina)
+SVINSSEQ
+SVINSLEN
+
+# Severus
+INSSEQ
+
+# Sniffles2
+SEQ			Sniffles2
+
+# some long-read custom pipelines
+CONSENSUS	consensus sequence de l’insertion
+
+# bcftools
+accept SVINSSEQ
+
+
+
+
+# Tests with 2 INS that have the same position but different SVLENs
+###################################################################
+
+# chr18   1963003 cuteSV.INS.4743 .       <INS>   19      PASS    SVLEN=1512;SVTYPE=INS;CHR2=chr18;END=1963003    GT      0/1
+# chr18   1963003 cuteSV.INS.4744 .       <INS>   50      PASS    SVLEN=51;SVTYPE=INS;CHR2=chr18;END=1963003      GT      0/1
+time $ANNOTSVDEV/bin/AnnotSV -SVinputFile test_INS_1.vcf -outputFile ./output/test_INS_1.annotated.tsv
+
+cut -f 1 ./test_INS_1.annotated.tsv
+AnnotSV_ID
+18_1963003_1963003_INS_1
+18_1963003_1963003_INS_2
+=> Ok
+
+
+# Tests with 2 INS that have the same position but different inserted sequences
+###############################################################################
+
+# chr18   1963003 cuteSV.INS.4743 .       <INS>   19      PASS    SVTYPE=INS;CHR2=chr18;END=1963003;SVINSSEQ=ATGTGTAATGCCGTATGCTTGTAATGCCGTATGCTTGTAATGCCGTATGCTTGAAAACCGT        GT      0/1
+# chr18   1963003 cuteSV.INS.4744 .       <INS>   50      PASS    SVTYPE=INS;CHR2=chr18;END=1963003;SVINSSEQ=ATGCTTGTAATGCCGTATGCTTGTAATGCCGTATGCTTGTAATGCCGTATGCTTGTAATGCCGT     GT      0/1
+time $ANNOTSVDEV/bin/AnnotSV -SVinputFile test_INS_2.vcf -outputFile ./output/test_INS_2.annotated.tsv
+
+cut -f 1 ./test_INS_2.annotated.tsv
+AnnotSV_ID
+18_1963003_1963003_INS_1
+18_1963003_1963003_INS_2
+=> Ok
+
+
+# chr2    79197378        oo      A       AATATGCTTGTAATGCCGTATGCTTGTAATGCCGTATGCTTGTAATGCCGTATGCTTGTAATGCCGT[chr2:79198779[      352     PASS    SVTYPE=BND      GT:FT   0/1:PASS
+# chr2    79197378        pp      A       AATATGCTTGTAATGCCGTATGCTTGTAATGCCGTATGCTTGTAATGCCGTATGCTTGTAATGCCGTTAATGCCGTATGCTTGTAAT[chr2:79198779[  352     PASS    SVTYPE=BND      GT:FT   0/1:PASS
+time $ANNOTSVDEV/bin/AnnotSV -SVinputFile test_INS_3.vcf -outputFile ./output/test_INS_3.annotated.tsv
+
+cut -f 1,16 ./test_INS_3.annotated.tsv | gr full
+2_79197378_79198779_DEL_1       full
+2_79197378_79198779_DEL_2       full
+=> Ok
+
+
+
+
+
