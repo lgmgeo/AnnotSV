@@ -551,7 +551,7 @@ $ANNOTSV/bin/AnnotSV -SVinputFile "./input/input_OnlyTheReciprocalBND_square-bra
 # 12      5000    breakend_del_1_b        T       ]12:3000]T      .       PASS    SVTYPE=BND;EXTRA=DEL_PAIRED;MATEID=breakend_del_1_a;CIPOS=-1,1;CIEND=-5,5       GT      0/0     0/1
 
 squareResult=`$cut "./output/command_13_square-bracketed-del_1.annotated.tsv" "AnnotSV_ID;ID;SV_type;REF;ALT;INFO;ACMG_class" | grep -v "full=" | tail -1 | awk 'BEGIN{ORS=" "; OFS=" "} { print $1, $2, $3, $4, $5, $6, $7}'`
-if [ "$squareResult" != "12_3000_5000_DEL_1 breakend_del_1_b DEL N <DEL> SVTYPE=BND;EXTRA=DEL_PAIRED;MATEID=breakend_del_1_a;CIPOS=-5,5;CIEND=-1,1;BNDrescue 3 " ]
+if [ "$squareResult" != "12_3000_5000_DEL_1 breakend_del_1_b DEL T ]12:3000]T SVTYPE=BND;EXTRA=DEL_PAIRED;MATEID=breakend_del_1_a;CIPOS=-5,5;CIEND=-1,1;BNDrescue 3 " ]
 then
         echo "error 1: Error with command_13 (OnlyTheReciprocalBND_square bad values)"
         exit 1
@@ -577,7 +577,7 @@ $ANNOTSV/bin/AnnotSV -SVinputFile "./input/input_OnlyTheReciprocalBND_square-bra
 # 15      5000    breakend_del_partial_pass_a     T       ]15:3000]T      .       FAIL    SVTYPE=BND;EXTRA=DEL_PAIRED_PARTIAL_PASS;MATEID=breakend_del_partial_pass_b     GT      0/0     0/1
 
 squareResult=`$cut "./output/command_14_square-bracketed-del_partial_pass.annotated.tsv" "AnnotSV_ID;ID;SV_type;REF;ALT;INFO;ACMG_class" | grep -v "full=" | tail -1 | awk 'BEGIN{ORS=" "; OFS=" "} { print $1, $2, $3, $4, $5, $6, $7}'`
-if [ "$squareResult" != "15_3000_5000_DEL_1 breakend_del_partial_pass_a DEL N <DEL> SVTYPE=BND;EXTRA=DEL_PAIRED_PARTIAL_PASS;MATEID=breakend_del_partial_pass_b;BNDrescue 3 " ]
+if [ "$squareResult" != "15_3000_5000_DEL_1 breakend_del_partial_pass_a DEL T ]15:3000]T SVTYPE=BND;EXTRA=DEL_PAIRED_PARTIAL_PASS;MATEID=breakend_del_partial_pass_b;BNDrescue 3 " ]
 then
         echo "error 1: Error with command_14 (OnlyTheReciprocalBND_square bad values)"
         exit 1
@@ -595,7 +595,7 @@ $ANNOTSV/bin/AnnotSV -SVinputFile "./input/input_OnlyTheReciprocalBND_square-bra
 # 22      5000    breakend_del_unordered_b        T       ]22:3000]T      .       PASS    SVTYPE=BND;EXTRA=DEL_PAIRED;MATEID=breakend_del_unordered_a     GT      0/0     0/1
 
 squareResult=`$cut "./output/command_15_square-bracketed-del_unordered.annotated.tsv" "AnnotSV_ID;ID;SV_type;REF;ALT;INFO;ACMG_class" | grep -v "full=" | tail -1 | awk 'BEGIN{ORS=" "; OFS=" "} { print $1, $2, $3, $4, $5, $6, $7}'`
-if [ "$squareResult" != "22_3000_5000_DEL_1 breakend_del_unordered_b DEL N <DEL> SVTYPE=BND;EXTRA=DEL_PAIRED;MATEID=breakend_del_unordered_a;BNDrescue 3 " ]
+if [ "$squareResult" != "22_3000_5000_DEL_1 breakend_del_unordered_b DEL T ]22:3000]T SVTYPE=BND;EXTRA=DEL_PAIRED;MATEID=breakend_del_unordered_a;BNDrescue 3 " ]
 then
         echo "error 1: Error with command_15 (OnlyTheReciprocalBND_square bad values)"
         exit 1
@@ -613,7 +613,7 @@ $ANNOTSV/bin/AnnotSV -SVinputFile "./input/input_OnlyTheReciprocalBND_square-bra
 # 2       5000    breakend_dup_b  T       T[2:3000[       .       PASS    SVTYPE=BND;EXTRA=DUP_PAIRED;MATEID=breakend_dup_a       GT      0/0     0/1
 
 squareResult=`$cut "./output/command_16_square-bracketed-dup.annotated.tsv" "AnnotSV_ID;ID;SV_type;REF;ALT;INFO;ACMG_class" | grep -v "full=" | tail -1 | awk 'BEGIN{ORS=" "; OFS=" "} { print $1, $2, $3, $4, $5, $6, $7}'`
-if [ "$squareResult" != "2_3000_5000_DUP_1 breakend_dup_b DUP N <DUP> SVTYPE=BND;EXTRA=DUP_PAIRED;MATEID=breakend_dup_a;BNDrescue 3 " ]
+if [ "$squareResult" != "2_3000_5000_DUP_1 breakend_dup_b DUP T T[2:3000[ SVTYPE=BND;EXTRA=DUP_PAIRED;MATEID=breakend_dup_a;BNDrescue 3 " ]
 then
         echo "error 1: Error with command_16 (OnlyTheReciprocalBND_square bad values)"
         exit 1
@@ -648,7 +648,7 @@ $ANNOTSV/bin/AnnotSV -SVinputFile "./input/input_OnlyTheReciprocalBND_square-bra
 # 13      53040042        ins_by_gridss   A       ]13:53040041]ATATATATACACACA    .       PASS    SVTYPE=BND;EXTRA=DEL_INS_FROM_GRIDSS    GT      0/0     0/1
 
 squareResult=`$cut "./output/command_18_square-bracketed-ins_by_gridss.annotated.tsv" "AnnotSV_ID;ID;SV_type;REF;ALT;INFO;ACMG_class" | grep -v "full=" | tail -1 | awk 'BEGIN{ORS=" "; OFS=" "} { print $1, $2, $3, $4, $5, $6, $7}'`
-if [ "$squareResult" != "13_53040041_53040041_INS_1 ins_by_gridss INS N <INS> SVTYPE=BND;EXTRA=DEL_INS_FROM_GRIDSS;BNDrescue NA " ]
+if [ "$squareResult" != "13_53040041_53040041_INS_1 ins_by_gridss INS A ]13:53040041]ATATATATACACACA SVTYPE=BND;EXTRA=DEL_INS_FROM_GRIDSS;BNDrescue NA " ]
 then
         echo "error 1: Error with command_18 (OnlyTheReciprocalBND_square bad values)"
         exit 1
@@ -666,7 +666,7 @@ $ANNOTSV/bin/AnnotSV -SVinputFile "./input/input_OnlyTheReciprocalBND_square-bra
 # 3       5000    breakend_inv_1_b        T       [3:2999[T       .       PASS    SVTYPE=BND;EXTRA=INV_PAIRED;MATEID=breakend_inv_1_a     GT    0/0      0/1
 
 squareResult=`$cut "./output/command_19_square-bracketed-inv1.annotated.tsv" "AnnotSV_ID;ID;SV_type;REF;ALT;INFO;ACMG_class" | grep -v "full=" | tail -1 | awk 'BEGIN{ORS=" "; OFS=" "} { print $1, $2, $3, $4, $5, $6, $7}'`
-if [ "$squareResult" != "3_2999_5000_INV_1 breakend_inv_1_b INV N <INV> SVTYPE=BND;EXTRA=INV_PAIRED;MATEID=breakend_inv_1_a;BNDrescue NA " ]
+if [ "$squareResult" != "3_2999_5000_INV_1 breakend_inv_1_b INV T [3:2999[T SVTYPE=BND;EXTRA=INV_PAIRED;MATEID=breakend_inv_1_a;BNDrescue NA " ]
 then
         echo "error 1: Error with command_19 (OnlyTheReciprocalBND_square bad values)"
         exit 1
@@ -684,7 +684,7 @@ $ANNOTSV/bin/AnnotSV -SVinputFile "./input/input_OnlyTheReciprocalBND_square-bra
 # 3       5001    breakend_inv_2_b        T       T]3:3000]       .       PASS    SVTYPE=BND;EXTRA=INV_PAIRED;MATEID=breakend_inv_2_a     GT    0/0      0/1
 
 squareResult=`$cut "./output/command_20_square-bracketed-inv2.annotated.tsv" "AnnotSV_ID;ID;SV_type;REF;ALT;INFO;ACMG_class" | grep -v "full=" | tail -1 | awk 'BEGIN{ORS=" "; OFS=" "} { print $1, $2, $3, $4, $5, $6, $7}'`
-if [ "$squareResult" != "3_3000_5001_INV_1 breakend_inv_2_b INV N <INV> SVTYPE=BND;EXTRA=INV_PAIRED;MATEID=breakend_inv_2_a;BNDrescue NA " ]
+if [ "$squareResult" != "3_3000_5001_INV_1 breakend_inv_2_b INV T T]3:3000] SVTYPE=BND;EXTRA=INV_PAIRED;MATEID=breakend_inv_2_a;BNDrescue NA " ]
 then
         echo "error 1: Error with command_20 (OnlyTheReciprocalBND_square bad values)"
         exit 1
@@ -696,13 +696,13 @@ echo "Command_20 (OnlyTheReciprocalBND_square) OK"
 # command_21: OnlyTheReciprocalBND_square-bracketed-tra1_1
 ##########################################################
 
-$ANNOTSV/bin/AnnotSV -SVinputFile "./input/input_OnlyTheReciprocalBND_square-bracketed-tra1_1.vcf" -outputFile "./output/input_OnlyTheReciprocalBND_square-bracketed-tra1_1.annotated.tsv"
+$ANNOTSV/bin/AnnotSV -SVinputFile "./input/input_OnlyTheReciprocalBND_square-bracketed-tra1_1.vcf" -outputFile "./output/command_21_OnlyTheReciprocalBND_square-bracketed-tra1_1.annotated.tsv"
 
 # tail -1 ./input/input_OnlyTheReciprocalBND_square-bracketed-tra1_1.vcf
 # 2       321682  tra_a   T       ]13:123456]T    .       PASS    SVTYPE=BND      GT      0/0     0/1
 
-squareResult=`$cut "./output/input_OnlyTheReciprocalBND_square-bracketed-tra1_1.annotated.tsv" "AnnotSV_ID;ID;SV_type;REF;ALT;INFO;ACMG_class" | grep -v "full=" | tail -2 | awk 'BEGIN{ORS=" "; OFS=" "} { print $1, $2, $3, $4, $5, $6, $7}'`
-if [ "$squareResult" != "13_123456_123456_TRA_1 tra_a TRA N <TRA> SVTYPE=BND;BNDrescue NA 2_321682_321682_TRA_1 tra_a TRA T ]13:123456]T SVTYPE=BND NA " ]
+squareResult=`$cut "./output/command_21_OnlyTheReciprocalBND_square-bracketed-tra1_1.annotated.tsv" "AnnotSV_ID;ID;SV_type;REF;ALT;INFO;ACMG_class" | grep -v "full=" | tail -2 | awk 'BEGIN{ORS=" "; OFS=" "} { print $1, $2, $3, $4, $5, $6, $7}'`
+if [ "$squareResult" != "13_123456_123456_TRA_1 tra_a TRA T ]13:123456]T SVTYPE=BND;BNDrescue NA 2_321682_321682_TRA_1 tra_a TRA T ]13:123456]T SVTYPE=BND NA " ]
 then
         echo "error 1: Error with command_21 (OnlyTheReciprocalBND_square bad values)"
         exit 1
@@ -720,7 +720,7 @@ $ANNOTSV/bin/AnnotSV -SVinputFile "./input/input_OnlyTheReciprocalBND_square-bra
 # 13      123456  tra_b   C       C[2:321682[     .       PASS    SVTYPE=BND      GT      0/0     0/1
 
 squareResult=`$cut "./output/input_OnlyTheReciprocalBND_square-bracketed-tra1_2.annotated.tsv" "AnnotSV_ID;ID;SV_type;REF;ALT;INFO;ACMG_class" | grep -v "full=" | tail -2 | awk 'BEGIN{ORS=" "; OFS=" "} { print $1, $2, $3, $4, $5, $6, $7}'`
-if [ "$squareResult" != "13_123456_123456_TRA_1 tra_b TRA C C[2:321682[ SVTYPE=BND NA 2_321682_321682_TRA_1 tra_b TRA N <TRA> SVTYPE=BND;BNDrescue NA " ]
+if [ "$squareResult" != "13_123456_123456_TRA_1 tra_b TRA C C[2:321682[ SVTYPE=BND NA 2_321682_321682_TRA_1 tra_b TRA C C[2:321682[ SVTYPE=BND;BNDrescue NA " ]
 then
         echo "error 1: Error with command_21 (OnlyTheReciprocalBND_square bad values)"
         exit 1

@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.5.5                                                                                            #
+# AnnotSV 3.5.6                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -40,7 +40,7 @@ TCLDIR               := $(SHAREDIR)/$(TCLVERSION)
 PYTHONDIR            := $(SHAREDIR)/python3
 ANNOTSV              := AnnotSV
 JARDIR               := $(SHAREDIR)/$(ANNOTSV)/jar
-VERSION              := 3.5.5
+VERSION              := 3.5.6
 HUMANVERSION         := 3.5
 MOUSEVERSION         := 3.4.2
 RM                   := /bin/rm
@@ -83,8 +83,12 @@ install-display:
 
 install-documentationlight: $(DOCUMENTATIONS)
 	@echo ""
-	$(CP) $^ $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
-	$(CPDIR) $(TCLDIRDISTRIBUTED) $(TCLDIR)
+	@if [ -n "$^" ]; then \
+	    $(MV) $^ $(DESTDIR)$(DOCDIR)/$(ANNOTSV); \
+	fi
+	@if [ -d "$(TCLDIRDISTRIBUTED)" ]; then \
+		$(MV) "$(TCLDIRDISTRIBUTED)" "$(TCLDIR)"; \
+	fi
 
 install-configfile: $(CONFIGFILE)
 	@echo ""

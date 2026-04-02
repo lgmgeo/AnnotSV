@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.5.5                                                                                            #
+# AnnotSV 3.5.6                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -114,9 +114,15 @@ proc WriteTextInFile {text fichier} {
 ##############################################################################
 
 # INPUT: "${chrom}_${pos}_${end}_${svtype}" "$ref" "$alt"
+# For <INS>: alt = "alt_insertedseq" or "alt_svlen"
+# For <TRA>: alt = "alt_chr2_end"
 proc settingOfTheAnnotSVID {deb ref alt} {
     global g_ID
     global g_deb
+    
+    set result [split [removeREFinBracketedALT $ref $alt] "\t"]
+    set ref [lindex $result 0]
+    set alt [lindex $result 1]
     
     if {![info exists g_ID($deb,$ref,$alt)]} {
         set i 1
@@ -129,50 +135,41 @@ proc settingOfTheAnnotSVID {deb ref alt} {
 }
 
 
-proc replaceREFwithNinALT {alt {svtype ""}} {
-    # Used for square-bracketed SV only.
+# - Remove the REF from the bracketed ALT
+# - Replace "][" with ";"
+proc removeREFinBracketedALT {ref alt} {
+    # Used only for square-bracketed SV:
+    # => because for BND rescue, the REF is replaced by "N".
+    # => a new AnnotSV_ID would be attribute to the BND rescue, even if the 1st BND exists)
+    #
     # Examples:
     # INS: T TAAAA[13:5000[ => N NAAAA[13:5000[
     # INS: T ]13:5000]AAAAT => N ]13:5000]AAAAN
     # DEL: T ]22:3000]A => N ]22:3000]N
     if {[regexp "(\[acgtnACGTN\]*)(\\\[|\\\])(\[^:\]+):(\[0-9\]+)(\\\[|\\\])(\[acgtnACGTN\]*)" $alt match baseLeft bracketLeft inBracketChrom inBracketStart bracketRight baseRight]} {
-        if {$svtype eq "inv"} {
-            # INV
-            # For inversion, the brackets can stay the same ("[" or "]") between the both BND of a pair (or not stay the same):
-            # 3       3000    breakend_inv_3_a        T       [3:5001[T
-            # 3       5001    breakend_inv_3_b        T       [3:3000[T  or  T]3:3000]
-            if {$bracketLeft == "\["} {
-                set bracketLeft "\]"
-                set bracketRight "\]"
-            } else {
-                set bracketLeft "\["
-                set bracketRight "\["
-            }
-            if {$baseRight eq ""} {
-                set baseRight "N"; set baseLeft ""
-            } else {
-                set baseRight ""; set baseLeft "N"
-            }
-        } elseif {[string length $baseLeft] > [string length $baseRight]} {
-            # INS
-            set baseLeft "N[string range $baseLeft 1 end]"
-        } elseif {[string length $baseLeft] < [string length $baseRight]} {
-            # INS
-            set baseRight "[string range $baseRight 0 end-1]N"
+        if {[string length $baseLeft] > 1 } {
+            # INS, keep the inserted seq
+            regsub -nocase "^$ref" $baseLeft "" baseLeft
+        } elseif {[string length $baseRight] > 1} {
+            # INS, keep the inserted seq
+            regsub -nocase "$ref$" $baseRight "" baseRight
         } else {
-            # DEL, DUP, TRA
-            if {$baseLeft ne ""} {
-                set baseLeft "N"
-            } else {
-                set baseRight "N"
-            }
-            
+            # Not INS, remove REF from ALT
+            set baseLeft ""
+            set baseRight ""
         }
         set alt "$baseLeft$bracketLeft${inBracketChrom}:$inBracketStart$bracketRight$baseRight"
+        
+        # L_squBrack_SV_ID_Written (VCFsToBED): lappend add "\" before "]" => we remove all []
+        regsub -all "\\\]|\\\[" "$alt" ";" alt
+        
+        # REF is included in bracketed ALT. No need to compare for AnnotSV_ID (else, bug because REF can be replace by "N" for the BND rescue)
+        set ref ""
     }
     
-    return $alt
+    return "$ref\t$alt"
 }
+
 
 ##############################################################################
 #                          WORKING WITH rsID

@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.5.5                                                                                            #
+# AnnotSV 3.5.6                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -63,8 +63,8 @@ proc checkVariantconvertConfigfile {} {
             set newfullsplitModeLine "\"mode\": \"full\\&split\","
             
             # 1 - AnnotSV install done with the "root" user
-            # 2 - AnnotSV run with "non-root" user 
-			# (or vice versa)
+            # 2 - AnnotSV run with "non-root" user
+            # (or vice versa)
             # => The $localConfigfile can not be created by a non-root user. The "configs" dir should exists with 777 permissions (Done in the Makefile)
             
             # If the user defined a wrong "-annotationsDir" during the first execution of AnnotSV (using the -vcf 1 parameter), the $localConfigfile need to be removed then recomputed.
@@ -112,7 +112,7 @@ proc checkVariantconvertConfigfile {} {
         # => Can be done during the installation with the Makefile (if the python environment is OK)
         set currentDir [pwd]
         set flagFile "$g_AnnotSV(variantconvertDir)/pipinstall.flag"
-		set vcDone 0
+        set vcDone 0
         catch {
             if {![file exists $flagFile] || ![regexp -nocase "Successfully installed variantconvert" [ContentFromFile $flagFile]]} {
                 cd $g_AnnotSV(variantconvertDir)
@@ -121,24 +121,24 @@ proc checkVariantconvertConfigfile {} {
                     WriteTextInFile "\n##############################################\n\n" $flagFile
                     if {[catch {exec pip install -e .} Message]} {
                         WriteTextInFile "$Message" $flagFile
-	                    WriteTextInFile "\n##############################################\n\n" $flagFile
-						if {[catch {exec python -m pip install -e .} Message]} {
-		                    WriteTextInFile "$Message" $flagFile
-							WriteTextInFile "\n##############################################\n\n" $flagFile
-						} else {
-							set vcDone 1
-						}
+                        WriteTextInFile "\n##############################################\n\n" $flagFile
+                        if {[catch {exec python -m pip install -e .} Message]} {
+                            WriteTextInFile "$Message" $flagFile
+                            WriteTextInFile "\n##############################################\n\n" $flagFile
+                        } else {
+                            set vcDone 1
+                        }
                     } else {
-						set vcDone 1
-					}
+                        set vcDone 1
+                    }
                 } else {
-					set vcDone 1
-				}
+                    set vcDone 1
+                }
             }
         }
-		if {$vcDone} {
-			WriteTextInFile "Done" $flagFile
-		}
+        if {$vcDone} {
+            WriteTextInFile "Done" $flagFile
+        }
         cd $currentDir
     }
 }

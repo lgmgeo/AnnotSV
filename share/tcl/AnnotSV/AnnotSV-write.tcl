@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.5.5                                                                                            #
+# AnnotSV 3.5.6                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -40,13 +40,13 @@ proc switchAllCoordinatesFromBEDtoVCFinLine {lineCompleted} {
     # Formate "AnnotSV_ID" and "SV_start"
     # (switch SV start coordinate from BED to VCF format)
     #####################################################
-    regexp "^\[^\t\]+\t\[^\t\]+\t(\[0-9\]+)" $lineCompleted match SVstart
-    set formatedSVstart [expr {$SVstart+1}]
+    regexp "^\[^\t\]+\t\[^\t\]+\t(\[0-9\]+)" $lineCompleted match SVstart_BED
+    set SVstart_VCF [expr {$SVstart_BED+1}]
     
     # Formate "AnnotSV_ID"
     set AnnotSV_ID [lindex $lineCompleted 0]
     set L_AnnotSV_ID [split $AnnotSV_ID "_"]
-    set updated_AnnotSV_ID [lindex $L_AnnotSV_ID 0]_${formatedSVstart}_[lindex $L_AnnotSV_ID 2]_[lindex $L_AnnotSV_ID 3]_[lindex $L_AnnotSV_ID 4]
+    set updated_AnnotSV_ID [lindex $L_AnnotSV_ID 0]_${SVstart_VCF}_[lindex $L_AnnotSV_ID 2]_[lindex $L_AnnotSV_ID 3]_[lindex $L_AnnotSV_ID 4]
     set length_AnnotSV_ID [expr {[string length $AnnotSV_ID]-1}]
     set lineCompleted [string replace $lineCompleted 0 $length_AnnotSV_ID $updated_AnnotSV_ID]
     
@@ -55,10 +55,10 @@ proc switchAllCoordinatesFromBEDtoVCFinLine {lineCompleted} {
     set length_chrom [string length $chrom]
     set length_updated_AnnotSV_ID [string length $updated_AnnotSV_ID]
     set lengthTot [expr {$length_updated_AnnotSV_ID+$length_chrom+1}]
-    if {[regexp -start $lengthTot -indices "$SVstart" $lineCompleted match_indices]} {
+    if {[regexp -start $lengthTot -indices "$SVstart_BED" $lineCompleted match_indices]} {
         set i_start [lindex $match_indices 0]
         set i_end   [lindex $match_indices 1]
-        set lineCompleted [string replace $lineCompleted $i_start $i_end $formatedSVstart]
+        set lineCompleted [string replace $lineCompleted $i_start $i_end $SVstart_VCF]
     }
     
     # Formate all genomic coordinates (e.g.: 2:1235-62531)
@@ -532,9 +532,9 @@ proc OrganizeAnnotation {} {
     ########################################################################
     ################### Parse the "FullAndSplitBedFile" ####################
     ########################################################################
-   
-	# FullAndSplitBedFile: Coordinates 0-based!!!
- 
+    
+    # FullAndSplitBedFile: Coordinates 0-based!!!
+    
     set f [open "$FullAndSplitBedFile"]
     
     while {! [eof $f]} {
@@ -1168,7 +1168,8 @@ proc OrganizeAnnotation {} {
         
         # Insertion of the SV length in the fourth column:
         set SVchrom [lindex $Ls 0]
-        set SVstart [lindex $Ls 1]
+        set SVstart_BED [lindex $Ls 1]
+        set SVstart_VCF [expr {$SVstart_BED+1}]
         set SVend [lindex $Ls 2]
         regsub "chr" [lindex $Ls $i_ref] "" ref
         regsub "chr" [lindex $Ls $i_alt] "" alt
@@ -1176,11 +1177,11 @@ proc OrganizeAnnotation {} {
         # Creation of the AnnotSV ID (chrom_start_end_SVtype_i)
         # (SV_type should not have any space or special car)
         regsub -all "\[ .():;\]" $SVtype "_" SVtypeTmp
-        set AnnotSV_ID [settingOfTheAnnotSVID "${SVchrom}_${SVstart}_${SVend}_$SVtypeTmp" "$ref" "$alt"]
+        set AnnotSV_ID [settingOfTheAnnotSVID "${SVchrom}_${SVstart_VCF}_${SVend}_$SVtypeTmp" "$ref" "$alt"]
         
         # FullAndSplitBedFile: Coordinates 0-based!!!
         # Report of the SV length
-        # set SVlength [expr {$SVend-$SVstart}] ; # No! Wrong for an insertion, a BND or a translocation
+        # set SVlength [expr {$SVend-$SVstart_BED}] ; # No! Wrong for an insertion, a BND or a translocation
         if {[info exists g_SVLEN($AnnotSV_ID)]} {
             set SVlength $g_SVLEN($AnnotSV_ID)
         } else {
@@ -1188,9 +1189,9 @@ proc OrganizeAnnotation {} {
             if {![info exist VCFheader]} {
                 # SVinputFile = BED
                 if {[regexp "DEL" $svtypenorm]} { ;# DEL
-                    set SVlength [expr {$SVstart-$SVend}]
+                    set SVlength [expr {$SVstart_BED-$SVend}]
                 } elseif {[regexp "DUP|INV" $svtypenorm]} { ;# DUP or INV
-                    set SVlength [expr {$SVend-$SVstart}]
+                    set SVlength [expr {$SVend-$SVstart_BED}]
                 } elseif {[regexp "TRA" $svtypenorm]} { ;# TRA
                     set SVlength 0
                     set g_SVLEN($AnnotSV_ID) 0
@@ -1198,9 +1199,9 @@ proc OrganizeAnnotation {} {
             } else {
                 # SVinputFile = VCF
                 if {[regexp "DEL" $svtypenorm]} { ;# DEL
-                    set SVlength [expr {$SVstart-$SVend}]
+                    set SVlength [expr {$SVstart_BED-$SVend}]
                 } elseif {[regexp "DUP|INV" $svtypenorm]} { ;# DUP or INV
-                    set SVlength [expr {$SVend-$SVstart}]
+                    set SVlength [expr {$SVend-$SVstart_BED}]
                 } elseif {[regexp "TRA" $svtypenorm]} { ;# TRA
                     set SVlength 0
                     set g_SVLEN($AnnotSV_ID) 0

@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.5.5                                                                                            #
+# AnnotSV 3.5.6                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -32,6 +32,7 @@
 proc configureAnnotSV {argv} {
     
     global g_AnnotSV
+    global g_rankingCriteria
     
     puts "...downloading the configuration data ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])"
     
@@ -86,6 +87,55 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(variantconvertMode)       "combined"
     set g_AnnotSV(vcf)                      "0"
     
+    set g_rankingCriteria(1A_Loss)         0.00
+    set g_rankingCriteria(1B_Loss)        -0.60
+    set g_rankingCriteria(2A_Loss)         1.00
+    set g_rankingCriteria(2B_Loss)         0.00
+    set g_rankingCriteria(2C-1_Loss)       0.90
+    set g_rankingCriteria(2C-2_Loss)       0.00
+    set g_rankingCriteria(2D-1_Loss)       0.00
+    set g_rankingCriteria(2D-2_Loss)       0.90
+    set g_rankingCriteria(2D-3_Loss)       0.45
+    set g_rankingCriteria(2D-4_Loss)       0.90
+    set g_rankingCriteria(2E-1_Loss)       0.90
+    set g_rankingCriteria(2E-2_Loss)       0.45
+    set g_rankingCriteria(2E-3_Loss)       0.30
+    set g_rankingCriteria(2E-4_Loss)       0.20
+    set g_rankingCriteria(2F-4O_Loss)     -1.00
+    set g_rankingCriteria(2G_Loss)         0.00
+    set g_rankingCriteria(2H_Loss)         0.15
+    set g_rankingCriteria(3A_Loss)         0.00
+    set g_rankingCriteria(3B_Loss)         0.45
+    set g_rankingCriteria(3C_Loss)         0.90
+    set g_rankingCriteria(4O_Loss)        -1.00
+    set g_rankingCriteria(5F_Loss)         0.00
+    set g_rankingCriteria(5G_Loss)         0.10
+    set g_rankingCriteria(5H_Loss)         0.30
+    
+    set g_rankingCriteria(1A_Gain)         0.00
+    set g_rankingCriteria(1B_Gain)        -0.60
+    set g_rankingCriteria(2A_Gain)         1.00
+    set g_rankingCriteria(2B_Gain)         0.00
+    set g_rankingCriteria(2C_Gain)        -1.00
+    set g_rankingCriteria(2D_Gain)        -1.00
+    set g_rankingCriteria(2E_Gain)         0.00
+    set g_rankingCriteria(2F_Gain)        -1.00
+    set g_rankingCriteria(2G_Gain)         0.00
+    set g_rankingCriteria(2H-1_Gain)       0.45
+    set g_rankingCriteria(2H-2_Gain)       0.00
+    set g_rankingCriteria(2I-1_Gain)       0.45
+    set g_rankingCriteria(2I-2_Gain)       0.45
+    set g_rankingCriteria(2I-3_Gain)       0.00
+    set g_rankingCriteria(2J_Gain)         0.00
+    set g_rankingCriteria(2K_Gain)         0.45
+    set g_rankingCriteria(2L_Gain)         0.00
+    set g_rankingCriteria(3A_Gain)         0.00
+    set g_rankingCriteria(3B_Gain)         0.45
+    set g_rankingCriteria(3C_Gain)         0.90
+    set g_rankingCriteria(4O_Gain)         0.00
+    set g_rankingCriteria(5F_Gain)         0.00
+    set g_rankingCriteria(5G_Gain)         0.10
+    set g_rankingCriteria(5H_Gain)         0.15
     
     ###########################
     ## Load config file options
@@ -113,6 +163,7 @@ proc configureAnnotSV {argv} {
     set testColumnNames 0
     foreach L [LinesFromFile $configFile] {
         if {[regexp "^# AnnotSV Output columns:" $L]} {set testColumnNames 1}
+        if {[regexp "^# AnnotSV ranking criteria:" $L]} {set testColumnNames 2}
         if {[regexp "^#" $L]} {continue}
         if {$L eq ""} {continue}
         if { ! $testColumnNames} {
@@ -128,15 +179,19 @@ proc configureAnnotSV {argv} {
                 puts "############################################################################"
                 puts "\"$optionName\" option not known."
                 puts "For more information on the arguments, please use the -help option"
-                puts "############################################################################"
+                puts "####################################
+                ########################################"
                 exit 2
             }
-        } else {
+        } elseif {$testColumnNames eq 1} {
             # Reading the configfile column names (not the options)
             # - Users can select only a subset of the annotation columns provided by AnnotSV
             # - Essential annotations are added below (at the end of the proc)
             regsub "( |\t|\\*)+$" $L "" L
             lappend g_AnnotSV(outputColHeader) $L
+        } elseif {$testColumnNames eq 2} {
+            # Reading the weights for the ranking criteria
+            set g_rankingCriteria([lindex $L 0]) [lindex $L 1]
         }
     }
     
@@ -227,7 +282,7 @@ proc configureAnnotSV {argv} {
         puts "############################################################################"
         exit 2
     }
-
+    
     ## benignAF: [0.001-0.1], default = 0.01
     if {![string is double $g_AnnotSV(benignAF)] || $g_AnnotSV(benignAF) < 0.001 || $g_AnnotSV(benignAF) > 0.1} {
         puts "############################################################################"

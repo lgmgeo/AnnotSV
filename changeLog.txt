@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.5.5                                                                                            #
+# AnnotSV 3.5.6                                                                                            #
 #                                                                                                          #
 # An integrated tool for Structural Variations annotation                                                  #
 #                                                                                                          #
@@ -10,7 +10,8 @@
 
 For more details, please see the README file.
 
-March, , 2026 AnnotSV version 3.5.6
+April, 02, 2026 AnnotSV version 3.5.6
+	- Allow to customize the weights of AnnotSV ranking criteria in the configfile
 	- Add of the "bracketedAltMode" option
 		Defines how bracketed ALT values in VCF are interpreted:
 			The SV can be considered as DEL, DUP, INS or INV, or considered as BND (TRA is always reported as BND)
