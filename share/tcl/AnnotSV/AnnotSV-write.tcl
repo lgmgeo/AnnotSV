@@ -94,7 +94,6 @@ proc OrganizeAnnotation {} {
     set FullAndSplitBedFile "$g_AnnotSV(outputDir)/$g_AnnotSV(outputFile).tmp" ;# created in AnnotSV-genes.tcl
     set outputFile "$g_AnnotSV(outputDir)/$g_AnnotSV(outputFile)"
     
-    
     #########################################################################################
     ################### Writing of the header (first line of the output) ####################
     #########################################################################################
@@ -548,6 +547,7 @@ proc OrganizeAnnotation {} {
         set SVright   [lindex $Ls 2]
         
         set AnnotationMode   [lindex $Ls end]                 ;# full or split
+        # SVtype is not normalized here
         if {$g_AnnotSV(svtBEDcol) ne -1} {
             set SVtype [lindex $Ls "$g_AnnotSV(svtBEDcol)"]                     ;# DEL, DUP, <CN0>...
         } else {
@@ -593,13 +593,42 @@ proc OrganizeAnnotation {} {
             set intersectStart ""
             set intersectEnd ""
             set nbExons [expr {[llength [split $exonStarts ","]]-1}]
+
+            # frameshift
+            set svtype_norm [normalizeSVtype $svtype]
             if {[string is integer $CDSl]} {
-                if {[expr {$CDSl%3}] eq 0} {
-                    set frameshift "no"
+                if {$svtype_norm eq "DEL" || $svtype_norm eq "DUP"} {
+                    # Deletion
+                    if {$CDSl eq 0} {
+                        # Outside the CDS
+                        set frameshift "NA"
+                    } elseif {[expr {$CDSl%3}] eq 0} {
+                        # Number of nucleotides overlapped is a multiple of 3 
+                        set frameshift "no"
+                    } else {
+                        # number of nucleotides overlapped is not a multiple of 3 
+                        set frameshift "yes"
+                    }
+                } elseif {$svtype_norm eq "INS"} {
+                    # Insertion
+                    if {![string is integer $g_SVLEN($AnnotSV_ID)]} {
+                        # Insertion length is unknown 
+                        set frameshift "NA"
+                    } elseif {[expr {$g_SVLEN($AnnotSV_ID)%3}] eq 0} {
+                        # Insertion length is a multiple of 3. The reading frame is preserved, 
+                        # but the inserted sequence may still have functional consequences (e.g. introduction of a premature stop codon)  
+                        set frameshift "NA"
+                    } else {
+                        # Insertion length is not a multiple of 3 
+                        # We do not yet know if the INS is in the CDS at the moment. This will be checked later with the value "location2".
+                        set frameshift "yes"
+                    }
                 } else {
-                    set frameshift "yes"
+                    # Translocations, Inversions, and other SV types
+                    set frameshift "NA"
                 }
-            } else {set frameshift ""}
+            } else {set frameshift "NA"}
+
         } else {
             set SV "[join [lrange $Ls 0 2] "\t"]"
             # full
@@ -814,6 +843,14 @@ proc OrganizeAnnotation {} {
             set location2 "$regionStart-$regionEnd"
             if {[regexp "(\[^-\]+)-(\[^-\]+)" $location2 match titi tutu]} {
                 if {$titi eq $tutu} {set location2 $titi}
+            }
+
+            # frameshift update for insertion
+            if {$svtype_norm eq "INS"} {
+                if {![regexp "exon" $location2]} {
+                    # Insertion outside the CDS
+                    set frameshift "NA"
+                }
             }
         }
         
@@ -1370,7 +1407,7 @@ proc OrganizeAnnotation {} {
         # 1 - score computed with the full line
         # 2 - score recomputed with the split lines
         if {$g_AnnotSV(ranking)} {
-            set SVtype [normalizeSVtype $SVtype] ;# DEL or DUP or INS or INV or None
+            set SVtype [normalizeSVtype $SVtype] ;# DEL or DUP or INS or INV or ""
             if {$SVtype eq "DEL"} {
                 SVrankingLoss "$TextToWrite" ;# Creation of $g_rankingScore($AnnotSV_ID) and $g_rankingExplanations($AnnotSV_ID)
             } elseif {$SVtype eq "DUP"} {

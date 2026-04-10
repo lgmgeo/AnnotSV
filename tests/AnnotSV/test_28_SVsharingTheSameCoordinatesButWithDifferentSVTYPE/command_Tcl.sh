@@ -35,7 +35,7 @@ $ANNOTSV/bin/AnnotSV -SVinputFile "./input/test.bed" -svtBEDcol 5 -outputFile ".
 # 1_3777548_4234731_DUP_1 1       3777548 4234731 457183  DUP     split   LINC01345
 # 1_3777548_4234731_DUP_1 1       3777548 4234731 457183  DUP     split   LINC01346
 
-if [ `$cut "./output/test_tcl.annotated.tsv" "AnnotSV_ID;SV_chrom;SV_start;SV_end;SV_length;SV_type;Annotation_mode;Gene_name" | grep -c "1_3777549_4234731_DEL_1"` > 1 ]
+if [ `$cut "./output/test_tcl.annotated.tsv" "AnnotSV_ID;SV_chrom;SV_start;SV_end;SV_length;SV_type;Annotation_mode;Gene_name" | grep -c "1_3777549_4234731_DEL_1"` -gt 1 ]
 then
         echo "Ok"
 else
@@ -43,7 +43,7 @@ else
         exit 1
 fi
 
-if [ `$cut "./output/test_tcl.annotated.tsv" "AnnotSV_ID;SV_chrom;SV_start;SV_end;SV_length;SV_type;Annotation_mode;Gene_name" | grep -c "1_3777549_4234731_DUP_1"` > 1 ]
+if [ `$cut "./output/test_tcl.annotated.tsv" "AnnotSV_ID;SV_chrom;SV_start;SV_end;SV_length;SV_type;Annotation_mode;Gene_name" | grep -c "1_3777549_4234731_DUP_1"` -gt 1 ]
 then
         echo "Ok"
 else

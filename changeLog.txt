@@ -24,6 +24,23 @@ April, 02, 2026 AnnotSV version 3.5.6
 	- Add bugfix for the interpretation of square-bracketed DUP fields in the VCF (those containing the start of the duplicated sequence)
 	- Add bugfix in the Makefile for bioconda (issue 307#issuecomment-4054614762)
 
+April, , 2026 AnnotSV version 3.5.7
+	- Improve the rules for determining the frameshift status
+
+April, 02, 2026 AnnotSV version 3.5.6
+	- Allow to customize the weights of AnnotSV ranking criteria in the configfile
+	- Add of the "bracketedAltMode" option
+		Defines how bracketed ALT values in VCF are interpreted:
+			The SV can be considered as DEL, DUP, INS or INV, or considered as BND (TRA is always reported as BND)
+			Values: ALL (default, infer all bracketed ALT as DEL, DUP, INS or INV)
+					BND (treat all bracketed ALT as BND)
+					comma-separated SVTYPE values among DEL, DUP, INS or INV (infer only selected SVTYPE; e.g.: "DEL,DUP". Others are treated as BND)
+	- Add of the "bracketedAltMaxSize" option
+	    Define a maximum SV length (Mb) for SVTYPE inference from bracketed ALT values. Above 10 Mb (default), bracketed ALT is treated as BND.
+	- Return 2 unique AnnotSV_Ids for two insertions located at the same position but with different inserted sequences (issue 324)
+	- Add bugfix for the interpretation of square-bracketed DUP fields in the VCF (those containing the start of the duplicated sequence)
+	- Add bugfix in the Makefile for bioconda (issue 307#issuecomment-4054614762)
+
 March, 03, 2026 AnnotSV version 3.5.5
 	- Improvements of the Makefile (by @drew-sinha)
 		add flag for annotation file download, expose path to rest-prioritiser 

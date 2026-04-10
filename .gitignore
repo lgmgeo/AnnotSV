@@ -28,6 +28,7 @@ tests/AnnotSV/test_*/command_Tcl.log
 tests/AnnotSV/test_*/output/
 tests/AnnotSV/ToDo
 tests/AnnotSV/check_all_public_test_directory.log
+tests/AnnotSV/test_11_RamTracking/ramAnnotSV-*-ram.txt
 
 # VariantConvert
 share/python3/variantconvert/pipinstall.flag

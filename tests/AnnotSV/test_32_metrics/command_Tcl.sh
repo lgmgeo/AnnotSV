@@ -51,7 +51,7 @@ done
 
 annotations=`$cut "./output/output.us_tcl.annotated.tsv" "B_gain_AFmax;B_loss_AFmax;B_ins_AFmax;B_inv_AFmax;GC_content_left;DDD_HI_percent;ExAC_synZ;GnomAD_pLI;ExAC_pLI;AnnotSV_ranking_score;AnnotSV_ranking_criteria;ACMG_class" | grep -v "full="`
 
-if [ `echo $annotations | tr " " "\n" | grep -c "[0-9]\\.[0-9]"` > 0 ] 
+if [ `echo $annotations | tr " " "\n" | grep -c "[0-9]\\.[0-9]"` -gt 0 ] 
 then
 	if [ `echo $annotations | tr " " "\n" | grep -c "[0-9]\\,[0-9]"` -eq 0 ]
 	then
@@ -91,7 +91,7 @@ annotations=`$cut "./output/output.fr_tcl.annotated.tsv" "B_gain_AFmax;B_loss_AF
 
 if [ `echo $annotations | tr " " "\n" | grep -c "[0-9]\\.[0-9]"` -eq 0 ]
 then
-	if [ `echo $annotations | tr " " "\n" | grep -c "[0-9]\\,[0-9]"` > 0 ]
+	if [ `echo $annotations | tr " " "\n" | grep -c "[0-9]\\,[0-9]"` -gt 0 ]
 	then
         echo "Ok"
 	else

@@ -261,7 +261,7 @@ return $newList
 
 proc normalizeSVtype {SVtype} {
 
-# SVtype in which category: DUP? DEL? INV? INS? None?
+# SVtype in which category: DUP? DEL? INV? INS? ""?
 if {[regexp -nocase "del|loss|<CN0>|<CN1>" $SVtype]} {
     set SVtype "DEL"
 } elseif {[regexp -nocase "dup|gain|MCNV" $SVtype ]} {
@@ -275,7 +275,7 @@ if {[regexp -nocase "del|loss|<CN0>|<CN1>" $SVtype]} {
 } elseif {[regexp -nocase "TRA|TRN" $SVtype ]} {
     set SVtype "TRA"
 } else {
-    set SVtype "None"
+    set SVtype ""
 }
 
 return $SVtype

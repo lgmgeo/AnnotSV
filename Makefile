@@ -63,6 +63,7 @@ EXRP_FILE            := #optional filepath for previously downloaded rest-priori
 
 # make install
 .PHONY: install
+
 ifeq ('$(INSTALLDIR1)' , '$(INSTALLDIR2)')
 all: install-display install-documentationlight install-variantconvert install-done
 install: install-display install-documentationlight install-variantconvert install-done
@@ -73,6 +74,7 @@ install: install-display install-configfile install-makefile install-executable 
 install-exomiser: install-exomiser-1 install-exomiser-2 install-exomiser-3
 endif
 
+# For all PREFIX
 install-display:
 	@echo ""
 	@echo "Installation of $(ANNOTSV)-$(VERSION):"
@@ -81,6 +83,7 @@ install-display:
 	@echo PREFIX=$(PREFIX)
 	@echo TCLVERSION=$(TCLVERSION)
 
+# For PREFIX==.
 install-documentationlight: $(DOCUMENTATIONS)
 	@echo ""
 	@if [ -n "$^" ]; then \
@@ -90,6 +93,7 @@ install-documentationlight: $(DOCUMENTATIONS)
 		$(MV) "$(TCLDIRDISTRIBUTED)" "$(TCLDIR)"; \
 	fi
 
+# For PREFIX!=.
 install-configfile: $(CONFIGFILE)
 	@echo ""
 	@echo "Configfile configuration"
@@ -97,12 +101,14 @@ install-configfile: $(CONFIGFILE)
 	$(MKDIR) $(DESTDIR)$(ETCDIR)/$(ANNOTSV)
 	install -p -m 0755 $(CONFIGFILE)  $(DESTDIR)$(ETCDIR)/$(ANNOTSV)
 
+# For PREFIX!=.
 install-makefile: $(MAKEFILE)
 	@echo ""
 	@echo "Makefile installation"
 	@echo "---------------------"
 	install -p -m 0755 $(MAKEFILE)  $(DESTDIR)$(PREFIX)
 
+# For PREFIX!=.
 install-executable:
 	@echo ""
 	@echo "Executable installation"
@@ -110,13 +116,15 @@ install-executable:
 	$(MKDIR) $(DESTDIR)$(BINDIR)
 	install -p -m 0755 bin/AnnotSV $(DESTDIR)$(BINDIR)
 
+# For PREFIX!=.
 install-tcl-toolbox: 
 	@echo ""
 	@echo "Tcl scripts installation"
 	@echo "------------------------"
 	$(MKDIR) $(DESTDIR)$(TCLDIR)/$(ANNOTSV)
-	cd $(DESTDIR)$(TCLDIR) ; tar cf - $(ANNOTSV) | tar xf - -C $(DESTDIR)$(TCLDIR)/
+	cd share/tcl ; tar cf - $(ANNOTSV) | tar xf - -C $(DESTDIR)$(TCLDIR)/
 
+# For all PREFIX
 install-variantconvert:
 	@echo ""
 	@echo "variantconvert installation"
@@ -160,6 +168,8 @@ install-variantconvert:
 		echo "variantconvert not installed"; \
 	fi
 
+
+# For PREFIX!=.
 install-bash-toolbox: $(BASH_SCRIPTS)
 	@echo ""
 	@echo "Bash scripts installation"
@@ -167,6 +177,7 @@ install-bash-toolbox: $(BASH_SCRIPTS)
 	$(MKDIR) $(DESTDIR)$(BASHDIR)/$(ANNOTSV)
 	$(CP) $^ $(DESTDIR)$(BASHDIR)/$(ANNOTSV)
 
+# For PREFIX!=.
 install-doc: $(DOCUMENTATIONS)
 	@echo ""
 	@echo "Documentations installation"
@@ -174,9 +185,18 @@ install-doc: $(DOCUMENTATIONS)
 	$(MKDIR) $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
 	$(CP) $^ $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
 
+<<<<<<< HEAD
 install-others-doc: share/doc/$(ANNOTSV)/Example
+||||||| parent of b3f7001 (feat: Improve the rules for determining the frameshift status (issue 300))
+install-others-doc: $(DESTDIR)$(DOCDIR)/$(ANNOTSV)/Example
+=======
+# For PREFIX!=.
+install-others-doc: share/doc/$(ANNOTSV)/Example
+>>>>>>> b3f7001 (feat: Improve the rules for determining the frameshift status (issue 300))
 	$(CPDIR) $^ $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
 
+
+# For all PREFIX
 install-done: 
 	@echo ""
 	@echo "Done"
@@ -206,6 +226,7 @@ else
 	@echo ""
 endif
 
+# For PREFIX==.
 install-exomiser-1: $(if $(USEANNODIR),,2406_phenotype.zip)
 	@echo ""
 	@echo "Installation of Exomiser data:"
@@ -231,9 +252,13 @@ else
 	ln -sf $(EXRP_FILE) $(DESTDIR)$(JARDIR)/$(notdir $(EXRP_FILE))
 endif
 
+
+# For PREFIX!=.
 install-exomiser-2:
 	install -D -p -m 0755 $(PROPERTIES) $(DESTDIR)$(ETCDIR)/$(ANNOTSV)
 
+
+# For PREFIX==.
 install-exomiser-3:
 	@echo ""
 	@echo "--> Exomiser data installed"

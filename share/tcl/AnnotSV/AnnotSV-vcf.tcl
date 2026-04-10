@@ -495,11 +495,16 @@ proc VCFsToBED {SV_VCFfiles} {
                 } else {
                     # First, we've choosen the SVTYPE in the INFO column (done above with the parsing of INFOcol).
                     # Second, we re-set with the SVtype in the ALT column (if exist).
-                    if {[regexp "^<(.+)>$" $alt match svtype2]} {
-                        set svtype $svtype2
+                    set svtypeALT ""
+                    if {[regexp "^<(.+)>$" $alt match svtypeALT]} {
+                        set svtypeALT [normalizeSVtype $svtypeALT] ;# DEL or DUP or INS or INV or ""
                     }
-                    set svtype [normalizeSVtype $svtype] ;# DEL or DUP or INS or INV or None
-                    
+                    if {$svtypeALT != ""} {
+                        set svtype $svtypeALT
+                    } else {
+                        set svtype [normalizeSVtype $svtype] ;# DEL or DUP or INS or INV or ""
+                    }
+
                     # Processing the alt of the INS (in case of having 2 INS with the same "pos" but with different "seq" and/or "svlen"):
                     # "alt" => "alt_INSSEQ" ou "alt_svlen"
                     #
