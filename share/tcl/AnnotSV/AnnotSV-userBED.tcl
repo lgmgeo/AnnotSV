@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.5.6                                                                                            #
+# AnnotSV 3.5.7                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -23,7 +23,7 @@
 
 
 # Check the Users BED regions annotations files (from .../Annotations_$g_AnnotSV(organism)/Users/GRCh*/*/*.bed)
-# Create : .../Annotations_$g_AnnotSV(organism)/Users/GRCh*/*ncludedIn*/*.formatted.sorted
+# Create : .../Annotations_$g_AnnotSV(organism)/Users/GRCh*/*/*.formatted.sorted
 # (After the formatting step, the copy and/or linked users file(s) are deleted)
 proc checkUsersBED {} {
     
@@ -39,7 +39,8 @@ proc checkUsersBED {} {
         regsub -nocase "(.formatted.sorted)?.bed$" $userBEDfile ".formatted.sorted.bed" formattedSortedFile
         regsub -nocase ".bed$" $notFormattedFile ".header.tsv" userHeaderFile
         if {[file exists $notFormattedFile]} {
-            # Create the formatted bedfile and check the header existence
+            # - Create the formatted bedfile
+            # - Check the *.header.tsv file existence and create it if it doesn't exist yet
             checkBed $notFormattedFile [file dirname $notFormattedFile]
             # Create the formatted and sorted bedfile
             #   Sorting of the bedfile:
@@ -63,30 +64,31 @@ proc checkUsersBED {} {
         }
         
         # Check that the bed and header files have the same number of columns (and more than 3)
-        set L1header   [split [FirstLineFromFile $userHeaderFile] "\t"]
-        set L_headerColName [lrange $L1header 3 end]
-        set L1bed      [split [FirstLineFromFile $formattedSortedFile] "\t"]
-        set nColHeader [llength $L1header]
-        set nColBed    [llength $L1bed]
+        set L_all_ColName_from_header   [split [FirstLineFromFile $userHeaderFile] "\t"]
+        set L_ann_ColName_from_header [lrange $L_all_ColName_from_header 3 end]
+        set Ls_BED      [split [FirstLineFromFile $formattedSortedFile] "\t"]
+        set nColHeader [llength $L_all_ColName_from_header]
+        set nColBed    [llength $Ls_BED]
         if {$nColHeader ne $nColBed} {
             puts "WARNING: [file tail $userHeaderFile] has $nColHeader fields, but $nColBed were expected. Header bed file not used.\n"
-            file rename -force $userHeaderFile $userHeaderFile.bad
+            file rename -force $userHeaderFile $userHeaderFile.bed
             WriteTextInFile "[join [lrepeat $nColBed ""] "\t"]" $userHeaderFile
-            set L_headerColName [expr {$nColBed-3}]
+            set L_ann_ColName_from_header [expr {$nColBed-3}]
         } elseif {$nColHeader <=3} {
             puts "WARNING: [file tail $userHeaderFile] has $nColHeader fields. More than 3 are expected. Header bed file not used.\n"
-            file rename -force $userHeaderFile $userHeaderFile.bad
+            file rename -force $userHeaderFile $userHeaderFile.bed
             WriteTextInFile "[join [lrepeat $nColBed ""] "\t"]" $userHeaderFile
-            set L_headerColName [expr {$nColBed-3}]
+            set L_ann_ColName_from_header [expr {$nColBed-3}]
         }
         
         # Number of annotation columns in the user bedfile (without the 3 columns "chrom start end")
-        set g_numberOfAnnotationCol($formattedSortedFile) [llength $L_headerColName]
+        set g_numberOfAnnotationCol($formattedSortedFile) [llength $L_ann_ColName_from_header]
     }
 }
 
 
 # Return the annotation of a SV with the userBED file
+# formattedSortedUserBEDfile: "chrom start end" (il n'y a que 3 colonnes, pas de col d'annotations)
 proc userBEDannotation {formattedSortedUserBEDfile SVchrom SVstart SVend {use3points 1}} {
     
     global g_AnnotSV
@@ -98,22 +100,34 @@ proc userBEDannotation {formattedSortedUserBEDfile SVchrom SVstart SVend {use3po
         set userBEDtext($formattedSortedUserBEDfile,Empty) ""
         
         regsub -nocase ".formatted.sorted.bed$" $formattedSortedUserBEDfile ".header.tsv" userHeaderFile
-        set L_headerColName [lrange [split [FirstLineFromFile $userHeaderFile] "\t"] 3 end]
-        set nColHeader [llength $L_headerColName]
-        set g_AnnotSV($formattedSortedUserBEDfile,userBEDAnn) 1
         
         # no intersection with the SV
         append userBEDtext($formattedSortedUserBEDfile,Empty) "\t[join [lrepeat $g_numberOfAnnotationCol($formattedSortedUserBEDfile) ""] "\t"]"
         
-        # Intersect
-        # $g_AnnotSV(bedFile) = formatted and sorted bedfile!
+        # NOTE: $g_AnnotSV(bedFile) = formatted and sorted bedfile!
         regsub -nocase ".formatted.sorted.bed$" $g_AnnotSV(bedFile) ".intersect.userBED" tmpFile
         set tmpFile "$g_AnnotSV(outputDir)/[file tail $tmpFile]"
         file delete -force $tmpFile
-        if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(fullAndSplitBedFile) -b $formattedSortedUserBEDfile -wa -wb > $tmpFile} Message]} {
-            if {[catch {exec $g_AnnotSV(bedtools) intersect -a $g_AnnotSV(fullAndSplitBedFile) -b $formattedSortedUserBEDfile -wa -wb > $tmpFile} Message]} {
+        
+        # Intersect
+        ###########
+        if {[regexp "FtIncludedInSV|SVincludedInFt|AnyOverlap" $formattedSortedUserBEDfile]} {
+            # Intersect (for "FtIncludedInSV", "SVincludedInFt" and "AnyOverlap")
+            if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(fullAndSplitBedFile) -b $formattedSortedUserBEDfile -wa -wb > $tmpFile} Message]} {
+                if {[catch {exec $g_AnnotSV(bedtools) intersect -a $g_AnnotSV(fullAndSplitBedFile) -b $formattedSortedUserBEDfile -wa -wb > $tmpFile} Message]} {
+                    puts "-- userBEDannotation --"
+                    puts "$g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(fullAndSplitBedFile) -b $formattedSortedUserBEDfile -wa -wb > $tmpFile"
+                    puts "$Message"
+                    puts "Exit with error"
+                    exit 2
+                }
+            }
+        } elseif {[regexp "BNDproximity" $formattedSortedUserBEDfile]} {
+            # Intersect (for "BNDproximity")
+            ## <=> At this step, keeping all close user regions
+            if {[catch {exec $g_AnnotSV(bedtools) window -a $g_AnnotSV(fullAndSplitBedFile) -b $formattedSortedUserBEDfile -w $g_AnnotSV(breakpointProximity) > $tmpFile} Message]} {
                 puts "-- userBEDannotation --"
-                puts "$g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(fullAndSplitBedFile) -b $formattedSortedUserBEDfile -wa -wb > $tmpFile"
+                puts "$g_AnnotSV(bedtools) window -a $g_AnnotSV(fullAndSplitBedFile) -b $formattedSortedUserBEDfile -w $g_AnnotSV(breakpointProximity) > $tmpFile"
                 puts "$Message"
                 puts "Exit with error"
                 exit 2
@@ -135,6 +149,7 @@ proc userBEDannotation {formattedSortedUserBEDfile SVchrom SVstart SVend {use3po
             set userFt_start [lindex $Ls end-[expr {$g_numberOfAnnotationCol($formattedSortedUserBEDfile)+1}]]
             
             # Select:
+            #########
             # - userBED that share > XX% length with the SV to annotate
             # (doesn't select the INSERTION)
             set userFt_length [expr {$userFt_end-$userFt_start}]
@@ -175,6 +190,11 @@ proc userBEDannotation {formattedSortedUserBEDfile SVchrom SVstart SVend {use3po
             } elseif {[regexp "AnyOverlap" $formattedSortedUserBEDfile]} {
                 ## AnyOverlap
                 ## <=> Keeping all user regions
+            } elseif {[regexp "BNDproximity" $formattedSortedUserBEDfile]} {
+                ## BNDproximity
+                ## <=> |start_SV − start_Ft| < $g_AnnotSV(breakpointProximity) and |end_SV − end_Ft| < $g_AnnotSV(breakpointProximity)
+                if {[expr {abs($SVtoAnn_start-$userFt_start)}] > $g_AnnotSV(breakpointProximity)} {continue}
+                if {[expr {abs($SVtoAnn_end-$userFt_end)}] > $g_AnnotSV(breakpointProximity)} {continue}
             }
             
             # Each SV to annotate can be overlapped with several users regions => use of "$i" to merge the annotations column by column

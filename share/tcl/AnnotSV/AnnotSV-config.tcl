@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.5.6                                                                                            #
+# AnnotSV 3.5.7                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -47,6 +47,7 @@ proc configureAnnotSV {argv} {
     set g_AnnotSV(benignAF)                 "0.01"
     set g_AnnotSV(bracketedAltMaxSize)      "10"
     set g_AnnotSV(bracketedAltMode)         "ALL"
+    set g_AnnotSV(breakpointProximity)      "100"
     set g_AnnotSV(candidateGenesFile)       ""
     set g_AnnotSV(candidateGenesFiltering)  "0"
     set g_AnnotSV(candidateSnvIndelFiles)   ""
@@ -140,7 +141,7 @@ proc configureAnnotSV {argv} {
     ###########################
     ## Load config file options
     ###########################
-    set lOptionsOk "annotationsDir annotationMode bcftools bedtools benignAF bracketedAltMaxSize bracketedAltMode candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo includeCI metrics minTotalNumber missingGTinSamplesid outputDir outputFile overlap overwrite promoterSize rankFiltering reciprocal REreport REselect1 REselect2 samplesidBEDcol snvIndelFiles snvIndelPASS snvIndelSamples SVinputFile SVinputInfo SVminSize svtBEDcol tx txFile variantconvertDir variantconvertMode vcf"
+    set lOptionsOk "annotationsDir annotationMode bcftools bedtools benignAF bracketedAltMaxSize bracketedAltMode breakpointProximity candidateGenesFile candidateGenesFiltering candidateSnvIndelFiles candidateSnvIndelSamples extann externalGeneFiles genomeBuild hpo includeCI metrics minTotalNumber missingGTinSamplesid outputDir outputFile overlap overwrite promoterSize rankFiltering reciprocal REreport REselect1 REselect2 samplesidBEDcol snvIndelFiles snvIndelPASS snvIndelSamples SVinputFile SVinputInfo SVminSize svtBEDcol tx txFile variantconvertDir variantconvertMode vcf"
     
     # Setting of $g_AnnotSV(SVinputFile) from the command line
     set i 0
@@ -452,7 +453,7 @@ proc configureAnnotSV {argv} {
     }
     
     ## It must be an integer > 0
-    foreach val {promoterSize SVminSize} {
+    foreach val {breakpointProximity promoterSize SVminSize} {
         if {[regexp "\[^0-9\]" $g_AnnotSV($val)]} {
             puts "############################################################################"
             puts "Bad value for the $val option ($g_AnnotSV($val)), should be a positive integer - Exit with error."
@@ -589,6 +590,20 @@ proc configureAnnotSV {argv} {
         
     } else {
         set g_AnnotSV(candidateSnvIndelSamples) ""
+    }
+    
+    ## It must be "ALL, BND, DEL, DUP, INS or INV, "
+    set L_authorized_values {ALL BND DEL DUP INS INV}
+    regsub -all " " $g_AnnotSV(bracketedAltMode) "" brackMode
+    set L_bracketedAltMode [split $brackMode ","]
+    foreach mode $L_bracketedAltMode {
+        if {![regexp -nocase "$mode" $L_authorized_values]} {
+            puts "############################################################################"
+            puts "Bad option value: -bracketedAltMode = $g_AnnotSV(bracketedAltMode)"
+            puts "Should be \"ALL\", \"BND\", \"DEL\", \"DUP\", \"INS\" or \"INV\""
+            puts "############################################################################"
+            exit 2
+        }
     }
     
     ## It must be "GRCh37" or "GRCh38" or "CHM13" or "mm39" or "mm9" or "mm10" for the genomeBuild option.

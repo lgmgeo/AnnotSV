@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.5.6                                                                                            #
+# AnnotSV 3.5.7                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -504,7 +504,7 @@ proc VCFsToBED {SV_VCFfiles} {
                     } else {
                         set svtype [normalizeSVtype $svtype] ;# DEL or DUP or INS or INV or ""
                     }
-
+                    
                     # Processing the alt of the INS (in case of having 2 INS with the same "pos" but with different "seq" and/or "svlen"):
                     # "alt" => "alt_INSSEQ" ou "alt_svlen"
                     #

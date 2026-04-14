@@ -1,0 +1,6 @@
+#chrom	start	end	B_annotations_BNDprox
+chr1	50	80	B_ann1
+chr1	180	220	B_ann2
+chr1	250	300	B_ann3
+chr1	250	350	B_ann4
+chr1	301	400	B_ann5

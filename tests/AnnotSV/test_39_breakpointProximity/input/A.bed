@@ -1,0 +1,3 @@
+# chrom	start	end	svtype	tric
+chr1	100	200	DEL	truc
+chr1	150	170	DUP	trac

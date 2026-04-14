@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.5.6                                                                                            #
+# AnnotSV 3.5.7                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -22,7 +22,9 @@
 ############################################################################################################
 
 
-
+# Switch coordinates from BED to VCF format.
+# Input: chr1:12356-12359 (BED format)
+# Output: chr1:12357-12359 (VCF format)
 proc switchCoordinatesFromBEDtoVCF {BEDcoord} {
     set liste [split $BEDcoord ":|-"]
     if {[llength $liste] ne 3} {
@@ -214,8 +216,8 @@ proc OrganizeAnnotation {} {
         foreach formattedUserBEDfile [glob -nocomplain $usersDir/SVincludedInFt/*.formatted.sorted.bed] {
             regsub -nocase ".formatted.sorted.bed$" $formattedUserBEDfile ".header.tsv" userHeaderFile
             set L1header [split [FirstLineFromFile $userHeaderFile] "\t"]
-            set L_headerColName [lrange $L1header 3 end]
-            lappend SVincludedInFtHeader "[join $L_headerColName "\t"]"
+            set L_ann_ColName_from_header [lrange $L1header 3 end]
+            lappend SVincludedInFtHeader "[join $L_ann_ColName_from_header "\t"]"
         }
         append headerOutput "\t[join $SVincludedInFtHeader "\t"]"
     }
@@ -252,8 +254,8 @@ proc OrganizeAnnotation {} {
         foreach formattedUserBEDfile [glob -nocomplain $usersDir/FtIncludedInSV/*.formatted.sorted.bed] {
             regsub -nocase ".formatted.sorted.bed$" $formattedUserBEDfile ".header.tsv" userHeaderFile
             set L1header   [split [FirstLineFromFile $userHeaderFile] "\t"]
-            set L_headerColName [lrange $L1header 3 end]
-            lappend FtIncludedInSVHeader "[join $L_headerColName "\t"]"
+            set L_ann_ColName_from_header [lrange $L1header 3 end]
+            lappend FtIncludedInSVHeader "[join $L_ann_ColName_from_header "\t"]"
         }
         append headerOutput "\t[join $FtIncludedInSVHeader "\t"]"
     }
@@ -263,10 +265,21 @@ proc OrganizeAnnotation {} {
         foreach formattedUserBEDfile [glob -nocomplain $usersDir/AnyOverlap/*.formatted.sorted.bed] {
             regsub -nocase ".formatted.sorted.bed$" $formattedUserBEDfile ".header.tsv" userHeaderFile
             set L1header   [split [FirstLineFromFile $userHeaderFile] "\t"]
-            set L_headerColName [lrange $L1header 3 end]
-            lappend AnyOverlapHeader "[join $L_headerColName "\t"]"
+            set L_ann_ColName_from_header [lrange $L1header 3 end]
+            lappend AnyOverlapHeader "[join $L_ann_ColName_from_header "\t"]"
         }
         append headerOutput "\t[join $AnyOverlapHeader "\t"]"
+    }
+    
+    #######  usersDir: "BNDproximity header"
+    if {[glob -nocomplain $usersDir/BNDproximity/*.formatted.sorted.bed] ne ""} {
+        foreach formattedUserBEDfile [glob -nocomplain $usersDir/BNDproximity/*.formatted.sorted.bed] {
+            regsub -nocase ".formatted.sorted.bed$" $formattedUserBEDfile ".header.tsv" userHeaderFile
+            set L1header   [split [FirstLineFromFile $userHeaderFile] "\t"]
+            set L_ann_ColName_from_header [lrange $L1header 3 end]
+            lappend BNDproximityHeader "[join $L_ann_ColName_from_header "\t"]"
+        }
+        append headerOutput "\t[join $BNDproximityHeader "\t"]"
     }
     
     ####### "Breakpoints header"
@@ -395,44 +408,65 @@ proc OrganizeAnnotation {} {
         puts "\t\t...Children’s Mercy Research Institute"
     }
     
-    ####### "SVincludedInFt"
-    set L_SVincludedInFt [glob -nocomplain $usersDir/SVincludedInFt/*.formatted.sorted.bed]
-    if {$L_SVincludedInFt ne ""} {
+    ####### Custom "SVincludedInFt"
+    set L_files_SVincludedInFt [glob -nocomplain $usersDir/SVincludedInFt/*.formatted.sorted.bed]
+    if {$L_files_SVincludedInFt ne ""} {
         puts "\t...Annotations with features overlapping the SV ($g_AnnotSV(overlap) %)"
-        foreach formattedUserBEDfile $L_SVincludedInFt {
+        foreach formattedUserBEDfile $L_filesSVincludedInFt {
             puts "\t\t...[file tail $formattedUserBEDfile]"
             regsub -nocase ".formatted.sorted.bed$" $formattedUserBEDfile ".header.tsv" userHeaderFile
             set L1header [split [FirstLineFromFile $userHeaderFile] "\t"]
-            set L_headerColName [lrange $L1header 3 end]
+            set L_ann_ColName_from_header [lrange $L1header 3 end]
             # Number of columns of annotation in the user bedfile (without the 3 columns "chrom start end")
-            set nColHeader [llength $L_headerColName]
-            puts "\t\t($nColHeader annotations columns: [join $L_headerColName ", "])"
+            set nColHeader [llength $L_ann_ColName_from_header]
+            puts "\t\t($nColHeader annotations columns: [join $L_ann_ColName_from_header ", "])"
         }
     }
     
     ####### Custom "FtIncludedInSV"
-    puts "\t...Annotations with features overlapped with the SV ($g_AnnotSV(overlap) %)"
+    set L_files_FtincludedInSV [glob -nocomplain $usersDir/FtIncludedInSV/*.formatted.sorted.bed]
+    if {$L_files_FtincludedInSV ne "" || $g_AnnotSV(tadAnn)} {
+        puts "\t...Annotations with features overlapped with the SV ($g_AnnotSV(overlap) %)"
+    }
     if {$g_AnnotSV(tadAnn)} {puts "\t\t...TAD annotation"}
-    foreach formattedUserBEDfile [glob -nocomplain $usersDir/FtIncludedInSV/*.formatted.sorted.bed] {
+    foreach formattedUserBEDfile $L_files_FtincludedInSV {
         puts "\t\t...[file tail $formattedUserBEDfile]"
         regsub -nocase ".formatted.sorted.bed$" $formattedUserBEDfile ".header.tsv" userHeaderFile
         set L1header   [split [FirstLineFromFile $userHeaderFile] "\t"]
-        set L_headerColName [lrange $L1header 3 end]
+        set L_ann_ColName_from_header [lrange $L1header 3 end]
         # Number of columns of annotation in the user bedfile (without the 3 columns "chrom start end")
-        set nColHeader [llength $L_headerColName]
-        puts "\t\t($nColHeader annotations columns: [join $L_headerColName ", "])"
+        set nColHeader [llength $L_ann_ColName_from_header]
+        puts "\t\t($nColHeader annotations columns: [join $L_ann_ColName_from_header ", "])"
     }
     
     ####### Custom "AnyOverlap"
-    puts "\t...Annotations with features sharing any overlap with the SV"
-    foreach formattedUserBEDfile [glob -nocomplain $usersDir/AnyOverlap/*.formatted.sorted.bed] {
+    set L_files_AnyOverlap [glob -nocomplain $usersDir/AnyOverlap/*.formatted.sorted.bed]
+    if {$L_files_AnyOverlap ne ""} {
+        puts "\t...Annotations with features sharing any overlap with the SV"
+    }
+    foreach formattedUserBEDfile $L_files_AnyOverlap {
         puts "\t\t...[file tail $formattedUserBEDfile]"
         regsub -nocase ".formatted.sorted.bed$" $formattedUserBEDfile ".header.tsv" userHeaderFile
         set L1header   [split [FirstLineFromFile $userHeaderFile] "\t"]
-        set L_headerColName [lrange $L1header 3 end]
+        set L_ann_ColName_from_header [lrange $L1header 3 end]
         # Number of columns of annotation in the user bedfile (without the 3 columns "chrom start end")
-        set nColHeader [llength $L_headerColName]
-        puts "\t\t($nColHeader annotations columns: [join $L_headerColName ", "])"
+        set nColHeader [llength $L_ann_ColName_from_header]
+        puts "\t\t($nColHeader annotations columns: [join $L_ann_ColName_from_header ", "])"
+    }
+    
+    ####### Custom "BNDproximity"
+    set L_files_BNDproximity [glob -nocomplain $usersDir/BNDproximity/*.formatted.sorted.bed]
+    if {$L_files_BNDproximity ne ""} {
+        puts "\t...Annotations with features sharing very close BND with the SV"
+    }
+    foreach formattedUserBEDfile $L_files_BNDproximity {
+        puts "\t\t...[file tail $formattedUserBEDfile]"
+        regsub -nocase ".formatted.sorted.bed$" $formattedUserBEDfile ".header.tsv" userHeaderFile
+        set L1header   [split [FirstLineFromFile $userHeaderFile] "\t"]
+        set L_ann_ColName_from_header [lrange $L1header 3 end]
+        # Number of columns of annotation in the user bedfile (without the 3 columns "chrom start end")
+        set nColHeader [llength $L_ann_ColName_from_header]
+        puts "\t\t($nColHeader annotations columns: [join $L_ann_ColName_from_header ", "])"
     }
     
     ####### "Breakpoints annotations"
@@ -593,33 +627,33 @@ proc OrganizeAnnotation {} {
             set intersectStart ""
             set intersectEnd ""
             set nbExons [expr {[llength [split $exonStarts ","]]-1}]
-
+            
             # frameshift
-            set svtype_norm [normalizeSVtype $svtype]
+            set SVtype_norm [normalizeSVtype $SVtype]
             if {[string is integer $CDSl]} {
-                if {$svtype_norm eq "DEL" || $svtype_norm eq "DUP"} {
+                if {$SVtype_norm eq "DEL" || $SVtype_norm eq "DUP"} {
                     # Deletion
                     if {$CDSl eq 0} {
                         # Outside the CDS
                         set frameshift "NA"
                     } elseif {[expr {$CDSl%3}] eq 0} {
-                        # Number of nucleotides overlapped is a multiple of 3 
+                        # Number of nucleotides overlapped is a multiple of 3
                         set frameshift "no"
                     } else {
-                        # number of nucleotides overlapped is not a multiple of 3 
+                        # number of nucleotides overlapped is not a multiple of 3
                         set frameshift "yes"
                     }
-                } elseif {$svtype_norm eq "INS"} {
+                } elseif {$SVtype_norm eq "INS"} {
                     # Insertion
-                    if {![string is integer $g_SVLEN($AnnotSV_ID)]} {
-                        # Insertion length is unknown 
+                    if {![info exists g_SVLEN($AnnotSV_ID)] || ![string is integer $g_SVLEN($AnnotSV_ID)]} {
+                        # Insertion length is unknown
                         set frameshift "NA"
                     } elseif {[expr {$g_SVLEN($AnnotSV_ID)%3}] eq 0} {
-                        # Insertion length is a multiple of 3. The reading frame is preserved, 
-                        # but the inserted sequence may still have functional consequences (e.g. introduction of a premature stop codon)  
+                        # Insertion length is a multiple of 3. The reading frame is preserved,
+                        # but the inserted sequence may still have functional consequences (e.g. introduction of a premature stop codon)
                         set frameshift "NA"
                     } else {
-                        # Insertion length is not a multiple of 3 
+                        # Insertion length is not a multiple of 3
                         # We do not yet know if the INS is in the CDS at the moment. This will be checked later with the value "location2".
                         set frameshift "yes"
                     }
@@ -628,7 +662,7 @@ proc OrganizeAnnotation {} {
                     set frameshift "NA"
                 }
             } else {set frameshift "NA"}
-
+            
         } else {
             set SV "[join [lrange $Ls 0 2] "\t"]"
             # full
@@ -844,9 +878,9 @@ proc OrganizeAnnotation {} {
             if {[regexp "(\[^-\]+)-(\[^-\]+)" $location2 match titi tutu]} {
                 if {$titi eq $tutu} {set location2 $titi}
             }
-
+            
             # frameshift update for insertion
-            if {$svtype_norm eq "INS"} {
+            if {$SVtype_norm eq "INS"} {
                 if {![regexp "exon" $location2]} {
                     # Insertion outside the CDS
                     set frameshift "NA"
@@ -999,6 +1033,17 @@ proc OrganizeAnnotation {} {
             }
         }
         set AnyOverlapText [join $L_AnyOverlapText "\t"]
+        
+        # User BNDproximity BED annotations.
+        set L_BNDproximityText {}
+        foreach formattedUserBEDfile [glob -nocomplain $usersDir/BNDproximity/*.formatted.sorted.bed] {
+            if {$AnnotationMode eq "split"} {
+                lappend L_BNDproximityText "[userBEDannotation $formattedUserBEDfile $SVchrom $intersectStart $intersectEnd]"
+            } else {
+                lappend L_BNDproximityText "[userBEDannotation $formattedUserBEDfile $SVchrom $SVleft $SVright]"
+            }
+        }
+        set BNDproximityText [join $L_BNDproximityText "\t"]
         
         # Gene-based annotations.
         if {$g_AnnotSV(geneBasedAnn)} {
@@ -1222,24 +1267,24 @@ proc OrganizeAnnotation {} {
         if {[info exists g_SVLEN($AnnotSV_ID)]} {
             set SVlength $g_SVLEN($AnnotSV_ID)
         } else {
-            set svtypenorm [normalizeSVtype $SVtype]
+            set SVtype_norm [normalizeSVtype $SVtype]
             if {![info exist VCFheader]} {
                 # SVinputFile = BED
-                if {[regexp "DEL" $svtypenorm]} { ;# DEL
+                if {[regexp "DEL" $SVtype_norm]} { ;# DEL
                     set SVlength [expr {$SVstart_BED-$SVend}]
-                } elseif {[regexp "DUP|INV" $svtypenorm]} { ;# DUP or INV
+                } elseif {[regexp "DUP|INV" $SVtype_norm]} { ;# DUP or INV
                     set SVlength [expr {$SVend-$SVstart_BED}]
-                } elseif {[regexp "TRA" $svtypenorm]} { ;# TRA
+                } elseif {[regexp "TRA" $SVtype_norm]} { ;# TRA
                     set SVlength 0
                     set g_SVLEN($AnnotSV_ID) 0
                 } else {set SVlength ""}
             } else {
                 # SVinputFile = VCF
-                if {[regexp "DEL" $svtypenorm]} { ;# DEL
+                if {[regexp "DEL" $SVtype_norm]} { ;# DEL
                     set SVlength [expr {$SVstart_BED-$SVend}]
-                } elseif {[regexp "DUP|INV" $svtypenorm]} { ;# DUP or INV
+                } elseif {[regexp "DUP|INV" $SVtype_norm]} { ;# DUP or INV
                     set SVlength [expr {$SVend-$SVstart_BED}]
-                } elseif {[regexp "TRA" $svtypenorm]} { ;# TRA
+                } elseif {[regexp "TRA" $SVtype_norm]} { ;# TRA
                     set SVlength 0
                     set g_SVLEN($AnnotSV_ID) 0
                 } else {set SVlength ""}
@@ -1352,13 +1397,18 @@ proc OrganizeAnnotation {} {
         if {$g_AnnotSV(candidateSnvIndelFiles) ne ""} {
             append TextToWrite "\t$compound"
         }
-        if {[glob -nocomplain $usersDir/FtIncludedInSV/*.formatted.sorted.bed] ne ""} { ; # Don't put {$FtIncludedInSVtext ne ""}: the user BED could have only 1 annotation column, and so $UserText can be equel to "" (without "\t")
+        if {[glob -nocomplain $usersDir/FtIncludedInSV/*.formatted.sorted.bed] ne ""} { ; # Don't put {$FtIncludedInSVtext ne ""}: the user BED could have only 1 annotation column, and so $UserText can be equal to "" (without "\t")
             append TextToWrite "\t$FtIncludedInSVtext"
         }
         
         #######  "Custom AnyOverlap"
-        if {[glob -nocomplain $usersDir/AnyOverlap/*.formatted.sorted.bed] ne ""} { ; # Don't put {$AnyOverlaptext ne ""}: the user BED could have only 1 annotation column, and so $UserText can be equel to "" (without "\t")
+        if {[glob -nocomplain $usersDir/AnyOverlap/*.formatted.sorted.bed] ne ""} { ; # Don't put {$AnyOverlaptext ne ""}: the user BED could have only 1 annotation column, and so $UserText can be equal to "" (without "\t")
             append TextToWrite "\t$AnyOverlapText"
+        }
+        
+        #######  "Custom BNDproximity"
+        if {[glob -nocomplain $usersDir/BNDproximity/*.formatted.sorted.bed] ne ""} { ; # Don't put {$BNDproximitytext ne ""}: the user BED could have only 1 annotation column, and so $UserText can be equal to "" (without "\t")
+            append TextToWrite "\t$BNDproximityText"
         }
         
         ####### "Breakpoints annotations"

@@ -19,33 +19,38 @@ command_Tcl.tcl >& command_Tcl.log
 ## BILAN:
 #########
 
-## AnnotSV v1.2 utilise :
-- 615 Mb en écrivant les lignes 1 par 1 dans l'output
-- 619 Mb en écrivant l'output à la fin
+## AnnotSV v3.5.7 (2026/04/14)
+- 473776 ko
 
-## AnnotSV v2.1 (2019/04/05)
-- 651 Mb
-
-## AnnotSV v2.2 (2019/07/08)
-- 664 Mb
-
-## AnnotSV v2.3 (2019-12-20)
-- 679 Mb
-
-## AnnotSV v2.4 (2020/07/30)
-- 679 Mb
-
-## AnnotSV v2.5 (2020/10/12)
-- 680 Mb
-
-## AnnotSV 3.0 (2020/12/18)
-- 152804 Ko
-
-## AnnotSV 3.1 (2021/10/26)
-- 179724 Ko
+## AnnotSV 3.5 (2025/07/17)
+- 481472 Ko
 
 ## AnnotSV 3.2 (2022/12/13)
 - 283884 Ko
 
-## AnnotSV 3.5 (2025/07/17)
-- 481472 Ko
+## AnnotSV 3.1 (2021/10/26)
+- 179724 Ko
+
+## AnnotSV 3.0 (2020/12/18)
+- 152804 Ko
+
+## AnnotSV v2.5 (2020/10/12)
+- 680 Mb
+
+## AnnotSV v2.4 (2020/07/30)
+- 679 Mb
+
+## AnnotSV v2.3 (2019-12-20)
+- 679 Mb
+
+## AnnotSV v2.2 (2019/07/08)
+- 664 Mb
+
+## AnnotSV v2.1 (2019/04/05)
+- 651 Mb
+
+## AnnotSV v1.2 utilise :
+- 615 Mb en écrivant les lignes 1 par 1 dans l'output
+- 619 Mb en écrivant l'output à la fin
+
+
