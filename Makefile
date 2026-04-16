@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.5.7                                                                                            #
+# AnnotSV 3.5.8                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -40,7 +40,7 @@ TCLDIR               := $(SHAREDIR)/$(TCLVERSION)
 PYTHONDIR            := $(SHAREDIR)/python3
 ANNOTSV              := AnnotSV
 JARDIR               := $(SHAREDIR)/$(ANNOTSV)/jar
-VERSION              := 3.5.7
+VERSION              := 3.5.8
 HUMANVERSION         := 3.5
 MOUSEVERSION         := 3.4.2
 RM                   := /bin/rm
@@ -185,14 +185,8 @@ install-doc: $(DOCUMENTATIONS)
 	$(MKDIR) $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
 	$(CP) $^ $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
 
-<<<<<<< HEAD
-install-others-doc: share/doc/$(ANNOTSV)/Example
-||||||| parent of b3f7001 (feat: Improve the rules for determining the frameshift status (issue 300))
-install-others-doc: $(DESTDIR)$(DOCDIR)/$(ANNOTSV)/Example
-=======
 # For PREFIX!=.
 install-others-doc: share/doc/$(ANNOTSV)/Example
->>>>>>> b3f7001 (feat: Improve the rules for determining the frameshift status (issue 300))
 	$(CPDIR) $^ $(DESTDIR)$(DOCDIR)/$(ANNOTSV)
 
 
