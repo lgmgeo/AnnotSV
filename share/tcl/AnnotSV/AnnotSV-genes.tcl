@@ -22,6 +22,7 @@
 ############################################################################################################
 
 
+
 ## - Check and create if necessary the "genes.RefSeq.sorted.bed" file
 proc checkGenesRefSeqFile {} {
     
@@ -44,7 +45,8 @@ proc checkGenesRefSeqFile {} {
     
     if {$genesFileDownloaded eq "" && $genesFileFormatted eq ""} {
         puts "############################################################################"
-        puts "\"$genesDir/*.txt.gz\" file doesn't exist"
+        #puts "\"$genesDir/*.txt.gz\" file doesn't exist"
+        puts "\"$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Genes/$g_AnnotSV(genomeBuild)/*.txt.gz\" file doesn't exist"
         puts "Please check your install - Exit with error."
         puts "############################################################################"
         exit 2
@@ -247,7 +249,7 @@ proc genesAnnotation {} {
     global g_AnnotSV
     global g_Lgenes
     
-    
+   
     # Check the -svtBEDcol and -samplesidBEDcol options
     # Create the -svtTSVcol variable
     #####################################################################################
@@ -284,6 +286,7 @@ proc genesAnnotation {} {
         }
     }
     close $f
+    
     ## Writing the bedfile (not sorted)
     set emptyBed 1
     regsub -nocase ".bed$" $g_AnnotSV(bedFile) ".formatted.sorted.bed" newBed
@@ -439,7 +442,7 @@ proc genesAnnotation {} {
             set SVtype ""
         }
         set splitSV "[join [lrange $Ls 0 end-10] "\t"]"
-        
+
         if {$splitSV ne $oldSplitSV} {;# new annotated SV line (all the split lines are done for the oldSV) => we write all information about the oldSV
             while {$SVfromBED ne $splitSV} {
                 # Writing of the "full" SV line (not present in the $splitBedFile file, if not covering a gene)

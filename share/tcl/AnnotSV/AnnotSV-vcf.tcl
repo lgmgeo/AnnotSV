@@ -446,10 +446,46 @@ proc VCFsToBED {SV_VCFfiles} {
             set pos [expr {$posVCF-1}]; # VCF: 1-based ==> BED: 0-based
             regsub "chr" [lindex $Ls 3] "" ref ; # for alt like: "alt="G]chr17:1584563]"
             regsub "chr" [lindex $Ls 4] "" alt
+
             set altVCF $alt ;# To use with the proc "settingOfTheAnnotSVID" (because alt is modified if it is a square-bracketed notation)
             set refVCF $ref
             regsub "CHR2=chr" $Ls "CHR2=" Ls
             regsub -all "\"" [lindex $Ls 7] "" INFOcol
+
+
+            ## Case of very large DEL with NT sequences inside the REF column (=> bug, memory size)
+            ## => encode here to use symbolic alleles (<DEL>) instead of storing the complete deleted sequence (if > 10000 bp)
+            ##    Add of SVLEN annotations if not present in the INFO field
+            ## This approach is standard for large DEL in VCF and avoids excessive memory usage during parsing.
+            if {[regexp -nocase "^\[acgtnACGTN\]+$" $ref]} {
+                # Type1: sequence notation
+				set refLength [string length $ref]
+				if {$refLength > 10000} {
+					# Large SV
+					set altLength [string length $alt]
+					if {[string range $ref 0 [expr {$altLength-1}]] eq $alt} {
+						# large DEL (> 10kb), not a complex SV
+						set ref $alt
+                        lset Ls 3 "$ref"
+						set alt "<DEL>"
+						lset Ls 4 "$alt"
+						set refVCF $ref ;# We don't keep the REF sequence in the TSV output
+						set altVCF $alt ;# We don't keep the ALT sequence in the TSV output
+						if {![regexp ";SVTYPE=" $INFOcol] && ![regexp "^SVTYPE=" $INFOcol]} {
+							append INFOcol ";SVTYPE=DEL"	
+						}
+                        if {![regexp ";SVLEN=" $INFOcol] && ![regexp "^SVLEN=" $INFOcol]} {
+                            append INFOcol ";SVLEN=-[expr {$refLength-$altLength}]"
+                        }
+                        if {![regexp ";END=" $INFOcol] && ![regexp "^END=" $INFOcol]} {
+                            append INFOcol ";END=[expr {$pos+$refLength-$altLength}]"
+                        }
+					    lset Ls 7 "$INFOcol"
+					}
+				}
+            }
+
+
             set svlen ""; set end ""; set svtype ""; set cipos ""; set ciend ""; set chr2 ""; set cipos95 ""; set ciend95 ""
             if {[regexp "SVLEN=(\[0-9-\]+)" $INFOcol match SVLEN]} {set svlen $SVLEN}
             if {[regexp ";END=(\[0-9\]+)" $INFOcol match END] || [regexp "^END=(\[0-9\]+)" $INFOcol match END]} {set end $END}
@@ -534,6 +570,14 @@ proc VCFsToBED {SV_VCFfiles} {
                         set svlen [expr {$posVCF-$end}]
                     } elseif {[regexp "DUP|INV" $svtype]} {
                         set svlen [expr {$end-$posVCF}]
+                    }
+                }
+
+                if {$svlen ne "" && $end eq ""} {
+                    if {$svtype eq "DEL"} {
+                        set end [expr {$posVCF-$svlen}]
+                    } elseif {[regexp "DUP|INV" $svtype]} {
+                        set end [expr {$svlen+$posVCF}]
                     }
                 }
                 
@@ -766,7 +810,7 @@ proc VCFsToBED {SV_VCFfiles} {
                 # Type1
                 regsub -all "\[*.\]" $ref "" refbis ;# cf GRIDSS comment, just below
                 regsub -all "\[*.\]" $alt "" altbis
-                
+               
                 set variantLengthType1 [expr {[string length $altbis]-[string length $refbis]}]
                 if {[expr {abs($variantLengthType1)}] < $g_AnnotSV(SVminSize)} {
                     # it is a small insertion or deletion (indel)

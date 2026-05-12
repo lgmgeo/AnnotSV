@@ -10,6 +10,14 @@
 
 For more details, please see the README file.
 
+
+May, 12, 2026 AnnotSV version 3.5.9
+	- Avoid storing very large deleted sequences (>10 kb) in REF
+		=> Encode large DEL in REF as symbolic <DEL> alleles to reduce memory usage
+		=> Add END, SVLEN and SVTYPE annotations when missing
+	- Properly handle cases where users keep only a single genome build (e.g., GRCh37 or GRCh38) and omit CHM13 to save storage space (issue 15, Mannyari)
+
+
 April, 16, 2026 AnnotSV version 3.5.8
 	- Add a fix for the install (issue 328)
 
