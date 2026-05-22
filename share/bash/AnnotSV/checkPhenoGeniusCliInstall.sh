@@ -5,6 +5,9 @@
 # A successfully executed code should exit with code 0. 
 # Other values indicate an error. 
 
+# Retrieve the AnnotSV installation directory from the command line
+ANNOTSV_SHARE_DIR="$1"
+
 
 # Poetry is required
 ####################
@@ -28,8 +31,8 @@ fi
 
 # PhenogeniusCli install (if needed)
 ####################################
-mkdir -p $ANNOTSV/share/python3/phenogeniuscli
-cd $ANNOTSV/share/python3/phenogeniuscli
+mkdir -p $ANNOTSV_SHARE_DIR/python3/phenogeniuscli
+cd $ANNOTSV_SHARE_DIR/python3/phenogeniuscli
 if [ ! -d PhenoGeniusCli ]
 then
 	git clone https://github.com/kyauy/PhenoGeniusCli.git >> PhenoGeniusCli.install.log 2>&1
@@ -41,7 +44,7 @@ then
 	poetry install &> ../poetry_install.log
 fi
 
-cd $ANNOTSV/share/python3/phenogeniuscli/PhenoGeniusCli
+cd $ANNOTSV_SHARE_DIR/python3/phenogeniuscli/PhenoGeniusCli
 
 poetry run python3 phenogenius_cli.py --help  &> ../PhenoGenius.run.test1.log
 if [ `grep -c -- "--hpo_list" ../PhenoGenius.run.test1.log` == "1" ]

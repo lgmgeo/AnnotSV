@@ -1,6 +1,6 @@
 python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/variantconvert convert -i /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/doc/AnnotSV/Example/test1.annotated.tsv -o /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/doc/AnnotSV/Example/test1.annotated.vcf -c /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/variantconvert/configs/GRCh37/annotsv3_from_bed.combined.local.json
 
-2026-04-14 12:03:34 [INFO] running variantconvert 2.0.1
+2026-05-24 19:48:43 [INFO] running variantconvert 2.0.1
 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert/src/variantconvert/converters/vcf_from_annotsv.py:59: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '[1.0 '.' 2.0 '.' '.' 1.0 '.' 9.0 '.' '.' '.' '.' '.' '.' '.' '.' '.' 2.0
  '.' '.' 1.0 '.' 1.0 '.' 1.0 '.' 2.0 '.' '.' 0.0 26.0 '.' '.' '.' '.' '.'
  '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.' '.'
@@ -2028,4 +2028,4 @@ python3 /PROGS/EXTERN/AnnotSV/AnnotSV_dev/share/python3/variantconvert//src/vari
  'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA' 'NA'
  'NA' 'NA' 'NA' 'NA']' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   df.loc[:, sample_col] = df.loc[:, sample_col].fillna("NA")
-2026-04-14 12:03:36 [INFO] variantconvert finished.
+2026-05-24 19:48:45 [INFO] variantconvert finished.

@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.5.8                                                                                            #
+# AnnotSV 3.5.9                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -43,7 +43,7 @@ TCL_SRC_DIR           := share/tcl
 TCL_INSTALL_DIR       := $(SHARE_INSTALL_DIR)/$(TCL_VERSION)
 PYTHON_INSTALL_DIR    := $(SHARE_INSTALL_DIR)/python3
 JAR_INSTALL_DIR       := $(SHARE_INSTALL_DIR)/AnnotSV/jar
-ANNOTSV_VERSION       := 3.5.8
+ANNOTSV_VERSION       := 3.5.9
 HUMAN_VERSION         := 3.5
 EXOMISER_VERSION      := 2406
 MOUSE_VERSION         := 3.4.2
@@ -184,7 +184,8 @@ install-bash-toolbox: $(SRC_BASH_SCRIPTS)
 	@echo "Bash scripts installation"
 	@echo "-------------------------"
 	$(MKDIR) $(DESTDIR)$(BASH_INSTALL_DIR)/AnnotSV
-	$(CP) $^ $(DESTDIR)$(BASH_INSTALL_DIR)/AnnotSV
+	$(CP) $^ $(DESTDIR)$(BASH_INSTALL_DIR)/AnnotSV/
+	$(CHMOD) $(DESTDIR)$(BASH_INSTALL_DIR)/AnnotSV/*.sh
 
 # For PREFIX!=.
 install-doc: $(SRC_DOCUMENTATIONS)

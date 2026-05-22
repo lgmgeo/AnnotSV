@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.5.8                                                                                            #
+# AnnotSV 3.5.9                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -412,7 +412,7 @@ proc OrganizeAnnotation {} {
     set L_files_SVincludedInFt [glob -nocomplain $usersDir/SVincludedInFt/*.formatted.sorted.bed]
     if {$L_files_SVincludedInFt ne ""} {
         puts "\t...Annotations with features overlapping the SV ($g_AnnotSV(overlap) %)"
-        foreach formattedUserBEDfile $L_filesSVincludedInFt {
+        foreach formattedUserBEDfile $L_files_SVincludedInFt {
             puts "\t\t...[file tail $formattedUserBEDfile]"
             regsub -nocase ".formatted.sorted.bed$" $formattedUserBEDfile ".header.tsv" userHeaderFile
             set L1header [split [FirstLineFromFile $userHeaderFile] "\t"]

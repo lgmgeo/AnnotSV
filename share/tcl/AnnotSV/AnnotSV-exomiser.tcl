@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.5.8                                                                                            #
+# AnnotSV 3.5.9                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -177,7 +177,7 @@ proc runExomiser {L_Genes L_HPO} {
     package require json 1.3.3
     
     # Creation of the temporary "application.properties" file
-    if {[catch {set port [exec bash $g_AnnotSV(bashDir)/searchForAFreePortNumber.bash]} Message]} {
+    if {[catch {set port [exec bash $g_AnnotSV(bashDir)/searchForAFreePortNumber.sh]} Message]} {
         puts "$Message"
         puts "WARNING: port is defined to 50000"
         set port 50000

@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.5.8                                                                                            #
+# AnnotSV 3.5.9                                                                                            #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -28,21 +28,23 @@
 proc checkPhenoGeniusCli {} {
     
     global g_AnnotSV
-    
+
     if {$g_AnnotSV(hpo) eq ""} {
         set g_AnnotSV(PhenoGeniusCli) "0" ;# No HPO terms in INPUT
         return
     }
-    set checkResult [catch {exec $g_AnnotSV(bashDir)/checkPhenoGeniusCliInstall.sh} Message]
+    set checkResult [catch {exec $g_AnnotSV(bashDir)/checkPhenoGeniusCliInstall.sh "$g_AnnotSV(installDir)/share"} Message]
     if {$checkResult eq 0} {
         puts "\tINFO: AnnotSV takes use of PhenoGenius (Yauy et al., 2023) for the phenotype-driven analysis."
         set g_AnnotSV(PhenoGeniusCli) "1"
     } else {
+        set logFile "$g_AnnotSV(installDir)/share/python3/phenogeniuscli/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_[pid].log"
         puts "\nWARNING: No PhenoGenius installation available for the phenotype-driven analysis."
-        puts "\ncf $g_AnnotSV(installDir)/share/python3/phenogeniuscli/*.log\n"
+        WriteTextInFile "$Message" $logFile
+        puts "\ncf $logFile\n"
         set g_AnnotSV(PhenoGeniusCli) "0"
     }
-    
+
     return
 }
 
