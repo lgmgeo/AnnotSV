@@ -17,7 +17,7 @@ May, 22, 2026 AnnotSV version 3.5.9
 		=> Encode large DEL in REF as symbolic <DEL> alleles to reduce memory usage
 		=> Add END, SVLEN and SVTYPE annotations when missing
 	- Properly handle cases where users keep only a single genome build (e.g., GRCh37 or GRCh38) and omit CHM13 to save storage space (issue 15, Mannyari)
-
+	- Refactor INSTALL_annotations.sh
 
 April, 16, 2026 AnnotSV version 3.5.8
 	- Add a fix for the install (issue 328)
