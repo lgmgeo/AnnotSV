@@ -12,6 +12,7 @@ For more details, please see the README file.
 
 
 May, 22, 2026 AnnotSV version 3.5.9
+	- Makefile: fix PhenoGenius Conda handling
 	- Makefile: introduce SRC/INSTALL variable separation and improve Exomiser Conda handling
 	- Avoid storing very large deleted sequences (>10 kb) in REF
 		=> Encode large DEL in REF as symbolic <DEL> alleles to reduce memory usage
