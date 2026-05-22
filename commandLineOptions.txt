@@ -28,6 +28,7 @@ OPTIONS
                                         comma-separated SVTYPE values among DEL, DUP, INS or INV (infer only selected SVTYPE; e.g.: "DEL,DUP". Others are treated as BND)
 
 -breakpointProximity:           Maximum allowed distance (bp) between SV and feature breakpoints (start-to-start and end-to-end). 
+                                Applicable only to external BED annotation files
                                 Values: positive int (default: 100)
 
 -candidateGenesFile:            Path of a file containing the candidate genes of the user (gene names can be space-separated, tabulation-separated, or line-break-separated)
