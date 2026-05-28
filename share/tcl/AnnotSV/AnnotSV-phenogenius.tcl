@@ -67,7 +67,7 @@ proc runPhenoGeniusCli {L_Genes L_NCBI_ID L_HPO} {
     global g_PhenoGeniusCli
     
     puts "...running PhenoGeniusCli for [llength $L_Genes] gene names ([clock format [clock seconds] -format "%B %d %Y - %H:%M"])\n"
-    
+
     set tmpCommandFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_[pid]_run_phenogeniuscli.tmp.bash"
     set tmpResultsFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_[pid]_phenogeniuscli_results.tmp.tsv"
     set tmpResultsLogFile "$g_AnnotSV(outputDir)/[clock format [clock seconds] -format "%Y%m%d-%H%M%S"]_[pid]_phenogeniuscli_results.tmp.log"
@@ -104,8 +104,11 @@ proc runPhenoGeniusCli {L_Genes L_NCBI_ID L_HPO} {
         set NCBI_ID [lindex $Ls $i_ncbi_id]
         set gene [lindex $Ls $i_gene]
         set score [lindex $Ls $i_score]
+
         regsub -all "': \[0-9\]\\\.\[0-9\]" [lindex $Ls $i_phenotype] "" phenotype
         regsub -all "\[\\\[\\\]{}'\]" $phenotype "" phenotype
+        regsub -all "\"" $phenotype "" phenotype
+
         set specificity [string index [lindex $Ls $i_specificity] 0] ;# A, B, C or D
         if {[lsearch -exact $L_Genes $gene] ne -1} {
             set g_PhenoGeniusCli($gene) "$score\t$phenotype\t$specificity"
