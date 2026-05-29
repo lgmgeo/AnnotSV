@@ -11,6 +11,9 @@
 For more details, please see the README file.
 
 
+	- Handle escaped double quotes in PhenoGenius annotation output to prevent AnnotSV parsing errors (issue 338)
+	- Refactor AnnotSV to fully decouple Exomiser and PhenoGenius modules
+
 May, 22, 2026 AnnotSV version 3.5.9
 	- Makefile: fix PhenoGenius Conda handling
 	- Makefile: introduce SRC/INSTALL variable separation and improve Exomiser Conda handling

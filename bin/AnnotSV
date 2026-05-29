@@ -272,7 +272,7 @@ puts "\tAnnotSV has been run with these arguments:"
 puts "\t******************************************"
 set lKey [array names g_AnnotSV]
 foreach key [lsort $lKey] {
-    if {[regexp "ABCann|GHann|MPRAann|EAann|Ann|bashDir|bedFile|docDir|etcDir|extann|installDir|outputColHeader|ranking|genes|samplesidTSVcol|svtTSVcol|tclDir|userDir|Version$" $key]} {continue}
+    if {[regexp "ABCann|Ann|EAann|Exomiser|GHann|MPRAann|PhenoGeniusCli|bashDir|bedFile|docDir|etcDir|extann|genes|installDir|outputColHeader|ranking|samplesidTSVcol|svtTSVcol|tclDir|userDir|Version$" $key]} {continue}
     if {$g_AnnotSV($key) eq ""} {continue}
     puts "\t-$key $g_AnnotSV($key)"
 }

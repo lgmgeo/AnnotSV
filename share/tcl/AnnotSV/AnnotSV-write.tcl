@@ -328,7 +328,7 @@ proc OrganizeAnnotation {} {
     }
     
     ####### "Exomiser header"
-    if {$g_AnnotSV(hpo) ne ""} {
+    if {$g_AnnotSV(Exomiser)} {
         append headerOutput "\tExomiser_gene_pheno_score\tHuman_pheno_evidence\tMouse_pheno_evidence\tFish_pheno_evidence"
     }
     
@@ -487,7 +487,7 @@ proc OrganizeAnnotation {} {
     if {$g_AnnotSV(PhenoGeniusCli)} {puts "\t...PhenoGenius annotations"}
     
     ####### "Exomiser annotation"
-    if {$g_AnnotSV(hpo) ne ""} {puts "\t...Exomiser annotations"}
+    if {$g_AnnotSV(Exomiser)} {puts "\t...Exomiser annotations"}
     
     
     
@@ -1308,7 +1308,7 @@ proc OrganizeAnnotation {} {
             }
         }
         ####### "Exomiser annotation"
-        if {$g_AnnotSV(hpo) ne ""} {
+        if {$g_AnnotSV(Exomiser)} {
             if {$AnnotationMode eq "split"} {
                 set exomiserText [ExomiserAnnotation $geneName "all"]
             } else {
@@ -1436,7 +1436,7 @@ proc OrganizeAnnotation {} {
             append TextToWrite "\t$phenogeniusText"
         }
         ####### "Exomiser annotation"
-        if {$g_AnnotSV(hpo) ne ""} {
+        if {$g_AnnotSV(Exomiser)} {
             append TextToWrite "\t$exomiserText"
         }
         
@@ -1447,7 +1447,7 @@ proc OrganizeAnnotation {} {
         ##			Each SV is assumed to only have one single line of 'full' annotation (no ID redundancy authorized in VCF)
         if {![info exists L_TextToWrite($AnnotSV_ID)]} {
             lappend L_AnnotSV_ID $AnnotSV_ID
-            if {$g_AnnotSV(hpo) ne ""} {
+            if {$g_AnnotSV(Exomiser)} {
                 set bestExomiserScore($AnnotSV_ID) "[lindex [split $exomiserText "\t"] 0]"
             }
         }

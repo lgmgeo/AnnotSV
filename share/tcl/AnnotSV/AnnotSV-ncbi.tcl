@@ -35,12 +35,12 @@ proc checkNCBIandHGNC {} {
     set NCBIandHGNCgeneDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/NCBIandHGNCgeneID"
     if {![regexp "Human" $g_AnnotSV(organism)]} {
         ## Checked the organism: should be "Human"
-        set g_AnnotSV(hpo) "" ;# used for exomiser
+        set g_AnnotSV(hpo) "" ;# used for exomiser and phenogenius
     } elseif {![file exists "$NCBIandHGNCgeneDir/results.txt"]} {
         ## Checked if the "results.txt" file exists
         puts "\nWARNING: No Exomiser annotations available."
         puts "...$NCBIandHGNCgeneDir/results.txt doesn't exist"
-        set g_AnnotSV(hpo) "" ;# used for exomiser
+        set g_AnnotSV(hpo) "" ;# used for exomiser and phenogenius
     } elseif {![file exists "$NCBIandHGNCgeneDir/geneSymbol_NCBIandHGNCgeneID.tsv"]} {
         # Checked if the "geneSymbol_NCBIandHGNCgeneID.tsv" file exists
         set L_TextToWrite {"genes\tNCBI_gene_ID\tHGNC_gene_ID"}

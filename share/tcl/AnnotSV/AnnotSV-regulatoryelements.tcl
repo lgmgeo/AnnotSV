@@ -1166,7 +1166,7 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
         set L_NCBI_ID [lsort -unique $L_NCBI_ID]
         runPhenoGeniusCli "$L_allGenes" "$L_NCBI_ID" "$g_AnnotSV(hpo)"
     }
-    if {$g_AnnotSV(hpo) ne "" && $L_allGenes ne ""} {
+    if {$g_AnnotSV(Exomiser) && $L_allGenes ne ""} {
         runExomiser "$L_allGenes" "$g_AnnotSV(hpo)"
     }
     
@@ -1215,7 +1215,7 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
             if {$g_AnnotSV(PhenoGeniusCli)} {
                 set PhenoGeniusSpecificity "[PhenoGeniusCliAnnotation $gName "specificity"]"
             } else {set PhenoGeniusSpecificity ""}
-            if {$g_AnnotSV(hpo) ne ""} {
+            if {$g_AnnotSV(Exomiser)} {
                 set exomiserScore "[ExomiserAnnotation $gName "score"]"
             } else {set exomiserScore ""}
             

@@ -36,7 +36,7 @@ proc startTheRESTservice {applicationPropertiesTmpFile port exomiserStartService
         puts "The REST service has not been started successfully:"
         puts "java -Xmx4g -jar $jarFile --server.port=$port --spring.config.location=$applicationPropertiesTmpFile >& $exomiserStartServiceFile"
         puts "$Message"
-        set g_AnnotSV(hpo) ""
+        set g_AnnotSV(Exomiser) 0
         file delete -force $exomiserStartServiceFile
         set idService ""
     } else {
@@ -78,7 +78,7 @@ proc startTheRESTservice {applicationPropertiesTmpFile port exomiserStartService
             puts "The REST service has not been started successfully:"
             puts "java -Xmx4g -jar $jarFile --server.port=$port --spring.config.location=$applicationPropertiesTmpFile >& $exomiserStartServiceFile"
             puts "(see $exomiserStartServiceFile)"
-            set g_AnnotSV(hpo) ""
+            set g_AnnotSV(Exomiser) 0
             set idService ""
         } else {
             # The REST service has been successfully started
@@ -96,35 +96,14 @@ proc checkExomiserInstallation {} {
     global hpoVersion
     
     
-    #    # Check the existence of the "$NCBIandHGNCgeneDir/results.txt" file (for Human annotations)
-    #    # Approved symbol Alias symbol    Previous symbol NCBI Gene ID
-    #    # A1BG-AS1        FLJ23569        NCRNA00181      503538
-    #    set NCBIandHGNCgeneDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/NCBIandHGNCgeneID"
-    #    if {![regexp "Human" $g_AnnotSV(organism)]} {
-        #        ## Checked the organism: should be "Human"
-        #        set g_AnnotSV(hpo) ""
-        #    } elseif {![file exists "$NCBIandHGNCgeneDir/results.txt"]} {
-        #        ## Checked if the "results.txt" file exists
-        #        puts "\nWARNING: No Exomiser annotations available."
-        #        puts "...$NCBIandHGNCgeneDir/results.txt doesn't exist"
-        #        set g_AnnotSV(hpo) ""
-        #    } elseif {![file exists "$NCBIandHGNCgeneDir/geneSymbol_NCBIandHGNCgeneID.tsv"]} {
-        #        # Checked if the "geneSymbol_NCBIandHGNCgeneID.tsv" file exists
-        #        set L_TextToWrite {"genes\tNCBI_gene_ID"}
-        #        foreach L [LinesFromFile "$NCBIandHGNCgeneDir/results.txt"] {
-            #            set Ls [split $L "\t"]
-            #            set NCBIandHGNCgeneID [lindex $Ls 3]
-            #            if {$NCBIandHGNCgeneID eq "" || $NCBIandHGNCgeneID eq "NCBI Gene ID"} {continue}
-            #            set ApprovedSymbol [lindex $Ls 0]
-            #            if {$ApprovedSymbol ne "" && ![info exist tmp($ApprovedSymbol)]} {set tmp($ApprovedSymbol) 1; lappend L_TextToWrite "$ApprovedSymbol\t$NCBIandHGNCgeneID"}
-            #            set AliasSymbol [lindex $Ls 1]
-            #            if {$AliasSymbol ne "" && ![info exist tmp($AliasSymbol)]} {set tmp($AliasSymbol) 1; lappend L_TextToWrite "$AliasSymbol\t$NCBIandHGNCgeneID"}
-            #            set PreviousSymbol [lindex $Ls 2]
-            #            if {$PreviousSymbol ne "" && ![info exist tmp($PreviousSymbol)]} {set tmp($PreviousSymbol) 1; lappend L_TextToWrite "$PreviousSymbol\t$NCBIandHGNCgeneID"}
-            #        }
-        #        WriteTextInFile [join $L_TextToWrite "\n"] "$NCBIandHGNCgeneDir/geneSymbol_NCBIandHGNCgeneID.tsv"
-        #    }
-    
+	if {$g_AnnotSV(hpo) ne ""} {
+		set g_AnnotSV(Exomiser) 1
+	} else {
+        set g_AnnotSV(Exomiser) 0
+		return
+	}
+
+
     ## Check if the Exomiser data files exist
     ## + HPO citation
     set L_hpoDir [glob -nocomplain $g_AnnotSV(annotationsDir)/Annotations_Exomiser/*]
@@ -145,11 +124,11 @@ proc checkExomiserInstallation {} {
             puts "\nWARNING: No Exomiser application properties file available"
             puts "...$g_AnnotSV(etcDir)/application.properties doesn't exist\n"
             puts "...$g_AnnotSV(annotationsDir)/Annotations_Exomiser/$hpoVersion/application.properties doesn't exist\n"
-            set g_AnnotSV(hpo) ""
+            set g_AnnotSV(Exomiser) 0
         }
     } else {
         puts "\nWARNING: No Exomiser annotations available in $g_AnnotSV(annotationsDir)/Annotations_Exomiser/\n"
-        set g_AnnotSV(hpo) ""
+        set g_AnnotSV(Exomiser) 0
     }
     
     return
