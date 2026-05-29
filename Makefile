@@ -1,5 +1,5 @@
 ############################################################################################################
-# AnnotSV 3.5.9                                                                                            #
+# AnnotSV 3.5.10                                                                                           #
 #                                                                                                          #
 # AnnotSV: An integrated tool for Structural Variations annotation and ranking                             #
 #                                                                                                          #
@@ -43,7 +43,7 @@ TCL_SRC_DIR           := share/tcl
 TCL_INSTALL_DIR       := $(SHARE_INSTALL_DIR)/$(TCL_VERSION)
 PYTHON_INSTALL_DIR    := $(SHARE_INSTALL_DIR)/python3
 JAR_INSTALL_DIR       := $(SHARE_INSTALL_DIR)/AnnotSV/jar
-ANNOTSV_VERSION       := 3.5.9
+ANNOTSV_VERSION       := 3.5.10
 HUMAN_VERSION         := 3.5
 EXOMISER_VERSION      := 2406
 MOUSE_VERSION         := 3.4.2
@@ -108,14 +108,14 @@ install-configfile: $(CONFIGFILE)
 	@echo "Configfile configuration"
 	@echo "------------------------"
 	$(MKDIR) $(DESTDIR)$(ETC_INSTALL_DIR)/AnnotSV
-	install -p -m 0755 $(CONFIGFILE)  $(DESTDIR)$(ETC_INSTALL_DIR)/AnnotSV
+	install -p -m 0755 $(CONFIGFILE)  $(DESTDIR)$(ETC_INSTALL_DIR)/AnnotSV/
 
 # For PREFIX!=.
 install-makefile: $(MAKEFILE)
 	@echo ""
 	@echo "Makefile installation"
 	@echo "---------------------"
-	install -p -m 0755 $(MAKEFILE)  $(DESTDIR)$(PREFIX)
+	install -p -m 0755 $(MAKEFILE)  $(DESTDIR)$(PREFIX)/
 
 # For PREFIX!=.
 install-executable:
@@ -123,7 +123,7 @@ install-executable:
 	@echo "Executable installation"
 	@echo "-----------------------"
 	$(MKDIR) $(DESTDIR)$(BIN_INSTALL_DIR)
-	install -p -m 0755 bin/AnnotSV $(DESTDIR)$(BIN_INSTALL_DIR)
+	install -p -m 0755 bin/AnnotSV $(DESTDIR)$(BIN_INSTALL_DIR)/
 
 # For PREFIX!=.
 install-tcl-toolbox: 
@@ -251,7 +251,7 @@ endif
 # exomiser-rest-prioritiser-14.1.0.jar
 install-exomiser-resources: $(EX_SRC_PROPERTIES)
 ifneq ('$(INSTALLDIR1)' , '$(INSTALLDIR2)')
-	install -D -p -m 0755 $(EX_SRC_PROPERTIES) $(DESTDIR)$(ETC_INSTALL_DIR)/AnnotSV
+	install -D -p -m 0755 $(EX_SRC_PROPERTIES) $(DESTDIR)$(ETC_INSTALL_DIR)/AnnotSV/
 endif
 
 	$(MKDIR) -p $(DESTDIR)$(JAR_INSTALL_DIR)
