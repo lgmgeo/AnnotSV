@@ -1,0 +1,21 @@
+name: ShellCheck
+
+on:
+  pull_request:
+    paths:
+      - '**/*.sh'
+      - '.github/workflows/shellcheck.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - '**/*.sh'
+      - '.github/workflows/shellcheck.yml'
+
+jobs:
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y shellcheck
+      - run: find . -type f -name "*.sh" -print0 | xargs -0 -r shellcheck
