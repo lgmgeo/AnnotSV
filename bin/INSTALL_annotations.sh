@@ -45,7 +45,7 @@
 ANNOTATIONSDIR="./AnnotSV_annotations"
 
 # MAKEFILE: used when HUMANVERSION and EXOMISERVERSION are not provided as arguments
-if [ -z "$1" && -z "$2" ]; then
+if [[ -z "$1" && -z "$2" ]]; then
 	# ANNOTSV: AnnotSV installation directory (must be defined: export ANNOTSV=/path/to/AnnotSV)
 	if [ -z "$ANNOTSV" ]; then
 	  echo "ERROR: ANNOTSV is not defined"
@@ -81,6 +81,7 @@ else
 	EXOMISERVERSION="$2"
 fi
 
+echo $EXOMISERVERSION
 
 mkdir $ANNOTATIONSDIR
 cd $ANNOTATIONSDIR
@@ -88,12 +89,12 @@ cd $ANNOTATIONSDIR
 # ----------------------------------------
 # Download AnnotSV human annotations files
 # ----------------------------------------
-echo ""
-echo "Download AnnotSV supporting data files:"
-echo ""
-curl -C - -LO "https://www.lbgi.fr/~geoffroy/Annotations/Annotations_Human_${HUMANVERSION}.tar.gz"
-tar -xf "Annotations_Human_${HUMANVERSION}.tar.gz" -C ./
-rm -f "Annotations_Human_${HUMANVERSION}.tar.gz"
+#echo ""
+#echo "Download AnnotSV supporting data files:"
+#echo ""
+#curl -C - -LO "https://www.lbgi.fr/~geoffroy/Annotations/Annotations_Human_${HUMANVERSION}.tar.gz"
+#tar -xf "Annotations_Human_${HUMANVERSION}.tar.gz" -C ./
+#rm -f "Annotations_Human_${HUMANVERSION}.tar.gz"
 
 # ---------------------------------------
 # Download Exomiser supporting data files
