@@ -7,7 +7,7 @@ on:
       - '.github/workflows/shellcheck.yml'
   push:
     branches:
-      - main
+      - master
     paths:
       - '**/*.sh'
       - '.github/workflows/shellcheck.yml'
