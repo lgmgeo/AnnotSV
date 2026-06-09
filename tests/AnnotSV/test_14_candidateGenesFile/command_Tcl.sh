@@ -38,7 +38,7 @@ nBadLines_With=`$cut "./output/test.with_tcl.annotated.tsv" "AnnotSV_ID;Gene_nam
 
 # Check the line filtering
 ##########################
-if [ $nLines_Without > $nLines_With ]
+if [[ $nLines_Without > $nLines_With ]]
 then
         echo "Ok"
 else
