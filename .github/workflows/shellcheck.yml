@@ -18,15 +18,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
       - name: Install ShellCheck
         run: sudo apt-get update && sudo apt-get install -y shellcheck
 
       - name: Show all ShellCheck findings
         run: |
-          git ls-files '*.sh' -z | xargs -0 -r shellcheck || true
+          find . -type f -name '*.sh' -not -path './.git/*' -print0 | xargs -0 -r shellcheck || true
 
       - name: Fail only on ShellCheck errors
         run: |
-          git ls-files '*.sh' -z | xargs -0 -r shellcheck --severity=error
+          find . -type f -name '*.sh' -not -path './.git/*' -print0 | xargs -0 -r shellcheck --severity=error
