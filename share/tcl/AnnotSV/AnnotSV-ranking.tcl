@@ -158,7 +158,7 @@ proc SVrankingLoss {L_annotations} {
         } else {
             if {$poPloss ne ""} {
                 # 2B. Partial overlap of a known pathogenic Loss SV (default +0.00)
-                set g_rankingExplanations($AnnotSV_ID,2B) "2B (cf po_P_loss_source, HI, OMIM_morbid, +$g_rankingCriteria(2B_Loss);"
+                set g_rankingExplanations($AnnotSV_ID,2B) "2B (cf po_P_loss_source, HI, OMIM_morbid, +$g_rankingCriteria(2B_Loss));"
             }
             if {$Bloss ne ""} {
                 # 2F. Completely contained within an established benign CNV region (default -1.00)

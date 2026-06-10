@@ -11,6 +11,9 @@
 For more details, please see the README file.
 
 
+June, , 2026 AnnotSV version 3.5.11
+	- Add missing closing parenthesis in 2B (loss) explanation (issue 341)
+
 May, 29, 2026 AnnotSV version 3.5.10
 	- Handle escaped double quotes in PhenoGenius annotation output to prevent AnnotSV parsing errors (issue 338)
 	- Refactor AnnotSV to fully decouple Exomiser and PhenoGenius modules
