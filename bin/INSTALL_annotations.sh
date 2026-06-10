@@ -82,8 +82,8 @@ else
 fi
 
 
-mkdir $ANNOTATIONSDIR
-cd $ANNOTATIONSDIR
+mkdir -p "$ANNOTATIONSDIR"
+cd "$ANNOTATIONSDIR" || exit 1
 
 # ----------------------------------------
 # Download AnnotSV human annotations files
@@ -102,6 +102,7 @@ echo ""
 echo "Download Exomiser supporting data files:"
 echo ""
 curl -C - -LO "https://data.monarchinitiative.org/exomiser/data/${EXOMISERVERSION}_phenotype.zip"
+mkdir -p "Annotations_Exomiser/${EXOMISERVERSION}/"
 unzip "${EXOMISERVERSION}_phenotype.zip" -d "Annotations_Exomiser/${EXOMISERVERSION}/"
 rm -f "${EXOMISERVERSION}_phenotype.zip"
 
@@ -110,5 +111,3 @@ chmod -R 777 ./Annotations_*
 
 
 echo "Installation completed. Annotation files have been generated in ${ANNOTATIONSDIR}."
-
-
