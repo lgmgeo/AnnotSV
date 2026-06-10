@@ -88,12 +88,12 @@ cd $ANNOTATIONSDIR
 # ----------------------------------------
 # Download AnnotSV human annotations files
 # ----------------------------------------
-#echo ""
-#echo "Download AnnotSV supporting data files:"
-#echo ""
-#curl -C - -LO "https://www.lbgi.fr/~geoffroy/Annotations/Annotations_Human_${HUMANVERSION}.tar.gz"
-#tar -xf "Annotations_Human_${HUMANVERSION}.tar.gz" -C ./
-#rm -f "Annotations_Human_${HUMANVERSION}.tar.gz"
+echo ""
+echo "Download AnnotSV supporting data files:"
+echo ""
+curl -C - -LO "https://www.lbgi.fr/~geoffroy/Annotations/Annotations_Human_${HUMANVERSION}.tar.gz"
+tar -xf "Annotations_Human_${HUMANVERSION}.tar.gz" -C ./
+rm -f "Annotations_Human_${HUMANVERSION}.tar.gz"
 
 # ---------------------------------------
 # Download Exomiser supporting data files
@@ -101,9 +101,9 @@ cd $ANNOTATIONSDIR
 echo ""
 echo "Download Exomiser supporting data files:"
 echo ""
-curl -C - -LO "https://data.monarchinitiative.org/exomiser/data/${EXOMISER_VERSION}_phenotype.zip"
-unzip "${EXOMISER_VERSION}_phenotype.zip" -d "Annotations_Exomiser/${EXOMISER_VERSION}/"
-rm -f "${EXOMISER_VERSION}_phenotype.zip"
+curl -C - -LO "https://data.monarchinitiative.org/exomiser/data/${EXOMISERVERSION}_phenotype.zip"
+unzip "${EXOMISERVERSION}_phenotype.zip" -d "Annotations_Exomiser/${EXOMISERVERSION}/"
+rm -f "${EXOMISERVERSION}_phenotype.zip"
 
 chmod -R 777 ./Annotations_*
 
