@@ -19,10 +19,10 @@
 # -----------------------------------------------------------------------------
 
 # Option 1:
-# INSTALL_annotations.sh <HUMANVERSION> <EXOMISERVERSION>
+# INSTALL_annotations.sh <HUMAN_VERSION> <EXOMISER_VERSION>
 #
-#   HUMANVERSION        Version of AnnotSV human annotations
-#   EXOMISERVERSION     Version of Exomiser phenotype annotations
+#   HUMAN_VERSION        Version of AnnotSV human annotations
+#   EXOMISER_VERSION     Version of Exomiser phenotype annotations
 #
 # Example:
 #   INSTALL_annotations.sh 3.5 2406
@@ -31,7 +31,7 @@
 # Option 2:
 # INSTALL_annotations.sh
 #
-#   In this mode, HUMANVERSION and EXOMISERVERSION are automatically
+#   In this mode, HUMAN_VERSION and EXOMISER_VERSION are automatically
 #   extracted from the AnnotSV Makefile.
 #
 # -----------------------------------------------------------------------------
@@ -44,7 +44,7 @@
 # ANNOTATIONSDIR: AnnotSV human annotations directory
 ANNOTATIONSDIR="./AnnotSV_annotations"
 
-# MAKEFILE: used when HUMANVERSION and EXOMISERVERSION are not provided as arguments
+# MAKEFILE: used when HUMAN_VERSION and EXOMISER_VERSION are not provided as arguments
 if [[ -z "$1" && -z "$2" ]]; then
 	# ANNOTSV: AnnotSV installation directory (must be defined: export ANNOTSV=/path/to/AnnotSV)
 	if [ -z "$ANNOTSV" ]; then
@@ -64,21 +64,21 @@ fi
 
 
 # -------------------------
-# Default HUMANVERSION
+# Default HUMAN_VERSION
 # -------------------------
 if [ -z "$1" ]; then
-    HUMANVERSION=$(awk -F'= *' '/^HUMANVERSION/ {print $2}' "$MAKEFILE")
+    HUMAN_VERSION=$(awk -F'= *' '/^HUMAN_VERSION/ {print $2}' "$MAKEFILE")
 else
-    HUMANVERSION="$1"
+    HUMAN_VERSION="$1"
 fi
 
 # -------------------------
-# Default EXOMISERVERSION
+# Default EXOMISER_VERSION
 # -------------------------
 if [ -z "$2" ]; then
-	EXOMISERVERSION=$(awk -F'= *' '/^EXOMISERVERSION/ {print $2}' "$MAKEFILE")
+	EXOMISER_VERSION=$(awk -F'= *' '/^EXOMISER_VERSION/ {print $2}' "$MAKEFILE")
 else
-	EXOMISERVERSION="$2"
+	EXOMISER_VERSION="$2"
 fi
 
 
@@ -91,9 +91,9 @@ cd "$ANNOTATIONSDIR" || exit 1
 echo ""
 echo "Download AnnotSV supporting data files:"
 echo ""
-curl -C - -LO "https://www.lbgi.fr/~geoffroy/Annotations/Annotations_Human_${HUMANVERSION}.tar.gz"
-tar -xf "Annotations_Human_${HUMANVERSION}.tar.gz" -C ./
-rm -f "Annotations_Human_${HUMANVERSION}.tar.gz"
+curl -C - -LO "https://www.lbgi.fr/~geoffroy/Annotations/Annotations_Human_${HUMAN_VERSION}.tar.gz"
+tar -xf "Annotations_Human_${HUMAN_VERSION}.tar.gz" -C ./
+rm -f "Annotations_Human_${HUMAN_VERSION}.tar.gz"
 
 # ---------------------------------------
 # Download Exomiser supporting data files
