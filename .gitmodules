@@ -1,0 +1,4 @@
+[submodule "share/python3/variantconvert"]
+	path = share/python3/variantconvert
+	url = https://github.com/SamuelNicaise/variantconvert.git
+

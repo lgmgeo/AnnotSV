@@ -45,7 +45,7 @@
 ANNOTATIONSDIR="./AnnotSV_annotations"
 
 # MAKEFILE: used when HUMANVERSION and EXOMISERVERSION are not provided as arguments
-if [ -z "$1" && -z "$2" ]; then
+if [[ -z "$1" && -z "$2" ]]; then
 	# ANNOTSV: AnnotSV installation directory (must be defined: export ANNOTSV=/path/to/AnnotSV)
 	if [ -z "$ANNOTSV" ]; then
 	  echo "ERROR: ANNOTSV is not defined"
@@ -82,8 +82,8 @@ else
 fi
 
 
-mkdir $ANNOTATIONSDIR
-cd $ANNOTATIONSDIR
+mkdir -p "$ANNOTATIONSDIR"
+cd "$ANNOTATIONSDIR" || exit 1
 
 # ----------------------------------------
 # Download AnnotSV human annotations files
@@ -101,14 +101,13 @@ rm -f "Annotations_Human_${HUMANVERSION}.tar.gz"
 echo ""
 echo "Download Exomiser supporting data files:"
 echo ""
-curl -C - -LO "https://data.monarchinitiative.org/exomiser/data/${EXOMISER_VERSION}_phenotype.zip"
-unzip "${EXOMISER_VERSION}_phenotype.zip" -d "Annotations_Exomiser/${EXOMISER_VERSION}/"
-rm -f "${EXOMISER_VERSION}_phenotype.zip"
+curl -C - -LO "https://data.monarchinitiative.org/exomiser/data/${EXOMISERVERSION}_phenotype.zip"
+mkdir -p "Annotations_Exomiser/${EXOMISERVERSION}/"
+unzip "${EXOMISERVERSION}_phenotype.zip" -d "Annotations_Exomiser/${EXOMISERVERSION}/"
+rm -f "${EXOMISERVERSION}_phenotype.zip"
 
 chmod -R 777 ./Annotations_*
 
 
 
 echo "Installation completed. Annotation files have been generated in ${ANNOTATIONSDIR}."
-
-

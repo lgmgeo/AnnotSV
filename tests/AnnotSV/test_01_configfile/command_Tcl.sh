@@ -44,7 +44,7 @@ then
 	exit 1
 fi
 
-if [[ $minAnn > 74 ]]
+if [[ $minAnn -gt 74 ]]
 then
         echo "error 1: too much annotation columns ($minAnn)"
         exit 1
