@@ -288,7 +288,7 @@ Annotations_%.tar.gz:
 	@echo ""
 	@echo "Download AnnotSV supporting data files:"
 	@echo ""
-	curl -C - -LO https://www.lbgi.fr/~geoffroy/Annotations/$@
+	curl -C - -LO https://cstb-icube.fr/~geoffroy/Annotations/$@
 
 %_phenotype.zip:
 	@echo ""

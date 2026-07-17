@@ -30,7 +30,7 @@
 
 Anyone interested in implementing new annotations/features in AnnotSV?
 
-Thanks to the [AnnotSV user community](https://lbgi.fr/AnnotSV/acknowledgments):
+Thanks to the [AnnotSV user community](https://bigest-icube.fr/AnnotSV/acknowledgments):
 
     - Bugs could be tackled efficiently
 
