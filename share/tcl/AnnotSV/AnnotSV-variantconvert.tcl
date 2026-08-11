@@ -137,7 +137,7 @@ proc checkVariantconvertConfigfile {} {
             }
         }
         if {$vcDone} {
-            WriteTextInFile "Done" $flagFile
+            ReplaceTextInFile "Successfully installed variantconvert" $flagFile
         }
         cd $currentDir
     }
@@ -150,6 +150,9 @@ proc runVariantconvert {outputFile} {
     global g_AnnotSV
     
     regsub "\.tsv$" $outputFile ".vcf" VCFoutputFile
+	if {[file tail $VCFoutputFile] eq [file tail $g_AnnotSV(SVinputFile)]} {
+		regsub ".vcf$" $VCFoutputFile ".annotated.vcf" VCFoutputFile
+	}
     
     catch {exec python3 $g_AnnotSV(variantconvertDir)/src/variantconvert --version} Message
     if {[regexp "variantconvert (\[0-9\]+\\.\[0-9\]+\\.\[0-9\]+)" $Message match version]} {
@@ -185,8 +188,8 @@ proc runVariantconvert {outputFile} {
         
     } else {
         
-        ## SVinputfile is a BED)
-        ########################
+        ## SVinputfile is a BED
+        #######################
         
         # configfile definition
         if {$g_AnnotSV(variantconvertMode) eq "combined"} {
