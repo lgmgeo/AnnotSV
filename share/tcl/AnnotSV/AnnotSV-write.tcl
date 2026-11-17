@@ -1473,7 +1473,13 @@ proc OrganizeAnnotation {} {
         }
         
         ####### Define $L_TextToWrite($AnnotSV_ID)
-        lappend L_TextToWrite($AnnotSV_ID) "$TextToWrite"
+        # With "-annotationMode full", the split lines were only needed for the ranking (done above): they are
+        # not written, so they are not kept until the output is written
+        if {$g_AnnotSV(annotationMode) eq "full" && $AnnotationMode eq "split"} {
+            if {![info exists L_TextToWrite($AnnotSV_ID)]} {set L_TextToWrite($AnnotSV_ID) {}}
+        } else {
+            lappend L_TextToWrite($AnnotSV_ID) "$TextToWrite"
+        }
     }
     close $f
     
