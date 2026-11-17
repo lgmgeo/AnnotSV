@@ -1062,6 +1062,47 @@ proc checkMPRAfiles {} {
 
 
 
+## Record the regulated genes of each line of a "bedtools intersect -wa -wb" between the SV and a regulatory elements file,
+## in g_genesReg($SVfromBED) and g_reDB($SVfromBED,$gene), each pair once.
+## Genes the report can never show (g_reGeneSkipped, and with selectOnRead the genes REselect1 drops) are not recorded,
+## so the memory used is bounded by the distinct reportable (SV, gene) pairs rather than by the intersect lines.
+proc recordRegulatedGenes {f selectOnRead} {
+    
+    global g_genesReg
+    global g_reDB
+    global g_clingenHI
+    global g_clingenTS
+    global g_reGeneSkipped
+    global g_reGeneReportable
+    global g_allRegulatedGenes
+    
+    while {[gets $f L] >= 0} {
+        set Ls [split $L "\t"]
+        # SVfromBED ("chrom\tstart\tend")
+        set SVfromBED "[join [lrange $Ls 0 2] "\t"]"
+        set db [lindex $Ls end-1]
+        foreach g [split [lindex $Ls end] ";"] {
+            set g_allRegulatedGenes($g) 1
+            if {[info exists g_reGeneSkipped($g)]} {continue}
+            if {$selectOnRead} {
+                if {![info exists g_reGeneReportable($g)]} {
+                    set g_reGeneReportable($g) [expr {([info exists g_clingenHI($g)] && $g_clingenHI($g) eq "3") \
+                                                   || ([info exists g_clingenTS($g)] && $g_clingenTS($g) eq "3") \
+                                                   || [isMorbid $g] || [isCandidate $g]}]
+                }
+                if {!$g_reGeneReportable($g)} {continue}
+            }
+            if {![info exists g_reDB($SVfromBED,$g)]} {
+                lappend g_genesReg($SVfromBED) $g ;# regulated genes
+                set g_reDB($SVfromBED,$g) [list $db]
+            } elseif {[lsearch -exact $g_reDB($SVfromBED,$g) $db] eq -1} {
+                lappend g_reDB($SVfromBED,$g) $db
+            }
+        }
+    }
+}
+
+
 ## Annotate the SV bedFile with the regulatory elements files
 ## Creation of the g_re global variable
 proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
@@ -1072,13 +1113,51 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
     global g_HI
     global g_TS
     global g_reDB
+    global g_clingenHI
+    global g_clingenTS
+    global g_reGeneSkipped
+    global g_allRegulatedGenes
+    
+    # HI/TS information from ClinGen, needed while reading the intersections to skip the genes REselect1 can never report
+    ###################################################################################################################
+    set clingenDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/ClinGen"
+    set ClinGenFileFormatted [lindex [glob -nocomplain "$clingenDir/*_ClinGenAnnotations.tsv*"] end]
+    if {$ClinGenFileFormatted ne ""} {
+        if {[regexp ".gz$" $ClinGenFileFormatted]} {
+            set f [open "| gzip -cd $ClinGenFileFormatted"]
+        } else {
+            set f [open "$ClinGenFileFormatted"]
+        }
+        while {! [eof $f]} {
+            set L [gets $f]
+            set Ls [split $L "\t"]
+            set gene [lindex $Ls 0]
+            set HI [lindex $Ls 1]; if {$HI ne "Not yet evaluated"} {set g_clingenHI($gene) "$HI"}
+            set TS [lindex $Ls 2]; if {$TS ne "Not yet evaluated"} {set g_clingenTS($gene) "$TS"}
+        }
+        close $f
+    }
+    
+    # Genes that are skipped as they are read, as the report below would drop them anyway:
+    #  - REselect2: genes overlapped by an SV
+    #  - REselect1: genes that are not OMIM morbid, ClinGen HI=3 / TS=3 or user candidate genes
+    #    (only without PhenoGenius / Exomiser, whose scores are not known until all the regulated genes are)
+    set selectOnRead [expr {$g_AnnotSV(REselect1) && !$g_AnnotSV(PhenoGeniusCli) && !$g_AnnotSV(Exomiser)}]
+    if {$g_AnnotSV(REselect2)} {
+        foreach g $L_allGenesOverlapped {
+            set g_reGeneSkipped($g) 1
+        }
+    }
     
     # Intersect of the input SV bedfile with the regulatory elements files
     ######################################################################
-    ## Sorted SV bed file: $g_AnnotSV(bedFile)
-    regsub "(.annotated)?.tsv$" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) ".SV_RE_intersect.tmp" SV_RE_intersectBEDfile
-    file delete -force $SV_RE_intersectBEDfile
-    
+    # Only the SV coordinates are needed (the SV key is "chrom\tstart\tend"), so the intersections are made with a
+    # de-duplicated 3 columns copy of the sorted SV bed file, and read through a pipe rather than a temporary file.
+    # The full intersections are written only when they are kept in a report (REreport).
+    #
+    # Definition of the g_genesReg($SVfromBED) variable (list all the regulated genes impacted by 1 SV)
+    # and of g_reDB($SVfromBED,$gene) (list of the regulatory element sources linking the SV to the gene)
+    ###################################################################################################
     set extannDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)"
     set regElementsDir "$extannDir/FtIncludedInSV/RegulatoryElements/$g_AnnotSV(genomeBuild)"
     set L_REfiles {}
@@ -1088,51 +1167,81 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
     lappend L_REfiles "$regElementsDir/miRTargetLink_${g_AnnotSV(tx)}_$g_AnnotSV(genomeBuild).sorted.bed"     ;#miRTargetLink
     lappend L_REfiles "$regElementsDir/ABC_${g_AnnotSV(tx)}_$g_AnnotSV(genomeBuild).sorted.bed"; #Activity-by-Contact (ABC) Model data
     lappend L_REfiles "$regElementsDir/MPRA_${g_AnnotSV(tx)}_$g_AnnotSV(genomeBuild).sorted.bed"; #Massive parallel reporter assays (MPRA) data (Kircher lab)
-    foreach reFile $L_REfiles {
-        if {![file exists $reFile]} {continue}
-        if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(bedFile) -b $reFile -wa -wb >> $SV_RE_intersectBEDfile} Message]} {
-            if {[catch {exec $g_AnnotSV(bedtools) intersect -a $g_AnnotSV(bedFile) -b $reFile -wa -wb >> $SV_RE_intersectBEDfile} Message]} {
-                puts "-- regulatoryElementsAnnotation --"
-                puts "$g_AnnotSV(bedtools) intersect -sorted -a $g_AnnotSV(bedFile) -b $reFile -wa -wb >> $SV_RE_intersectBEDfile"
-                puts "$Message"
-                puts "Exit with error"
-                exit 2
-            }
+    
+    regsub "(.annotated)?.tsv$" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) ".SV_RE_intersect.tmp" SV_RE_intersectBEDfile
+    regsub "(.annotated)?.tsv$" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) ".SV_RE_coordinates.tmp.bed" SVcoordinatesBEDfile
+    regsub "(.annotated)?.tsv$" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) ".SV_RE_intersect.stderr.tmp" SV_RE_stderrFile
+    file delete -force $SV_RE_intersectBEDfile
+    if {$g_AnnotSV(REreport)} {
+        set SVbedForIntersect $g_AnnotSV(bedFile)
+    } else {
+        # Same order as the sorted SV bed file (for "bedtools intersect -sorted")
+        set fIn [open $g_AnnotSV(bedFile)]
+        set fOut [open $SVcoordinatesBEDfile w]
+        while {[gets $fIn L] >= 0} {
+            set coord [join [lrange [split $L "\t"] 0 2] "\t"]
+            if {[info exists coordSeen($coord)]} {continue}
+            set coordSeen($coord) 1
+            puts $fOut $coord
         }
+        close $fIn
+        close $fOut
+        unset -nocomplain coordSeen
+        set SVbedForIntersect $SVcoordinatesBEDfile
     }
     
-    # Definition of the g_genesReg($SVfromBED) variable (list all the regulated genes impacted by 1 SV)
-    ###################################################################################################
-    set L_allRegulatedGenes {} ;# used for exomiser
-    if {![file exists $SV_RE_intersectBEDfile ] || [file size $SV_RE_intersectBEDfile] eq 0} {
-        # No intersection between SV and regulatory elements
-        ## Delete temporary file
-        file delete -force $SV_RE_intersectBEDfile
-    } else {
-        set f [open "$SV_RE_intersectBEDfile"]
-        while {! [eof $f]} {
-            set L [gets $f]
-            set Ls [split $L "\t"]
-            # SVfromBED ("chrom\tstart\tend")
-            set SVfromBED "[join [lrange $Ls 0 2] "\t"]"
-            set L_genesFromTheLine [split [lindex $Ls end] ";"]
-            lappend g_genesReg($SVfromBED) {*}$L_genesFromTheLine ;# regulated genes
-            lappend L_allRegulatedGenes {*}$L_genesFromTheLine
-            set db [lindex $Ls end-1]
-            foreach g $L_genesFromTheLine {
-                lappend g_reDB($SVfromBED,$g) $db
+    set Message ""
+    foreach reFile $L_REfiles {
+        if {![file exists $reFile]} {continue}
+        if {$g_AnnotSV(REreport)} {
+            if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $SVbedForIntersect -b $reFile -wa -wb >> $SV_RE_intersectBEDfile} Message]} {
+                if {[catch {exec $g_AnnotSV(bedtools) intersect -a $SVbedForIntersect -b $reFile -wa -wb >> $SV_RE_intersectBEDfile} Message]} {
+                    set intersectOk 0
+                } else {set intersectOk 1}
+            } else {set intersectOk 1}
+        } else {
+            # As with "exec", any output on stderr (or an error exit) is a failure, and the unsorted intersect is tried next.
+            # Intersections already read from a failed attempt are read again by the next one, which de-duplication absorbs.
+            set intersectOk 0
+            foreach sortedOption {{-sorted} {}} {
+                file delete -force $SV_RE_stderrFile
+                set f [open |[list $g_AnnotSV(bedtools) intersect {*}$sortedOption -a $SVbedForIntersect -b $reFile -wa -wb 2> $SV_RE_stderrFile]]
+                recordRegulatedGenes $f $selectOnRead
+                if {![catch {close $f} Message] && [file size $SV_RE_stderrFile] eq 0} {
+                    set intersectOk 1
+                    break
+                }
+            }
+            if {!$intersectOk} {
+                catch {set fErr [open $SV_RE_stderrFile]; append Message "\n[read $fErr]"; close $fErr}
             }
         }
+        if {!$intersectOk} {
+            puts "-- regulatoryElementsAnnotation --"
+            puts "$g_AnnotSV(bedtools) intersect -a $SVbedForIntersect -b $reFile -wa -wb"
+            puts "$Message"
+            puts "Exit with error"
+            exit 2
+        }
+    }
+    if {$g_AnnotSV(REreport) && [file exists $SV_RE_intersectBEDfile]} {
+        set f [open $SV_RE_intersectBEDfile]
+        recordRegulatedGenes $f $selectOnRead
         close $f
-        foreach SV [array names g_genesReg] {
-            set g_genesReg($SV) [lsort -unique $g_genesReg($SV)]
-        }
-        foreach key [array names g_reDB] {
-            set g_reDB($key) [lsort -unique $g_reDB($key)]
-        }
-        
-        ## Delete temporary file
-        if {$g_AnnotSV(REreport)} {
+    }
+    file delete -force $SVcoordinatesBEDfile $SV_RE_stderrFile
+    set L_allRegulatedGenes [array names g_allRegulatedGenes] ;# used for exomiser
+    unset -nocomplain g_allRegulatedGenes
+    foreach SV [array names g_genesReg] {
+        set g_genesReg($SV) [lsort -unique $g_genesReg($SV)]
+    }
+    foreach key [array names g_reDB] {
+        set g_reDB($key) [lsort -unique $g_reDB($key)]
+    }
+    
+    ## Delete temporary file
+    if {[file exists $SV_RE_intersectBEDfile]} {
+        if {$g_AnnotSV(REreport) && [file size $SV_RE_intersectBEDfile] ne 0} {
             regsub "(.annotated)?.tsv$" $g_AnnotSV(outputDir)/$g_AnnotSV(outputFile) ".SV_RE_intersect.report" permanentSV_RE_intersectBEDfile
             file delete -force $permanentSV_RE_intersectBEDfile
             file rename $SV_RE_intersectBEDfile $permanentSV_RE_intersectBEDfile
@@ -1173,26 +1282,9 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
     ## HI/TS information for these regulated genes
     ## -> definition of g_HI($gene) and g_TS($gene)
     ###############################################
-    set clingenDir "$g_AnnotSV(annotationsDir)/Annotations_$g_AnnotSV(organism)/Gene-based/ClinGen"
-    set ClinGenFileFormatted [lindex [glob -nocomplain "$clingenDir/*_ClinGenAnnotations.tsv*"] end]
     foreach g $L_allRegulatedGenes {
-        set t($g) 1
-    }
-    if {$ClinGenFileFormatted ne ""} {
-        if {[regexp ".gz$" $ClinGenFileFormatted]} {
-            set f [open "| gzip -cd $ClinGenFileFormatted"]
-        } else {
-            set f [open "$ClinGenFileFormatted"]
-        }
-        while {! [eof $f]} {
-            set L [gets $f]
-            set Ls [split $L "\t"]
-            set gene [lindex $Ls 0]
-            if {[info exists t($gene)]} {
-                set HI [lindex $Ls 1]; if {$HI ne "Not yet evaluated"} {set g_HI($gene) "$HI"}
-                set TS [lindex $Ls 2]; if {$TS ne "Not yet evaluated"} {set g_TS($gene) "$TS"}
-            }
-        }
+        if {[info exists g_clingenHI($g)]} {set g_HI($g) $g_clingenHI($g)}
+        if {[info exists g_clingenTS($g)]} {set g_TS($g) $g_clingenTS($g)}
     }
     
     ## Resume RE information for each SV
