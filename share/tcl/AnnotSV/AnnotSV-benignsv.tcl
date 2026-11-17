@@ -1763,10 +1763,13 @@ proc poBenignSVannotation {SVchrom SVstart SVend L_GenesSVtoAnnotate} {
             foreach coordSource $benignCoordSource($SVtoAnn,$svtype) {
                 lassign $coordSource benign_coord benign_source
                 # benign_coord: 16:47182577-47188882
-                if {[info exists L_genes($benign_coord)]} {
+                # allG: the benign SV contains every gene of the SV (matched exactly, as a regexp would match
+                # NECTIN3 to NECTIN3-AS1). An SV with no genes is never allG.
+                if {[info exists L_genes($benign_coord)] && $L_GenesSVtoAnnotate ne ""} {
                     set allG 1
+                    set L_benignGenes [split [join $L_genes($benign_coord) ";"] ";"]
                     foreach gN [split $L_GenesSVtoAnnotate ";"] {
-                        if {![regexp $gN [split $L_genes($benign_coord) ";"]]} {
+                        if {[lsearch -exact $L_benignGenes $gN] eq -1} {
                             set allG 0
                             break
                         }
