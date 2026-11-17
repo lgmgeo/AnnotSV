@@ -1760,7 +1760,8 @@ proc poBenignSVannotation {SVchrom SVstart SVend L_GenesSVtoAnnotate} {
         if {[lsearch -regexp "$g_AnnotSV(outputColHeader)" "^po_B_[string tolower ${svtype}]_"] eq -1} { continue }
         
         if {[info exists benignCoordSource($SVtoAnn,$svtype)]} {
-            foreach {benign_coord benign_source} $benignCoordSource($SVtoAnn,$svtype) {
+            foreach coordSource $benignCoordSource($SVtoAnn,$svtype) {
+                lassign $coordSource benign_coord benign_source
                 # benign_coord: 16:47182577-47188882
                 if {[info exists L_genes($benign_coord)]} {
                     set allG 1
