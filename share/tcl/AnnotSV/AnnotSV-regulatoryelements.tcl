@@ -1062,6 +1062,30 @@ proc checkMPRAfiles {} {
 
 
 
+## Called when "bedtools intersect -sorted" failed on a regulatory elements file.
+## Some "*.sorted.bed" files of the Annotations_Human 3.5 bundle are not sorted (lgmgeo/AnnotSV#356), and the unsorted
+## intersect loads the whole file into memory (about 1.4 GB for ABC_RefSeq_GRCh38). An unsorted file is sorted in place
+## (as the promoter and EnhancerAtlas files are built) when it can be written.
+## Returns 1 if the file is now sorted (the "-sorted" intersect can be tried again), 0 (with a warning) otherwise.
+proc sortRegulatoryElementsFile {reFile} {
+    if {![catch {exec env LC_ALL=C sort -c -s -k1,1 -k2,2n $reFile}]} {
+        puts "\t...WARNING: \"bedtools intersect -sorted\" failed with $reFile, the whole file is loaded into memory"
+        return 0
+    }
+    if {[file writable $reFile] && [file writable [file dirname $reFile]]} {
+        puts "\t...sorting $reFile (not sorted by chromosome and start)"
+        set tmpFile "$reFile.[pid].tmp"
+        if {![catch {exec env LC_ALL=C sort -k1,1 -k2,2n $reFile > $tmpFile}]} {
+            file rename -force $tmpFile $reFile
+            return 1
+        }
+        file delete -force $tmpFile
+    }
+    puts "\t...WARNING: $reFile is not sorted (\"LC_ALL=C sort -k1,1 -k2,2n\") and could not be sorted, the whole file is loaded into memory"
+    return 0
+}
+
+
 ## Record the regulated genes of each line of a "bedtools intersect -wa -wb" between the SV and a regulatory elements file,
 ## in g_genesReg($SVfromBED) and g_reDB($SVfromBED,$gene), each pair once.
 ## Genes the report can never show (g_reGeneSkipped, and with selectOnRead the genes REselect1 drops) are not recorded,
@@ -1193,17 +1217,29 @@ proc regulatoryElementsAnnotation {L_allGenesOverlapped} {
     set Message ""
     foreach reFile $L_REfiles {
         if {![file exists $reFile]} {continue}
+        # When the "-sorted" intersect fails, it is tried again once the file is sorted, else the unsorted intersect is used.
         if {$g_AnnotSV(REreport)} {
-            if {[catch {exec $g_AnnotSV(bedtools) intersect -sorted -a $SVbedForIntersect -b $reFile -wa -wb >> $SV_RE_intersectBEDfile} Message]} {
-                if {[catch {exec $g_AnnotSV(bedtools) intersect -a $SVbedForIntersect -b $reFile -wa -wb >> $SV_RE_intersectBEDfile} Message]} {
-                    set intersectOk 0
-                } else {set intersectOk 1}
-            } else {set intersectOk 1}
+            # The lines a failed attempt wrote before the error are removed, so the report has each intersection once.
+            set reportSize [expr {[file exists $SV_RE_intersectBEDfile] ? [file size $SV_RE_intersectBEDfile] : 0}]
+            set intersectOk 0
+            foreach sortedOption {{-sorted} {}} {
+                if {$sortedOption eq "" && [sortRegulatoryElementsFile $reFile]} {set sortedOption "-sorted"}
+                if {![catch {exec $g_AnnotSV(bedtools) intersect {*}$sortedOption -a $SVbedForIntersect -b $reFile -wa -wb >> $SV_RE_intersectBEDfile} Message]} {
+                    set intersectOk 1
+                    break
+                }
+                if {[file exists $SV_RE_intersectBEDfile]} {
+                    set fReport [open $SV_RE_intersectBEDfile r+]
+                    chan truncate $fReport $reportSize
+                    close $fReport
+                }
+            }
         } else {
-            # As with "exec", any output on stderr (or an error exit) is a failure, and the unsorted intersect is tried next.
+            # As with "exec", any output on stderr (or an error exit) is a failure, and the next intersect is tried.
             # Intersections already read from a failed attempt are read again by the next one, which de-duplication absorbs.
             set intersectOk 0
             foreach sortedOption {{-sorted} {}} {
+                if {$sortedOption eq "" && [sortRegulatoryElementsFile $reFile]} {set sortedOption "-sorted"}
                 file delete -force $SV_RE_stderrFile
                 set f [open |[list $g_AnnotSV(bedtools) intersect {*}$sortedOption -a $SVbedForIntersect -b $reFile -wa -wb 2> $SV_RE_stderrFile]]
                 recordRegulatedGenes $f $selectOnRead
